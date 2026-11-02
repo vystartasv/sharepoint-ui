@@ -116,7 +116,7 @@ export { defineRatingDisplay, defineRatingItem } from "./elements/rating-display
 export { defineList, defineListItem, type ListItemValue, type ListNavigationMode, type ListSelectionMode } from "./elements/list.js";
 export { defineBreadcrumb, defineBreadcrumbButton, defineBreadcrumbDivider, defineBreadcrumbItem } from "./elements/breadcrumb.js";
 export { defineTabs } from "./elements/tabs.js";
-export { defineTooltip, type TooltipAppearance, type TooltipPosition, type TooltipPositioning, type TooltipRelationship, type TooltipVisibleChangeData } from "./elements/tooltip.js";
+export { defineTooltip, type TooltipAppearance, type TooltipPosition, type TooltipPositioning, type TooltipPositioningBoundary, type TooltipPositioningEndData, type TooltipPositioningImperativeRef, type TooltipPositioningOffset, type TooltipPositioningOffsetParams, type TooltipPositioningOptions, type TooltipPositioningPlacement, type TooltipPositioningRect, type TooltipPositioningRef, type TooltipPositioningShorthand, type TooltipPositioningTarget, type TooltipPositioningTargetRect, type TooltipRelationship, type TooltipVisibleChangeData } from "./elements/tooltip.js";
 export { definePopover, definePopoverSurface, definePopoverTrigger } from "./elements/popover.js";
 export { defineTeachingPopover } from "./elements/teaching-popover.js";
 export type { SharePointTeachingPopoverCarouselElement, TeachingPopoverAnnouncementFunction, TeachingPopoverAnnouncementDetail, TeachingPopoverFinishDetail } from "./elements/teaching-popover.js";

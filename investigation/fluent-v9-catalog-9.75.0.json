@@ -687,7 +687,7 @@
       ],
       "localStatus": "partial",
       "purpose": "Show a brief explanation on hover or keyboard focus.",
-      "coverageNote": "Tooltip now supports label/description/inaccessible ARIA relationships, distinct show/hide delays, normal/inverted theme appearances, arrows, aligned positioning, controlled visibility events, focus and hover interaction, Escape dismissal, and top-layer collision handling. Remaining parity includes the complete Fluent positioning/portal contract, pointer and assistive-technology edge cases, full theme/contrast review, and tenant/performance comparison."
+      "coverageNote": "Tooltip supports label/description/inaccessible ARIA relationships, distinct show/hide delays, normal/inverted theme appearances, arrows, controlled visibility, and the Fluent PositioningShorthand contract including fallbacks, boundaries, sizing, virtual targets, offsets, transforms, positioning refs, and completion events. Focus/hover, Escape, top-layer clipping escape, and custom placement are verified in Chromium. Remaining: exact cross-browser positioning semantics, assistive-technology output, full theme/contrast review, and tenant/performance comparison."
     },
     {
       "family": "tree",

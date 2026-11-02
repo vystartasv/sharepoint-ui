@@ -56,6 +56,7 @@ export type { ListItemActionData, ListItemActionEvent, ListSelectionChangeData }
 import { defineBreadcrumb, defineBreadcrumbButton, defineBreadcrumbDivider, defineBreadcrumbItem } from "./elements/breadcrumb.js";
 import { defineTabs } from "./elements/tabs.js";
 import { defineTooltip, type TooltipAppearance, type TooltipPositioning, type TooltipRelationship, type TooltipVisibleChangeData } from "./elements/tooltip.js";
+export type { TooltipPositioning, TooltipPositioningBoundary, TooltipPositioningEndData, TooltipPositioningImperativeRef, TooltipPositioningOffset, TooltipPositioningOffsetParams, TooltipPositioningOptions, TooltipPositioningPlacement, TooltipPositioningRect, TooltipPositioningRef, TooltipPositioningShorthand, TooltipPositioningTarget, TooltipPositioningTargetRect } from "./elements/tooltip.js";
 import { definePopover, type PopoverOpenChangeData, type PopoverPositioning } from "./elements/popover.js";
 export type { PopoverAlignment, PopoverAutoSize, PopoverBoundary, PopoverBoundaryPadding, PopoverBoundaryRect, PopoverOffset, PopoverOpenChangeData, PopoverPosition, PopoverPositioning, PopoverTarget } from "./elements/popover.js";
 import { defineTeachingPopover as defineNativeTeachingPopover, type TeachingPopoverCarouselValueChangeType } from "./elements/teaching-popover.js";
@@ -2208,11 +2209,12 @@ export const Tooltip = React.forwardRef<HTMLElement, ElementProps & { children?:
     if (controlledVisible !== undefined && nextVisible !== controlledVisible) requestAnimationFrame(() => { const requested = controlledVisibleRef.current; const element = ref.current as (HTMLElement & { open?: boolean }) | null; if (requested !== undefined && element && element.open !== requested) element.open = requested; });
   });
   React.useLayoutEffect(() => { const element = ref.current as (HTMLElement & { open?: boolean }) | null; if (element && controlledVisible !== undefined) element.open = controlledVisible; }, [controlledVisible]);
+  React.useLayoutEffect(() => { const element = ref.current as (HTMLElement & { positioning?: TooltipPositioning }) | null; if (element) element.positioning = positioning; }, [positioning]);
   const resolvedPositioning = typeof positioning === "string" ? positioning : positioning?.position;
   const resolvedAlign = typeof positioning === "object" ? positioning.align : align;
   const resolvedOffset = typeof positioning === "object" ? positioning.offset : offset;
   const resolvedPlacement = resolvedPositioning ?? placement;
-  return React.createElement("spui-tooltip", useCustomElementProps({ ...props, ref, placement: resolvedPlacement, positioning: undefined, align: resolvedAlign, offset: resolvedOffset, appearance, relationship, disabled: disabled || undefined, open: controlledVisible, "show-delay": showDelay ?? delay, "hide-delay": hideDelay, "with-arrow": withArrow || undefined }), children,
+  return React.createElement("spui-tooltip", useCustomElementProps({ ...props, ref, placement: resolvedPlacement, positioning: undefined, align: resolvedAlign, offset: typeof resolvedOffset === "number" ? resolvedOffset : undefined, appearance, relationship, disabled: disabled || undefined, open: controlledVisible, "show-delay": showDelay ?? delay, "hide-delay": hideDelay, "with-arrow": withArrow || undefined }), children,
     content === undefined ? null : React.createElement("span", { slot: "tooltip" }, content));
 });
 

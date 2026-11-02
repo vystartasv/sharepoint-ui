@@ -3994,7 +3994,7 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Provide delayed hover/focus help with label, description, or inaccessible relationships; supports theme appearances, controlled visibility, arrows, and aligned collision-aware positioning."
+      "summary": "Provide delayed hover/focus help with label, description, or inaccessible relationships; supports theme appearances, controlled visibility, arrows, and Fluent-compatible fallback, boundary, sizing, target, offset, and positioning-ref options."
     },
     {
       "react": "Popover",

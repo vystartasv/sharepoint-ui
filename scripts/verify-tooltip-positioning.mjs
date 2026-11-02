@@ -30,9 +30,9 @@ try {
   const topTip = await tooltipFor("top-tip").boundingBox();
   assert.ok(topTip.y >= topTarget.y + topTarget.height, "top placement flips below when the viewport edge has no room");
   assert.ok(topTip.x >= 8 && topTip.x + topTip.width <= 382, "flipped tooltip stays within horizontal viewport margins");
-  const originalLeft = Number.parseFloat(await tooltipFor("top-tip").evaluate(element => element.style.left));
+  const originalLeft = (await tooltipFor("top-tip").boundingBox()).x;
   await page.locator("#top-trigger").evaluate(element => { element.style.width = "100px"; });
-  await page.waitForFunction(original => Number.parseFloat(document.querySelector("#top-tip [role=tooltip]").style.left) > original + 10, originalLeft);
+  await page.waitForFunction(original => document.querySelector("#top-tip [role=tooltip]").getBoundingClientRect().left > original + 10, originalLeft);
   const movedTarget = await page.locator("#top-trigger").boundingBox();
   const movedTip = await tooltipFor("top-tip").boundingBox();
   assert.ok(Math.abs(movedTip.x + movedTip.width / 2 - (movedTarget.x + movedTarget.width / 2)) <= 1, "ResizeObserver recenters after the trigger resizes");
@@ -78,6 +78,67 @@ try {
   await tooltipFor("second").waitFor({ state: "visible" });
   await page.locator("#second").evaluate(element => { Object.defineProperty(element.ownerDocument, "visibilityState", { configurable: true, value: "hidden" }); element.ownerDocument.dispatchEvent(new Event("visibilitychange")); });
   await tooltipFor("second").waitFor({ state: "hidden" });
+
+  const positioningContract = await page.evaluate(async () => {
+    const boundary = document.createElement("div");
+    Object.assign(boundary.style, { position: "fixed", left: "20px", top: "0px", width: "180px", height: "160px", pointerEvents: "none" });
+    document.body.append(boundary);
+    const host = document.createElement("spui-tooltip");
+    host.id = "positioning-contract";
+    host.setAttribute("content", "A deliberately long tooltip that can wrap into multiple lines when its width is constrained by the target.");
+    host.setAttribute("with-arrow", "");
+    const trigger = document.createElement("button");
+    trigger.textContent = "Anchor";
+    host.append(trigger);
+    const ref = { current: null };
+    let callbackData;
+    let callbackCount = 0;
+    host.positioning = {
+      position: "above",
+      fallbackPositions: ["below-end"],
+      flipBoundary: boundary,
+      overflowBoundary: boundary,
+      overflowBoundaryPadding: 8,
+      autoSize: "height",
+      matchTargetSize: "width",
+      offset: ({ targetRect }) => ({ mainAxis: 12, crossAxis: targetRect.width > 0 ? 2 : 0 }),
+      arrowPadding: 12,
+      target: { getBoundingClientRect: () => ({ x: 100, y: 5, top: 5, left: 100, right: 150, bottom: 25, width: 50, height: 20 }), contextElement: trigger },
+      positioningRef: ref,
+      onPositioningEnd: event => { callbackData = event.detail; callbackCount++; },
+    };
+    document.body.append(host);
+    host.open = true;
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const surface = host.querySelector("[role=tooltip]");
+    const result = {
+      refAvailable: Boolean(ref.current?.updatePosition && ref.current?.setTarget),
+      placement: surface.dataset.placement,
+      bounds: surface.getBoundingClientRect().toJSON(),
+      width: surface.getBoundingClientRect().width,
+      maxHeight: surface.style.maxHeight,
+      strategy: surface.style.position,
+      transform: surface.style.transform,
+      detail: callbackData,
+      callbackCount,
+    };
+    ref.current.setTarget({ getBoundingClientRect: () => ({ x: 120, y: 110, top: 110, left: 120, right: 160, bottom: 130, width: 40, height: 20 }), contextElement: trigger });
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    result.retargeted = { left: surface.getBoundingClientRect().left, placement: surface.dataset.placement };
+    host.remove();
+    boundary.remove();
+    return result;
+  });
+  assert.equal(positioningContract.refAvailable, true, "positioningRef exposes update and target controls");
+  assert.equal(positioningContract.placement, "bottom", "custom fallback replaces a blocked above placement");
+  assert.equal(positioningContract.width, 50, "matchTargetSize applies the virtual target width");
+  assert.equal(positioningContract.maxHeight, "115px", "autoSize height respects overflow boundary padding");
+  assert.equal(positioningContract.strategy, "absolute", "absolute is the Fluent positioning strategy default");
+  assert.ok(positioningContract.transform.includes("translate3d"), "useTransform defaults to GPU-friendly transform positioning");
+  assert.equal(positioningContract.detail.placement, "bottom-end");
+  assert.equal(positioningContract.detail.escaped, false);
+  assert.ok(positioningContract.callbackCount >= 1, "onPositioningEnd receives completed placement updates");
+  assert.ok(Math.abs(positioningContract.retargeted.left - 122) <= 1 && positioningContract.retargeted.placement === "top", `positioningRef.setTarget updates a virtual anchor and preserves custom offset: ${JSON.stringify(positioningContract.retargeted)}`);
   assert.deepEqual(errors, []);
 
   const touchContext = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
@@ -88,5 +149,5 @@ try {
   assert.equal(await touchPage.locator("#touch [role=tooltip]").isVisible(), false, "touch pointer entry does not open hover-only content");
   await touchContext.close();
 
-  console.log(JSON.stringify({ status: "passed", viewport: "390x844", topAndBottomCollision: true, ltrAndRtlLogicalSideCollision: true, transformedContainerClippingEscaped: true, topLayer: true, resizeRepositioning: true, oneVisibleTooltip: true, escapeDismissal: true, hiddenDocumentDismissal: true, touchDoesNotTriggerHover: true, pageErrors: errors.length }));
+  console.log(JSON.stringify({ status: "passed", viewport: "390x844", topAndBottomCollision: true, ltrAndRtlLogicalSideCollision: true, transformedContainerClippingEscaped: true, topLayer: true, resizeRepositioning: true, customFallbackAndBoundary: true, autoSizeAndTargetWidth: true, offsetCallback: true, positioningEndEvent: true, positioningRefRetarget: true, oneVisibleTooltip: true, escapeDismissal: true, hiddenDocumentDismissal: true, touchDoesNotTriggerHover: true, pageErrors: errors.length }));
 } finally { await browser?.close(); server.close(); }

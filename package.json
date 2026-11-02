@@ -58,7 +58,7 @@
     "verify:card-selection": "npm run build:library && node scripts/verify-card-selection.mjs",
     "verify:card-primitives": "npm run build:library && node scripts/verify-card-primitives.mjs",
     "verify:button-group": "npm run build:library && node scripts/verify-button-group.mjs",
-    "verify:tooltip-positioning": "npm run build:library && node scripts/verify-tooltip-positioning.mjs",
+    "verify:tooltip-positioning": "npm run build:library && node scripts/verify-tooltip-positioning-contract.mjs && node scripts/verify-tooltip-positioning.mjs",
     "verify:tooltip-parity": "npm run build:library && node scripts/verify-tooltip-parity.mjs",
     "verify:checkbox-parity": "npm run build:library && node scripts/verify-checkbox-parity.mjs",
     "verify:disabled-focusable": "npm run build:library && node scripts/verify-disabled-focusable.mjs",

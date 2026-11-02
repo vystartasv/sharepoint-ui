@@ -1,9 +1,10 @@
 export type FloatingPlacement = "top" | "bottom" | "start" | "end" | "left" | "right";
-export type FloatingPosition = { top: number; left: number; placement: Exclude<FloatingPlacement, "start" | "end"> };
+export type FloatingPosition = { top: number; left: number; placement: Exclude<FloatingPlacement, "start" | "end">; align: FloatingAlign };
 export type FloatingAlign = "start" | "center" | "end" | "top" | "bottom";
 export type FloatingModifiers = { crossAxisOffset?: number; coverTarget?: boolean; overflowBoundaryPadding?: { top?: number; right?: number; bottom?: number; left?: number } };
+export type FloatingAnchorRect = Pick<DOMRectReadOnly, "left" | "top" | "right" | "bottom" | "width" | "height">;
 
-export function getFloatingPosition(anchor: DOMRectReadOnly, surface: Pick<DOMRectReadOnly, "width" | "height">, placement: FloatingPlacement, direction: "ltr" | "rtl", gap = 8, viewport = { width: innerWidth, height: innerHeight }, align: FloatingAlign = "center", fallbackPlacements: Array<{ placement: FloatingPlacement; align?: FloatingAlign }> = [], pinned = false, flipBoundary?: Pick<DOMRectReadOnly, "left" | "top" | "right" | "bottom">, overflowBoundary?: Pick<DOMRectReadOnly, "left" | "top" | "right" | "bottom">, modifiers: FloatingModifiers = {}): FloatingPosition {
+export function getFloatingPosition(anchor: FloatingAnchorRect, surface: Pick<DOMRectReadOnly, "width" | "height">, placement: FloatingPlacement, direction: "ltr" | "rtl", gap = 8, viewport = { width: innerWidth, height: innerHeight }, align: FloatingAlign = "center", fallbackPlacements: Array<{ placement: FloatingPlacement; align?: FloatingAlign }> = [], pinned = false, flipBoundary?: Pick<DOMRectReadOnly, "left" | "top" | "right" | "bottom">, overflowBoundary?: Pick<DOMRectReadOnly, "left" | "top" | "right" | "bottom">, modifiers: FloatingModifiers = {}): FloatingPosition {
   const viewportBoundary = { left: 0, top: 0, right: viewport.width, bottom: viewport.height };
   const flipBounds = flipBoundary ?? viewportBoundary;
   const overflowBounds = overflowBoundary ?? viewportBoundary;
@@ -37,6 +38,7 @@ export function getFloatingPosition(anchor: DOMRectReadOnly, surface: Pick<DOMRe
   const point = selected.point;
   return {
     placement: actual,
+    align: selected.align,
     left: Math.max(overflowBounds.left + gap + (overflowPadding.left ?? 0), Math.min(point.left, overflowBounds.right - surface.width - gap - (overflowPadding.right ?? 0))),
     top: Math.max(overflowBounds.top + gap + (overflowPadding.top ?? 0), Math.min(point.top, overflowBounds.bottom - surface.height - gap - (overflowPadding.bottom ?? 0))),
   };
