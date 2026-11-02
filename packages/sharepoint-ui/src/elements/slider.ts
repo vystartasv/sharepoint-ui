@@ -62,14 +62,20 @@ export function defineSlider(): void {
       if (input) { input.value = this.currentValue; this.syncFormValue(input); this.syncVisual(input); }
     }
 
-    get defaultValue(): number { return Number(this.currentDefaultValue ?? this.getAttribute("default-value") ?? 0); }
+    get defaultValue(): number {
+      const value = this.currentDefaultValue ?? this.getAttribute("default-value");
+      if (value !== null && value !== undefined) return Number(value);
+      const input = this.getInput();
+      const fallback = this.shadowRoot?.querySelector<HTMLInputElement>(".input-fallback");
+      return Number(input && input !== fallback ? this.slotInputDefaults?.defaultValue ?? input.defaultValue : 0);
+    }
     set defaultValue(value: number) {
       this.currentDefaultValue = String(value);
       this.setAttribute("default-value", this.currentDefaultValue);
     }
 
     formDisabledCallback(disabled: boolean): void { this.formDisabled = disabled; this.syncSlots(); }
-    formResetCallback(): void { const input = this.getInput(); if (input) { input.value = this.getAttribute("value") ?? this.getAttribute("default-value") ?? "0"; this.currentValue = input.value; this.syncFormValue(input); this.syncVisual(input); } }
+    formResetCallback(): void { const input = this.getInput(); if (input) { input.value = this.getAttribute("value") ?? String(this.defaultValue); this.currentValue = input.value; this.syncFormValue(input); this.syncVisual(input); } }
     formStateRestoreCallback(state: string | File | FormData | null): void { if (typeof state === "string") this.value = Number(state); }
 
     private syncFormValue(input: HTMLInputElement): void { this.internals?.setFormValue(input.value); }

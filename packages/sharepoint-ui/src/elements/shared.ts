@@ -8,6 +8,7 @@ export type NativeFormControlDefaults = {
   readOnly: boolean;
   multiple: boolean;
   value: string;
+  defaultValue: string;
   checked: boolean;
   defaultChecked: boolean;
 };
@@ -21,6 +22,7 @@ export function rememberNativeFormControlDefaults(current: NativeFormControlDefa
     readOnly: "readOnly" in control && control.readOnly,
     multiple: "multiple" in control && control.multiple,
     value: control.value,
+    defaultValue: "defaultValue" in control ? control.defaultValue : control.value,
     checked: "checked" in control && control.checked,
     defaultChecked: "defaultChecked" in control && control.defaultChecked,
   };

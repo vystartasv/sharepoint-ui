@@ -1,4 +1,4 @@
-import { base } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, type NativeFormControlDefaults } from "./shared.js";
 
 export type InputSize = "small" | "medium" | "large";
 export type InputAppearance = "outline" | "underline" | "filled-darker" | "filled-lighter" | "filled-darker-shadow" | "filled-lighter-shadow";
@@ -16,7 +16,7 @@ export function defineInput(): void {
     private formDisabled = false;
     private customError = "";
     private boundInput?: HTMLInputElement;
-    private slotInputDefaults?: { input: HTMLInputElement; disabled: boolean; required: boolean; readOnly: boolean };
+    private slotInputDefaults?: NativeFormControlDefaults;
 
     private handleInput = (event: Event): void => {
       const input = this.input();
@@ -75,8 +75,8 @@ export function defineInput(): void {
       if (name === "value") { if (!this.dirty && input.type !== "file") { this.currentValue = value ?? ""; input.value = this.currentValue; this.syncForm(input); } return; }
       if (name === "size" || name === "appearance") this.shadowRoot.querySelector<HTMLElement>(".control")!.dataset[name] = value || (name === "size" ? "medium" : "outline");
       else if (name === "type") { try { input.type = value || "text"; } catch { input.type = "text"; } }
-      else if (name === "checked") input.checked = value !== null;
-      else if (name === "default-checked") { input.defaultChecked = value !== null; if (!this.dirty) input.checked = value !== null; }
+      else if (name === "checked") input.checked = value !== null || (!this.dirty && Boolean(this.slotInputDefaults?.checked));
+      else if (name === "default-checked") { input.defaultChecked = value !== null || Boolean(this.slotInputDefaults?.defaultChecked); if (!this.dirty) input.checked = value !== null || Boolean(this.slotInputDefaults?.checked); }
       else if (["placeholder", "autocomplete", "inputmode", "min", "max", "step", "minlength", "maxlength", "pattern", "multiple"].includes(name)) {
         const target = name === "read-only" ? "readonly" : name;
         if (value === null) input.removeAttribute(target); else input.setAttribute(target, value);
@@ -107,9 +107,7 @@ export function defineInput(): void {
       if (!input) return;
       const fallback = this.shadowRoot?.querySelector<HTMLInputElement>(".input-fallback");
       if (fallback) fallback.hidden = input !== fallback;
-      if (input !== fallback && this.slotInputDefaults?.input !== input) {
-        this.slotInputDefaults = { input, disabled: input.disabled, required: input.required, readOnly: input.readOnly };
-      }
+      if (input !== fallback) this.slotInputDefaults = rememberNativeFormControlDefaults(this.slotInputDefaults, input);
       if (this.boundInput !== input) {
         this.boundInput?.removeEventListener("input", this.handleInput);
         this.boundInput?.removeEventListener("change", this.handleChange);
@@ -127,9 +125,9 @@ export function defineInput(): void {
       input.disabled = this.disabled || this.formDisabled || Boolean(defaults?.disabled);
       input.required = this.required || Boolean(defaults?.required);
       input.readOnly = this.readOnly || Boolean(defaults?.readOnly);
-      input.defaultChecked = this.hasAttribute("default-checked");
+      if (this.hasAttribute("default-checked")) input.defaultChecked = true;
       if (this.hasAttribute("checked")) input.checked = true;
-      if (!this.dirty && input.type !== "file" && (this.hasAttribute("value") || this.defaultValue)) input.value = this.currentValue || this.defaultValue;
+      if (!this.dirty && input.type !== "file" && this.hasAttribute("value")) input.value = this.currentValue || this.defaultValue;
       this.syncForm(input);
     }
 

@@ -1,4 +1,4 @@
-import { base } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, type NativeFormControlDefaults } from "./shared.js";
 
 export function defineTextArea(): void {
   if (customElements.get("spui-textarea")) return;
@@ -10,11 +10,11 @@ export function defineTextArea(): void {
     private dirty = false;
     private formDisabled = false;
     private boundTextarea?: HTMLTextAreaElement;
-    private slotTextareaDefaults?: { textarea: HTMLTextAreaElement; disabled: boolean; required: boolean; readOnly: boolean };
+    private slotTextareaDefaults?: NativeFormControlDefaults;
     constructor() { super(); try { this.internals = this.attachInternals(); } catch { /* The native textarea still works when form-associated custom elements are unavailable. */ } }
     get value(): string { return this.input()?.value ?? this.currentValue; }
     set value(value: string) { this.currentValue = String(value ?? ""); this.dirty = true; const control = this.input(); if (control) control.value = this.currentValue; this.syncForm(control); }
-    get defaultValue(): string { return this.getAttribute("default-value") ?? this.getAttribute("value") ?? ""; }
+    get defaultValue(): string { return this.getAttribute("default-value") ?? this.getAttribute("value") ?? this.input()?.defaultValue ?? ""; }
     set defaultValue(value: string) { this.setAttribute("default-value", String(value ?? "")); }
     get name(): string { return this.getAttribute("name") ?? ""; }
     set name(value: string) { this.setAttribute("name", value); }
@@ -40,7 +40,11 @@ export function defineTextArea(): void {
       style.textContent += `:host([appearance=filled-darker-shadow]) slot[name=textarea]::slotted(textarea),:host([appearance=filled-lighter-shadow]) slot[name=textarea]::slotted(textarea){box-shadow:var(--spui-input-filled-shadow,var(--shadow2,0 1px 2px rgb(0 0 0 / 20%)))}`;
       const controlSlot = document.createElement("slot"); controlSlot.name = "textarea"; controlSlot.part.add("textarea"); controlSlot.append(input); controlSlot.addEventListener("slotchange", () => this.syncTextareaSlot());
       shadow.append(style, label, controlSlot);
-      if (!this.dirty) { this.currentValue = this.defaultValue; input.value = this.currentValue; }
+      if (!this.dirty) {
+        const assigned = this.input();
+        this.currentValue = this.hasAttribute("value") || this.hasAttribute("default-value") ? this.defaultValue : assigned && assigned !== input ? assigned.value : this.defaultValue;
+        input.value = this.currentValue;
+      }
       this.syncTextareaSlot();
     }
     attributeChangedCallback(name: string) {
@@ -66,6 +70,8 @@ export function defineTextArea(): void {
     checkValidity(): boolean { return this.internals?.checkValidity() ?? this.input()?.checkValidity() ?? true; }
     reportValidity(): boolean { return this.internals?.reportValidity() ?? this.input()?.reportValidity() ?? true; }
     private input(): HTMLTextAreaElement | null {
+      const assigned = this.querySelector<HTMLTextAreaElement>('textarea[slot="textarea"]');
+      if (assigned) return assigned;
       const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="textarea"]');
       return slot?.assignedElements().find((element): element is HTMLTextAreaElement => element instanceof HTMLTextAreaElement) ?? this.shadowRoot?.querySelector<HTMLTextAreaElement>(".textarea-fallback") ?? null;
     }
@@ -77,15 +83,13 @@ export function defineTextArea(): void {
         input.addEventListener("input", this.handleTextareaInput);
         this.boundTextarea = input;
       }
-      if (input !== fallback && this.slotTextareaDefaults?.textarea !== input) {
-        this.slotTextareaDefaults = { textarea: input, disabled: input.disabled, required: input.required, readOnly: input.readOnly };
-      }
+      if (input !== fallback) this.slotTextareaDefaults = rememberNativeFormControlDefaults(this.slotTextareaDefaults, input);
       if (fallback) { const assigned = input !== fallback; fallback.hidden = assigned; fallback.setAttribute("aria-hidden", String(assigned)); }
       if (input !== fallback) {
         for (const name of ["autocomplete", "dirname", "form", "maxlength", "minlength", "cols", "wrap"]) if (!input.hasAttribute(name) && this.hasAttribute(name)) input.setAttribute(name, this.getAttribute(name)!);
         if (!input.hasAttribute("aria-label") && !input.hasAttribute("aria-labelledby")) { const label = this.getAttribute("label"); if (label) input.setAttribute("aria-label", label); }
         if (this.hasAttribute("name")) input.removeAttribute("name");
-        if (!this.dirty && (this.hasAttribute("value") || this.defaultValue)) input.value = this.currentValue || this.defaultValue;
+        if (!this.dirty && (this.hasAttribute("value") || this.hasAttribute("default-value"))) input.value = this.currentValue;
       }
       const defaults = input === fallback ? undefined : this.slotTextareaDefaults;
       input.disabled = this.disabled || this.formDisabled || Boolean(defaults?.disabled);

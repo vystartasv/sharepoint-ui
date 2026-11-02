@@ -168,7 +168,7 @@ export function defineCombobox(): void {
       this.selectedOptionsState = this.readSelectedOptions(this.getAttribute("default-selected-options"));
       this.selectionsDirty = false;
       this.selectedValueState = this.getAttribute("selected-value") ?? "";
-      this.value = this.getAttribute("value") ?? "";
+      this.value = this.getAttribute("value") ?? this.slotInputDefaults?.defaultValue ?? "";
       this.closeList();
     }
     formStateRestoreCallback(state: string | File | FormData | null): void {

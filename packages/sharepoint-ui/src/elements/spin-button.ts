@@ -70,11 +70,18 @@ export function defineSpinButton(): void {
       if (input) { input.value = this.getAttribute("display-value") ?? this.currentValue; this.syncAria(input); this.syncFormState(input); this.updateButtons(input); }
     }
     get valueAsNumber(): number { return this.currentValue === "" || this.currentValue === undefined ? NaN : Number(this.currentValue); }
-    get defaultValue(): number | null { const value = this.getAttribute("default-value"); return value === null || value === "" ? null : Number(value); }
+    get defaultValue(): number | null {
+      const value = this.getAttribute("default-value");
+      if (value !== null) return value === "" ? null : Number(value);
+      const input = this.getInput();
+      const fallback = this.shadowRoot?.querySelector<HTMLInputElement>(".input-fallback");
+      const nativeDefault = input && input !== fallback ? this.slotInputDefaults?.defaultValue ?? input.defaultValue : "";
+      return nativeDefault === "" ? null : Number(nativeDefault);
+    }
     set defaultValue(value: number | null) { if (value === null) this.removeAttribute("default-value"); else this.setAttribute("default-value", String(value)); }
 
     formDisabledCallback(disabled: boolean): void { this.formDisabled = disabled; this.syncSlots(); }
-    formResetCallback(): void { this.currentValue = this.getAttribute("value") ?? this.getAttribute("default-value") ?? "0"; this.draft = undefined; this.previousDraft = undefined; const input = this.getInput(); if (input) { input.value = this.getAttribute("display-value") ?? this.currentValue; this.syncAria(input); this.syncFormState(input); this.updateButtons(input); } }
+    formResetCallback(): void { this.currentValue = this.getAttribute("value") ?? String(this.defaultValue ?? 0); this.draft = undefined; this.previousDraft = undefined; const input = this.getInput(); if (input) { input.value = this.getAttribute("display-value") ?? this.currentValue; this.syncAria(input); this.syncFormState(input); this.updateButtons(input); } }
     formStateRestoreCallback(state: string | File | FormData | null): void { if (typeof state === "string") this.value = state; }
 
     private numberValue(value = this.currentValue): number | null {
