@@ -5,8 +5,8 @@ description: Install SharePoint UI and use it in an SPFx 1.24 web part.
 
 ## Install
 
-:::note[First npm release in progress]
-The package is not yet on the public npm registry. This install command will work after the first release.
+:::caution[Initial npm release]
+The package is prepared for its first public npm release. This install command will work after the maintainer publishes it.
 :::
 
 ```sh
@@ -30,7 +30,7 @@ export function RequestForm() {
 }
 ```
 
-Use the SPFx locale instead of hard-coding direction. Arabic and other right-to-left locales receive RTL layout from the language value.
+Use the SPFx locale instead of hard-coding direction. Arabic and other right-to-left locales receive RTL layout from the language value. Add `dir` explicitly if the culture identifier does not follow the browser's locale direction mapping.
 
 ## Custom elements
 

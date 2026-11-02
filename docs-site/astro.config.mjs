@@ -7,6 +7,7 @@ export default defineConfig({
   integrations: [starlight({
     title: "SharePoint UI",
     description: "Theme-aware components and reusable views for SharePoint Framework 1.24.",
+    social: [{ icon: "github", label: "GitHub", href: "https://github.com/vystartasv/sharepoint-ui" }],
     customCss: ["./src/styles/custom.css"],
     sidebar: [
       { label: "Start here", items: ["index", "getting-started", "catalog"] },

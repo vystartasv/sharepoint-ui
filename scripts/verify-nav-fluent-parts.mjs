@@ -2,14 +2,26 @@ import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { resolve } from "node:path";
 import { build } from "esbuild";
+import ts from "typescript";
 import { chromium } from "playwright";
+
+const typeFixturePath = resolve("packages/sharepoint-ui/src/.nav-event-type-contract.tsx");
+const typeFixture = `import * as React from "react"; import { Nav, NavDrawer } from "./react.js"; const click = (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => event; const example = <><Nav onNavItemSelect={(event, data) => { const callbackEvent: Event | React.SyntheticEvent = event; if (data.type === "click") { const branch = click(data.event); void branch; } else { const branch: Event | React.SyntheticEvent = data.event; void branch; } void [callbackEvent, data.value]; }} onNavCategoryItemToggle={(event, data) => { const callbackEvent: Event | React.SyntheticEvent = event; if (data.type === "click") { const branch = click(data.event); void branch; } else { const branch: Event | React.SyntheticEvent = data.event; void branch; } void [callbackEvent, data.open]; }} /><NavDrawer onNavItemSelect={(event, data) => { if (data.type === "click") { const branch = click(data.event); void branch; } }} /></>;`;
+const typeOptions = { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.NodeNext, moduleResolution: ts.ModuleResolutionKind.NodeNext, jsx: ts.JsxEmit.ReactJSX, strict: true, skipLibCheck: true, noEmit: true };
+const originalReadFile = ts.sys.readFile;
+const originalGetSourceFile = ts.createCompilerHost(typeOptions).getSourceFile;
+const typeHost = ts.createCompilerHost(typeOptions);
+typeHost.readFile = file => resolve(file) === typeFixturePath ? typeFixture : originalReadFile(file);
+typeHost.getSourceFile = (file, languageVersion, onError, fresh) => resolve(file) === typeFixturePath ? ts.createSourceFile(file, typeFixture, languageVersion, true, ts.ScriptKind.TSX) : originalGetSourceFile(file, languageVersion, onError, fresh);
+const typeErrors = ts.getPreEmitDiagnostics(ts.createProgram([typeFixturePath], typeOptions, typeHost)).map(diagnostic => ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n"));
+assert.deepEqual(typeErrors, [], `Nav selection and category events should narrow like Fluent: ${typeErrors.join("\n")}`);
 
 const bundle = await build({
   stdin: {
     sourcefile: "nav-fluent-parts.tsx",
     loader: "tsx",
     resolveDir: process.cwd(),
-    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{AppItem,AppItemStatic,Hamburger,Nav,NavCategory,NavCategoryItem,NavDrawer,NavDrawerBody,NavDrawerFooter,NavDrawerHeader,NavItem,NavSubItemGroup,SplitNavItem}from"${resolve("packages/sharepoint-ui/src/react.tsx")}";window.selects=[];window.toggles=[];window.hamburgers=0;function App(){return <><Nav data-testid="nav" defaultSelectedCategoryValue="projects" onNavItemSelect={(_e,d)=>window.selects.push(d)} onNavCategoryItemToggle={(_e,d)=>window.toggles.push(d)}><AppItem value="app" href="#app">App</AppItem><AppItemStatic>Application label</AppItemStatic><NavCategory value="projects"><NavCategoryItem>Projects</NavCategoryItem><NavItem value="project-a" href="#project-a">Project A</NavItem></NavCategory><SplitNavItem value="split" actionLabel="More split actions" onAction={()=>window.selects.push({value:"action"})}>Split destination</SplitNavItem></Nav><NavDrawer data-testid="drawer" label="Workspace" defaultOpen modal={false} dismissible={false} position="end" tabbable={false} defaultOpenCategories={["drawer-projects"]}><NavDrawerHeader>Workspace title</NavDrawerHeader><NavDrawerBody><NavCategory value="drawer-projects"><NavCategoryItem>Drawer projects</NavCategoryItem><NavSubItemGroup><NavItem value="drawer-home">Drawer home</NavItem></NavSubItemGroup></NavCategory></NavDrawerBody><NavDrawerFooter><NavItem value="settings">Settings</NavItem></NavDrawerFooter></NavDrawer><NavDrawer data-testid="inline-drawer" type="inline" label="Inline navigation" defaultOpen><NavItem value="inline-home">Inline home</NavItem></NavDrawer><Hamburger data-testid="hamburger" label="Open workspace navigation" open onClick={()=>window.hamburgers++}/></>}createRoot(document.querySelector("#root")).render(<App/>);`,
+    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{AppItem,AppItemStatic,Hamburger,Nav,NavCategory,NavCategoryItem,NavDrawer,NavDrawerBody,NavDrawerFooter,NavDrawerHeader,NavItem,NavSubItemGroup,SplitNavItem}from"${resolve("packages/sharepoint-ui/src/react.tsx")}";window.selects=[];window.toggles=[];window.navEvents=[];window.hamburgers=0;function App(){return <><Nav data-testid="nav" defaultSelectedCategoryValue="projects" onNavItemSelect={(e,d)=>{window.selects.push(d);window.navEvents.push({eventSame:e===d.event,type:d.type,currentTarget:d.event.currentTarget?.tagName,target:d.event.target?.tagName,nativeEventType:d.event.nativeEvent?.type})}} onNavCategoryItemToggle={(e,d)=>{window.toggles.push(d);window.navEvents.push({eventSame:e===d.event,type:d.type,currentTarget:d.event.currentTarget?.tagName,target:d.event.target?.tagName,nativeEventType:d.event.nativeEvent?.type})}}><AppItem value="app" href="#app">App</AppItem><AppItemStatic>Application label</AppItemStatic><NavCategory value="projects"><NavCategoryItem>Projects</NavCategoryItem><NavItem value="project-a" href="#project-a">Project A</NavItem></NavCategory><SplitNavItem value="split" actionLabel="More split actions" onAction={()=>window.selects.push({value:"action"})}>Split destination</SplitNavItem></Nav><NavDrawer data-testid="drawer" label="Workspace" defaultOpen modal={false} dismissible={false} position="end" tabbable={false} defaultOpenCategories={["drawer-projects"]}><NavDrawerHeader>Workspace title</NavDrawerHeader><NavDrawerBody><NavCategory value="drawer-projects"><NavCategoryItem>Drawer projects</NavCategoryItem><NavSubItemGroup><NavItem value="drawer-home">Drawer home</NavItem></NavSubItemGroup></NavCategory></NavDrawerBody><NavDrawerFooter><NavItem value="settings">Settings</NavItem></NavDrawerFooter></NavDrawer><NavDrawer data-testid="inline-drawer" type="inline" label="Inline navigation" defaultOpen><NavItem value="inline-home">Inline home</NavItem></NavDrawer><Hamburger data-testid="hamburger" label="Open workspace navigation" open onClick={()=>window.hamburgers++}/></>}createRoot(document.querySelector("#root")).render(<App/>);`,
   },
   bundle: true,
   format: "iife",
@@ -40,11 +52,13 @@ try {
   assert.equal((await page.evaluate(() => window.toggles))[0].value, "projects", "Fluent named category callback receives the selected category");
   assert.equal(await page.evaluate(() => window.toggles[0].event?.type), "click", "category callback preserves the originating click event");
   assert.equal((await page.evaluate(() => window.toggles))[0].type, "click", "category callback identifies the click source");
+  assert.deepEqual((await page.evaluate(() => window.navEvents))[0], { eventSame: true, type: "click", currentTarget: "BUTTON", target: "BUTTON", nativeEventType: "click" }, "category callback supplies the originating React button event");
   assert.equal(await category.getAttribute("selected"), "", "category selection is independent of disclosure state");
   await nav.locator("spui-app-item a").click();
   assert.equal((await page.evaluate(() => window.selects))[0].value, "app", "AppItem participates in Nav selection and native link behavior");
   assert.equal(await page.evaluate(() => window.selects[0].event?.type), "click", "item callback preserves the originating click event");
   assert.equal((await page.evaluate(() => window.selects))[0].type, "click", "item callback identifies the click source");
+  assert.deepEqual((await page.evaluate(() => window.navEvents))[1], { eventSame: true, type: "click", currentTarget: "A", target: "A", nativeEventType: "click" }, "item callback supplies the originating React anchor event");
   const split = nav.locator("spui-split-nav-item");
   assert.equal(await split.locator("spui-nav-item button").count(), 1);
   await split.locator('[slot="action"]').click();

@@ -1,6 +1,5 @@
 <section class="preview-bench" aria-label="Live SharePoint UI component preview">
   <div class="preview-copy">
-    <p class="preview-label">One theme, every surface</p>
     <h2>Built for the page you already have.</h2>
     <p>Controls inherit the active SharePoint palette and keep their layout inside the section that hosts them.</p>
     <div class="preview-actions">
@@ -32,7 +31,7 @@
   defineInput();
   defineTag();
 
-  const previewMessage = document.querySelector<HTMLDivElement>("#preview-message");
+  const previewMessage = document.querySelector<HTMLOutputElement>("#preview-message");
   document.querySelector("#preview-save")?.addEventListener("click", () => {
     if (previewMessage) previewMessage.textContent = "Your update is ready to save.";
   });

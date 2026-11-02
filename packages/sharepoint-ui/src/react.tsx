@@ -47,7 +47,7 @@ import { VariableSizeIndex, type VirtualListDataSource } from "./elements/virtua
 import { clampDataGridColumnWidth, clampDataGridRowHeight, dataGridColumnVar, filterDataGridItems, fitDataGridColumnWidths, formatDataGridClipboard, getDataGridColumnSizing, getDataGridColumnWindow, getDataGridCellValue, groupDataGridItems, isDataGridRowSelected, parseDataGridClipboard, parseDataGridClipboardValue, parseDataGridInputValue, sortDataGridItems, toDataGridInputValue, writeDataGridClipboardText, type DataGridCellEdit, type DataGridColumn, getDataGridDataSourceRow, type DataGridDataSource, type DataGridDataSourceRow, type DataGridColumnSizingOptions, type DataGridColumnWidths, type DataGridEditValue, type DataGridFocusMode, type DataGridGroup, type DataGridSelectionAppearance, type DataGridSelectionModel, setDataGridRowSelected, type DataGridSort, type DataGridSortState } from "./elements/data-grid-model.js";
 import { flattenAllTree, flattenTree, type TreeNode, type VisibleTreeNode } from "./elements/tree-model.js";
 import { defineInteractionTag, defineInteractionTagPrimary, defineInteractionTagSecondary, defineTag, defineTagGroup, type InteractionTagSelectData, type TagAppearance, type TagGroupSelectData, type TagSize } from "./elements/tags.js";
-import { defineTagPicker, type TagPickerOnOpenChangeData, type TagPickerOnOptionSelectData } from "./elements/tag-picker.js";
+import { defineTagPicker, type TagPickerOpenChangeType, type TagPickerOnOpenChangeData, type TagPickerOnOptionSelectData } from "./elements/tag-picker.js";
 export type { TagPickerOpenChangeType, TagPickerOnOpenChangeData, TagPickerOnOptionSelectData } from "./elements/tag-picker.js";
 import { defineRating } from "./elements/rating.js";
 import { defineRatingDisplay, defineRatingItem } from "./elements/rating-display.js";
@@ -73,6 +73,13 @@ export type { ColorPickerHsvColor } from "./elements/color-picker.js";
 import { defineToolbar, defineToolbarGroup, defineToolbarSeparator, defineToolbarRadioGroup, defineToolbarRadioButton, type ToolbarCheckedValues } from "./elements/toolbar.js";
 import { defineNav, defineNavItem, defineAppItem, defineAppItemStatic, defineHamburger, defineNavDrawer, defineNavDrawerBody, defineNavDrawerFooter, defineNavDrawerHeader, defineSplitNavItem, defineNavCategory, defineNavCategoryItem, defineNavSubItemGroup, defineNavSubItem, defineNavDivider, defineNavSectionHeader, type NavItemSelectData, type NavCategoryToggleData } from "./elements/nav.js";
 export type { NavItemSelectData, NavCategoryToggleData } from "./elements/nav.js";
+export type NavReactItemSelectData = Omit<NavItemSelectData, "event" | "type"> & ({ type: undefined; event: SharePointUIEvent } | { type: "click"; event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement> });
+export type NavReactCategoryToggleData = Omit<NavCategoryToggleData, "event" | "type"> & ({ type: undefined; event: SharePointUIEvent } | { type: "click"; event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement> });
+function createNavActionEvent(sourceEvent: MouseEvent, dispatchEvent: Event, host: HTMLElement): React.MouseEvent<HTMLButtonElement | HTMLAnchorElement> {
+  const target = sourceEvent.composedPath().find((entry): entry is HTMLAnchorElement | HTMLButtonElement => entry instanceof HTMLAnchorElement || entry instanceof HTMLButtonElement)
+    ?? sourceEventTarget(sourceEvent, host) as HTMLAnchorElement | HTMLButtonElement;
+  return createReactEventBridge(sourceEvent, dispatchEvent, target, target) as React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>;
+}
 import { ensureLabelStyles, getLabelStyle, type LabelSize, type LabelWeight } from "./elements/label.js";
 import { defineInfoButton, type InfoPlacement } from "./elements/info.js";
 import { defineCarousel, defineCarouselCard, defineCarouselNav, defineCarouselNavButton, defineCarouselNavImageButton, defineCarouselButton, defineCarouselAutoplayButton, defineCarouselNavContainer, defineCarouselSlider, defineCarouselViewport, type CarouselAlign, type CarouselAppearance, type CarouselIndexChangeData, type CarouselMotion } from "./elements/carousel.js";
@@ -248,11 +255,11 @@ function useSpuiEvent(ref: React.RefObject<HTMLElement | null>, eventName: strin
   }, [ref, eventName, Boolean(callback)]);
 }
 
-function createReactEventBridge<T extends Element>(sourceEvent: Event, dispatchEvent: Event, currentTarget: T): React.SyntheticEvent<T> {
+function createReactEventBridge<T extends Element>(sourceEvent: Event, dispatchEvent: Event, currentTarget: T, target = sourceEvent.target): React.SyntheticEvent<T> {
   let propagationStopped = false;
   const bridged = {
     nativeEvent: sourceEvent,
-    target: sourceEvent.target as EventTarget & T,
+    target: target as EventTarget & T,
     currentTarget,
     bubbles: sourceEvent.bubbles,
     cancelable: sourceEvent.cancelable,
@@ -1516,13 +1523,20 @@ export const InteractionTagSecondary = React.forwardRef<HTMLElement, ElementProp
 });
 
 export type TagDismissEvent = React.MouseEvent | React.KeyboardEvent;
-export const TagGroup = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; orientation?: "horizontal" | "vertical"; label?: string; appearance?: TagAppearance; size?: TagSize; disabled?: boolean; dismissible?: boolean; selectedValues?: string[]; defaultSelectedValues?: string[]; onTagSelect?: (event: SharePointUIEvent, data: SharePointUIEventData<TagGroupSelectData>) => void; onDismiss?: (event: TagDismissEvent, data: { value: string }) => void }>(function TagGroup({ children, orientation = "horizontal", label, appearance = "filled", size = "medium", disabled = false, dismissible = false, selectedValues, defaultSelectedValues, onTagSelect, onDismiss, ...props }: ElementProps & { children?: React.ReactNode; orientation?: "horizontal" | "vertical"; label?: string; appearance?: TagAppearance; size?: TagSize; disabled?: boolean; dismissible?: boolean; selectedValues?: string[]; defaultSelectedValues?: string[]; onTagSelect?: (event: SharePointUIEvent, data: SharePointUIEventData<TagGroupSelectData>) => void; onDismiss?: (event: TagDismissEvent, data: { value: string }) => void }, forwardedRef): React.ReactElement {
+export type TagGroupReactSelectData = Omit<TagGroupSelectData, "event" | "type"> & (
+  | { event: SharePointUIEvent; type: undefined }
+  | { event: React.MouseEvent<HTMLButtonElement>; type: "click" }
+);
+export const TagGroup = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; orientation?: "horizontal" | "vertical"; label?: string; appearance?: TagAppearance; size?: TagSize; disabled?: boolean; dismissible?: boolean; selectedValues?: string[]; defaultSelectedValues?: string[]; onTagSelect?: (event: SharePointUIEvent, data: TagGroupReactSelectData) => void; onDismiss?: (event: TagDismissEvent, data: { value: string }) => void }>(function TagGroup({ children, orientation = "horizontal", label, appearance = "filled", size = "medium", disabled = false, dismissible = false, selectedValues, defaultSelectedValues, onTagSelect, onDismiss, ...props }: ElementProps & { children?: React.ReactNode; orientation?: "horizontal" | "vertical"; label?: string; appearance?: TagAppearance; size?: TagSize; disabled?: boolean; dismissible?: boolean; selectedValues?: string[]; defaultSelectedValues?: string[]; onTagSelect?: (event: SharePointUIEvent, data: TagGroupReactSelectData) => void; onDismiss?: (event: TagDismissEvent, data: { value: string }) => void }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   ensureDefined(defineTagGroup);
   useSpuiEvent(ref, "spui-selection-change", (detail, event) => {
-    const data: SharePointUIEventData<TagGroupSelectData> = { event: detail.event ?? event, type: "click", value: String(detail.value ?? ""), selectedValues: detail.selectedValues ?? [] };
-    onTagSelect?.(data.event, data);
+    const sourceEvent = detail.event instanceof Event ? detail.event : event;
+    const target = sourceEvent.composedPath().find((entry): entry is HTMLButtonElement => entry instanceof HTMLButtonElement)
+      ?? sourceEventTarget(sourceEvent, ref.current!) as HTMLButtonElement;
+    const callbackEvent = createReactEventBridge(sourceEvent, event, target, target) as React.MouseEvent<HTMLButtonElement>;
+    onTagSelect?.(callbackEvent, { event: callbackEvent, type: "click", value: String(detail.value ?? ""), selectedValues: detail.selectedValues ?? [] });
   });
   useSpuiEvent(ref, "spui-tag-dismiss", (detail, event) => { const sourceEvent = detail.sourceEvent ?? event; const callbackEvent = createReactEventBridge(sourceEvent, event, sourceEventTarget(sourceEvent, ref.current!)) as unknown as TagDismissEvent; onDismiss?.(callbackEvent, { value: String(detail.value ?? "") }); });
   React.useLayoutEffect(() => {
@@ -1532,7 +1546,19 @@ export const TagGroup = React.forwardRef<HTMLElement, ElementProps & { children?
   return React.createElement("spui-tag-group", useCustomElementProps({ ...props, ref, role: props.role ?? "toolbar", orientation, label, appearance, size, disabled: disabled || undefined, dismissible: dismissible || undefined, "default-selected-values": defaultSelectedValues === undefined ? undefined : JSON.stringify(defaultSelectedValues), "aria-label": props["aria-label"] ?? label }), children);
 });
 
-export type TagPickerProps = Omit<ElementProps, "onChange"> & { children?: React.ReactNode; label?: string; form?: string; selectedValues?: string[]; defaultSelectedValues?: string[]; inputValue?: string; open?: boolean; defaultOpen?: boolean; inline?: boolean; noPopover?: boolean; onOpenChange?: (event: SharePointUIEvent | undefined, data: SharePointUIEventData<TagPickerOnOpenChangeData>) => void; onOptionSelect?: (event: SharePointUIEvent, data: SharePointUIEventData<TagPickerOnOptionSelectData>) => void; onInputValueChange?: (value: string) => void; onChange?: (values: string[]) => void };
+type TagPickerReactOpenChangeData = { open: boolean; reason: string } & (
+  | { type: undefined; event: SharePointUIEvent }
+  | { type: "click"; event: React.MouseEvent<HTMLDivElement> }
+  | { type: "keydown"; event: React.KeyboardEvent<HTMLDivElement> }
+  | { type: Exclude<TagPickerOpenChangeType, "click" | "keydown" | "programmatic">; event: SharePointUIEvent }
+  | { type: "programmatic"; event: Event }
+);
+type TagPickerReactOptionSelectData = { value: string; selectedOptions: string[] } & (
+  | { type: undefined; event: SharePointUIEvent }
+  | { type: "click"; event: React.MouseEvent<HTMLDivElement> }
+  | { type: "keydown"; event: React.KeyboardEvent<HTMLDivElement> }
+);
+export type TagPickerProps = Omit<ElementProps, "onChange"> & { children?: React.ReactNode; label?: string; form?: string; selectedValues?: string[]; defaultSelectedValues?: string[]; inputValue?: string; open?: boolean; defaultOpen?: boolean; inline?: boolean; noPopover?: boolean; onOpenChange?: (event: SharePointUIEvent, data: TagPickerReactOpenChangeData) => void; onOptionSelect?: (event: SharePointUIEvent, data: TagPickerReactOptionSelectData) => void; onInputValueChange?: (value: string) => void; onChange?: (values: string[]) => void };
 export const TagPicker = React.forwardRef<HTMLElement, TagPickerProps>(function TagPicker({ children, label, selectedValues, defaultSelectedValues, inputValue, open, defaultOpen, inline = false, noPopover = false, onOpenChange, onOptionSelect, onInputValueChange, onChange, ...props }: TagPickerProps, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -1540,8 +1566,23 @@ export const TagPicker = React.forwardRef<HTMLElement, TagPickerProps>(function 
   ensureDefined(defineTagPicker);
   useSpuiEvent(ref, "spui-change", detail => onChange?.(detail.values ?? detail.selectedValues ?? []));
   useSpuiEvent(ref, "spui-input", detail => onInputValueChange?.(String(detail.value ?? "")));
-  useSpuiEvent(ref, "spui-open-change", detail => { const change = detail as TagPickerOnOpenChangeData; onOpenChange?.(change.event, { ...change, event: change.event } as SharePointUIEventData<TagPickerOnOpenChangeData>); });
-  useSpuiEvent(ref, "spui-option-select", detail => { const change = detail as TagPickerOnOptionSelectData; onOptionSelect?.(change.event, { ...change, event: change.event } as SharePointUIEventData<TagPickerOnOptionSelectData>); });
+  useSpuiEvent(ref, "spui-open-change", (detail, dispatchEvent) => {
+    const change = detail as TagPickerOnOpenChangeData;
+    const sourceEvent = change.event;
+    const currentTarget = ref.current?.shadowRoot?.querySelector<HTMLDivElement>(".control") ?? ref.current as HTMLDivElement;
+    const callbackEvent = sourceEvent instanceof MouseEvent || sourceEvent instanceof KeyboardEvent
+      ? createReactEventBridge(sourceEvent, dispatchEvent, currentTarget)
+      : sourceEvent;
+    const type = change.type === "programmatic" ? undefined : change.type;
+    onOpenChange?.(callbackEvent, { ...change, type, event: callbackEvent } as TagPickerReactOpenChangeData);
+  });
+  useSpuiEvent(ref, "spui-option-select", (detail, dispatchEvent) => {
+    const change = detail as TagPickerOnOptionSelectData;
+    const sourceEvent = change.event;
+    const currentTarget = ref.current?.shadowRoot?.querySelector<HTMLDivElement>(".control") ?? ref.current as HTMLDivElement;
+    const callbackEvent = createReactEventBridge(sourceEvent, dispatchEvent, currentTarget);
+    onOptionSelect?.(callbackEvent, { ...change, event: callbackEvent } as TagPickerReactOptionSelectData);
+  });
   React.useLayoutEffect(() => {
     const element = ref.current as (HTMLElement & { value?: string[] }) | null;
     if (element && selectedValues !== undefined) element.value = selectedValues;
@@ -1594,7 +1635,10 @@ export const TagPickerOptionGroup = React.forwardRef<HTMLElement, ElementProps &
   return React.createElement("spui-tag-picker-option-group", useCustomElementProps({ ref: forwardedRef, label, disabled: disabled || undefined }), children);
 });
 
-export type RatingOnChangeData = { event: SharePointUIEvent; type: "change"; value: number };
+export type RatingOnChangeData = { value: number } & (
+  | { event: SharePointUIEvent; type: undefined }
+  | { event: React.FormEvent<HTMLDivElement>; type: "change" }
+);
 export type RatingInputSlot = React.ReactElement<any> | Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "name" | "value" | "checked" | "disabled" | "required">;
 
 export type RatingProps = Omit<ElementProps, "onChange"> & { value?: number; defaultValue?: number; max?: number; step?: 0.5 | 1; size?: "small" | "medium" | "large" | "extra-large"; color?: "brand" | "marigold" | "neutral"; label?: string; itemLabel?: (rating: number) => string; iconFilled?: React.ElementType; iconOutline?: React.ElementType; fullValueInput?: RatingInputSlot; halfValueInput?: RatingInputSlot; name?: string; form?: string; disabled?: boolean; readOnly?: boolean; required?: boolean; onChange?: (event: SharePointUIEvent, data: RatingOnChangeData) => void };
@@ -1605,8 +1649,10 @@ export const Rating = React.forwardRef<HTMLElement, RatingProps>(function Rating
   const strings = React.useContext(UIContext).strings;
   ensureDefined(defineRating);
   useSpuiEvent(ref, "spui-change", (detail, event) => {
-    const data = { event: (detail.event as Event | undefined) ?? event, type: "change" as const, value: Number(detail.value ?? 0) };
-    onChange?.(data.event, data);
+    const sourceEvent = detail.event instanceof Event ? detail.event : event;
+    const currentTarget = ref.current?.shadowRoot?.querySelector<HTMLDivElement>(".items") ?? ref.current as HTMLDivElement;
+    const callbackEvent = createReactEventBridge(sourceEvent, event, currentTarget) as React.FormEvent<HTMLDivElement>;
+    onChange?.(callbackEvent, { event: callbackEvent, type: "change", value: Number(detail.value ?? 0) });
   });
   React.useLayoutEffect(() => {
     const element = ref.current as (HTMLElement & { itemLabel?: (rating: number) => string }) | null;
@@ -1705,16 +1751,22 @@ export const CarouselButton = React.forwardRef<HTMLElement, Omit<ElementProps, "
   return React.createElement("spui-carousel-button", useCustomElementProps({ ref: forwardedRef, ...props, slot: props.slot === null ? null : props.slot || (navType === "prev" ? "previous" : "next"), "nav-type": navType, label }), renderIconSlot(icon), children);
 });
 
-export type CarouselAutoplayChangeData = { event: SharePointUIEvent; type: "click"; checked: boolean };
+export type CarouselAutoplayChangeData = { checked: boolean } & (
+  | { event: SharePointUIEvent; type: undefined }
+  | { event: React.MouseEvent<HTMLButtonElement>; type: "click" }
+);
 
-export const CarouselAutoplayButton = React.forwardRef<HTMLElement, Omit<ElementProps, "slot"> & { icon?: React.ReactNode; playLabel?: string; pauseLabel?: string; onCheckedChange?: (event: MouseEvent, data: CarouselAutoplayChangeData) => void; slot?: string | null }>(function CarouselAutoplayButton({ icon, playLabel, pauseLabel, onCheckedChange, ...props }: Omit<ElementProps, "slot"> & { icon?: React.ReactNode; playLabel?: string; pauseLabel?: string; onCheckedChange?: (event: MouseEvent, data: CarouselAutoplayChangeData) => void; slot?: string | null }, forwardedRef): React.ReactElement {
+export const CarouselAutoplayButton = React.forwardRef<HTMLElement, Omit<ElementProps, "slot"> & { icon?: React.ReactNode; playLabel?: string; pauseLabel?: string; onCheckedChange?: (event: SharePointUIEvent, data: CarouselAutoplayChangeData) => void; slot?: string | null }>(function CarouselAutoplayButton({ icon, playLabel, pauseLabel, onCheckedChange, ...props }: Omit<ElementProps, "slot"> & { icon?: React.ReactNode; playLabel?: string; pauseLabel?: string; onCheckedChange?: (event: SharePointUIEvent, data: CarouselAutoplayChangeData) => void; slot?: string | null }, forwardedRef): React.ReactElement {
   const strings = React.useContext(UIContext).strings;
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   ensureDefined(defineCarouselAutoplayButton);
   useSpuiEvent(ref, "spui-carousel-autoplay-toggle", (detail, event) => {
-    const data = detail as CarouselAutoplayChangeData;
-    onCheckedChange?.((data.event ?? event) as MouseEvent, data);
+    const change = detail as CarouselAutoplayChangeData;
+    const sourceEvent = change.event instanceof Event ? change.event : event;
+    const target = sourceEventTarget(sourceEvent, ref.current!);
+    const callbackEvent = createReactEventBridge(sourceEvent, event, target as HTMLButtonElement) as React.MouseEvent<HTMLButtonElement>;
+    onCheckedChange?.(callbackEvent, { ...change, event: callbackEvent } as CarouselAutoplayChangeData);
   });
   return React.createElement("spui-carousel-autoplay-button", useCustomElementProps({ ...props, ref, slot: props.slot === null ? null : props.slot || "autoplay", "play-label": playLabel || strings.carouselPlay || "Play", "pause-label": pauseLabel || strings.carouselPause || "Pause" }), renderIconSlot(icon));
 });
@@ -1722,6 +1774,26 @@ export const CarouselAutoplayButton = React.forwardRef<HTMLElement, Omit<Element
 export type CarouselNavButtonSlotProps = React.ReactElement | Omit<Parameters<typeof CarouselButton>[0], "navType" | "slot">;
 export type CarouselAutoplaySlotProps = React.ReactElement | Omit<Parameters<typeof CarouselAutoplayButton>[0], "slot"> | boolean;
 export type CarouselTooltipSlotProps = React.ReactElement | Omit<Parameters<typeof Tooltip>[0], "children" | "slot">;
+export type CarouselReactIndexChangeData = { index: number } & (
+  | { event: SharePointUIEvent; type: undefined }
+  | { event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>; type: "click" }
+  | { event: React.FocusEvent<Element>; type: "focus" }
+  | { event: PointerEvent | MouseEvent; type: "drag" }
+  | { event: Event; type: "autoplay" | "scroll" | "programmatic" }
+  | { event: React.KeyboardEvent<HTMLElement>; type: "keydown" }
+);
+
+function createCarouselChangeEvent(change: { event: Event; eventType: CarouselIndexChangeData["type"] }, dispatchEvent: Event, host: HTMLElement): CarouselReactIndexChangeData["event"] {
+  if (change.eventType === "click" && change.event instanceof MouseEvent) {
+    const target = change.event.composedPath().find((entry): entry is HTMLButtonElement | HTMLAnchorElement => entry instanceof HTMLButtonElement || entry instanceof HTMLAnchorElement)
+      ?? sourceEventTarget(change.event, host) as HTMLButtonElement | HTMLAnchorElement;
+    return createReactEventBridge(change.event, dispatchEvent, target, target) as React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>;
+  }
+  if ((change.eventType === "focus" && change.event instanceof FocusEvent) || (change.eventType === "keydown" && change.event instanceof KeyboardEvent)) {
+    return createReactEventBridge(change.event, dispatchEvent, sourceEventTarget(change.event, host)) as React.FocusEvent<Element> | React.KeyboardEvent<HTMLElement>;
+  }
+  return change.event;
+}
 
 export const CarouselNavContainer = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; prev?: CarouselNavButtonSlotProps | null; next?: CarouselNavButtonSlotProps | null; autoplay?: CarouselAutoplaySlotProps | null; prevTooltip?: CarouselTooltipSlotProps | null; nextTooltip?: CarouselTooltipSlotProps | null; autoplayTooltip?: CarouselTooltipSlotProps | null; layout?: "inline" | "inline-wide" | "overlay" | "overlay-wide" | "overlay-expanded" }>(function CarouselNavContainer({ children, prev, next, autoplay, prevTooltip, nextTooltip, autoplayTooltip, layout = "inline", ...props }: ElementProps & { children?: React.ReactNode; prev?: CarouselNavButtonSlotProps | null; next?: CarouselNavButtonSlotProps | null; autoplay?: CarouselAutoplaySlotProps | null; prevTooltip?: CarouselTooltipSlotProps | null; nextTooltip?: CarouselTooltipSlotProps | null; autoplayTooltip?: CarouselTooltipSlotProps | null; layout?: "inline" | "inline-wide" | "overlay" | "overlay-wide" | "overlay-expanded" }, forwardedRef): React.ReactElement {
   const strings = React.useContext(UIContext).strings;
@@ -1786,10 +1858,10 @@ export const CarouselViewport = React.forwardRef<HTMLElement, ElementProps & { c
 
 export const Carousel = React.forwardRef<HTMLElement, ElementProps & {
   children?: React.ReactNode; label?: string; roleDescription?: string; previousLabel?: string; nextLabel?: string; slideLabel?: string; slideGroupLabel?: string; navigationLabel?: string; playLabel?: string; pauseLabel?: string; slideWidth?: string;
-  align?: CarouselAlign; appearance?: CarouselAppearance; motion?: CarouselMotion; motionDuration?: number; autoplay?: boolean; autoplayInterval?: number; selectedIndex?: number; activeIndex?: number; defaultSelectedIndex?: number; defaultActiveIndex?: number; wrap?: boolean; circular?: boolean; groupSize?: number | "auto"; draggable?: boolean; whitespace?: boolean; announcement?: CarouselAnnouncerFunction; onIndexChange?: (index: number) => void; onActiveIndexChange?: (event: SharePointUIEvent, data: SharePointUIEventData<CarouselIndexChangeData>) => void
+  align?: CarouselAlign; appearance?: CarouselAppearance; motion?: CarouselMotion; motionDuration?: number; autoplay?: boolean; autoplayInterval?: number; selectedIndex?: number; activeIndex?: number; defaultSelectedIndex?: number; defaultActiveIndex?: number; wrap?: boolean; circular?: boolean; groupSize?: number | "auto"; draggable?: boolean; whitespace?: boolean; announcement?: CarouselAnnouncerFunction; onIndexChange?: (index: number) => void; onActiveIndexChange?: (event: SharePointUIEvent, data: CarouselReactIndexChangeData) => void
 }>(function Carousel({ children, label, roleDescription, previousLabel, nextLabel, slideLabel, slideGroupLabel, navigationLabel, playLabel, pauseLabel, slideWidth, align = "center", appearance = "flat", motion = "slide", motionDuration = 240, autoplay = false, autoplayInterval = 4000, selectedIndex, activeIndex, defaultSelectedIndex, defaultActiveIndex, wrap = false, circular = false, groupSize = "auto", draggable = false, whitespace = false, announcement, onIndexChange, onActiveIndexChange, ...props }: ElementProps & {
   children?: React.ReactNode; label?: string; roleDescription?: string; previousLabel?: string; nextLabel?: string; slideLabel?: string; slideGroupLabel?: string; navigationLabel?: string; playLabel?: string; pauseLabel?: string; slideWidth?: string;
-  align?: CarouselAlign; appearance?: CarouselAppearance; motion?: CarouselMotion; motionDuration?: number; autoplay?: boolean; autoplayInterval?: number; selectedIndex?: number; activeIndex?: number; defaultSelectedIndex?: number; defaultActiveIndex?: number; wrap?: boolean; circular?: boolean; groupSize?: number | "auto"; draggable?: boolean; whitespace?: boolean; announcement?: CarouselAnnouncerFunction; onIndexChange?: (index: number) => void; onActiveIndexChange?: (event: SharePointUIEvent, data: SharePointUIEventData<CarouselIndexChangeData>) => void
+  align?: CarouselAlign; appearance?: CarouselAppearance; motion?: CarouselMotion; motionDuration?: number; autoplay?: boolean; autoplayInterval?: number; selectedIndex?: number; activeIndex?: number; defaultSelectedIndex?: number; defaultActiveIndex?: number; wrap?: boolean; circular?: boolean; groupSize?: number | "auto"; draggable?: boolean; whitespace?: boolean; announcement?: CarouselAnnouncerFunction; onIndexChange?: (index: number) => void; onActiveIndexChange?: (event: SharePointUIEvent, data: CarouselReactIndexChangeData) => void
 }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -1798,7 +1870,7 @@ export const Carousel = React.forwardRef<HTMLElement, ElementProps & {
   const motionKind = typeof motion === "string" ? motion : motion.kind;
   const motionPhysicsDuration = typeof motion === "string" ? undefined : motion.duration;
   const controlledIndex = activeIndex ?? selectedIndex;
-  useSpuiEvent(ref, "spui-carousel-change", detail => { const change = detail as typeof detail & { event: Event; eventType: CarouselIndexChangeData["type"] }; const index = Number(change.value ?? 0); const data = { event: change.event, type: change.eventType, index } as CarouselIndexChangeData; onIndexChange?.(index); onActiveIndexChange?.(change.event, data); });
+  useSpuiEvent(ref, "spui-carousel-change", (detail, dispatchEvent) => { const change = detail as typeof detail & { event: Event; eventType: CarouselIndexChangeData["type"] }; const index = Number(change.value ?? 0); const event = createCarouselChangeEvent(change, dispatchEvent, ref.current!); const type = change.eventType === "programmatic" ? undefined : change.eventType; const data = { event, type, index } as CarouselReactIndexChangeData; onIndexChange?.(index); onActiveIndexChange?.(event, data); });
   React.useLayoutEffect(() => { if (controlledIndex !== undefined && ref.current) (ref.current as HTMLElement & { selectedIndex: number }).selectedIndex = controlledIndex; }, [controlledIndex]);
   React.useLayoutEffect(() => { const element = ref.current as (HTMLElement & { announcement?: CarouselAnnouncerFunction }) | null; if (element) element.announcement = announcement; }, [announcement]);
   return React.createElement("spui-carousel", useCustomElementProps({ ...props, ref, "aria-label": label || strings.carouselDescription, "aria-roledescription": roleDescription || strings.carouselRoleDescription, "previous-label": previousLabel || strings.carouselPrevious, "next-label": nextLabel || strings.carouselNext, "slide-label": slideLabel || strings.carouselSlide, "slide-group-label": slideGroupLabel || strings.carouselSlides, "navigation-label": navigationLabel || strings.carouselNavigation, "play-label": playLabel || strings.carouselPlay || "Play", "pause-label": pauseLabel || strings.carouselPause || "Pause", "slide-width": slideWidth, "group-size": groupSize, draggable: draggable || undefined, whitespace: whitespace || undefined, align, appearance, motion: motionKind, "motion-physics-duration": motionPhysicsDuration, "motion-duration": motionDuration, autoplay: autoplay || undefined, "autoplay-interval": autoplayInterval, "selected-index": controlledIndex, "active-index": activeIndex, "default-selected-index": defaultActiveIndex ?? defaultSelectedIndex, "default-active-index": defaultActiveIndex, controlled: controlledIndex !== undefined || undefined, wrap: wrap || undefined, circular: circular || undefined }), children);
@@ -1831,14 +1903,14 @@ export const BreadcrumbDivider = React.forwardRef<HTMLElement, ElementProps & { 
   return React.createElement("spui-breadcrumb-divider", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
 
-export const Nav = React.forwardRef<HTMLElement, Omit<ElementProps, "onSelect"> & { children?: React.ReactNode; label?: string; selectedValue?: string | null; defaultSelectedValue?: string | null; selectedCategoryValue?: string | null; defaultSelectedCategoryValue?: string | null; openCategories?: readonly string[]; defaultOpenCategories?: readonly string[]; open?: boolean; defaultOpen?: boolean; collapsed?: boolean; defaultCollapsed?: boolean; collapsible?: boolean; multiple?: boolean; density?: "small" | "medium" | "large"; tabbable?: boolean | "true" | "false"; openLabel?: string; closeLabel?: string; onItemSelect?: (value: string, href: string | null, label: string) => void; onCategoryToggle?: (value: string, open: boolean, openCategories: string[]) => void; onNavItemSelect?: (event: MouseEvent, data: SharePointUIEventData<NavItemSelectData>) => void; onNavCategoryItemToggle?: (event: MouseEvent, data: SharePointUIEventData<NavCategoryToggleData>) => void; onOpenChange?: (open: boolean) => void; onCollapsedChange?: (collapsed: boolean) => void }>(function Nav({ children, label = "Navigation", selectedValue, defaultSelectedValue, selectedCategoryValue, defaultSelectedCategoryValue, openCategories, defaultOpenCategories = [], open, defaultOpen, collapsed, defaultCollapsed, collapsible = false, multiple = true, density = "medium", openLabel, closeLabel, onItemSelect, onCategoryToggle, onNavItemSelect, onNavCategoryItemToggle, onOpenChange, onCollapsedChange, ...props }: Omit<ElementProps, "onSelect"> & { children?: React.ReactNode; label?: string; selectedValue?: string | null; defaultSelectedValue?: string | null; selectedCategoryValue?: string | null; defaultSelectedCategoryValue?: string | null; openCategories?: readonly string[]; defaultOpenCategories?: readonly string[]; open?: boolean; defaultOpen?: boolean; collapsed?: boolean; defaultCollapsed?: boolean; collapsible?: boolean; multiple?: boolean; density?: "small" | "medium" | "large"; tabbable?: boolean | "true" | "false"; openLabel?: string; closeLabel?: string; onItemSelect?: (value: string, href: string | null, label: string) => void; onCategoryToggle?: (value: string, open: boolean, openCategories: string[]) => void; onNavItemSelect?: (event: MouseEvent, data: SharePointUIEventData<NavItemSelectData>) => void; onNavCategoryItemToggle?: (event: MouseEvent, data: SharePointUIEventData<NavCategoryToggleData>) => void; onOpenChange?: (open: boolean) => void; onCollapsedChange?: (collapsed: boolean) => void }, forwardedRef): React.ReactElement {
+export const Nav = React.forwardRef<HTMLElement, Omit<ElementProps, "onSelect"> & { children?: React.ReactNode; label?: string; selectedValue?: string | null; defaultSelectedValue?: string | null; selectedCategoryValue?: string | null; defaultSelectedCategoryValue?: string | null; openCategories?: readonly string[]; defaultOpenCategories?: readonly string[]; open?: boolean; defaultOpen?: boolean; collapsed?: boolean; defaultCollapsed?: boolean; collapsible?: boolean; multiple?: boolean; density?: "small" | "medium" | "large"; tabbable?: boolean | "true" | "false"; openLabel?: string; closeLabel?: string; onItemSelect?: (value: string, href: string | null, label: string) => void; onCategoryToggle?: (value: string, open: boolean, openCategories: string[]) => void; onNavItemSelect?: (event: SharePointUIEvent, data: NavReactItemSelectData) => void; onNavCategoryItemToggle?: (event: SharePointUIEvent, data: NavReactCategoryToggleData) => void; onOpenChange?: (open: boolean) => void; onCollapsedChange?: (collapsed: boolean) => void }>(function Nav({ children, label = "Navigation", selectedValue, defaultSelectedValue, selectedCategoryValue, defaultSelectedCategoryValue, openCategories, defaultOpenCategories = [], open, defaultOpen, collapsed, defaultCollapsed, collapsible = false, multiple = true, density = "medium", openLabel, closeLabel, onItemSelect, onCategoryToggle, onNavItemSelect, onNavCategoryItemToggle, onOpenChange, onCollapsedChange, ...props }: Omit<ElementProps, "onSelect"> & { children?: React.ReactNode; label?: string; selectedValue?: string | null; defaultSelectedValue?: string | null; selectedCategoryValue?: string | null; defaultSelectedCategoryValue?: string | null; openCategories?: readonly string[]; defaultOpenCategories?: readonly string[]; open?: boolean; defaultOpen?: boolean; collapsed?: boolean; defaultCollapsed?: boolean; collapsible?: boolean; multiple?: boolean; density?: "small" | "medium" | "large"; tabbable?: boolean | "true" | "false"; openLabel?: string; closeLabel?: string; onItemSelect?: (value: string, href: string | null, label: string) => void; onCategoryToggle?: (value: string, open: boolean, openCategories: string[]) => void; onNavItemSelect?: (event: SharePointUIEvent, data: NavReactItemSelectData) => void; onNavCategoryItemToggle?: (event: SharePointUIEvent, data: NavReactCategoryToggleData) => void; onOpenChange?: (open: boolean) => void; onCollapsedChange?: (collapsed: boolean) => void }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   const defaultsApplied = React.useRef(false);
   const strings = React.useContext(UIContext).strings;
   ensureDefined(defineNav);
-  useSpuiEvent(ref, "spui-nav-item-select", detail => { const data = detail as NavItemSelectData; onItemSelect?.(data.value, data.href, data.label); onNavItemSelect?.(data.event, data); });
-  useSpuiEvent(ref, "spui-nav-category-toggle", detail => { const data = detail as NavCategoryToggleData; onCategoryToggle?.(data.value, data.open, data.openCategories); onNavCategoryItemToggle?.(data.event, data); });
+  useSpuiEvent(ref, "spui-nav-item-select", (detail, dispatchEvent) => { const data = detail as NavItemSelectData; onItemSelect?.(data.value, data.href, data.label); const event = createNavActionEvent(data.event, dispatchEvent, ref.current!); onNavItemSelect?.(event, { ...data, event } as NavReactItemSelectData); });
+  useSpuiEvent(ref, "spui-nav-category-toggle", (detail, dispatchEvent) => { const data = detail as NavCategoryToggleData; onCategoryToggle?.(data.value, data.open, data.openCategories); const event = createNavActionEvent(data.event, dispatchEvent, ref.current!); onNavCategoryItemToggle?.(event, { ...data, event } as NavReactCategoryToggleData); });
   useSpuiEvent(ref, "spui-nav-open-change", detail => onOpenChange?.(Boolean(detail.open)));
   useSpuiEvent(ref, "spui-nav-collapsed-change", detail => onCollapsedChange?.(Boolean(detail.collapsed)));
   React.useLayoutEffect(() => {

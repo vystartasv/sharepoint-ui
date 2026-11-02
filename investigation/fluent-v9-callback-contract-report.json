@@ -11,7 +11,7 @@
     "inheritedHandlerCollisions": 0,
     "eventTypeMismatches": 0,
     "payloadEventTypeMismatches": 0,
-    "payloadEventBranchMismatches": 33,
+    "payloadEventBranchMismatches": 15,
     "payloadEventBranchExtensions": 12
   },
   "inheritedHandlerCollisions": [],
@@ -118,168 +118,6 @@
       "localAssignableToFluent": false
     },
     {
-      "component": "Nav",
-      "callback": "onNavCategoryItemToggle",
-      "typeBranch": "undefined",
-      "fluentDataEventType": "Event | import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").SyntheticEvent<Element, Event>",
-      "localDataEventType": "<missing>",
-      "fluentAssignableToLocal": false,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "Nav",
-      "callback": "onNavCategoryItemToggle",
-      "typeBranch": "\"click\"",
-      "fluentDataEventType": "import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "Nav",
-      "callback": "onNavItemSelect",
-      "typeBranch": "undefined",
-      "fluentDataEventType": "Event | import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").SyntheticEvent<Element, Event>",
-      "localDataEventType": "<missing>",
-      "fluentAssignableToLocal": false,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "Nav",
-      "callback": "onNavItemSelect",
-      "typeBranch": "\"click\"",
-      "fluentDataEventType": "import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "NavDrawer",
-      "callback": "onNavCategoryItemToggle",
-      "typeBranch": "undefined",
-      "fluentDataEventType": "Event | SyntheticEvent<Element, Event>",
-      "localDataEventType": "<missing>",
-      "fluentAssignableToLocal": false,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "NavDrawer",
-      "callback": "onNavCategoryItemToggle",
-      "typeBranch": "\"click\"",
-      "fluentDataEventType": "MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "NavDrawer",
-      "callback": "onNavItemSelect",
-      "typeBranch": "undefined",
-      "fluentDataEventType": "Event | SyntheticEvent<Element, Event>",
-      "localDataEventType": "<missing>",
-      "fluentAssignableToLocal": false,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "NavDrawer",
-      "callback": "onNavItemSelect",
-      "typeBranch": "\"click\"",
-      "fluentDataEventType": "MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "Rating",
-      "callback": "onChange",
-      "typeBranch": "undefined",
-      "fluentDataEventType": "Event | import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").SyntheticEvent<Element, Event>",
-      "localDataEventType": "<missing>",
-      "fluentAssignableToLocal": false,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "Rating",
-      "callback": "onChange",
-      "typeBranch": "\"change\"",
-      "fluentDataEventType": "import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").FormEvent<HTMLDivElement>",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "TagPicker",
-      "callback": "onOpenChange",
-      "typeBranch": "undefined",
-      "fluentDataEventType": "Event | import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").SyntheticEvent<Element, Event>",
-      "localDataEventType": "<missing>",
-      "fluentAssignableToLocal": false,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "TagPicker",
-      "callback": "onOpenChange",
-      "typeBranch": "\"click\"",
-      "fluentDataEventType": "import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").MouseEvent<HTMLDivElement, MouseEvent>",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "TagPicker",
-      "callback": "onOpenChange",
-      "typeBranch": "\"keydown\"",
-      "fluentDataEventType": "import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").KeyboardEvent<HTMLDivElement>",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "TagPicker",
-      "callback": "onOptionSelect",
-      "typeBranch": "undefined",
-      "fluentDataEventType": "Event | import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").SyntheticEvent<Element, Event>",
-      "localDataEventType": "<missing>",
-      "fluentAssignableToLocal": false,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "TagPicker",
-      "callback": "onOptionSelect",
-      "typeBranch": "\"keydown\"",
-      "fluentDataEventType": "import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").KeyboardEvent<HTMLDivElement>",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "TagPicker",
-      "callback": "onOptionSelect",
-      "typeBranch": "\"click\"",
-      "fluentDataEventType": "import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").MouseEvent<HTMLDivElement, MouseEvent>",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "TagGroup",
-      "callback": "onTagSelect",
-      "typeBranch": "undefined",
-      "fluentDataEventType": "Event | import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").SyntheticEvent<Element, Event>",
-      "localDataEventType": "<missing>",
-      "fluentAssignableToLocal": false,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "TagGroup",
-      "callback": "onTagSelect",
-      "typeBranch": "\"click\"",
-      "fluentDataEventType": "import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").MouseEvent<HTMLButtonElement, MouseEvent>",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
       "component": "TeachingPopoverCarousel",
       "callback": "onFinish",
       "typeBranch": "undefined",
@@ -356,12 +194,6 @@
     {
       "component": "TagPicker",
       "callback": "onOpenChange",
-      "typeBranch": "\"programmatic\"",
-      "localDataEventType": "SharePointUIEvent"
-    },
-    {
-      "component": "TagPicker",
-      "callback": "onOpenChange",
       "typeBranch": "\"focusout\"",
       "localDataEventType": "SharePointUIEvent"
     },
@@ -376,6 +208,12 @@
       "callback": "onOpenChange",
       "typeBranch": "\"pointerdown\"",
       "localDataEventType": "SharePointUIEvent"
+    },
+    {
+      "component": "TagPicker",
+      "callback": "onOpenChange",
+      "typeBranch": "\"programmatic\"",
+      "localDataEventType": "Event"
     },
     {
       "component": "TeachingPopoverCarousel",

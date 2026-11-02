@@ -3,8 +3,16 @@ import { getFloatingPosition } from "./floating-position.js";
 
 type PickerOption = { value: string; label: string; group: string; disabled: boolean; selected: boolean; element: Element };
 export type TagPickerOpenChangeType = "click" | "keydown" | "input" | "focus" | "focusout" | "blur" | "pointerdown" | "programmatic";
-export type TagPickerOnOpenChangeData = { open: boolean; event?: Event; type: TagPickerOpenChangeType; reason: string };
-export type TagPickerOnOptionSelectData = { value: string; selectedOptions: string[]; event: MouseEvent | KeyboardEvent; type: "click" | "keydown" };
+export type TagPickerOnOpenChangeData = { open: boolean; reason: string } & (
+  | { event: MouseEvent; type: "click" }
+  | { event: KeyboardEvent; type: "keydown" }
+  | { event: Event; type: Exclude<TagPickerOpenChangeType, "click" | "keydown" | "programmatic"> }
+  | { event: Event; type: "programmatic" }
+);
+export type TagPickerOnOptionSelectData = { value: string; selectedOptions: string[] } & (
+  | { event: MouseEvent; type: "click" }
+  | { event: KeyboardEvent; type: "keydown" }
+);
 
 /** Searchable multi-select picker with native form association and light-DOM options. */
 export function defineTagPicker(): void {
@@ -117,7 +125,8 @@ export function defineTagPicker(): void {
       if (!changed) return;
       if (!this.openControlled) this.openState = value;
       this.syncAria();
-      this.dispatchEvent(new CustomEvent<TagPickerOnOpenChangeData>("spui-open-change", { detail: { open: value, reason, event, type: (event?.type ?? "programmatic") as TagPickerOpenChangeType }, bubbles: true, composed: true }));
+      const sourceEvent = event ?? new Event("programmatic");
+      this.dispatchEvent(new CustomEvent<TagPickerOnOpenChangeData>("spui-open-change", { detail: { open: value, reason, event: sourceEvent, type: sourceEvent.type as TagPickerOpenChangeType } as TagPickerOnOpenChangeData, bubbles: true, composed: true }));
     }
 
     formDisabledCallback(disabled: boolean): void { this.formDisabled = disabled; const input = this.input(); if (input) input.disabled = this.isDisabled(); this.syncAria(); }
@@ -234,7 +243,10 @@ export function defineTagPicker(): void {
       this.syncAria();
       this.syncForm();
       this.dispatchEvent(new CustomEvent("spui-change", { detail: { values: this.value, selectedValues: this.value }, bubbles: true, composed: true }));
-      this.dispatchEvent(new CustomEvent<TagPickerOnOptionSelectData>("spui-option-select", { detail: { value, selectedOptions: this.value, event, type: event.type as "click" | "keydown" }, bubbles: true, composed: true }));
+      const detail: TagPickerOnOptionSelectData = event instanceof KeyboardEvent
+        ? { value, selectedOptions: this.value, event, type: "keydown" }
+        : { value, selectedOptions: this.value, event: event as MouseEvent, type: "click" };
+      this.dispatchEvent(new CustomEvent<TagPickerOnOptionSelectData>("spui-option-select", { detail, bubbles: true, composed: true }));
     }
     private removeValue(value: string): void {
       if (!this.selected.has(value) || this.isDisabled()) return;

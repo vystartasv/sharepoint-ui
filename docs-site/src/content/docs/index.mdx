@@ -1,14 +1,14 @@
 ---
 title: SharePoint UI
-description: A theme-aware component library for SharePoint Framework 1.24.
+description: Framework-independent components for SharePoint Framework 1.24, with React adapters, theme inheritance, and a searchable API catalog.
 template: splash
 hero:
-  tagline: Components and reusable views for SharePoint Framework 1.24. Keep the host theme. Bring your own framework.
+  tagline: Build SharePoint experiences with a focused component library. Keep the tenant theme, choose your framework, and ship only the pieces you use.
   actions:
-    - text: Browse the component catalog
+    - text: Browse components
       link: /sharepoint-ui-docs/catalog/
       variant: primary
-    - text: Get started
+    - text: Start with SPFx
       link: /sharepoint-ui-docs/getting-started/
       variant: minimal
 ---
@@ -17,25 +17,42 @@ import PreviewBench from "../../components/PreviewBench.astro";
 
 <PreviewBench />
 
-## Start with the host, keep your own stack
+## A component system shaped for SharePoint
 
-SharePoint UI maps SharePoint and Fluent theme values into reusable controls. Use the React adapter in SPFx, or register custom elements directly when React is not part of the page.
+SharePoint UI gives SPFx developers and coding agents a searchable set of controls, compound components, and reusable SharePoint views. Components inherit SharePoint and Fluent theme values. Use the React adapter in SPFx, or register custom elements directly from plain JavaScript and other frameworks.
 
 ```sh
 npm install @vilius/sharepoint-ui
 ```
 
-The package keeps React optional for custom-element consumers and supports SPFx 1.24 with React 18.
+The package targets SPFx 1.24 and React 18. React is an optional peer dependency; custom-element consumers can import only the definitions they need.
 
-## Find the component that fits
+## Find a useful starting point
 
-The catalog includes every named component in the Fluent UI React v9 suite baseline used by this library, plus SharePoint-focused additions such as `ViewCard` and `RichTextEditor`. Search component names, slots, and API summaries from the navigation search.
+The catalog contains 243 named exports across 62 modules, including the named component surface from the pinned Fluent UI React v9 baseline and SharePoint additions such as `ViewCard` and `RichTextEditor`. Search names, slots, callback props, and API summaries from the site search.
 
-<a class="catalog-link" href="/sharepoint-ui-docs/catalog/">Explore 243 catalog entries <span aria-hidden="true">→</span></a>
+<a class="catalog-link" href="/sharepoint-ui-docs/catalog/">Explore the component catalog <span aria-hidden="true">→</span></a>
 
-:::note[First npm release in progress]
-The package is not yet on the public npm registry. The install command above will work after the first release.
+:::caution[Initial npm release]
+The package is prepared for its first public npm release. The install command will work after the maintainer publishes it. Follow the release notes in the [GitHub repository](https://github.com/vystartasv/sharepoint-ui) for current status.
 :::
+
+## Keep composition lightweight
+
+The React adapter is convenient for SPFx projects. For other frameworks, import a leaf element definition and register it once. Both approaches use the same theme-aware custom-element implementation.
+
+<div class="entry-points">
+  <section>
+    <h3>React in SPFx</h3>
+    <p>Use familiar React props and compose components inside your web part.</p>
+    <a href="/sharepoint-ui-docs/getting-started/">React quick start <span aria-hidden="true">→</span></a>
+  </section>
+  <section>
+    <h3>Custom elements</h3>
+    <p>Register a leaf component and use it in plain HTML or another framework.</p>
+    <a href="/sharepoint-ui-docs/components/button/">See the Button API <span aria-hidden="true">→</span></a>
+  </section>
+</div>
 
 ## Compose an SPFx view
 
@@ -49,4 +66,4 @@ import { Button, SharePointUIProvider, ViewCard } from "@vilius/sharepoint-ui/re
 </SharePointUIProvider>
 ```
 
-The `lang` value controls localization and text direction. Components inherit the site theme and remain in the SharePoint section that owns them.
+The `lang` value controls localization and direction. Components inherit the site theme and stay within the SharePoint section that owns them. Keep SharePoint data access and persistence in the web part; the UI components expose the interaction and value changes.
