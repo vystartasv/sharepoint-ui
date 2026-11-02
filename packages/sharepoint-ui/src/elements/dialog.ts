@@ -152,8 +152,22 @@ export function defineDialog(): void {
     }
 
     private focusableElements(): HTMLElement[] {
-      return [...this.querySelectorAll<HTMLElement>('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')]
-        .filter(element => !element.closest('[slot="trigger"]') && element.getClientRects().length > 0);
+      const selector = 'button,a[href],input,select,textarea,[tabindex]';
+      const controls: HTMLElement[] = [];
+      const seen = new Set<HTMLElement>();
+      const visit = (root: ParentNode): void => {
+        for (const element of root.querySelectorAll<HTMLElement>("*")) {
+          if (element.closest('[slot="trigger"]')) continue;
+          if (element.matches(selector) && !element.matches(":disabled") && element.tabIndex >= 0 && element.getClientRects().length > 0 && !seen.has(element)) {
+            controls.push(element);
+            seen.add(element);
+          }
+          if (element.shadowRoot) visit(element.shadowRoot);
+          if (element instanceof HTMLSlotElement) for (const assigned of element.assignedElements({ flatten: true })) visit(assigned);
+        }
+      };
+      visit(this);
+      return controls;
     }
 
     private closeDialog(type: DialogOpenChangeData["type"], event: DialogOpenChangeData["event"]): void {

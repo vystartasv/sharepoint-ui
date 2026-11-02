@@ -178,7 +178,7 @@
       ],
       "localStatus": "partial",
       "purpose": "Present a focused modal or non-modal task surface.",
-      "coverageNote": "A local implementation exists, but family-level behavior, accessibility, theme, composition, documentation, and performance parity are not yet complete."
+      "coverageNote": "React and custom-element Dialog paths cover modal and alert semantics, accessible title names, trigger/close/backdrop/Escape events, custom backdrop composition, forced colors, and contained focus. The legacy contained-focus trap includes controls inside nested shadow roots; the rendered Chromium fixture has zero axe WCAG 2.2 A/AA violations. Full Fluent theme/performance and cross-browser, assistive-technology, and tenant parity remain under review."
     },
     {
       "family": "divider",

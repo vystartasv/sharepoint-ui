@@ -22,7 +22,7 @@ const bundle = await build({
   stdin: {
     contents: `import * as React from "react";
       import { createRoot } from "react-dom/client";
-      import { Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, DialogTrigger } from "${resolve("packages/sharepoint-ui/src/react.tsx")}";
+      import { Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, DialogTrigger, Input } from "${resolve("packages/sharepoint-ui/src/react.tsx")}";
       import { defineDialog } from "${resolve("packages/sharepoint-ui/src/elements/dialog.ts")}";
       defineDialog();
       function Motion({ visible, slot, unmountOnExit, children }) { return !visible && unmountOnExit ? null : <div slot={slot} data-motion={slot} data-visible={String(visible)}>{children}</div>; }
@@ -36,7 +36,7 @@ const bundle = await build({
           <Dialog data-testid="composed" open={open} closeLabel="Dismiss composed dialog" surfaceMotion={Motion} onOpenChange={(event,data) => { window.dialogOpenChanges.push({open:data.open,type:data.type,eventType:event.type,sameEvent:event===data.event,currentTarget:event.currentTarget.tagName,nativeEventType:event.nativeEvent.type}); setOpen(data.open); setChanges(current => [...current, data.open]); }}><DialogTrigger><button data-testid="trigger">Open composed dialog</button></DialogTrigger><DialogTrigger disableButtonEnhancement><button data-testid="plain-trigger">Open without enhancement</button></DialogTrigger><DialogSurface backdrop={{ appearance: "dimmed" }} backdropMotion={Motion}><DialogContent><DialogTitle action={<button data-testid="dialog-title-action">Help</button>}>Composed dialog title</DialogTitle><DialogBody><p data-testid="body-copy">Composed dialog body</p></DialogBody><DialogActions><button data-testid="action">Save</button></DialogActions></DialogContent></DialogSurface></Dialog>
           <output data-testid="changes">{changes.join(",")}</output>
           <Dialog data-testid="legacy" inertTrapFocus unmountOnClose={false} title="Legacy title" actions={<button data-testid="legacy-action">Done</button>}><p data-testid="legacy-copy">Legacy body</p></Dialog>
-          <button data-testid="fallback-trigger" onClick={() => setFallbackOpen(true)}>Open contained-focus dialog</button><Dialog data-testid="fallback" open={fallbackOpen} onOpenChange={(event,data) => {window.fallbackOpenChanges.push({open:data.open,type:data.type,eventType:event.type,sameEvent:event===data.event});setFallbackOpen(data.open)}} inertTrapFocus={false}><DialogSurface><DialogTitle>Contained focus</DialogTitle><DialogBody><button data-testid="fallback-one">First</button><button data-testid="fallback-two">Last</button></DialogBody></DialogSurface></Dialog>
+          <button data-testid="fallback-trigger" onClick={() => setFallbackOpen(true)}>Open contained-focus dialog</button><Dialog data-testid="fallback" open={fallbackOpen} onOpenChange={(event,data) => {window.fallbackOpenChanges.push({open:data.open,type:data.type,eventType:event.type,sameEvent:event===data.event});setFallbackOpen(data.open)}} inertTrapFocus={false}><DialogSurface><DialogTitle>Contained focus</DialogTitle><DialogBody><button data-testid="fallback-one">First</button><Input data-testid="fallback-input" aria-label="Fallback dialog field"/><button data-testid="fallback-two">Last</button></DialogBody></DialogSurface></Dialog>
         </>;
       }
       createRoot(document.querySelector("#root")).render(<App/>);window.dialogOpenChanges=[];window.fallbackOpenChanges=[];`,
@@ -59,6 +59,7 @@ try {
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
   await page.goto(`http://127.0.0.1:${server.address().port}`);
+  await page.addScriptTag({ path: require.resolve("axe-core") });
 
   const alert = page.getByTestId("alert");
   await page.waitForFunction(() => document.querySelector("[data-testid=alert]")?.shadowRoot?.querySelector("dialog")?.open);
@@ -164,7 +165,12 @@ try {
   await fallbackTrigger.click();
   await page.waitForFunction(() => document.querySelector("[data-testid=fallback]")?.shadowRoot?.querySelector("dialog")?.open);
   assert.deepEqual(await fallback.evaluate(host => ({ ariaModal: host.shadowRoot.querySelector("dialog").getAttribute("aria-modal"), backdropHidden: host.shadowRoot.querySelector(".modal-backdrop").hidden })), { ariaModal: "true", backdropHidden: false }, "inertTrapFocus=false retains modal semantics with a themed overlay");
+  const dialogViolations = await page.evaluate(async () => (await axe.run(document.querySelector('[data-testid="fallback"]'), { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"] } })).violations.map(({ id, help, nodes }) => ({ id, help, targets: nodes.map(node => node.target) })));
+  assert.deepEqual(dialogViolations, [], `contained-focus Dialog passes axe WCAG checks: ${JSON.stringify(dialogViolations)}`);
   await page.waitForFunction(() => document.querySelector("[data-testid=fallback-one]")?.matches(":focus"));
+  assert.equal(await page.getByRole("textbox", { name: "Fallback dialog field" }).count(), 1, "custom control in contained modal has an accessible name");
+  await page.keyboard.press("Tab");
+  assert.equal(await page.getByTestId("fallback-input").locator("input").evaluate(element => element.matches(":focus")), true, "Tab follows focus into the input shadow root");
   await page.keyboard.press("Tab");
   assert.equal(await page.getByTestId("fallback-two").evaluate(element => element.matches(":focus")), true, "Tab advances inside the modal");
   await page.keyboard.press("Tab");
@@ -192,7 +198,7 @@ try {
   await page.waitForTimeout(50);
   assert.equal(await fallbackTrigger.evaluate(element => element.matches(":focus")), true, "closing restores focus to the trigger");
   assert.deepEqual(errors, [], "no browser errors");
-  console.log(JSON.stringify({ status: "passed", reactComposition: true, nativeComposition: true, triggerAndAccessibleName: true, controlledOpenAndClose: true, defaultOpenAndAlertMode: true, triggerActionAndEnhancement: true, unmountOnClose: true, dialogActionsPositionAndFluid: true, inertTrapFocusOptOut: true, focusContainmentAndRestoration: true, legacyApi: true, forcedColors: { system: dialogSystemColors, rendered: dialogForcedColors }, noPageErrors: true, screenshot: "test-results/dialog-composition.png" }, null, 2));
+  console.log(JSON.stringify({ status: "passed", reactComposition: true, nativeComposition: true, triggerAndAccessibleName: true, controlledOpenAndClose: true, defaultOpenAndAlertMode: true, triggerActionAndEnhancement: true, unmountOnClose: true, dialogActionsPositionAndFluid: true, inertTrapFocusOptOut: true, focusContainmentAndRestoration: true, shadowRootTabOrder: true, axeViolations: 0, legacyApi: true, forcedColors: { system: dialogSystemColors, rendered: dialogForcedColors }, noPageErrors: true, screenshot: "test-results/dialog-composition.png" }, null, 2));
 } finally {
   await browser?.close();
   server.close();
