@@ -244,13 +244,25 @@ export function defineSpinButton(): void {
     private handleBlur = (event: Event): void => this.commit(event.currentTarget as HTMLInputElement, event);
     private handleKeyDown = (rawEvent: Event): void => {
       const event = rawEvent as KeyboardEvent; const input = event.currentTarget as HTMLInputElement;
-      if (event.altKey || event.ctrlKey || event.metaKey || input.readOnly) return;
-      if (event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "PageUp" || event.key === "PageDown") { event.preventDefault(); this.step(input, event, event.key === "ArrowUp" || event.key === "PageUp" ? 1 : -1, event.key.startsWith("Page")); }
-      else if (event.key === "Home" && this.hasAttribute("min")) { event.preventDefault(); const min = Number(this.getAttribute("min")); if (this.numberValue() !== min) this.emitChange(input, event, min); }
-      else if (event.key === "End" && this.hasAttribute("max")) { event.preventDefault(); const max = Number(this.getAttribute("max")); if (this.numberValue() !== max) this.emitChange(input, event, max); }
-      else if (event.key === "Enter") { event.preventDefault(); this.commit(input, event); }
+      if (input.readOnly) return;
+      if (event.key === "ArrowUp" || event.key === "ArrowDown") this.step(input, event, event.key === "ArrowUp" ? 1 : -1);
+      else if (event.key === "PageUp" || event.key === "PageDown") { event.preventDefault(); this.step(input, event, event.key === "PageUp" ? 1 : -1, true); }
+      else if (event.key === "Home" && !event.shiftKey && this.hasAttribute("min")) { const min = Number(this.getAttribute("min")); if (this.numberValue() !== min) this.emitChange(input, event, min); }
+      else if (event.key === "End" && !event.shiftKey && this.hasAttribute("max")) { const max = Number(this.getAttribute("max")); if (this.numberValue() !== max) this.emitChange(input, event, max); }
+      else if (event.key === "Enter") { this.commit(input, event); this.submitFormFromEnter(input); }
       else if (event.key === "Escape" && this.draft !== undefined) { input.value = this.getAttribute("display-value") ?? this.currentValue ?? ""; this.draft = undefined; this.previousDraft = undefined; this.syncAria(input); }
     };
+    private submitFormFromEnter(input: HTMLInputElement): void {
+      const form = this.form;
+      if (!form || input.form === form) return;
+      const submitter = Array.from(form.elements).find((control): control is HTMLButtonElement | HTMLInputElement =>
+        control instanceof HTMLButtonElement && control.type === "submit"
+        || control instanceof HTMLInputElement && (control.type === "submit" || control.type === "image")
+      );
+      if (submitter) {
+        if (!submitter.disabled) form.requestSubmit(submitter);
+      } else form.requestSubmit();
+    }
     private handleDecrement = (event: Event): void => this.handleStepButton(event, -1);
     private handleIncrement = (event: Event): void => this.handleStepButton(event, 1);
     private handleStepButton(event: Event, direction: number): void {

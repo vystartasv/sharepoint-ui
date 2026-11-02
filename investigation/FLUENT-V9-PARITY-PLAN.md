@@ -1,5 +1,9 @@
 # Fluent UI React v9 parity plan
 
+### SpinButton keyboard defaults and Enter submission — Fluent 9.75.0 runtime and local Chromium, 2026-11-03
+
+Fluent only prevents the browser default for PageUp/PageDown. The local SpinButton had also canceled ArrowUp/ArrowDown, Home/End, and Enter, suppressed modified key combinations, and let Shift+Home/End change the bound. It now matches Fluent's default-prevention and Shift behavior. Enter commits and submits the associated form, activating its default submitter when the internal shadow input itself has no form owner; assigned inputs retain native submission. The verifier mounts the pinned Fluent SpinButton beside the local control, compares key default-prevention, confirms both forms submit on Enter, and checks shadow-input form submission. `verify:spin-button-parity` passes with zero page errors. Remaining cross-browser, assistive-technology, theme, tenant, and family performance parity are open.
+
 ### SearchBox native constraint validation — Fluent 9.75.0 input behavior and local Chromium, 2026-11-03
 
 The SearchBox custom element forwarded native constraints such as `minlength` and `pattern` to its shadow input but only reflected `required` through `ElementInternals`. The enclosing form therefore missed native `tooShort` and `patternMismatch` states. It now maps the shadow input's `ValidityState` flags and validation message to the form-associated host. `verify:search-box-parity` confirms short and pattern-mismatched values fail the associated form and valid text restores `:valid`; it is now included in the form-controls sweep. The full `parity:check` also passes. Cross-browser, assistive-technology, tenant, and SearchBox-wide visual/performance parity remain open.

@@ -21,7 +21,7 @@ assert.deepEqual(typeErrors, [], `SpinButton Fluent event contract should type-c
 const bundle = await build({
   stdin: {
     sourcefile: "spin-button-parity.tsx", loader: "tsx", resolveDir: process.cwd(),
-    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{SpinButton}from"${resolve("packages/sharepoint-ui/src/react.tsx")}";import{defineSpinButton}from"${resolve("packages/sharepoint-ui/src/elements/spin-button.ts")}";window.changes=[];window.edits=[];function App(){const[value,setValue]=React.useState(2);return <form id="react-form"><SpinButton data-testid="controlled" label="Weight" name="weight" value={value} displayValue={value.toFixed(1)+" kg"} min={0} max={5} step={0.1} stepPage={1} precision={1} incrementLabel="Increase weight" decrementLabel="Decrease weight" onChange={(event,data)=>{window.changes.push([data.value,data.displayValue,event.target.value,event.currentTarget===event.target,event.nativeEvent.type,event.nativeEvent.key,event.key,event.currentTarget.tagName,typeof event.preventDefault,typeof event.stopPropagation,typeof event.persist,typeof event.isDefaultPrevented]);setValue(data.value)}} onValueChange={v=>window.edits.push(v)}/><SpinButton data-testid="default" label="Quantity" name="quantity" defaultValue={3.2} displayValue="ignored uncontrolled display" min={0} max={4} step={0.2} size="small" appearance="filled-lighter"/><SpinButton data-testid="slotted" label="Slotted quantity" name="slotted" defaultValue={1} min={0} max={2} step={1} input={{inputMode:"numeric", "data-testid":"slotted-input"}} incrementButton={{"data-testid":"slotted-increment"}} decrementButton={{"data-testid":"slotted-decrement"}}/><button type="reset">Reset</button></form>};createRoot(document.querySelector("#react")).render(<App/>);window.mountNative=()=>{defineSpinButton();const form=document.querySelector("#native-form");const el=document.createElement("spui-spin-button");el.dataset.testid="native";el.setAttribute("label","Native count");el.setAttribute("name","count");el.setAttribute("default-value","4");el.setAttribute("min","0");el.setAttribute("max","4");el.setAttribute("step","1");el.setAttribute("aria-valuetext","Four items");el.setAttribute("appearance","underline");el.setAttribute("dir","rtl");form.append(el);const reset=document.createElement("button");reset.type="reset";reset.textContent="Reset native";form.append(reset)};window.mountNative();`,
+    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{SpinButton}from"${resolve("packages/sharepoint-ui/src/react.tsx")}";import{defineSpinButton}from"${resolve("packages/sharepoint-ui/src/elements/spin-button.ts")}";import{SpinButton as FluentSpinButton}from"@fluentui/react-spinbutton";window.changes=[];window.edits=[];window.formSubmits={local:0,fluent:0,native:0};window.keyDefaults=[];function App(){const[value,setValue]=React.useState(2);return <><form id="react-form" onSubmit={event=>{event.preventDefault();window.formSubmits.local++}}><SpinButton data-testid="controlled" label="Weight" name="weight" value={value} displayValue={value.toFixed(1)+" kg"} min={0} max={5} step={0.1} stepPage={1} precision={1} incrementLabel="Increase weight" decrementLabel="Decrease weight" onChange={(event,data)=>{window.changes.push([data.value,data.displayValue,event.target.value,event.currentTarget===event.target,event.nativeEvent.type,event.nativeEvent.key,event.key,event.currentTarget.tagName,typeof event.preventDefault,typeof event.stopPropagation,typeof event.persist,typeof event.isDefaultPrevented]);setValue(data.value)}} onValueChange={v=>window.edits.push(v)}/><SpinButton data-testid="default" label="Quantity" name="quantity" defaultValue={3.2} displayValue="ignored uncontrolled display" min={0} max={4} step={0.2} size="small" appearance="filled-lighter"/><SpinButton data-testid="slotted" label="Slotted quantity" name="slotted" defaultValue={1} min={0} max={2} step={1} input={{inputMode:"numeric", "data-testid":"slotted-input"}} incrementButton={{"data-testid":"slotted-increment"}} decrementButton={{"data-testid":"slotted-decrement"}}/><button type="submit" name="action" value="save">Save</button><button type="reset">Reset</button></form><form id="fluent-form" onSubmit={event=>{event.preventDefault();window.formSubmits.fluent++}}><FluentSpinButton data-testid="fluent" aria-label="Fluent weight" defaultValue={2}/><button type="submit">Save Fluent</button></form></>};createRoot(document.querySelector("#react")).render(<App/>);document.querySelector("#native-form").addEventListener("submit",event=>{event.preventDefault();window.formSubmits.native++});window.mountNative=()=>{defineSpinButton();const form=document.querySelector("#native-form");const el=document.createElement("spui-spin-button");el.dataset.testid="native";el.setAttribute("label","Native count");el.setAttribute("name","count");el.setAttribute("default-value","4");el.setAttribute("min","0");el.setAttribute("max","4");el.setAttribute("step","1");el.setAttribute("aria-valuetext","Four items");el.setAttribute("appearance","underline");el.setAttribute("dir","rtl");form.append(el);const reset=document.createElement("button");reset.type="reset";reset.textContent="Reset native";form.append(reset)};window.mountNative();`,
   },
   bundle: true, format: "iife", platform: "browser", target: ["es2020"], write: false,
   alias: { react: resolve("node_modules/react"), "react-dom/client": resolve("examples/spfx124-webpart/node_modules/react-dom/client.js") },
@@ -40,7 +40,10 @@ try {
   await page.goto(`http://127.0.0.1:${server.address().port}`);
   const host = name => page.getByTestId(name);
   const input = name => host(name).locator("input:not([hidden])");
-  assert.equal(await page.getByRole("spinbutton", { name: "Weight" }).count(), 1, "visible label names the spinbutton");
+  const fluentInput = page.locator("#fluent-form input");
+  await input("controlled").evaluate(node => node.addEventListener("keydown", event => window.keyDefaults.push(["local", event.key, event.defaultPrevented])));
+  await fluentInput.evaluate(node => node.addEventListener("keydown", event => window.keyDefaults.push(["fluent", event.key, event.defaultPrevented])));
+  assert.equal(await page.getByRole("spinbutton", { name: "Weight", exact: true }).count(), 1, "visible label names the spinbutton");
   assert.equal(await input("controlled").getAttribute("role"), "spinbutton");
   assert.equal(await input("controlled").getAttribute("aria-valuenow"), "2");
   assert.equal(await input("controlled").getAttribute("aria-valuemin"), "0");
@@ -79,6 +82,8 @@ try {
   assert.equal(await host("controlled").locator("button").nth(0).isDisabled(), true, "upper stepper disables at max");
   await input("controlled").press("Home");
   await page.waitForFunction(() => document.querySelector('[data-testid="controlled"]').value === "0");
+  await input("controlled").press("Shift+End");
+  assert.equal(await host("controlled").evaluate(el => el.value), "0", "Shift+End preserves text-selection behavior instead of applying the max bound");
   assert.equal(await host("controlled").evaluate(el => el.value), "0", "Home moves to the min bound");
   const previousEditCount = await page.evaluate(() => window.edits.length);
   await input("controlled").fill("4.88");
@@ -89,6 +94,11 @@ try {
   await input("controlled").press("Enter");
   await page.waitForFunction(() => document.querySelector('[data-testid="controlled"]').value === "2.3");
   assert.equal(await host("controlled").evaluate(el => el.value), "2.3", "commit rounds to precision");
+  await fluentInput.press("Enter");
+  await page.waitForFunction(() => window.formSubmits.local === 1 && window.formSubmits.fluent === 1);
+  assert.deepEqual(await page.evaluate(() => window.formSubmits), { local: 1, fluent: 1, native: 0 }, "Enter submits both local and Fluent spinbutton forms");
+  assert.deepEqual(await page.evaluate(() => window.keyDefaults.filter(([source, key]) => key === "Enter")), [["local", "Enter", false], ["fluent", "Enter", false]], "Enter remains unprevented for native form submission");
+  assert.deepEqual(await page.evaluate(() => window.keyDefaults.filter(([source, key]) => ["ArrowUp", "PageUp", "End", "Home", "Enter"].includes(key))), [["local", "ArrowUp", false], ["local", "PageUp", true], ["local", "End", false], ["local", "Home", false], ["local", "End", false], ["local", "Enter", false], ["fluent", "Enter", false]], "only PageUp/PageDown prevent browser defaults, matching Fluent key behavior");
   assert.deepEqual((await page.evaluate(() => window.changes)).at(-1).slice(0, 2), [2.3, "2.34"], "commit reports the rounded value and entered display string");
   const uncontrolled = host("default");
   await uncontrolled.locator("button").nth(0).click();
@@ -104,6 +114,7 @@ try {
   assert.equal(await native.locator("button").nth(0).isDisabled(), true);
   await native.locator("input").fill("2");
   await native.locator("input").press("Enter");
+  assert.deepEqual(await page.evaluate(() => window.formSubmits.native), 1, "Enter submits an associated form when the internal input is in a shadow root");
   assert.deepEqual(await page.locator("#native-form").evaluate(form => [...new FormData(form).entries()]), [["count","2"]]);
   await page.getByRole("button", { name: "Reset native" }).click();
   assert.equal(await native.evaluate(el => el.value), "4", "form reset restores the default");
@@ -122,7 +133,7 @@ try {
   assert.equal(await native.evaluate(el => el.value), "2", "direct custom-element stepper slots use host stepping behavior");
   assert.deepEqual(await page.locator("#native-form").evaluate(form => [...new FormData(form).entries()]), [["count","2"]], "assigned input remains form-associated through host");
   assert.deepEqual(errors, []);
-  console.log(JSON.stringify({ status: "passed", replaceableInputAndStepperSlots: true, controlledAndDefaultValues: true, displayValue: true, callbacks: true, keyboardAndBounds: true, precisionAndStepPage: true, appearanceAndSize: true, steppers: true, nativeFormAndReset: true, pageErrors: errors.length }));
+  console.log(JSON.stringify({ status: "passed", enterFormSubmission: true, nativeKeyDefaultBehavior: true, replaceableInputAndStepperSlots: true, controlledAndDefaultValues: true, displayValue: true, callbacks: true, keyboardAndBounds: true, precisionAndStepPage: true, appearanceAndSize: true, steppers: true, nativeFormAndReset: true, pageErrors: errors.length }));
 } finally {
   await browser?.close();
   await new Promise((done, reject) => server.close(error => error ? reject(error) : done()));
