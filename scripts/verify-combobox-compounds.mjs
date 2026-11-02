@@ -169,6 +169,7 @@ try {
   await comboInput.press("x");
   await page.waitForFunction(() => window.events.comboOpen.at(-1)?.open === true);
   assert.deepEqual(await page.evaluate(() => window.events.comboOpen.slice(-1)), [{ open: true, eventType: "keydown", nativeType: "keydown", currentTarget: "INPUT" }], "typing opens the popup with the initiating key event");
+  assert.deepEqual(await page.evaluate(() => window.events.combo.at(-1).selectedOptions), [], "typing with no matching option clears the prior single selection through the React callback");
   await comboInput.press("Escape");
   assert.deepEqual(await page.evaluate(() => window.events.comboOpen.slice(-1)), [{ open: false, eventType: "keydown", nativeType: "keydown", currentTarget: "INPUT" }], "Escape closes the popup with the initiating key event");
   await comboInput.press("ArrowDown");
@@ -216,8 +217,14 @@ try {
   assert.equal(await activeOption(), "Gamma", "PageDown moves toward the last option and stops at the boundary");
   await keyboardInput.press("Tab");
   assert.equal(await keyboardInput.inputValue(), "Gamma", "Tab commits the active single-select option");
+
+  await keyboardInput.fill("be");
+  assert.equal(await activeOption(), "Beta", "typing activates the first enabled option with a matching prefix");
+  await keyboardInput.fill("zzz");
+  assert.equal(await keyboardInput.inputValue(), "zzz", "clearing a selection retains the user's unmatched search text");
+  assert.equal(await keyboardCombo.evaluate(element => element.selectedValue), "", "typing with no matching option clears the previous selection");
   assert.deepEqual(errors, []);
-  console.log(JSON.stringify({ status: "passed", dropdownReadonly: true, comboBoxComposition: true, optionGrouping: true, controlledCallbacks: true, dropdownSlots: true, nativeSlots: true, clearing: true, listboxKeyboard: true, multiselect: true, comboboxKeyboardParity: true, pageErrors: errors }));
+  console.log(JSON.stringify({ status: "passed", dropdownReadonly: true, comboBoxComposition: true, optionGrouping: true, controlledCallbacks: true, dropdownSlots: true, nativeSlots: true, clearing: true, listboxKeyboard: true, multiselect: true, comboboxKeyboardParity: true, typingPrefixActivation: true, typingClearsStaleSelection: true, pageErrors: errors }));
 } finally {
   await browser?.close();
   await new Promise((done, reject) => server.close(error => error ? reject(error) : done()));

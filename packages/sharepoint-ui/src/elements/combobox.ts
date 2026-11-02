@@ -23,7 +23,36 @@ export function defineCombobox(): void {
     private boundInput?: HTMLInputElement;
     private formDisabled = false;
     private slotInputDefaults?: NativeFormControlDefaults;
-    private readonly handleInput = (event: Event): void => { const input = this.getInput(); if (!input) return; const changed = !this.open; this.currentValue = input.value; this.dirty = true; this.activeIndex = -1; this.open = true; this.updateOptions(); this.syncFormState(); this.notifyOpenChange(true, event, changed); this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: input.value }, bubbles: true, composed: true })); };
+    private readonly handleInput = (event: Event): void => {
+      const input = this.getInput();
+      if (!input) return;
+      const changed = !this.open;
+      this.currentValue = input.value;
+      this.dirty = true;
+      const previousOption = this.activeOptionValue();
+      const query = input.value.trim().toLocaleLowerCase(this.lang || undefined);
+      const matchingOption = query ? this.optionElements().find(option =>
+        !this.isOptionDisabled(option) && (option.getAttribute("label") ?? option.textContent ?? "").trim().toLocaleLowerCase(this.lang || undefined).startsWith(query)
+      ) : undefined;
+      const options = this.filteredOptions();
+      this.activeIndex = matchingOption ? options.indexOf(matchingOption) : -1;
+      this.announceActiveOption(previousOption, event);
+      if (!this.hasAttribute("multiselect") && (this.selectedValueState || this.selectedOptionsState.length === 1) && (!query || !matchingOption)) {
+        this.selectedValueState = "";
+        this.selectedOptionsState = [];
+        this.selectionsDirty = true;
+        this.dispatchEvent(new CustomEvent("spui-change", {
+          detail: { event, value: input.value, selectedValue: undefined, optionText: undefined, selectedOptions: [] },
+          bubbles: true,
+          composed: true
+        }));
+      }
+      this.open = true;
+      this.updateOptions();
+      this.syncFormState();
+      this.notifyOpenChange(true, event, changed);
+      this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: input.value }, bubbles: true, composed: true }));
+    };
     private readonly handleInputClick = (event: Event): void => { if (!this.open) this.openList(0, event); };
     private readonly handleInputKeyDown = (event: KeyboardEvent): void => this.onKeyDown(event);
     private readonly handleInputBlur = (event: FocusEvent): void => { window.setTimeout(() => { if (!this.matches(":focus-within")) this.closeList(event); }, 0); };

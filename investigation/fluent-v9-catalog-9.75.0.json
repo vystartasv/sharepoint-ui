@@ -162,7 +162,7 @@
       ],
       "localStatus": "partial",
       "purpose": "Search or filter a list of options and choose a result.",
-      "coverageNote": "A local implementation exists, but family-level behavior, accessibility, theme, composition, documentation, and performance parity are not yet complete."
+      "coverageNote": "React and framework-neutral ComboBox, Dropdown, Listbox, Option, OptionGroup, and ComboboxProvider paths support grouped and disabled options, filtering, active-descendant keyboard navigation, multiselect tags, controlled callbacks, native forms, replaceable input/listbox/trigger/icon slots, and provider composition. Typing now activates the first enabled prefix match and clears a stale single selection when the query is empty or unmatched while retaining the typed query; focused Chromium coverage checks React callbacks and native state. The existing combined verifier also covers keyboard edges, disabled groups, RTL, selection, reset, state restore, and zero page errors. Full cross-browser, assistive-technology, theme-state, tenant, visual, and family-wide performance parity remain open."
     },
     {
       "family": "dialog",
