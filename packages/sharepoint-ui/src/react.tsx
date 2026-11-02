@@ -97,10 +97,15 @@ type SharePointUIEventData<T> = T extends { event: unknown }
   : T extends { event?: unknown }
     ? Omit<T, "event"> & { event?: SharePointUIEvent }
     : T;
-type MenuEventData<T> = T extends { event: unknown }
-  ? Omit<T, "event"> & { event: Event | React.KeyboardEvent<HTMLElement> | React.MouseEvent<Element> }
+type MenuEventData<T> = T extends { type: infer Type; event: infer E }
+  ? Type extends "clickOutside" | "scrollOutside"
+    ? Omit<T, "event"> & { event: E }
+    : Type extends "menuSafeZoneMouseEnter"
+      ? Omit<T, "event"> & { event: React.MouseEvent<Element> }
+      : Omit<T, "event"> & { event: E extends MouseEvent ? React.MouseEvent<HTMLElement> : E extends KeyboardEvent ? React.KeyboardEvent<HTMLElement> : E }
   : never;
-type MenuReactOpenChangeData = MenuEventData<MenuOpenChangeData>;
+type MenuReactOpenChangeData = MenuOpenChangeData extends infer T ? T extends MenuOpenChangeData ? MenuEventData<T> : never : never;
+type MenuReactOpenChangeEvent = MenuReactOpenChangeData["event"];
 type ElementProps = React.HTMLAttributes<HTMLElement> & { [attribute: `data-${string}`]: string | number | boolean | undefined };
 export type FieldControlProps = Pick<React.HTMLAttributes<HTMLElement>, "id" | "aria-label" | "aria-labelledby" | "aria-describedby" | "aria-description" | "aria-invalid" | "aria-required">;
 export type FieldControlOptions = { supportsLabelFor?: boolean; supportsRequired?: boolean; supportsSize?: boolean };
@@ -2439,7 +2444,7 @@ export type MenuProps = Omit<ElementProps, "onSelect" | "contextMenu"> & {
   closeOnScroll?: boolean; inline?: boolean; persistOnItemClick?: boolean; checkedValues?: MenuCheckedValues; defaultCheckedValues?: MenuCheckedValues;
   hasCheckmarks?: boolean; hasIcons?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>;
   onCheckedValueChange?: (event: MenuCheckedValueChangeEvent, data: MenuCheckedValueChangeData) => void;
-  onOpenChange?: (event: MenuOpenChangeData["event"], data: MenuReactOpenChangeData) => void; onSelect?: (value: string, label: string, checked: boolean) => void;
+  onOpenChange?: (event: MenuReactOpenChangeEvent, data: MenuReactOpenChangeData) => void; onSelect?: (value: string, label: string, checked: boolean) => void;
 };
 
 export function Menu({ children, trigger, label, placement, positioning, open, defaultOpen = false, contextMenu = false, openOnContext = contextMenu, openOnHover = false, hoverDelay = 300, closeOnScroll = false, inline = false, persistOnItemClick = false, checkedValues, defaultCheckedValues = {}, hasCheckmarks = false, hasIcons = false, surfaceMotion, onCheckedValueChange, onOpenChange, onSelect, ...props }: MenuProps): React.ReactElement {
@@ -2449,7 +2454,16 @@ export function Menu({ children, trigger, label, placement, positioning, open, d
   const motionVisible = open ?? motionState;
   const currentCheckedValues = checkedValues ?? internalCheckedValues;
   ensureDefined(defineMenu);
-  useSpuiEvent(ref, "spui-open-change", (detail, event) => { const change = detail as MenuOpenChangeData; if (open === undefined) setMotionState(change.open); onOpenChange?.(change.event, { ...change, bubble: Boolean(change.bubble || event.target !== event.currentTarget) }); });
+  useSpuiEvent(ref, "spui-open-change", (detail, event) => {
+    const change = detail as MenuOpenChangeData;
+    if (open === undefined) setMotionState(change.open);
+    const sourceEvent = change.event;
+    const callbackEvent = sourceEvent instanceof MouseEvent || sourceEvent instanceof KeyboardEvent
+      ? createReactEventBridge(sourceEvent, event, sourceEventTarget(sourceEvent, ref.current!))
+      : sourceEvent;
+    const dataEvent = change.type === "clickOutside" || change.type === "scrollOutside" ? sourceEvent : callbackEvent;
+    onOpenChange?.(callbackEvent as MenuReactOpenChangeEvent, { ...change, event: dataEvent } as MenuReactOpenChangeData);
+  });
   useSpuiEvent(ref, "spui-select", detail => onSelect?.(String(detail.value ?? ""), String(detail.label ?? ""), Boolean(detail.checked)));
   const selection = React.useMemo<MenuSelectionContextValue>(() => ({
     checkedValues: currentCheckedValues,
@@ -4740,9 +4754,11 @@ export function TreeItemPersonaLayout({ children, media, main, description, acti
 
 export type TreeInteractionEvent = React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>;
 export type TreeCheckedChangeEvent = React.ChangeEvent<HTMLElement>;
-export type TreeOpenChangeData = { event: TreeInteractionEvent; open: boolean; openItems: Set<string>; value: string; target: HTMLElement; type: "ExpandIconClick" | "Click" | "ArrowLeft" | "ArrowRight" | "Enter" };
-export type TreeItemOpenChangeData = { event: TreeInteractionEvent; open: boolean; value: string | number; target: HTMLElement; type: "ExpandIconClick" | "Click" | "ArrowLeft" | "ArrowRight" | "Enter" };
-export type TreeNavigationData = { event: TreeInteractionEvent; target: HTMLElement; value: string; parentValue?: string; type: string; isScrollPrevented: boolean; preventScroll: () => void };
+type TreeOpenChangeEventMap = { ExpandIconClick: React.MouseEvent<HTMLElement>; Click: React.MouseEvent<HTMLElement>; ArrowLeft: React.KeyboardEvent<HTMLElement>; ArrowRight: React.KeyboardEvent<HTMLElement>; Enter: React.KeyboardEvent<HTMLElement> };
+type TreeNavigationEventMap = { Click: React.MouseEvent<HTMLElement>; TypeAhead: React.KeyboardEvent<HTMLElement>; ArrowRight: React.KeyboardEvent<HTMLElement>; ArrowLeft: React.KeyboardEvent<HTMLElement>; ArrowUp: React.KeyboardEvent<HTMLElement>; ArrowDown: React.KeyboardEvent<HTMLElement>; Home: React.KeyboardEvent<HTMLElement>; End: React.KeyboardEvent<HTMLElement> };
+export type TreeOpenChangeData = { [Type in keyof TreeOpenChangeEventMap]: { event: TreeOpenChangeEventMap[Type]; open: boolean; openItems: Set<string>; value: string; target: HTMLElement; type: Type } }[keyof TreeOpenChangeEventMap];
+export type TreeItemOpenChangeData = { [Type in keyof TreeOpenChangeEventMap]: { event: TreeOpenChangeEventMap[Type]; open: boolean; value: string | number; target: HTMLElement; type: Type } }[keyof TreeOpenChangeEventMap];
+export type TreeNavigationData = { [Type in keyof TreeNavigationEventMap]: { event: TreeNavigationEventMap[Type]; target: HTMLElement; value: string; parentValue?: string; type: Type; isScrollPrevented: boolean; preventScroll: () => void } }[keyof TreeNavigationEventMap];
 export type TreeItemProps = ElementProps & { itemType: "leaf" | "branch"; value?: string | number; open?: boolean; parentValue?: string | number; onOpenChange?: (event: TreeInteractionEvent, data: TreeItemOpenChangeData) => void; disabled?: boolean; children?: React.ReactNode };
 export function TreeItem(_props: TreeItemProps): null { return null; }
 
@@ -4827,30 +4843,31 @@ export function Tree<T>({ items, children, label, selectionMode = "none", select
     onSelectionChange?.(next, flattenAllTree(treeItems).filter(entry => next.includes(entry.key)).map(entry => entry.node));
     onCheckedChange?.(event, { value: key, checkedItems: nextChecked, target: refs.current.get(key) ?? event.currentTarget, event, type: "Change", selectionMode: effectiveSelectionMode === "multiple" ? "multiselect" : "single", checked });
   };
-  const updateExpanded = (key: string, event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>, type: "ExpandIconClick" | "Click" | "ArrowLeft" | "ArrowRight" | "Enter"): void => {
+  const updateExpanded = <Type extends keyof TreeOpenChangeEventMap,>(key: string, event: TreeOpenChangeEventMap[Type], type: Type): void => {
     const node = flattenAllTree(treeItems).find(entry => entry.key === key)?.node;
     if (node?.disabled) return;
     const next = expandedSet.has(key) ? activeExpanded.filter(value => value !== key) : [...activeExpanded, key];
     if (openItems === undefined && expandedKeys === undefined && node?.open === undefined) setInternalExpanded(next);
     onExpandedChange?.(next);
-    onOpenChange?.(event, { event, open: next.includes(key), openItems: new Set(next), value: key, target: refs.current.get(key) ?? event.currentTarget, type });
-    itemCallbacks.get(key)?.onOpenChange?.(event, { event, open: next.includes(key), value: node?.id ?? key, target: refs.current.get(key) ?? event.currentTarget, type });
+    onOpenChange?.(event, { event, open: next.includes(key), openItems: new Set(next), value: key, target: refs.current.get(key) ?? event.currentTarget, type } as Extract<TreeOpenChangeData, { type: Type }>);
+    itemCallbacks.get(key)?.onOpenChange?.(event, { event, open: next.includes(key), value: node?.id ?? key, target: refs.current.get(key) ?? event.currentTarget, type } as Extract<TreeItemOpenChangeData, { type: Type }>);
   };
-  const focusKey = (key: string | undefined, event: React.KeyboardEvent<HTMLElement>, type: string): void => {
+  function focusKey<Type extends keyof TreeNavigationEventMap>(key: string | undefined, event: TreeNavigationEventMap[Type], type: Type): void;
+  function focusKey(key: string | undefined, event: TreeInteractionEvent, type: keyof TreeNavigationEventMap): void {
     if (!key) return;
     setActiveKey(key);
     const entry = visible.find(candidate => candidate.key === key);
     const target = refs.current.get(key);
     if (entry && target) {
       let scrollPrevented = false;
-      const data: TreeNavigationData = { event, target, value: key, parentValue: entry.parentKey, type,
+      const data = { event, target, value: key, parentValue: entry.parentKey, type,
         get isScrollPrevented() { return scrollPrevented; },
         preventScroll: () => { scrollPrevented = true; }
-      };
+      } as unknown as TreeNavigationData;
       onNavigation?.(event, data);
       requestAnimationFrame(() => refs.current.get(key)?.focus({ preventScroll: data.isScrollPrevented }));
     } else requestAnimationFrame(() => refs.current.get(key)?.focus());
-  };
+  }
   const onTreeKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
     const row = (event.target as HTMLElement).closest<HTMLElement>("[data-tree-key]");
     if (!row) return;
@@ -4906,7 +4923,7 @@ export function Tree<T>({ items, children, label, selectionMode = "none", select
       <input ref={node => { if (node) selectorRefs.current.set(entry.key, node); else selectorRefs.current.delete(entry.key); }} data-tree-selector="" type="checkbox" name={`${selectorName}-tree-selection`} aria-label={entry.node.label} aria-checked={selectorChecked} aria-hidden="true" checked={selectorChecked === true} disabled={entry.node.disabled} tabIndex={-1} onClick={event => event.stopPropagation()} onChange={event => { event.stopPropagation(); setActiveKey(entry.key); updateSelected(entry.node, event); }} style={{ position: "absolute", inset: -3, width: 22, height: 22, margin: 0, opacity: 0, cursor: "pointer" }} />
     </span>;
     const hasChildren = Boolean(entry.node.children?.length);
-    const row = <div key={entry.key} ref={node => { if (node) refs.current.set(entry.key, node); else refs.current.delete(entry.key); }} className="spui-tree-item" data-tree-key={entry.key} role="treeitem" aria-level={entry.level} aria-posinset={entry.position} aria-setsize={entry.setSize} aria-expanded={hasChildren ? expandedSet.has(entry.key) : undefined} aria-selected={effectiveSelectionMode === "none" || effectiveSelectionMode === "multiple" ? undefined : selectedSet.has(entry.key)} aria-checked={effectiveSelectionMode === "multiple" ? selectorChecked : undefined} aria-disabled={entry.node.disabled || undefined} tabIndex={entry.key === currentActiveKey && visible.some(item => item.key === entry.key) ? 0 : -1} style={{ "--spui-tree-level": entry.level - 1 } as React.CSSProperties} onFocus={() => setActiveKey(entry.key)} onClick={event => { if ((event.target as HTMLElement).closest("button,a,input,select,textarea") || entry.node.disabled) return; setActiveKey(entry.key); event.currentTarget.focus(); selectorRefs.current.get(entry.key)?.click(); }}>
+    const row = <div key={entry.key} ref={node => { if (node) refs.current.set(entry.key, node); else refs.current.delete(entry.key); }} className="spui-tree-item" data-tree-key={entry.key} role="treeitem" aria-level={entry.level} aria-posinset={entry.position} aria-setsize={entry.setSize} aria-expanded={hasChildren ? expandedSet.has(entry.key) : undefined} aria-selected={effectiveSelectionMode === "none" || effectiveSelectionMode === "multiple" ? undefined : selectedSet.has(entry.key)} aria-checked={effectiveSelectionMode === "multiple" ? selectorChecked : undefined} aria-disabled={entry.node.disabled || undefined} tabIndex={entry.key === currentActiveKey && visible.some(item => item.key === entry.key) ? 0 : -1} style={{ "--spui-tree-level": entry.level - 1 } as React.CSSProperties} onFocus={() => setActiveKey(entry.key)} onClick={event => { if ((event.target as HTMLElement).closest("button,a,input,select,textarea") || entry.node.disabled) return; focusKey(entry.key, event, "Click"); event.currentTarget.focus(); selectorRefs.current.get(entry.key)?.click(); }}>
       {hasChildren ? <button type="button" className="spui-tree-disclosure" tabIndex={-1} aria-label={`${resolvedToggleLabel} ${entry.node.label}`} aria-expanded={expandedSet.has(entry.key)} disabled={entry.node.disabled} onClick={event => { event.stopPropagation(); setActiveKey(entry.key); updateExpanded(entry.key, event, "ExpandIconClick"); }}>{React.isValidElement(entry.node.value) ? (entry.node.value.props as TreeItemLayoutProps | TreeItemPersonaLayoutProps).expandIcon ?? <span className="spui-tree-chevron" aria-hidden="true" /> : <span className="spui-tree-chevron" aria-hidden="true" />}</button> : <span className="spui-tree-disclosure" aria-hidden="true" />}
       {selector}
       <span className="spui-tree-label">{effectiveRenderItem ? effectiveRenderItem(entry.node, entry.level) : entry.node.label}</span>
