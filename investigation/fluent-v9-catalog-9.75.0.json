@@ -1,0 +1,720 @@
+{
+  "reference": "@fluentui/react-components",
+  "version": "9.75.0",
+  "source": "Direct dependencies of the installed Fluent UI React v9 suite package",
+  "generatedOn": "2026-10-31",
+  "scopeNote": "This lists the suite component and data-rendering family packages, excluding shared React infrastructure. Local matches are partial until behaviors, API, accessibility, themes, composition, documentation, and performance gates pass.",
+  "infrastructurePackages": [
+    "@fluentui/react-aria",
+    "@fluentui/react-motion",
+    "@fluentui/react-portal",
+    "@fluentui/react-positioning",
+    "@fluentui/react-provider",
+    "@fluentui/react-shared-contexts",
+    "@fluentui/react-tabster",
+    "@fluentui/react-theme",
+    "@fluentui/react-utilities"
+  ],
+  "families": [
+    {
+      "family": "accordion",
+      "package": "@fluentui/react-accordion",
+      "componentExamples": [
+        "Accordion",
+        "AccordionHeader",
+        "AccordionItem",
+        "AccordionPanel",
+        "AccordionProvider"
+      ],
+      "localStatus": "partial",
+      "purpose": "Group related sections so readers can expand the details they need.",
+      "coverageNote": "React and custom-element Accordion/AccordionItem support single or multiple open panels, controlled/default item state, disabled items, labelled triggers and panels, keyboard activation, RTL direction, reduced motion, and theme tokens. Full appearance, screen-reader, tenant, and family-wide behavior parity remain under review."
+    },
+    {
+      "family": "alert",
+      "package": "@fluentui/react-alert",
+      "componentExamples": [
+        "Alert"
+      ],
+      "localStatus": "partial",
+      "purpose": "Announce important status messages and optional actions.",
+      "coverageNote": "React and framework-neutral Alert support info/success/warning/error intents, polite/assertive semantics, dismissal, actions, and primary/inverted appearances. Inverted colors derive from Fluent tokens or theme-aware fallbacks; local Chromium measures 15.52:1 contrast for the fallback. Forced-color/theme matrices, assistive technology, tenant, and full behavior/performance parity remain open."
+    },
+    {
+      "family": "avatar",
+      "package": "@fluentui/react-avatar",
+      "componentExamples": [
+        "Avatar",
+        "AvatarGroup",
+        "AvatarGroupItem",
+        "AvatarGroupPopover",
+        "AvatarGroupProvider"
+      ],
+      "localStatus": "partial",
+      "purpose": "Represent a person or group with identity, presence, or activity.",
+      "coverageNote": "Avatar supports Fluent active states, image/initial/fallback slots, stable accessible naming, and all 30 named palette colors with active SharePoint/Fluent token inheritance and theme-aware fallbacks. Generated initials follow Fluent word-count and small-size rules, inherited locale casing, and RTL ordering. AvatarGroupProvider shares size/layout; AvatarGroup supports stack, spread, and pie layouts, RTL-aware slices, and reachable expanded overflow; AvatarGroupPopover provides a localized, themed list. Full screen-reader behavior, all theme states, current-package tenant validation, and family-wide performance parity remain open."
+    },
+    {
+      "family": "badge",
+      "package": "@fluentui/react-badge",
+      "componentExamples": [
+        "Badge",
+        "CounterBadge",
+        "PresenceBadge"
+      ],
+      "localStatus": "partial",
+      "purpose": "Communicate a compact status or category beside related content.",
+      "coverageNote": "Badge and CounterBadge support Fluent's size, shape, color, appearance, count, overflow, dot, showZero, and icon-position APIs; PresenceBadge covers all eight statuses, size, custom icon, out-of-office marker, and accessible naming. All six Badge sizes measure 6/10/16/20/24/32px. Chromium verifies all 64 color/appearance token combinations against Fluent webLightTheme and webDarkTheme, with minimum 4.56:1 text contrast for filled/tint states; PresenceBadge uses Fluent neutral surfaces and status palette colors. Forced-colors emulation verifies all Badge appearances retain 7:1 text contrast and visible boundaries, and PresenceBadge uses distinct Canvas/CanvasText colors. React and native paths, counter updates, and accessible status labels pass. OS-level high contrast, assistive-technology, tenant, documentation, and family performance parity remain open."
+    },
+    {
+      "family": "breadcrumb",
+      "package": "@fluentui/react-breadcrumb",
+      "componentExamples": [
+        "Breadcrumb",
+        "BreadcrumbButton",
+        "BreadcrumbDivider",
+        "BreadcrumbItem"
+      ],
+      "localStatus": "partial",
+      "purpose": "Show a page location and provide navigation back to parent destinations.",
+      "coverageNote": "React Switch now accepts Fluent's documented label prop alongside the existing children alias; both produce the same associated native label and accessible switch name. It also supports controlled/default checked state, native form submission/validation/reset, disabled fieldsets, disabledFocusable, small/medium sizes, and before/after/above label placement. Chromium verifies the medium track/thumb dimensions match Fluent's 40x20px track and 18px thumb, and covers React/native form behavior, RTL ordering, and the explicit label prop. Full visual-state, forced-color, assistive-technology, tenant, and family performance parity remain open."
+    },
+    {
+      "family": "button",
+      "package": "@fluentui/react-button",
+      "componentExamples": [
+        "Button",
+        "CompoundButton",
+        "MenuButton",
+        "SplitButton",
+        "ToggleButton"
+      ],
+      "localStatus": "partial",
+      "purpose": "Trigger an action, submit work, or navigate when used as a link.",
+      "coverageNote": "Button React/native paths support primary, secondary, outline, subtle, and transparent appearances; small/medium/large sizes; rounded/circular/square shapes; icon placement; disabledFocusable; and SplitButton slot composition. React now also exports ButtonContextProvider/useButtonContext for a default size and infers icon-only layout from icon-without-children; explicit size overrides context. Button browser checks cover action semantics, slots, context inheritance, explicit overrides, icon-only inference, and zero page errors. Full button state/theme/contrast, assistive-technology, tenant, and family performance parity remain open."
+    },
+    {
+      "family": "card",
+      "package": "@fluentui/react-card",
+      "componentExamples": [
+        "Card",
+        "CardFooter",
+        "CardHeader",
+        "CardPreview"
+      ],
+      "localStatus": "partial",
+      "purpose": "Group related content and actions into a coherent surface.",
+      "coverageNote": "React and framework-neutral Card support selectable state through pointer, Space, and Enter on the Card/selection checkbox; Enter on nested actions does not toggle selection. Selectable actions, focus modes, floating actions, custom selection controls, RTL positioning, and controlled/default state have local browser coverage. Broader Card family appearance, assistive-technology, tenant, theme, and performance parity remain open."
+    },
+    {
+      "family": "carousel",
+      "package": "@fluentui/react-carousel",
+      "componentExamples": [
+        "Carousel",
+        "CarouselAutoplayButton",
+        "CarouselButton",
+        "CarouselCard",
+        "CarouselNav",
+        "CarouselNavButton",
+        "CarouselNavContainer",
+        "CarouselNavImageButton",
+        "CarouselProvider",
+        "CarouselSlider",
+        "CarouselViewport"
+      ],
+      "localStatus": "partial",
+      "purpose": "Browse a sequential collection of related items with previous and next controls.",
+      "coverageNote": "All eleven named Fluent Carousel React exports are available. Framework-neutral CarouselSlider and CarouselViewport elements support direct or nested Cards, controlled/default active index aliases, numeric or responsive auto grouping, circular navigation, mouse drag, whitespace padding, localized live announcements, previous/next/autoplay controls, image navigation, RTL focus movement, and slide/fade motion. Full drag physics, non-slide motion timing, grouped fade visuals, and screen-reader/browser parity remain under review."
+    },
+    {
+      "family": "checkbox",
+      "package": "@fluentui/react-checkbox",
+      "componentExamples": [
+        "Checkbox"
+      ],
+      "localStatus": "partial",
+      "purpose": "Select independent options and communicate checked or mixed state.",
+      "coverageNote": "Checkbox supports controlled/uncontrolled checked and mixed state, Fluent shape/size/label placement and change data, form association, validation, reset, fieldset disabling, and disabled-focusable behavior. Its native input and themed visual indicator are replaceable slots, verified through React props/elements and direct custom-element composition. The optional compact extension retains a 14px indicator while giving icon-only controls a tested 30x24px pointer target. Screen-reader, full theme-state, authenticated tenant, and family-wide parity remain open."
+    },
+    {
+      "family": "color-picker",
+      "package": "@fluentui/react-color-picker",
+      "componentExamples": [
+        "AlphaSlider",
+        "ColorArea",
+        "ColorPicker",
+        "ColorSlider"
+      ],
+      "localStatus": "partial",
+      "purpose": "Choose a color value from a palette or a precise color input.",
+      "coverageNote": "A native/React picker provides live SharePoint semantic swatches, HSV object control (h/s/v/a), saturation/value and hue interaction, HEX/RGB entry, opacity, form value/reset, and RTL-safe layout. ColorArea, ColorSlider, and AlphaSlider also support standalone controlled/default HSV state and per-control onChange. Additional color formats and full assistive-technology/theme parity remain open."
+    },
+    {
+      "family": "combobox",
+      "package": "@fluentui/react-combobox",
+      "componentExamples": [
+        "Combobox",
+        "ComboboxProvider",
+        "Dropdown",
+        "Listbox",
+        "Option",
+        "OptionGroup"
+      ],
+      "localStatus": "partial",
+      "purpose": "Search or filter a list of options and choose a result.",
+      "coverageNote": "A local implementation exists, but family-level behavior, accessibility, theme, composition, documentation, and performance parity are not yet complete."
+    },
+    {
+      "family": "dialog",
+      "package": "@fluentui/react-dialog",
+      "componentExamples": [
+        "Dialog",
+        "DialogActions",
+        "DialogBody",
+        "DialogContent",
+        "DialogSurface",
+        "DialogTitle",
+        "DialogTrigger"
+      ],
+      "localStatus": "partial",
+      "purpose": "Present a focused modal or non-modal task surface.",
+      "coverageNote": "A local implementation exists, but family-level behavior, accessibility, theme, composition, documentation, and performance parity are not yet complete."
+    },
+    {
+      "family": "divider",
+      "package": "@fluentui/react-divider",
+      "componentExamples": [
+        "Divider"
+      ],
+      "localStatus": "partial",
+      "purpose": "Visually and semantically separate adjacent content groups.",
+      "coverageNote": "Divider exposes separator semantics and orientation whether or not it has content. React wrapper content receives a stable ID referenced by aria-labelledby; framework-neutral slotted labels receive a generated accessible name unless the consumer supplies ARIA naming. React/native browser checks cover labeled/unlabeled and vertical cases, wrapper replacement, alignment, theme-derived appearance, and zero browser errors. Exact Fluent spacing/typography, screen-reader output, tenant behavior, and family performance parity remain open."
+    },
+    {
+      "family": "drawer",
+      "package": "@fluentui/react-drawer",
+      "componentExamples": [
+        "Drawer",
+        "DrawerBody",
+        "DrawerFooter",
+        "DrawerHeader",
+        "DrawerHeaderNavigation",
+        "DrawerHeaderTitle",
+        "InlineDrawer",
+        "OverlayDrawer"
+      ],
+      "localStatus": "partial",
+      "purpose": "Show a side panel or sheet that supports focused work alongside the page.",
+      "coverageNote": "A local implementation exists, but family-level behavior, accessibility, theme, composition, documentation, and performance parity are not yet complete."
+    },
+    {
+      "family": "field",
+      "package": "@fluentui/react-field",
+      "componentExamples": [
+        "Field"
+      ],
+      "localStatus": "partial",
+      "purpose": "Pair a form control with its label, validation, hint, and required state.",
+      "coverageNote": "React Field accepts a control element or Fluent-style render-function child receiving generated ID and ARIA control props. Built-in TextField, Input, TextArea, Select, RadioGroup, Checkbox, Switch, SpinButton, Slider, DatePicker, ComboBox, SearchBox, ColorPicker, FileUpload, RichTextEditor, and ProgressBar adapters consume Field context when nested under wrappers; context supplies accessible naming/descriptions plus required, disabled, size, and validation state where applicable. ProgressBar maps error/warning/success validation to its matching status color. Error and warning messages use role=alert; descriptions follow validation-message/hint/user order; success and warning do not mark controls invalid. Framework-neutral consumers can compose native or custom controls with createFormField. Broader Field family behavior, assistive-technology review, and tenant verification remain open."
+    },
+    {
+      "family": "image",
+      "package": "@fluentui/react-image",
+      "componentExamples": [
+        "Image"
+      ],
+      "localStatus": "partial",
+      "purpose": "Present an image with meaningful alternative text, sizing, and loading behavior.",
+      "coverageNote": "A native img adapter and framework-neutral factory provide fit, shape, border, shadow, srcSet/sizes, intrinsic dimensions, lazy loading/decoding, and fetch priority. The native factory configures srcSet, sizes, and intrinsic dimensions before src to avoid initiating a request before the responsive candidate and layout are ready. Chromium verifies source assignment order, fit modes, dimensions, alt text, and zero browser errors. Responsive network selection across browsers, full visual/accessibility coverage, tenant behavior, and family performance parity remain open."
+    },
+    {
+      "family": "infobutton",
+      "package": "@fluentui/react-infobutton",
+      "componentExamples": [
+        "InfoButton",
+        "InfoLabel"
+      ],
+      "localStatus": "partial",
+      "purpose": "Open contextual help from an information affordance.",
+      "coverageNote": "A local React and custom-element InfoButton are present and compose the Popover engine. Full Fluent interaction, localization, and screen-reader parity remain open."
+    },
+    {
+      "family": "infolabel",
+      "package": "@fluentui/react-infolabel",
+      "componentExamples": [
+        "InfoButton",
+        "InfoLabel"
+      ],
+      "localStatus": "partial",
+      "purpose": "Pair a field or status label with optional contextual help.",
+      "coverageNote": "A local InfoLabel pairs the native Label adapter with InfoButton in React and a DOM factory. Full Fluent variants and family-wide accessibility coverage remain open."
+    },
+    {
+      "family": "input",
+      "package": "@fluentui/react-input",
+      "componentExamples": [
+        "Input",
+        "SearchBox"
+      ],
+      "localStatus": "partial",
+      "purpose": "Accept short free-form text such as a query or value.",
+      "coverageNote": "A local implementation exists, but family-level behavior, accessibility, theme, composition, documentation, and performance parity are not yet complete."
+    },
+    {
+      "family": "label",
+      "package": "@fluentui/react-label",
+      "componentExamples": [
+        "Label"
+      ],
+      "localStatus": "partial",
+      "purpose": "Name a form control or related set of controls.",
+      "coverageNote": "Native-label React and DOM factory paths support Fluent size/type-ramp tokens, large-size semibold weight, required-marker color and spacing, custom required-slot content/props, theme-derived disabled foreground, and forced-colors GrayText. Required markers stay out of the accessible name; InfoLabel composition and label/InfoButton slot overrides have local browser coverage. Remaining work: full visual/theme matrix, assistive technology, SharePoint tenant, documentation, and family performance parity."
+    },
+    {
+      "family": "link",
+      "package": "@fluentui/react-link",
+      "componentExamples": [
+        "Link"
+      ],
+      "localStatus": "partial",
+      "purpose": "Navigate to a location using anchor semantics.",
+      "coverageNote": "React and framework-neutral Link support safe native URLs, subtle appearance, underline modes, inline text styling, disabledFocusable links, Fluent's no-href button default, and an explicit button/span render override. The span action supports Enter/Space; button actions default to type=button. Unsafe URL schemes are stripped and disabled actions suppress activation. Disabled focus styling uses the library focus token and forced-colors GrayText; broader visual, assistive-technology, tenant, and behavior/performance parity remain open."
+    },
+    {
+      "family": "list",
+      "package": "@fluentui/react-list",
+      "componentExamples": [
+        "DataGrid",
+        "List",
+        "ListItem"
+      ],
+      "localStatus": "partial",
+      "purpose": "Present and navigate a collection of related items.",
+      "coverageNote": "List and ListItem are Fluent React 9.75 components and are available as React adapters and framework-neutral custom elements. The library's indexed VirtualList is a SharePoint UI addition, not a Fluent component. List supports list/listbox/grid roles, single and multiselect state, cancelable item actions, disabledSelection, a checkmark slot, roving focus, vertical item navigation, and composite cell navigation with RTL-aware inline arrows. Broader Fluent selection details, visual parity, assistive-technology, and performance audits remain open."
+    },
+    {
+      "family": "menu",
+      "package": "@fluentui/react-menu",
+      "componentExamples": [
+        "Menu",
+        "MenuDivider",
+        "MenuGroup",
+        "MenuGroupHeader",
+        "MenuItem",
+        "MenuItemCheckbox",
+        "MenuItemLink",
+        "MenuItemRadio",
+        "MenuItemSwitch",
+        "MenuList",
+        "MenuPopover",
+        "MenuSplitGroup",
+        "MenuTrigger"
+      ],
+      "localStatus": "partial",
+      "purpose": "Offer a trigger-anchored list of commands with keyboard navigation.",
+      "coverageNote": "All 13 named Fluent Menu parts have React adapters and framework-neutral custom-element registrations. The family supports menu triggers/popovers/lists, split groups, native link items, checkbox/radio/switch roles, controlled/default checked values, icons, secondary shortcut text, subtext, persistent items, hover/context opening, close-on-scroll, inline surfaces, position/alignment/offset options, nested menus, typeahead, and LTR/RTL keyboard focus. Local Chromium behavior gates pass. Authenticated tenant verification of the current source, assistive-technology review, family-wide contrast, documentation parity, and bundle/performance measurement remain open."
+    },
+    {
+      "family": "message-bar",
+      "package": "@fluentui/react-message-bar",
+      "componentExamples": [
+        "MessageBar",
+        "MessageBarActions",
+        "MessageBarBody",
+        "MessageBarGroup",
+        "MessageBarTitle"
+      ],
+      "localStatus": "partial",
+      "purpose": "Show a persistent inline status, warning, or error near related work.",
+      "coverageNote": "A local implementation exists, but family-level behavior, accessibility, theme, composition, documentation, and performance parity are not yet complete."
+    },
+    {
+      "family": "nav",
+      "package": "@fluentui/react-nav",
+      "componentExamples": [
+        "AppItem",
+        "AppItemStatic",
+        "Hamburger",
+        "Nav",
+        "NavCategory",
+        "NavCategoryItem",
+        "NavDivider",
+        "NavDrawer",
+        "NavDrawerBody",
+        "NavDrawerFooter",
+        "NavDrawerHeader",
+        "NavItem",
+        "NavSectionHeader",
+        "NavSubItem",
+        "NavSubItemGroup",
+        "SplitNavItem"
+      ],
+      "localStatus": "partial",
+      "purpose": "Move between primary sections of an application.",
+      "coverageNote": "All 16 Fluent named exports have React adapters and framework-neutral custom-element entrypoints. Nav includes controlled/default item and category selection aliases/callbacks, density, RTL, responsive and compact rails, and localized mobile drawers. NavDrawer adds overlay/inline modes, drawer regions, and roving or tabbable keyboard modes; AppItem, AppItemStatic, Hamburger, and SplitNavItem are composed into the same selection engine. Local Chromium covers the new parts plus responsive, focus, RTL, and disabled-link paths; full family state, contrast, assistive-technology, tenant, and performance parity remain open."
+    },
+    {
+      "family": "overflow",
+      "package": "@fluentui/react-overflow",
+      "componentExamples": [
+        "Overflow",
+        "OverflowProvider",
+        "OverflowDivider",
+        "OverflowItem",
+        "OverflowReorderObserver",
+        "useOverflowSnapshot"
+      ],
+      "localStatus": "partial",
+      "purpose": "Keep action groups usable when some commands no longer fit.",
+      "coverageNote": "A native responsive command shelf and React adapter exist, but cross-family priority, layout, accessibility, theming, and measurement parity remain open."
+    },
+    {
+      "family": "persona",
+      "package": "@fluentui/react-persona",
+      "componentExamples": [
+        "Persona"
+      ],
+      "localStatus": "partial",
+      "purpose": "Present a person identity with name, role, and presence context.",
+      "coverageNote": "A local Persona custom element and React adapter compose the existing theme-aware Avatar with primary/secondary/tertiary identity text, size and layout variants, presence states, localized presence names, and avatar/details slots. Fluent persona variants, status breadth, interactive identity patterns, and tenant/accessibility/performance parity remain open."
+    },
+    {
+      "family": "popover",
+      "package": "@fluentui/react-popover",
+      "componentExamples": [
+        "Popover",
+        "PopoverProvider",
+        "PopoverSurface",
+        "PopoverTrigger"
+      ],
+      "localStatus": "partial",
+      "purpose": "Show a non-modal surface associated with a trigger.",
+      "coverageNote": "Popover supports composable Trigger and Surface parts in React and custom elements, collision-aware placement, ordered fallbackPositions, pinned placement, autoSize modes, matchTargetSize, RTL, and viewport clamping. Focused Chromium checks cover fallback priority, sizing, and interactions. Configurable collision boundaries and strategy, assistive technology, tenant, and performance parity remain open."
+    },
+    {
+      "family": "progress",
+      "package": "@fluentui/react-progress",
+      "componentExamples": [
+        "ProgressBar"
+      ],
+      "localStatus": "partial",
+      "purpose": "Communicate the progress of ongoing work.",
+      "coverageNote": "ProgressBar supports brand/success/warning/error colors, rounded/square shapes, medium/large thickness, clamped values, accessible indeterminate semantics, and a replaceable React/native bar slot. Inside Field it inherits error/warning/success color, label, hint, and validation-message references unless explicitly overridden. Determinate animation follows Fluent's 1% threshold; indeterminate motion is a 3-second RTL-aware sweep with a reduced-motion opacity pulse. Chromium verifies field contexts, host theme inheritance, custom bars, range clamping, reduced motion, and zero page errors. Contrast across status colors, screen-reader output, tenant behavior, and family performance parity remain open."
+    },
+    {
+      "family": "radio",
+      "package": "@fluentui/react-radio",
+      "componentExamples": [
+        "Radio",
+        "RadioGroup"
+      ],
+      "localStatus": "partial",
+      "purpose": "Choose one option from a related set.",
+      "coverageNote": "RadioGroup provides controlled/uncontrolled selection, Fluent vertical/horizontal/horizontal-stacked layouts, native keyboard/form behavior, per-option disabled and label placement, and Fluent-style group/item change data. Text-only option updates now refresh the accessible label in place, preserving the radio node and current keyboard focus instead of rebuilding the group. Screen-reader, full theme-state, authenticated tenant, and family-wide parity remain open."
+    },
+    {
+      "family": "rating",
+      "package": "@fluentui/react-rating",
+      "componentExamples": [
+        "Rating",
+        "RatingDisplay",
+        "RatingItem"
+      ],
+      "localStatus": "partial",
+      "purpose": "Display or collect a user score.",
+      "coverageNote": "Rating and interactive RatingItem are available as React adapters and framework-neutral custom elements. Static RatingDisplay supports count text, compact display, fractional fills, custom icon composition, generated or explicit accessible naming, and inherited theme tokens. Interactive Rating accepts custom filled and outline icon components or element slots. Family-level accessibility, theme, visual, documentation, and performance parity remains incomplete."
+    },
+    {
+      "family": "search",
+      "package": "@fluentui/react-search",
+      "componentExamples": [
+        "SearchBox"
+      ],
+      "localStatus": "partial",
+      "purpose": "Find matching content from a query.",
+      "coverageNote": "SearchBox is available through native and React entry points with theme-aware outline/underline/filled appearances, form value and reset support, clear action, RTL-safe layout, Enter submission, and Fluent contentBefore/contentAfter/dismiss composition. Chromium verifies slot order and native slot use. Full visual/forced-color, assistive-technology, and tenant parity remain open."
+    },
+    {
+      "family": "select",
+      "package": "@fluentui/react-select",
+      "componentExamples": [
+        "Select"
+      ],
+      "localStatus": "partial",
+      "purpose": "Choose a value from a fixed set of options.",
+      "coverageNote": "Select wraps a native select with controlled/default values, form association/reset/required validation, Field label and disabled/required context, Fluent size and appearance, change-event data, and replaceable select and icon slots. Local Chromium verifies React select-prop and React-element replacement, native custom-icon composition, accessibility naming, values, callbacks, form serialization, and reset. Native Select's full cross-platform visual/theme matrix, remaining Fluent native-select prop forwarding, assistive technology, tenant, documentation, and family performance parity remain open."
+    },
+    {
+      "family": "skeleton",
+      "package": "@fluentui/react-skeleton",
+      "componentExamples": [
+        "Skeleton",
+        "SkeletonItem"
+      ],
+      "localStatus": "partial",
+      "purpose": "Represent loading content with a stable structural placeholder.",
+      "coverageNote": "A local implementation exists, but family-level behavior, accessibility, theme, composition, documentation, and performance parity are not yet complete."
+    },
+    {
+      "family": "slider",
+      "package": "@fluentui/react-slider",
+      "componentExamples": [
+        "Slider"
+      ],
+      "localStatus": "partial",
+      "purpose": "Choose a numeric value within a range.",
+      "coverageNote": "A local implementation exists, but family-level behavior, accessibility, theme, composition, documentation, and performance parity are not yet complete."
+    },
+    {
+      "family": "spinbutton",
+      "package": "@fluentui/react-spinbutton",
+      "componentExamples": [
+        "SpinButton"
+      ],
+      "localStatus": "partial",
+      "purpose": "Edit a numeric value with increment and decrement controls.",
+      "coverageNote": "A local implementation exists, but family-level behavior, accessibility, theme, composition, documentation, and performance parity are not yet complete."
+    },
+    {
+      "family": "spinner",
+      "package": "@fluentui/react-spinner",
+      "componentExamples": [
+        "Spinner"
+      ],
+      "localStatus": "partial",
+      "purpose": "Indicate that work is in progress.",
+      "coverageNote": "React Spinner supports Fluent's exported SpinnerContextProvider/useSpinnerContext size fallback (explicit size prop wins), label/spinner/spinnerTail slots, all eight Fluent dimensions, primary/inverted appearances, four label positions, RTL, delayed visibility, localized labels, and reduced motion. The default indicator uses the Fluent-style masked track and segmented expanding tail, including RTL mirroring and a static reduced-motion fallback. Browser checks cover animation states, forced colors, dimensions, slots, and context; exact label typography, full tenant/assistive-technology coverage, and family performance parity remain open."
+    },
+    {
+      "family": "swatch-picker",
+      "package": "@fluentui/react-swatch-picker",
+      "componentExamples": [
+        "ColorSwatch",
+        "EmptySwatch",
+        "ImageSwatch",
+        "SwatchPicker",
+        "SwatchPickerRow"
+      ],
+      "localStatus": "partial",
+      "purpose": "Select one or more colors from a set of visual swatches.",
+      "coverageNote": "Native and React color/image swatches support single or multiple selection, controlled/default values, grid or row layouts, roving keyboard focus, RTL movement, and role-appropriate selected state. Selected rings now follow the host's selected state for both color and image swatches. All color/image/empty variants use Fluent's 20/24/28/32px size scale; picker spacing uses Fluent's 2/4px values. Browser coverage also caught and fixed EmptySwatch's recursive aria-label reflection. Fluent's reference is single-select; reusable named palettes, remaining interaction visuals, and assistive-technology parity remain open."
+    },
+    {
+      "family": "switch",
+      "package": "@fluentui/react-switch",
+      "componentExamples": [
+        "Switch"
+      ],
+      "localStatus": "partial",
+      "purpose": "Turn a setting on or off.",
+      "coverageNote": "React Switch accepts Fluent's documented label prop alongside the existing children alias; both produce the same associated native label and accessible switch name. It supports controlled/default checked state, native form submission/validation/reset, disabled fieldsets, disabledFocusable, small/medium sizes, and before/after/above label placement. Chromium verifies the medium track/thumb dimensions match Fluent's 40x20px track and 18px thumb, and covers React/native form behavior, RTL ordering, and the explicit label prop. Full visual-state, forced-color, assistive-technology, tenant, and family performance parity remain open."
+    },
+    {
+      "family": "table",
+      "package": "@fluentui/react-table",
+      "componentExamples": [
+        "ColumnIdContextProvider",
+        "DataGrid",
+        "DataGridBody",
+        "DataGridCell",
+        "DataGridContextProvider",
+        "useDataGridContext_unstable",
+        "DataGridHeader",
+        "DataGridHeaderCell",
+        "DataGridRow",
+        "DataGridSelectionCell",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableCellActions",
+        "TableCellLayout",
+        "TableHeader",
+        "TableHeaderCell",
+        "TableResizeHandle",
+        "TableRow",
+        "TableSelectionCell",
+        "createTableColumn",
+        "useTableFeatures",
+        "useTableColumnSizing_unstable",
+    "useTableCompositeNavigation",
+        "useTableSelection",
+        "useTableSort"
+      ],
+      "localStatus": "partial",
+      "purpose": "Present structured rows and columns of data.",
+      "coverageNote": "The local DataGrid provides a feature-rich virtualized table, and now also supports Fluent-style composable React DataGrid parts with render helpers, sortable headers, controlled multi-selection, accessible grid semantics, and keyboard cell navigation. Composable Table primitives provide semantic table structure, optional noNativeElements flex layout, row selection, column sizing with measured container fitting and accessible keyboard/pointer resize, cell layouts/actions, createTableColumn, and useTableFeatures/useTableSelection/useTableSort/useTableColumnSizing_unstable plugins. Broader visual, assistive-technology, tenant, and family performance parity remain under review."
+    },
+    {
+      "family": "tabs",
+      "package": "@fluentui/react-tabs",
+      "componentExamples": [
+        "Tab",
+        "TabList",
+        "TabListProvider"
+      ],
+      "localStatus": "partial",
+      "purpose": "Switch between related views while keeping one view active.",
+      "coverageNote": "React Tabs/TabList/Tab/TabPanel and framework-neutral custom elements support controlled/default selection, horizontal/vertical LTR/RTL keyboard movement, select-on-focus, disabled tabs, selected-panel relationships, appearance/size inheritance, stable selected-label widths, icons, and a provider registration contract. React values support string, number, boolean, null, and object identity; callbacks return original non-string values. Chromium verifies numeric, object, and empty-string cases plus existing string/native paths. Full theme/contrast, screen-reader, OS high-contrast, tenant, documentation, and family performance parity remain open."
+    },
+    {
+      "family": "tag-picker",
+      "package": "@fluentui/react-tag-picker",
+      "componentExamples": [
+        "TagPicker",
+        "TagPickerButton",
+        "TagPickerControl",
+        "TagPickerGroup",
+        "TagPickerInput",
+        "TagPickerList",
+        "TagPickerOption",
+        "TagPickerOptionGroup"
+      ],
+      "localStatus": "partial",
+      "purpose": "Search, select, and remove multiple labeled values.",
+      "coverageNote": "A local implementation exists, but family-level behavior, accessibility, theme, composition, documentation, and performance parity are not yet complete."
+    },
+    {
+      "family": "tags",
+      "package": "@fluentui/react-tags",
+      "componentExamples": [
+        "InteractionTag",
+        "InteractionTagPrimary",
+        "InteractionTagSecondary",
+        "Tag",
+        "TagGroup"
+      ],
+      "localStatus": "partial",
+      "purpose": "Represent status, category, or selected values as compact labels.",
+      "coverageNote": "Tag exposes selected styling and extra-small sizing. InteractionTag has primary/secondary action parts in React and custom elements. TagGroup supports controlled/default selection, callbacks, inherited appearance/size/disabled/dismissible defaults, toolbar semantics, and logical arrow navigation in both entry paths. Full visual/contrast, assistive-technology, authenticated tenant, and family performance review remain open."
+    },
+    {
+      "family": "teaching-popover",
+      "package": "@fluentui/react-teaching-popover",
+      "componentExamples": [
+        "TeachingPopover",
+        "TeachingPopoverBody",
+        "TeachingPopoverCarousel",
+        "TeachingPopoverCarouselCard",
+        "TeachingPopoverCarouselFooter",
+        "TeachingPopoverCarouselFooterButton",
+        "TeachingPopoverCarouselNav",
+        "TeachingPopoverCarouselNavButton",
+        "TeachingPopoverCarouselPageCount",
+        "TeachingPopoverFooter",
+        "TeachingPopoverHeader",
+        "TeachingPopoverSurface",
+        "TeachingPopoverTitle",
+        "TeachingPopoverTrigger"
+      ],
+      "localStatus": "partial",
+      "purpose": "Guide a user through a contextual explanation or feature discovery.",
+      "coverageNote": "All named React exports are implemented. Behavioral, styling, localization, and assistive-technology parity beyond the validated guided two-step flow remains open."
+    },
+    {
+      "family": "text",
+      "package": "@fluentui/react-text",
+      "componentExamples": [
+        "Body1",
+        "Body1Strong",
+        "Body1Stronger",
+        "Body2",
+        "Caption1",
+        "Caption1Strong",
+        "Caption1Stronger",
+        "Caption2",
+        "Caption2Strong",
+        "Display",
+        "LargeTitle",
+        "Subtitle1",
+        "Subtitle2",
+        "Subtitle2Stronger",
+        "Text",
+        "Title1",
+        "Title2",
+        "Title3"
+      ],
+      "localStatus": "partial",
+      "purpose": "Apply consistent typography for headings, body copy, labels, and emphasis.",
+      "coverageNote": "The Text engine supports Fluent typography tokens, semantic elements, alignment, font family, wrapping and emphasis. React preset adapters cover all 17 named typography presets exported by the suite. Full typography token, visual, documentation and platform rendering parity remains under review."
+    },
+    {
+      "family": "textarea",
+      "package": "@fluentui/react-textarea",
+      "componentExamples": [
+        "Textarea"
+      ],
+      "localStatus": "partial",
+      "purpose": "Enter or edit multi-line text.",
+      "coverageNote": "A local implementation exists, but family-level behavior, accessibility, theme, composition, documentation, and performance parity are not yet complete."
+    },
+    {
+      "family": "toast",
+      "package": "@fluentui/react-toast",
+      "componentExamples": [
+        "Toast",
+        "ToastBody",
+        "ToastFooter",
+        "ToastTitle",
+        "ToastTrigger",
+        "Toaster",
+        "useToastController"
+      ],
+      "localStatus": "partial",
+      "purpose": "Announce temporary feedback without interrupting the current task.",
+      "coverageNote": "Native and React Toast/Toaster paths support bounded visible notifications, ascending-priority pending queue with FIFO ties, timer/announcement pausing until promotion, update/dismiss/pause/play, hover/focus/window-blur timeout pausing, arrow navigation, keyboard dismissal, and Tab/Shift+Tab wrapping within the visible toaster action group. React compound Toast children are rendered inside the Toaster host so queue, focus, and keyboard management cover them. Queue, adapter composition, and focus behavior are locally validated; all appearance states, actual screen-reader/browser output, and authenticated tenant verification remain open."
+    },
+    {
+      "family": "toolbar",
+      "package": "@fluentui/react-toolbar",
+      "componentExamples": [
+        "Toolbar",
+        "ToolbarButton",
+        "ToolbarDivider",
+        "ToolbarGroup",
+        "ToolbarRadioButton",
+        "ToolbarRadioGroup",
+        "ToolbarToggleButton"
+      ],
+      "localStatus": "partial",
+      "purpose": "Group related commands with an efficient keyboard interaction model.",
+      "coverageNote": "The local surface includes Toolbar, command/toggle aliases, grouped radio controls with named checked values, and Divider aliases. Toolbar radio selection and keyboard semantics are covered by focused local browser checks. Remaining Fluent parity includes the full exact prop/slot contract, integration edge cases, theme/accessibility/performance comparisons, and deployed SharePoint validation."
+    },
+    {
+      "family": "tooltip",
+      "package": "@fluentui/react-tooltip",
+      "componentExamples": [
+        "Tooltip"
+      ],
+      "localStatus": "partial",
+      "purpose": "Show a brief explanation on hover or keyboard focus.",
+      "coverageNote": "Tooltip now supports label/description/inaccessible ARIA relationships, distinct show/hide delays, normal/inverted theme appearances, arrows, aligned positioning, controlled visibility events, focus and hover interaction, Escape dismissal, and top-layer collision handling. Remaining parity includes the complete Fluent positioning/portal contract, pointer and assistive-technology edge cases, full theme/contrast review, and tenant/performance comparison."
+    },
+    {
+      "family": "tree",
+      "package": "@fluentui/react-tree",
+      "componentExamples": [
+        "FlatTree",
+        "FlatTreeItem",
+        "Tree",
+        "TreeItem",
+        "TreeItemLayout",
+        "TreeItemPersonaLayout"
+      ],
+      "localStatus": "partial",
+      "purpose": "Navigate hierarchical content such as folders or nested categories.",
+      "coverageNote": "Tree and FlatTree have React and framework-neutral paths with nested/flat data, expansion, single/multiple selection, roving keyboard navigation, type-ahead, RTL, treegrid action focus, composed item layouts, and collapse motion. Selection follows Fluent checked-state behavior: activating a mixed item checks it, false states remain in checkedItems maps/events, and single selection can be toggled off. Local Chromium checks cover React and native paths; visual/theme, assistive-technology, tenant, documentation, and family performance parity remain open."
+    },
+    {
+      "family": "virtualizer",
+      "package": "@fluentui/react-virtualizer",
+      "componentExamples": [
+        "Virtualizer",
+        "VirtualizerScrollView",
+        "VirtualizerScrollViewDynamic"
+      ],
+      "localStatus": "partial",
+      "purpose": "Render only the visible portion of a large collection.",
+      "coverageNote": "The React Virtualizer shares the bounded VirtualList engine and supports fixed or measured items, horizontal/vertical axes, indexed rendering, range reporting, scroll-to-index, scroll loading, and flagged-index callbacks. It also supports vertical browser-window scrolling and exports Fluent observer, measurement, and scroll helpers; local Chromium covers 5,000-row window scrolling, 100,000-item rendering, RTL margins, resizing, and fixed/measured utility behavior. The Fluent 9.75.0 package is experimental and deprecated in favor of fluentui-contrib; its internal unstable render/style hooks are excluded. Cross-browser, assistive-technology, tenant, and family-level performance review remain open."
+    }
+  ]
+}

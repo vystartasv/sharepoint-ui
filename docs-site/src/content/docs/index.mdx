@@ -1,0 +1,52 @@
+---
+title: SharePoint UI
+description: A theme-aware component library for SharePoint Framework 1.24.
+template: splash
+hero:
+  tagline: Components and reusable views for SharePoint Framework 1.24. Keep the host theme. Bring your own framework.
+  actions:
+    - text: Browse the component catalog
+      link: /sharepoint-ui-docs/catalog/
+      variant: primary
+    - text: Get started
+      link: /sharepoint-ui-docs/getting-started/
+      variant: minimal
+---
+
+import PreviewBench from "../../components/PreviewBench.astro";
+
+<PreviewBench />
+
+## Start with the host, keep your own stack
+
+SharePoint UI maps SharePoint and Fluent theme values into reusable controls. Use the React adapter in SPFx, or register custom elements directly when React is not part of the page.
+
+```sh
+npm install @vilius/sharepoint-ui
+```
+
+The package keeps React optional for custom-element consumers and supports SPFx 1.24 with React 18.
+
+## Find the component that fits
+
+The catalog includes every named component in the Fluent UI React v9 suite baseline used by this library, plus SharePoint-focused additions such as `ViewCard` and `RichTextEditor`. Search component names, slots, and API summaries from the navigation search.
+
+<a class="catalog-link" href="/sharepoint-ui-docs/catalog/">Explore 243 catalog entries <span aria-hidden="true">→</span></a>
+
+:::note[First npm release in progress]
+The package is not yet on the public npm registry. The install command above will work after the first release.
+:::
+
+## Compose an SPFx view
+
+```tsx
+import { Button, SharePointUIProvider, ViewCard } from "@vilius/sharepoint-ui/react";
+
+<SharePointUIProvider lang={pageContext.cultureInfo.currentUICultureName}>
+  <ViewCard kind="list-item" title={item.Title} subtitle={item.Modified} description={item.Status}>
+    <Button slot="action" appearance="primary">Open item</Button>
+  </ViewCard>
+</SharePointUIProvider>
+```
+
+The `lang` value controls localization and text direction. Components inherit the site theme and remain in the SharePoint section that owns them.

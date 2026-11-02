@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "packages/sharepoint-ui/src/react.tsx"
+        ],
+        "createdAt": "2026-10-31T15:18:24.793Z",
+        "reason": "Agent: Tree styling uses a full focus-visible outline around the row, not a one-sided accent border; the finding is a regex false positive on the keyboard focus indicator."
+      }
+    ]
+  }
+}

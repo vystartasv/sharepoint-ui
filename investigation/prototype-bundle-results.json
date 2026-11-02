@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-31",
+  "tool": "esbuild",
+  "options": [
+    "bundle",
+    "minify",
+    "tree-shake",
+    "format=esm",
+    "platform=browser",
+    "React external"
+  ],
+  "results": [
+    {
+      "slice": "custom-elements+theme",
+      "bytes": 4858,
+      "gzipBytes": 1620,
+      "brotliBytes": 1339,
+      "modules": 3
+    },
+    {
+      "slice": "React-adapter+elements",
+      "bytes": 5010,
+      "gzipBytes": 1630,
+      "brotliBytes": 1353,
+      "modules": 2
+    },
+    {
+      "slice": "SPFx demo web-part bundle v1.0.0.8",
+      "bytes": 37494,
+      "gzipBytes": 10606,
+      "brotliBytes": 9302,
+      "modules": null
+    },
+    {
+      "slice": "SPFx demo web-part bundle v1.0.0.33 (production webpack)",
+      "bytes": 127243,
+      "gzipBytes": 28018,
+      "brotliBytes": 23857,
+      "modules": null,
+      "sppkgBytes": 34135,
+      "tenantVerification": "blocked: SharePoint served stale registered bundle manifest (6044899ca6c4bec1904d.js), expected 9ff2de10d34cb545aa5d.js"
+    },
+    {
+      "slice": "SPFx demo web-part bundle v1.0.0.37 (production webpack)",
+      "bytes": 132371,
+      "gzipBytes": 29147,
+      "brotliBytes": 24841,
+      "modules": null,
+      "sppkgBytes": 35665,
+      "tenantVerification": "incomplete: catalog 1.0.0.37 deployed; site remains installed at 1.0.0.35 and serves prior bundle"
+    },
+    {
+      "slice": "SPFx demo web-part bundle v1.0.0.38 (production webpack)",
+      "bytes": 137099,
+      "gzipBytes": 30449,
+      "brotliBytes": 25712,
+      "modules": null,
+      "sppkgBytes": 36791,
+      "tenantVerification": "passed: authenticated page loaded expected manifest bundle; install API still reports InstalledVersion 1.0.0.35 while catalog is 1.0.0.38"
+    }
+  ],
+  "notes": [
+    "Selected component slices and full library import figures are in component-slice-benchmarks.json; these retain exports but do not instantiate controls.",
+    "The SPFx demo bundle includes the entire demo app and framework adapter. Local gzip/Brotli sizes are file compression measurements.",
+    "The tenant CDN returned Content-Encoding: gzip but did not expose TransferSize via Resource Timing; browser reported the decoded response size.",
+    "Version 1.0.0.33 local bundle compression and .sppkg size were measured after a successful production build. Authenticated tenant runtime checks did not run because the page served stale component-manifest metadata; do not compare these bytes as tenant response measurements.",
+    "The 1.0.0.38 package uses per-site feature deployment and includes an ApplyElementManifests upgrade action. Authenticated runtime passed against the exact expected bundle, but the app-catalog InstalledVersion field remains behind at 1.0.0.35."
+  ]
+}

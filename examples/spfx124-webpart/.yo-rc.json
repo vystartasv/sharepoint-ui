@@ -1,0 +1,16 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "solutionName": "sharepoint-ui-lab",
+    "environment": "spo",
+    "packageManager": "npm",
+    "skipFeatureDeployment": true,
+    "useGulp": false,
+    "componentType": "webpart",
+    "template": "react",
+    "componentName": "LibraryDemo",
+    "componentDescription": "SharePoint UI library benchmark",
+    "version": "1.24.0",
+    "libraryName": "sharepoint-ui-lab",
+    "libraryId": "4b8a83e8-3ed4-4a75-98a0-e2f86bcbb395"
+  }
+}

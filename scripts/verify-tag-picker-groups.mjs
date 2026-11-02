@@ -1,0 +1,188 @@
+import assert from "node:assert/strict";
+import { createServer } from "node:http";
+import { resolve } from "node:path";
+import { build } from "esbuild";
+import { chromium } from "/Users/vilius/.t3/projects/spfx-research/node_modules/playwright/index.mjs";
+
+const bundle = await build({
+  stdin: { contents: `import * as React from "react"; import { createRoot } from "react-dom/client"; import { TagPicker, TagPickerButton, TagPickerControl, TagPickerGroup, TagPickerInput, TagPickerList, TagPickerOption, TagPickerOptionGroup } from "${resolve("packages/sharepoint-ui/src/react.tsx")}"; import { defineTagPicker } from "${resolve("packages/sharepoint-ui/src/elements/tag-picker.ts")}"; defineTagPicker(); window.reactOpenChanges=[]; window.reactOptionSelect=null;window.composedInputs=[]; function App(){const [selected,setSelected]=React.useState([]);const [open,setOpen]=React.useState(false);const [buttonValues,setButtonValues]=React.useState([]);return <><form id="react-form"><TagPicker data-testid="react-picker" label="Engineers" name="engineers" selectedValues={selected} onChange={setSelected} open={open} onOpenChange={(event,data)=>{window.reactOpenChanges.push({open:data.open,reason:data.reason,type:data.type,eventType:event?.type,sameEvent:event===data.event});setOpen(data.open)}} onOptionSelect={(event,data)=>{window.reactOptionSelect={value:data.value,selectedOptions:data.selectedOptions,type:data.type,eventType:event.type,sameEvent:event===data.event}}}><TagPickerOption value="ava" group="Engineering" media={<b>AL</b>} secondaryContent="Design system">Ava Lovelace</TagPickerOption><TagPickerOption value="lin" text="Linus T." group="Operations">Linus Torvalds</TagPickerOption></TagPicker><TagPicker data-testid="react-button-picker" label="Choose an owner" name="owners" selectedValues={buttonValues} onChange={setButtonValues}><TagPickerButton>Choose owner</TagPickerButton><TagPickerOption value="mira">Mira Engineer</TagPickerOption></TagPicker></form></>} createRoot(document.querySelector("#react-root")).render(<App/>);const compoundRoot=document.createElement("main");document.body.append(compoundRoot);createRoot(compoundRoot).render(React.createElement(TagPicker,{"data-testid":"compound-picker",label:"Compound owners",name:"compound",defaultSelectedValues:["ava"],defaultOpen:true,inline:true},React.createElement(TagPickerControl,{secondaryAction:React.createElement("button",{type:"button"},"More"),expandIcon:"v"},React.createElement(TagPickerGroup,{label:"Current owners","data-testid":"compound-group"},React.createElement("span",{"data-testid":"compound-selected"},"Ava Lovelace")),React.createElement(TagPickerInput,{value:"Ava",placeholder:"Search people",clearable:true,onValueChange:value=>window.composedInputs.push(value)})),React.createElement(TagPickerList,null,React.createElement(TagPickerOptionGroup,{label:"Engineering"},React.createElement(TagPickerOption,{value:"ava"},"Ava Lovelace"),React.createElement(TagPickerOption,{value:"lin"},"Linus Torvalds")))));`, resolveDir: process.cwd(), sourcefile: "tag-picker-check.tsx", loader: "tsx" },
+  bundle: true,
+  format: "iife",
+  platform: "browser",
+  target: ["es2020"],
+  alias: { react: resolve("node_modules/react"), "react-dom/client": resolve("examples/spfx124-webpart/node_modules/react-dom/client.js") },
+  nodePaths: [resolve("examples/spfx124-webpart/node_modules")],
+  write: false,
+});
+const server = createServer((request, response) => {
+  if (new URL(request.url, "http://localhost").pathname === "/") return response.writeHead(200, { "content-type": "text/html" }).end(`<!doctype html><form id="form"><spui-tag-picker name="people" label="People" default-open><spui-tag-picker-option value="ada" group="Engineering">Ada Lovelace</spui-tag-picker-option><spui-tag-picker-option value="grace" group="Engineering">Grace Hopper</spui-tag-picker-option><spui-tag-picker-option value="linus" group="Operations"><span slot="media"><b>LT</b></span><span slot="label">Linus Torvalds</span><span slot="secondary-content">Maintainer</span></spui-tag-picker-option></spui-tag-picker></form><form id="native-compound-form"><spui-tag-picker name="native-compound" label="Native compound" default-open><spui-tag-picker-control><spui-tag-picker-group slot="selected-group" aria-label="Picked people"><span data-testid="native-picked">Ada Lovelace</span></spui-tag-picker-group><spui-tag-picker-input placeholder="Search directory" value="Linus" clearable></spui-tag-picker-control><spui-tag-picker-list><spui-tag-picker-option-group label="Native group"><spui-tag-picker-option value="ada">Ada Lovelace</spui-tag-picker-option><spui-tag-picker-option value="linus">Linus Torvalds</spui-tag-picker-option></spui-tag-picker-option-group></spui-tag-picker-list></spui-tag-picker></form><form id="button-form"><spui-tag-picker name="button-owner" label="Owner" required><button type="button" slot="button">Choose owner</button><spui-tag-picker-option value="mira">Mira Engineer</spui-tag-picker-option></spui-tag-picker></form><main id="react-root"></main><script src="/bundle.js"></script>`);
+  if (new URL(request.url, "http://localhost").pathname === "/bundle.js") return response.writeHead(200, { "content-type": "text/javascript" }).end(bundle.outputFiles[0].contents);
+  response.writeHead(404).end();
+});
+await new Promise(done => server.listen(0, "127.0.0.1", done));
+let browser;
+try {
+  browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage();
+  const errors = [];
+  page.on("pageerror", error => errors.push(error.message));
+  await page.goto(`http://127.0.0.1:${server.address().port}`);
+  const picker = page.locator("#form spui-tag-picker");
+  const input = picker.getByRole("combobox");
+  await page.evaluate(() => { window.nativeOpenChanges = []; const nativePicker = document.querySelector("#form spui-tag-picker"); nativePicker.addEventListener("keydown", event => { window.nativeKeydownSource = event; }, true); nativePicker.addEventListener("input", event => { window.nativeInputSource = event; }, true); nativePicker.addEventListener("click", event => { window.nativeClickSource = event; }, true); nativePicker.addEventListener("focus", event => { window.nativeFocusSource = event; }, true); nativePicker.addEventListener("spui-open-change", event => window.nativeOpenChanges.push({ open: event.detail.open, reason: event.detail.reason, type: event.detail.type, eventType: event.detail.event?.type, sourceIdentity: event.detail.event === window.nativeKeydownSource || event.detail.event === window.nativeInputSource || event.detail.event === window.nativeClickSource || event.detail.event === window.nativeFocusSource })); });
+  assert.equal(await input.getAttribute("aria-expanded"), "true", "default-open initializes the picker list");
+  await input.press("Escape");
+  assert.equal(await input.getAttribute("aria-expanded"), "false");
+  assert.deepEqual(await picker.locator(".group-heading").allTextContents(), ["Engineering", "Operations"]);
+  await input.fill("Linus");
+  assert.deepEqual(await picker.locator(".group-heading").allTextContents(), ["Operations"]);
+  assert.equal(await picker.getByRole("group", { name: "Operations" }).count(), 1);
+  assert.deepEqual(await picker.evaluate(element => {
+    const option = element.shadowRoot.querySelector('[role="option"]');
+    return { label: option.querySelector(".option-label")?.textContent, media: option.querySelector(".option-media")?.textContent, secondary: option.querySelector(".option-secondary")?.textContent };
+  }), { label: "Linus Torvalds", media: "LT", secondary: "Maintainer" });
+  await input.press("ArrowDown");
+  await input.press("Enter");
+  assert.deepEqual(await picker.evaluate(element => element.value), ["linus"]);
+  assert.equal(await input.getAttribute("aria-expanded"), "false", "Enter selects and closes the list");
+  await input.press("ArrowDown");
+  await input.press("Space");
+  assert.deepEqual(await picker.evaluate(element => element.value), ["linus", "ada"]);
+  assert.equal(await input.getAttribute("aria-expanded"), "true", "Space selects without closing the list");
+  assert.equal(await picker.evaluate(element => element.shadowRoot.querySelector(".chip .option-media")?.textContent), "LT");
+  await picker.getByRole("option", { name: "Grace Hopper" }).click();
+  assert.deepEqual(await picker.evaluate(element => element.value), ["linus", "ada", "grace"]);
+  assert.equal(await input.getAttribute("aria-expanded"), "false", "pointer selection closes the list");
+  assert.deepEqual(await page.locator("#form").evaluate(form => new FormData(form).getAll("people")), ["linus", "ada", "grace"]);
+  await picker.getByRole("button", { name: "Remove Grace Hopper" }).focus();
+  await page.keyboard.press("Enter");
+  assert.deepEqual(await picker.evaluate(element => element.value), ["linus", "ada"], "keyboard removal updates the selected values");
+  assert.equal(await picker.evaluate(element => element.shadowRoot.activeElement?.getAttribute("role")), "combobox", "removing a chip returns focus to the input");
+  await input.fill("");
+  await input.press("Backspace");
+  assert.deepEqual(await picker.evaluate(element => element.value), ["linus"], "Backspace removes the last selected chip when the query is empty");
+  assert.equal(await picker.evaluate(element => element.shadowRoot.activeElement?.getAttribute("role")), "combobox", "Backspace removal keeps focus in the input");
+  await input.press("Escape");
+  const nativeButtonPicker = page.locator("#button-form spui-tag-picker");
+  const nativeTrigger = nativeButtonPicker.locator('button[slot="button"]');
+  assert.equal(await page.locator("#button-form").evaluate(form => form.checkValidity()), false, "required button-only picker starts invalid");
+  assert.equal(await nativeTrigger.getAttribute("aria-haspopup"), "listbox");
+  assert.equal(await nativeTrigger.getAttribute("aria-expanded"), "false");
+  await nativeTrigger.click();
+  assert.equal(await nativeTrigger.getAttribute("aria-expanded"), "true");
+  assert.equal(await nativeButtonPicker.locator('[role="listbox"]').isVisible(), true);
+  await nativeTrigger.press("ArrowDown");
+  await nativeTrigger.press("Enter");
+  assert.deepEqual(await nativeButtonPicker.evaluate(element => element.value), ["mira"]);
+  assert.equal(await page.locator("#button-form").evaluate(form => form.checkValidity()), true, "selecting through a button trigger satisfies required validity");
+  assert.equal(await nativeTrigger.getAttribute("aria-expanded"), "false");
+  assert.deepEqual(await page.locator("#button-form").evaluate(form => new FormData(form).getAll("button-owner")), ["mira"]);
+  const reactPicker = page.getByTestId("react-picker");
+  const reactInput = reactPicker.getByRole("combobox");
+  await reactInput.focus();
+  await page.waitForFunction(() => document.querySelector("#react-root spui-tag-picker").open);
+  await reactInput.fill("Linus T.");
+  assert.equal(await reactPicker.locator("[role=option] .option-label").textContent(), "Linus T.", "TagPickerOption text overrides its rendered label text");
+  await reactInput.fill("Ava");
+  assert.deepEqual(await reactPicker.evaluate(element => {
+    const option = element.shadowRoot.querySelector('[role="option"]');
+    return { label: option.querySelector(".option-label")?.textContent, media: option.querySelector(".option-media")?.textContent, secondary: option.querySelector(".option-secondary")?.textContent };
+  }), { label: "Ava Lovelace", media: "AL", secondary: "Design system" });
+  await reactInput.press("ArrowDown");
+  await reactInput.press("Enter");
+  await page.waitForFunction(() => document.querySelector("#react-root spui-tag-picker").value[0] === "ava");
+  await page.waitForFunction(() => !document.querySelector("#react-root spui-tag-picker").open);
+  assert.deepEqual(await page.evaluate(() => window.reactOpenChanges), [{ open: true, reason: "focus", type: "focus", eventType: "focus", sameEvent: true }, { open: false, reason: "keyboard", type: "keydown", eventType: "keydown", sameEvent: true }]);
+  assert.deepEqual(await page.evaluate(() => window.reactOptionSelect), { value: "ava", selectedOptions: ["ava"], type: "keydown", eventType: "keydown", sameEvent: true });
+  assert.equal(await reactPicker.evaluate(element => element.shadowRoot.querySelector(".chip .option-media")?.textContent), "AL");
+  assert.deepEqual(await page.locator("#react-form").evaluate(form => new FormData(form).getAll("engineers")), ["ava"]);
+  await reactPicker.getByRole("button", { name: "Remove Ava Lovelace" }).focus();
+  await page.keyboard.press("Enter");
+  assert.deepEqual(await reactPicker.evaluate(element => element.value), [], "controlled React removal updates selected values");
+  assert.equal(await reactPicker.evaluate(element => element.shadowRoot.activeElement?.getAttribute("role")), "combobox", "controlled React removal returns focus to the input");
+  assert.deepEqual(await page.locator("#react-form").evaluate(form => new FormData(form).getAll("engineers")), [], "removed React chips are excluded from FormData");
+  await reactInput.press("Escape");
+  await page.waitForFunction(() => !document.querySelector('[data-testid="react-picker"]').open, null, { timeout: 3000 });
+  assert.equal(await reactPicker.evaluate(element => element.shadowRoot.querySelector(".popup")?.matches(":popover-open")), false, "Escape closes the restored-focus popup before unrelated controls are used");
+  const reactButtonPicker = page.getByTestId("react-button-picker");
+  const reactTrigger = reactButtonPicker.getByRole("button", { name: "Choose owner" });
+  await reactTrigger.evaluate(button => button.click());
+  assert.equal(await reactTrigger.getAttribute("aria-haspopup"), "listbox");
+  assert.equal(await reactTrigger.getAttribute("aria-expanded"), "true");
+  await reactTrigger.press("ArrowDown");
+  await reactTrigger.press("Enter");
+  await page.waitForFunction(() => document.querySelector('[data-testid="react-button-picker"]').value[0] === "mira");
+  assert.equal(await reactTrigger.getAttribute("aria-expanded"), "false");
+  assert.deepEqual(await page.locator("#react-form").evaluate(form => new FormData(form).getAll("owners")), ["mira"]);
+  const clipping = await page.evaluate(() => {
+    const section = document.createElement("div");
+    section.id = "clipping-section";
+    section.style.cssText = "position:fixed;right:12px;bottom:8px;width:280px;height:52px;overflow:hidden;transform:translateZ(0)";
+    section.innerHTML = '<spui-tag-picker dir="rtl" default-open label="People"><spui-tag-picker-option value="ada">Ada Lovelace</spui-tag-picker-option><spui-tag-picker-option value="grace">Grace Hopper</spui-tag-picker-option></spui-tag-picker>';
+    document.body.append(section);
+    const picker = section.querySelector("spui-tag-picker");
+    const popup = picker.shadowRoot.querySelector(".popup");
+    const anchor = picker.shadowRoot.querySelector(".control").getBoundingClientRect();
+    const bounds = popup.getBoundingClientRect();
+    const sectionTop = section.getBoundingClientRect().top;
+    const hit = picker.shadowRoot.elementFromPoint(bounds.left + 10, sectionTop + 2);
+    return { open: popup.matches(":popover-open"), placement: popup.dataset.placement, left: bounds.left, right: bounds.right, top: bounds.top, bottom: bounds.bottom, anchorLeft: anchor.left, anchorTop: anchor.top, sectionTop, hitInsidePopup: Boolean(hit && popup.contains(hit)) };
+  });
+  assert.equal(clipping.open, true, "TagPicker uses the browser top layer");
+  assert.equal(clipping.placement, "top", "the list flips above when the bottom edge has no room");
+  assert.ok(clipping.left >= 4 && clipping.right <= 1276, "the RTL popup stays within the viewport");
+  assert.ok(clipping.bottom < clipping.anchorTop, "the popup clears the anchor after flipping");
+  assert.ok(clipping.top < clipping.sectionTop && clipping.bottom > clipping.sectionTop, "the popup crosses the clipping edge");
+  assert.equal(clipping.hitInsidePopup, true, "the top-layer popup receives hits where its section would otherwise clip it");
+  await page.locator("#clipping-section spui-tag-picker input").fill("missing");
+  assert.deepEqual(await page.locator("#clipping-section spui-tag-picker").evaluate(element => ({ open: element.shadowRoot.querySelector(".popup").matches(":popover-open"), emptyHidden: element.shadowRoot.querySelector(".empty").hidden })), { open: true, emptyHidden: false });
+  await page.screenshot({ path: resolve("test-results/tag-picker-positioning.png"), fullPage: true });
+  await page.locator("#clipping-section spui-tag-picker input").press("Escape");
+  assert.equal(await page.locator("#clipping-section spui-tag-picker").evaluate(element => element.shadowRoot.querySelector(".popup").matches(":popover-open")), false, "closing dismisses the top-layer popup");
+  const compound = page.getByTestId("compound-picker");
+  const compoundInput = compound.getByRole("combobox");
+  await compoundInput.focus();
+  assert.deepEqual(await compound.evaluate(element => { const popup = element.shadowRoot.querySelector(".popup"); return { topLayer: popup.matches(":popover-open"), visible: !popup.hidden, position: getComputedStyle(popup).position }; }), { topLayer: false, visible: true, position: "absolute" }, "inline keeps the open list in flow below the control");
+  assert.equal(await compoundInput.getAttribute("placeholder"), "Search people");
+  assert.equal(await compoundInput.getAttribute("type"), "search", "clearable uses the native search input affordance");
+  assert.equal(await compound.locator('[role="option"]').isVisible(), true, "inline options must escape the browser's closed-popover hiding rule");
+  assert.equal(await compound.getByRole("group", { name: "Current owners" }).count(), 1);
+  assert.equal(await compound.getByTestId("compound-selected").textContent(), "Ava Lovelace");
+  assert.equal(await compound.getByRole("button", { name: "More" }).count(), 1, "control secondary action is slotted into the engine control");
+  assert.deepEqual(await compound.locator("[role=group][aria-label=Engineering] [role=option] .option-label").allTextContents(), ["Ava Lovelace"]);
+  await compoundInput.fill("Linus");
+  await page.waitForFunction(() => window.composedInputs.includes("Linus"));
+  assert.deepEqual(await compound.locator("[role=group][aria-label=Engineering] [role=option] .option-label").allTextContents(), ["Linus Torvalds"]);
+  await compound.getByRole("option", { name: "Linus Torvalds" }).click();
+  assert.deepEqual(await compound.evaluate(element => element.value), ["ava", "lin"]);
+  const nativeCompound = page.locator("#native-compound-form spui-tag-picker");
+  const nativeCompoundInput = nativeCompound.getByRole("combobox");
+  await nativeCompoundInput.focus();
+  assert.equal(await nativeCompoundInput.getAttribute("placeholder"), "Search directory");
+  assert.equal(await nativeCompoundInput.getAttribute("type"), "search");
+  assert.equal(await nativeCompoundInput.getAttribute("aria-expanded"), "true");
+  assert.equal(await nativeCompound.getByRole("group", { name: "Picked people" }).count(), 1);
+  assert.deepEqual(await nativeCompound.locator("[role=group][aria-label='Native group'] [role=option] .option-label").allTextContents(), ["Linus Torvalds"]);
+  assert.equal(await nativeCompound.getByTestId("native-picked").textContent(), "Ada Lovelace");
+  await nativeCompound.locator('[role="option"]').click();
+  assert.deepEqual(await nativeCompound.evaluate(element => element.value), ["linus"]);
+  await page.evaluate(() => { const picker = document.createElement("spui-tag-picker"); picker.dataset.testid = "no-popover-picker"; picker.setAttribute("label", "Inline results"); picker.setAttribute("no-popover", ""); picker.innerHTML = '<spui-tag-picker-option value="doc">Document</spui-tag-picker-option>'; document.body.append(picker); });
+  const noPopover = page.getByTestId("no-popover-picker");
+  assert.equal(await noPopover.getByRole("combobox").getAttribute("aria-expanded"), "true");
+  assert.equal(await noPopover.getByRole("option", { name: "Document" }).count(), 1);
+  assert.equal(await noPopover.getByRole("option", { name: "Document" }).isVisible(), true);
+  assert.deepEqual(await noPopover.evaluate(element => { const popup = element.shadowRoot.querySelector(".popup"); return { topLayer: popup.matches(":popover-open"), visible: !popup.hidden, open: element.open }; }), { topLayer: false, visible: true, open: false });
+  await noPopover.evaluate(element => { element.removeAttribute("no-popover"); element.setAttribute("inline", ""); element.setAttribute("default-open", ""); });
+  const dynamicInlineState = await noPopover.evaluate(element => { const popup = element.shadowRoot.querySelector(".popup"); return { open: element.open, defaultOpen: element.hasAttribute("default-open"), inline: element.hasAttribute("inline"), popover: popup.getAttribute("popover"), hidden: popup.hidden, display: getComputedStyle(popup).display, rect: popup.getBoundingClientRect().toJSON() }; });
+  assert.equal(await noPopover.getByRole("option", { name: "Document" }).isVisible(), true, JSON.stringify(dynamicInlineState));
+  assert.equal(await noPopover.evaluate(element => element.shadowRoot.querySelector(".popup").hasAttribute("popover")), false);
+  await noPopover.evaluate(element => element.removeAttribute("inline"));
+  assert.deepEqual(await noPopover.evaluate(element => { const popup = element.shadowRoot.querySelector(".popup"); return { topLayer: popup.matches(":popover-open"), nativePopover: popup.getAttribute("popover") }; }), { topLayer: true, nativePopover: "manual" }, "switching back restores the native top-layer popup");
+  assert.equal(await page.evaluate(() => window.nativeOpenChanges.every(change => change.type === change.eventType && change.sourceIdentity)), true, `native open-change details preserve event type and exact source event across keyboard, input, and click paths: ${JSON.stringify(await page.evaluate(() => window.nativeOpenChanges))}`);
+  assert.deepEqual(await page.evaluate(() => window.nativeOpenChanges.map(event => event.reason)), ["escape", "input", "keyboard", "keyboard", "pointer", "focus", "escape"]);
+  assert.deepEqual(errors, []);
+  console.log(JSON.stringify({ status: "passed", native: { defaultOpen: true, openChangeReasons: true, EnterAndPointerClose: true, SpaceKeepsOpen: true, buttonOnlyTrigger: true, buttonTriggerAriaAndKeyboard: true, buttonTriggerRequiredValidity: true, groupedOptions: true, accessibleGroupSemantics: true, queryKeepsRelevantGroup: true, mediaAndSecondaryContent: true, mediaCarriesIntoSelectedTag: true, keyboardSelection: true, selectedTagRemovalFocus: true, backspaceRemovalFocus: true, formSubmission: true }, react: { controlledOpen: true, openChangeCallback: true, optionSelectCallback: true, buttonOnlyTrigger: true, buttonTriggerAriaAndKeyboard: true, mediaAndSecondaryContent: true, selectedTagMedia: true, controlledSelection: true, selectedTagRemovalFocus: true, formSubmission: true }, positioning: { topLayer: clipping.open, collisionFlip: clipping.placement === "top", inlineVisible: true, noPopoverVisible: true, runtimeModeSwitch: true, rtlViewportBounds: true, clippingSectionEscape: true, emptyState: true }, pageErrors: errors }, null, 2));
+} finally {
+  await browser?.close();
+  await new Promise(done => server.close(done));
+}

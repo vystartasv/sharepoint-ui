@@ -1,0 +1,11 @@
+{
+  "$schema":"https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
+  "id":"dff44344-7455-4955-ad27-2929a39d27e9",
+  "alias":"LibraryDemoWebPart",
+  "componentType":"WebPart",
+  "version":"*",
+  "manifestVersion":2,
+  "requiresCustomScript":false,
+  "supportsThemeVariants":true,
+  "preconfiguredEntries":[{"groupId":"1edbd9a8-0bfb-4aa2-9afd-14b8c7f1e857","group":{"default":"Other"},"title":{"default":"SharePoint UI Lab"},"description":{"default":"SharePoint UI components and performance metrics"},"officeFabricIconFontName":"Design","properties":{}}]
+}

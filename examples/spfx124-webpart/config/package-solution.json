@@ -1,0 +1,44 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "sharepoint-ui-lab-client-side-solution",
+    "id": "5f68f9b1-18bb-47e8-a85f-9957dce645e4",
+    "version": "1.0.0.160",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.24.0"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "SharePoint UI library demo"
+      },
+      "longDescription": {
+        "default": "SharePoint UI themes and reusable record card examples"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "SharePoint UI Library Demo",
+        "description": "Demo elements and performance panel",
+        "id": "cb9bc278-51c4-4f8e-80e5-440bdc8b95d3",
+        "version": "1.0.0.96",
+        "assets": {
+          "upgradeActions": [
+            "upgrade-actions.xml"
+          ]
+        }
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/sharepoint-ui-lab.sppkg"
+  }
+}

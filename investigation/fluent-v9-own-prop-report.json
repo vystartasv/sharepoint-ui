@@ -1,0 +1,7764 @@
+{
+  "baseline": "@fluentui/react-components@9.75.0",
+  "fluentPackages": 51,
+  "scope": "Named own props, public slot props declared through Fluent ComponentProps<Slots>, and resolvable string/number/boolean literal-union values versus local exported adapter props; local aliases, union/intersection branches, Pick/Omit key filtering, overloads, and Parameters<typeof Component>[0] are resolved. Value comparison reports only when both sides resolve to literal sets. SearchBox and DataGrid resolve from their actual Fluent subpackages. Non-component utilities are classified separately; absent reference packages are reported as unavailable rather than counted as prop gaps. Inherited React/DOM props and runtime semantics are excluded.",
+  "summary": {
+    "comparedComponents": 231,
+    "missingLocalComponentExports": 0,
+    "componentsWithPropNameGaps": 0,
+    "componentsWithSlotPropGaps": 6,
+    "componentsWithPropValueGaps": 0,
+    "manualReviewComponents": 0,
+    "unavailableBaselineComponents": 0,
+    "nonComponentContracts": 8,
+    "missingOwnPropCount": 0,
+    "missingSlotPropCount": 16,
+    "missingLiteralValueCount": 0
+  },
+  "components": [
+    {
+      "family": "accordion",
+      "component": "Accordion",
+      "localComponent": "Accordion",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "collapsible",
+        "defaultOpenItems",
+        "multiple",
+        "navigation",
+        "onToggle",
+        "openItems"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "collapsible",
+        "defaultOpenItems",
+        "mode",
+        "multiple",
+        "navigation",
+        "onToggle",
+        "openItems"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "mode"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "accordion",
+      "component": "AccordionHeader",
+      "localComponent": "AccordionHeader",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "expandIconPosition",
+        "inline",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "button",
+        "expandIcon",
+        "icon"
+      ],
+      "localOwnProps": [
+        "button",
+        "children",
+        "expandIcon",
+        "expandIconPosition",
+        "icon",
+        "inline",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "button",
+        "children",
+        "expandIcon",
+        "icon"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "accordion",
+      "component": "AccordionItem",
+      "localComponent": "AccordionItem",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "disabled",
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "defaultOpen",
+        "disabled",
+        "heading",
+        "onOpenChange",
+        "open",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "defaultOpen",
+        "heading",
+        "onOpenChange",
+        "open"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "accordion",
+      "component": "AccordionPanel",
+      "localComponent": "AccordionPanel",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "collapseMotion"
+      ],
+      "localOwnProps": [
+        "children",
+        "collapseMotion"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "collapseMotion"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "accordion",
+      "component": "AccordionProvider",
+      "localComponent": "AccordionProvider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "alert",
+      "component": "Alert",
+      "localComponent": "Alert",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "intent"
+      ],
+      "fluentSlotProps": [
+        "action",
+        "avatar",
+        "icon"
+      ],
+      "localOwnProps": [
+        "action",
+        "actions",
+        "appearance",
+        "assertive",
+        "avatar",
+        "dismissLabel",
+        "dismissible",
+        "icon",
+        "intent",
+        "onDismiss"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "action",
+        "actions",
+        "assertive",
+        "avatar",
+        "dismissLabel",
+        "dismissible",
+        "icon",
+        "onDismiss"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "avatar",
+      "component": "Avatar",
+      "localComponent": "Avatar",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "active",
+        "activeAppearance",
+        "color",
+        "idForColor",
+        "name",
+        "shape",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "badge",
+        "icon",
+        "image",
+        "initials"
+      ],
+      "localOwnProps": [
+        "active",
+        "activeAppearance",
+        "badge",
+        "children",
+        "color",
+        "decorative",
+        "icon",
+        "idForColor",
+        "image",
+        "initials",
+        "name",
+        "shape",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "badge",
+        "children",
+        "decorative",
+        "icon",
+        "image",
+        "initials"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "avatar",
+      "component": "AvatarGroup",
+      "localComponent": "AvatarGroup",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "layout",
+        "size"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "expanded",
+        "label",
+        "layout",
+        "maxVisible",
+        "onExpandedChange",
+        "showLessLabel",
+        "showMoreLabel",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "expanded",
+        "label",
+        "maxVisible",
+        "onExpandedChange",
+        "showLessLabel",
+        "showMoreLabel"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "avatar",
+      "component": "AvatarGroupItem",
+      "localComponent": "AvatarGroupItem",
+      "status": "review-slot-prop-gaps",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "avatar",
+        "overflowLabel"
+      ],
+      "localOwnProps": [
+        "active",
+        "activeAppearance",
+        "badge",
+        "color",
+        "icon",
+        "idForColor",
+        "image",
+        "initials",
+        "name",
+        "shape",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [
+        "avatar",
+        "overflowLabel"
+      ],
+      "localAdditions": [
+        "active",
+        "activeAppearance",
+        "badge",
+        "color",
+        "icon",
+        "idForColor",
+        "image",
+        "initials",
+        "name",
+        "shape",
+        "size"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "avatar",
+      "component": "AvatarGroupPopover",
+      "localComponent": "AvatarGroupPopover",
+      "status": "review-slot-prop-gaps",
+      "fluentOwnProps": [
+        "children",
+        "count",
+        "indicator"
+      ],
+      "fluentSlotProps": [
+        "content",
+        "popoverSurface",
+        "tooltip",
+        "triggerButton"
+      ],
+      "localOwnProps": [
+        "children",
+        "count",
+        "indicator",
+        "label",
+        "onOpenChange",
+        "open",
+        "placement",
+        "triggerLabel"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [
+        "content",
+        "popoverSurface",
+        "tooltip",
+        "triggerButton"
+      ],
+      "localAdditions": [
+        "label",
+        "onOpenChange",
+        "open",
+        "placement",
+        "triggerLabel"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "avatar",
+      "component": "AvatarGroupProvider",
+      "localComponent": "AvatarGroupProvider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "badge",
+      "component": "Badge",
+      "localComponent": "Badge",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "color",
+        "iconPosition",
+        "shape",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "icon"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "color",
+        "icon",
+        "iconPosition",
+        "shape",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "icon"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "badge",
+      "component": "CounterBadge",
+      "localComponent": "CounterBadge",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "color",
+        "count",
+        "dot",
+        "iconPosition",
+        "overflowCount",
+        "shape",
+        "showZero",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "icon"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "color",
+        "count",
+        "dot",
+        "icon",
+        "iconPosition",
+        "overflowCount",
+        "shape",
+        "showZero",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "icon"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "badge",
+      "component": "PresenceBadge",
+      "localComponent": "PresenceBadge",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "outOfOffice",
+        "size",
+        "status"
+      ],
+      "fluentSlotProps": [
+        "icon"
+      ],
+      "localOwnProps": [
+        "icon",
+        "outOfOffice",
+        "size",
+        "status"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "icon"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "breadcrumb",
+      "component": "Breadcrumb",
+      "localComponent": "Breadcrumb",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "focusMode",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "list"
+      ],
+      "localOwnProps": [
+        "children",
+        "focusMode",
+        "label",
+        "list",
+        "separator",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "label",
+        "list",
+        "separator"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "breadcrumb",
+      "component": "BreadcrumbButton",
+      "localComponent": "BreadcrumbButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "current",
+        "size"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "current",
+        "disabled",
+        "disabledFocusable",
+        "href",
+        "rel",
+        "size",
+        "target",
+        "type"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "disabled",
+        "disabledFocusable",
+        "href",
+        "rel",
+        "target",
+        "type"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "breadcrumb",
+      "component": "BreadcrumbDivider",
+      "localComponent": "BreadcrumbDivider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "breadcrumb",
+      "component": "BreadcrumbItem",
+      "localComponent": "BreadcrumbItem",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "size"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "current",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "current"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "button",
+      "component": "Button",
+      "localComponent": "Button",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "disabled",
+        "disabledFocusable",
+        "iconPosition",
+        "shape",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "icon"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "as",
+        "disabled",
+        "disabledFocusable",
+        "download",
+        "form",
+        "href",
+        "hrefLang",
+        "icon",
+        "iconOnly",
+        "iconPosition",
+        "name",
+        "referrerPolicy",
+        "rel",
+        "shape",
+        "size",
+        "target",
+        "type",
+        "value",
+        "variant",
+        "vertical"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "download",
+        "form",
+        "href",
+        "hrefLang",
+        "icon",
+        "iconOnly",
+        "name",
+        "referrerPolicy",
+        "rel",
+        "target",
+        "type",
+        "value",
+        "variant",
+        "vertical"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "button",
+      "component": "CompoundButton",
+      "localComponent": "CompoundButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "shape",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "contentContainer",
+        "secondaryContent"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "contentContainer",
+        "disabled",
+        "disabledFocusable",
+        "icon",
+        "iconPosition",
+        "secondaryContent",
+        "shape",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "contentContainer",
+        "disabled",
+        "disabledFocusable",
+        "icon",
+        "iconPosition",
+        "secondaryContent"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "button",
+      "component": "MenuButton",
+      "localComponent": "MenuButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "disabled",
+        "disabledFocusable",
+        "shape",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "icon",
+        "menuIcon"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "disabled",
+        "disabledFocusable",
+        "icon",
+        "menuIcon",
+        "shape",
+        "size",
+        "type"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "icon",
+        "menuIcon",
+        "type"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "button",
+      "component": "SplitButton",
+      "localComponent": "SplitButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "disabled",
+        "disabledFocusable",
+        "iconPosition",
+        "shape",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "icon",
+        "menuButton",
+        "menuIcon",
+        "primaryActionButton"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "disabled",
+        "disabledFocusable",
+        "icon",
+        "iconPosition",
+        "menuButton",
+        "menuIcon",
+        "menuItems",
+        "menuLabel",
+        "onClick",
+        "primaryActionButton",
+        "shape",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "icon",
+        "menuButton",
+        "menuIcon",
+        "menuItems",
+        "menuLabel",
+        "onClick",
+        "primaryActionButton"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "button",
+      "component": "ToggleButton",
+      "localComponent": "ToggleButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "checked",
+        "defaultChecked",
+        "disabled",
+        "disabledFocusable",
+        "iconPosition",
+        "isAccessible",
+        "shape",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "icon"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "checked",
+        "children",
+        "defaultChecked",
+        "defaultPressed",
+        "disabled",
+        "disabledFocusable",
+        "icon",
+        "iconPosition",
+        "isAccessible",
+        "name",
+        "onCheckedChange",
+        "onPressedChange",
+        "pressed",
+        "shape",
+        "size",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "defaultPressed",
+        "icon",
+        "name",
+        "onCheckedChange",
+        "onPressedChange",
+        "pressed",
+        "value"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "card",
+      "component": "Card",
+      "localComponent": "Card",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "defaultSelected",
+        "disabled",
+        "focusMode",
+        "onSelectionChange",
+        "orientation",
+        "selected",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "checkbox",
+        "floatingAction"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "checkbox",
+        "defaultSelected",
+        "disabled",
+        "floatingAction",
+        "focusMode",
+        "onSelectionChange",
+        "orientation",
+        "selected",
+        "selectionLabel",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "checkbox",
+        "floatingAction",
+        "selectionLabel"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "card",
+      "component": "CardFooter",
+      "localComponent": "CardFooter",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "action"
+      ],
+      "localOwnProps": [
+        "action"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "action"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "card",
+      "component": "CardHeader",
+      "localComponent": "CardHeader",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "action",
+        "description",
+        "header",
+        "image"
+      ],
+      "localOwnProps": [
+        "action",
+        "description",
+        "header",
+        "image"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "action",
+        "description",
+        "header",
+        "image"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "card",
+      "component": "CardPreview",
+      "localComponent": "CardPreview",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "logo"
+      ],
+      "localOwnProps": [
+        "logo"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "logo"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "carousel",
+      "component": "Carousel",
+      "localComponent": "Carousel",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "activeIndex",
+        "align",
+        "announcement",
+        "appearance",
+        "autoplayInterval",
+        "circular",
+        "defaultActiveIndex",
+        "draggable",
+        "groupSize",
+        "motion",
+        "onActiveIndexChange",
+        "whitespace"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "activeIndex",
+        "align",
+        "announcement",
+        "appearance",
+        "autoplay",
+        "autoplayInterval",
+        "children",
+        "circular",
+        "defaultActiveIndex",
+        "defaultSelectedIndex",
+        "draggable",
+        "groupSize",
+        "label",
+        "motion",
+        "motionDuration",
+        "navigationLabel",
+        "nextLabel",
+        "onActiveIndexChange",
+        "onIndexChange",
+        "pauseLabel",
+        "playLabel",
+        "previousLabel",
+        "roleDescription",
+        "selectedIndex",
+        "slideGroupLabel",
+        "slideLabel",
+        "slideWidth",
+        "whitespace",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "autoplay",
+        "children",
+        "defaultSelectedIndex",
+        "label",
+        "motionDuration",
+        "navigationLabel",
+        "nextLabel",
+        "onIndexChange",
+        "pauseLabel",
+        "playLabel",
+        "previousLabel",
+        "roleDescription",
+        "selectedIndex",
+        "slideGroupLabel",
+        "slideLabel",
+        "slideWidth",
+        "wrap"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "carousel",
+      "component": "CarouselAutoplayButton",
+      "localComponent": "CarouselAutoplayButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "onCheckedChange"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "onCheckedChange",
+        "pauseLabel",
+        "playLabel",
+        "slot"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "pauseLabel",
+        "playLabel",
+        "slot"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "carousel",
+      "component": "CarouselButton",
+      "localComponent": "CarouselButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "navType"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "label",
+        "navType",
+        "slot"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "label",
+        "slot"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "carousel",
+      "component": "CarouselCard",
+      "localComponent": "CarouselCard",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "autoSize"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "autoSize",
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "carousel",
+      "component": "CarouselNav",
+      "localComponent": "CarouselNav",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "children"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "label",
+        "slot"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "appearance",
+        "label",
+        "slot"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "carousel",
+      "component": "CarouselNavButton",
+      "localComponent": "CarouselNavButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "disabled",
+        "index",
+        "label",
+        "selected"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "disabled",
+        "index",
+        "label",
+        "selected"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "carousel",
+      "component": "CarouselNavContainer",
+      "localComponent": "CarouselNavContainer",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "layout"
+      ],
+      "fluentSlotProps": [
+        "autoplay",
+        "autoplayTooltip",
+        "next",
+        "nextTooltip",
+        "prev",
+        "prevTooltip"
+      ],
+      "localOwnProps": [
+        "autoplay",
+        "autoplayTooltip",
+        "children",
+        "layout",
+        "next",
+        "nextTooltip",
+        "prev",
+        "prevTooltip"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "autoplay",
+        "autoplayTooltip",
+        "children",
+        "next",
+        "nextTooltip",
+        "prev",
+        "prevTooltip"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "carousel",
+      "component": "CarouselNavImageButton",
+      "localComponent": "CarouselNavImageButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "image"
+      ],
+      "localOwnProps": [
+        "alt",
+        "disabled",
+        "image",
+        "index",
+        "label",
+        "selected",
+        "src"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "alt",
+        "disabled",
+        "image",
+        "index",
+        "label",
+        "selected",
+        "src"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "carousel",
+      "component": "CarouselProvider",
+      "localComponent": "CarouselProvider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "carousel",
+      "component": "CarouselSlider",
+      "localComponent": "CarouselSlider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "cardFocus"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "cardFocus",
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "carousel",
+      "component": "CarouselViewport",
+      "localComponent": "CarouselViewport",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "checkbox",
+      "component": "Checkbox",
+      "localComponent": "Checkbox",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "checked",
+        "children",
+        "defaultChecked",
+        "labelPosition",
+        "onChange",
+        "shape",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "indicator",
+        "input",
+        "label"
+      ],
+      "localOwnProps": [
+        "checked",
+        "children",
+        "defaultChecked",
+        "disabled",
+        "disabledFocusable",
+        "indicator",
+        "input",
+        "label",
+        "labelPosition",
+        "name",
+        "onChange",
+        "onCheckedChange",
+        "required",
+        "shape",
+        "size",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "disabled",
+        "disabledFocusable",
+        "indicator",
+        "input",
+        "label",
+        "name",
+        "onCheckedChange",
+        "required",
+        "value"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "color-picker",
+      "component": "AlphaSlider",
+      "localComponent": "AlphaSlider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "color",
+        "defaultColor",
+        "onChange",
+        "shape",
+        "transparency",
+        "vertical"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "color",
+        "defaultColor",
+        "input",
+        "onChange",
+        "rail",
+        "shape",
+        "thumb",
+        "transparency",
+        "vertical"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "input",
+        "rail",
+        "thumb"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "color-picker",
+      "component": "ColorArea",
+      "localComponent": "ColorArea",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "color",
+        "defaultColor",
+        "onChange",
+        "shape"
+      ],
+      "fluentSlotProps": [
+        "inputX",
+        "inputY",
+        "thumb"
+      ],
+      "localOwnProps": [
+        "children",
+        "color",
+        "defaultColor",
+        "inputX",
+        "inputY",
+        "onChange",
+        "shape",
+        "thumb"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "inputX",
+        "inputY",
+        "thumb"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "color-picker",
+      "component": "ColorPicker",
+      "localComponent": "ColorPicker",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "color",
+        "onColorChange",
+        "shape"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "alpha",
+        "children",
+        "color",
+        "colors",
+        "defaultAlpha",
+        "defaultColor",
+        "defaultValue",
+        "format",
+        "label",
+        "name",
+        "onColorChange",
+        "onFormatChange",
+        "onValueChange",
+        "readOnly",
+        "required",
+        "shape",
+        "size",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "alpha",
+        "children",
+        "colors",
+        "defaultAlpha",
+        "defaultColor",
+        "defaultValue",
+        "format",
+        "label",
+        "name",
+        "onFormatChange",
+        "onValueChange",
+        "readOnly",
+        "required",
+        "size",
+        "value"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "color-picker",
+      "component": "ColorSlider",
+      "localComponent": "ColorSlider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "channel",
+        "color",
+        "defaultColor",
+        "onChange",
+        "shape",
+        "vertical"
+      ],
+      "fluentSlotProps": [
+        "input",
+        "rail",
+        "thumb"
+      ],
+      "localOwnProps": [
+        "channel",
+        "color",
+        "defaultColor",
+        "input",
+        "onChange",
+        "rail",
+        "shape",
+        "thumb",
+        "vertical"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "input",
+        "rail",
+        "thumb"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "combobox",
+      "component": "Combobox",
+      "localComponent": "ComboBox",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "children",
+        "clearable",
+        "defaultOpen",
+        "defaultSelectedOptions",
+        "defaultValue",
+        "disableAutoFocus",
+        "freeform",
+        "inlinePopup",
+        "multiselect",
+        "onActiveOptionChange",
+        "onOpenChange",
+        "onOptionSelect",
+        "open",
+        "placeholder",
+        "positioning",
+        "selectedOptions",
+        "size",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "clearIcon",
+        "expandIcon",
+        "input",
+        "listbox"
+      ],
+      "localOwnProps": [
+        "allowFreeform",
+        "appearance",
+        "children",
+        "clearIcon",
+        "clearable",
+        "defaultOpen",
+        "defaultSelectedOptions",
+        "defaultValue",
+        "disableAutoFocus",
+        "disabled",
+        "expandIcon",
+        "freeform",
+        "inlinePopup",
+        "input",
+        "label",
+        "listbox",
+        "multiselect",
+        "name",
+        "noResults",
+        "onActiveOptionChange",
+        "onOpenChange",
+        "onOptionSelect",
+        "onSelectedOptionsChange",
+        "onValueChange",
+        "open",
+        "placeholder",
+        "positioning",
+        "required",
+        "selectedOptions",
+        "selectedValue",
+        "size",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "allowFreeform",
+        "clearIcon",
+        "disabled",
+        "expandIcon",
+        "input",
+        "label",
+        "listbox",
+        "name",
+        "noResults",
+        "onSelectedOptionsChange",
+        "onValueChange",
+        "required",
+        "selectedValue"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "combobox",
+      "component": "ComboboxProvider",
+      "localComponent": "ComboboxProvider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "combobox",
+      "component": "Dropdown",
+      "localComponent": "Dropdown",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "clearable",
+        "defaultOpen",
+        "defaultSelectedOptions",
+        "defaultValue",
+        "disableAutoFocus",
+        "inlinePopup",
+        "multiselect",
+        "onActiveOptionChange",
+        "onOpenChange",
+        "onOptionSelect",
+        "open",
+        "placeholder",
+        "positioning",
+        "selectedOptions",
+        "size",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "button",
+        "clearButton",
+        "expandIcon",
+        "listbox"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "button",
+        "children",
+        "clearButton",
+        "clearable",
+        "defaultOpen",
+        "defaultSelectedOptions",
+        "defaultValue",
+        "disableAutoFocus",
+        "disabled",
+        "expandIcon",
+        "inlinePopup",
+        "label",
+        "listbox",
+        "multiselect",
+        "onActiveOptionChange",
+        "onOpenChange",
+        "onOptionSelect",
+        "open",
+        "placeholder",
+        "positioning",
+        "selectedOptions",
+        "size",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "button",
+        "children",
+        "clearButton",
+        "disabled",
+        "expandIcon",
+        "label",
+        "listbox"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "combobox",
+      "component": "Listbox",
+      "localComponent": "Listbox",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "defaultSelectedOptions",
+        "disableAutoFocus",
+        "multiselect",
+        "onOptionSelect",
+        "selectedOptions"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "defaultSelectedOptions",
+        "disableAutoFocus",
+        "multiselect",
+        "onOptionSelect",
+        "selectedOptions"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "combobox",
+      "component": "Option",
+      "localComponent": "Option",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "children",
+        "disabled",
+        "text",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "checkIcon"
+      ],
+      "localOwnProps": [
+        "checkIcon",
+        "children",
+        "disabled",
+        "text",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "checkIcon"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "combobox",
+      "component": "OptionGroup",
+      "localComponent": "OptionGroup",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "label"
+      ],
+      "localOwnProps": [
+        "children",
+        "label"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "label"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "dialog",
+      "component": "Dialog",
+      "localComponent": "Dialog",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "children",
+        "defaultOpen",
+        "inertTrapFocus",
+        "modalType",
+        "onOpenChange",
+        "open",
+        "unmountOnClose"
+      ],
+      "fluentSlotProps": [
+        "surfaceMotion"
+      ],
+      "localOwnProps": [
+        "actions",
+        "children",
+        "closeLabel",
+        "defaultOpen",
+        "dismissible",
+        "inertTrapFocus",
+        "modal",
+        "modalType",
+        "onOpenChange",
+        "open",
+        "surfaceMotion",
+        "title",
+        "unmountOnClose"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "actions",
+        "closeLabel",
+        "dismissible",
+        "modal",
+        "surfaceMotion",
+        "title"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "dialog",
+      "component": "DialogActions",
+      "localComponent": "DialogActions",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "fluid",
+        "position"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "fluid",
+        "position"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "dialog",
+      "component": "DialogBody",
+      "localComponent": "DialogBody",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "dialog",
+      "component": "DialogContent",
+      "localComponent": "DialogContent",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "dialog",
+      "component": "DialogSurface",
+      "localComponent": "DialogSurface",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "backdrop",
+        "backdropMotion"
+      ],
+      "localOwnProps": [
+        "backdrop",
+        "backdropMotion",
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "backdrop",
+        "backdropMotion",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "dialog",
+      "component": "DialogTitle",
+      "localComponent": "DialogTitle",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "action"
+      ],
+      "localOwnProps": [
+        "action",
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "action",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "dialog",
+      "component": "DialogTrigger",
+      "localComponent": "DialogTrigger",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "action",
+        "disableButtonEnhancement"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "action",
+        "children",
+        "disableButtonEnhancement"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "divider",
+      "component": "Divider",
+      "localComponent": "Divider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "alignContent",
+        "appearance",
+        "inset",
+        "vertical"
+      ],
+      "fluentSlotProps": [
+        "wrapper"
+      ],
+      "localOwnProps": [
+        "align",
+        "alignContent",
+        "appearance",
+        "children",
+        "inset",
+        "orientation",
+        "vertical",
+        "wrapper"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "align",
+        "children",
+        "orientation",
+        "wrapper"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "drawer",
+      "component": "Drawer",
+      "localComponent": "Drawer",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "defaultOpen",
+        "open",
+        "position",
+        "separator",
+        "size",
+        "type",
+        "unmountOnClose"
+      ],
+      "fluentSlotProps": [
+        "backdropMotion",
+        "surfaceMotion"
+      ],
+      "localOwnProps": [
+        "actions",
+        "backdropMotion",
+        "children",
+        "closeLabel",
+        "defaultOpen",
+        "dismissible",
+        "expandLabel",
+        "expandable",
+        "expanded",
+        "modal",
+        "onDismiss",
+        "onExpandedChange",
+        "onOpenChange",
+        "open",
+        "position",
+        "restoreLabel",
+        "separator",
+        "size",
+        "surfaceMotion",
+        "title",
+        "type",
+        "unmountOnClose"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "actions",
+        "backdropMotion",
+        "children",
+        "closeLabel",
+        "dismissible",
+        "expandLabel",
+        "expandable",
+        "expanded",
+        "modal",
+        "onDismiss",
+        "onExpandedChange",
+        "onOpenChange",
+        "restoreLabel",
+        "surfaceMotion",
+        "title"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "drawer",
+      "component": "DrawerBody",
+      "localComponent": "DrawerBody",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "drawer",
+      "component": "DrawerFooter",
+      "localComponent": "DrawerFooter",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "drawer",
+      "component": "DrawerHeader",
+      "localComponent": "DrawerHeader",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "drawer",
+      "component": "DrawerHeaderNavigation",
+      "localComponent": "DrawerHeaderNavigation",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "label"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "label"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "drawer",
+      "component": "DrawerHeaderTitle",
+      "localComponent": "DrawerHeaderTitle",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "action",
+        "heading"
+      ],
+      "localOwnProps": [
+        "action",
+        "children",
+        "heading"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "action",
+        "children",
+        "heading"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "drawer",
+      "component": "InlineDrawer",
+      "localComponent": "InlineDrawer",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "open",
+        "position",
+        "separator",
+        "size",
+        "unmountOnClose"
+      ],
+      "fluentSlotProps": [
+        "surfaceMotion"
+      ],
+      "localOwnProps": [
+        "actions",
+        "children",
+        "open",
+        "position",
+        "separator",
+        "size",
+        "surfaceMotion",
+        "title",
+        "unmountOnClose"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "actions",
+        "children",
+        "surfaceMotion",
+        "title"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "drawer",
+      "component": "OverlayDrawer",
+      "localComponent": "OverlayDrawer",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "defaultOpen",
+        "open",
+        "position",
+        "size",
+        "unmountOnClose"
+      ],
+      "fluentSlotProps": [
+        "backdropMotion",
+        "surfaceMotion"
+      ],
+      "localOwnProps": [
+        "actions",
+        "backdropMotion",
+        "children",
+        "closeLabel",
+        "defaultOpen",
+        "dismissible",
+        "expandLabel",
+        "expandable",
+        "expanded",
+        "modalType",
+        "onDismiss",
+        "onExpandedChange",
+        "onOpenChange",
+        "open",
+        "position",
+        "restoreLabel",
+        "separator",
+        "size",
+        "surfaceMotion",
+        "title",
+        "unmountOnClose"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "actions",
+        "backdropMotion",
+        "children",
+        "closeLabel",
+        "dismissible",
+        "expandLabel",
+        "expandable",
+        "expanded",
+        "modalType",
+        "onDismiss",
+        "onExpandedChange",
+        "onOpenChange",
+        "restoreLabel",
+        "separator",
+        "surfaceMotion",
+        "title"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "field",
+      "component": "Field",
+      "localComponent": "Field",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "children",
+        "orientation",
+        "required",
+        "size",
+        "validationState"
+      ],
+      "fluentSlotProps": [
+        "hint",
+        "label",
+        "validationMessage",
+        "validationMessageIcon"
+      ],
+      "localOwnProps": [
+        "children",
+        "disabled",
+        "hint",
+        "label",
+        "orientation",
+        "required",
+        "size",
+        "validationMessage",
+        "validationMessageIcon",
+        "validationState"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "disabled",
+        "hint",
+        "label",
+        "validationMessage",
+        "validationMessageIcon"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "image",
+      "component": "Image",
+      "localComponent": "Image",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "block",
+        "bordered",
+        "fit",
+        "shadow",
+        "shape"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "alt",
+        "block",
+        "bordered",
+        "decoding",
+        "fit",
+        "loading",
+        "shadow",
+        "shape"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "alt",
+        "decoding",
+        "loading"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "infobutton",
+      "component": "InfoButton",
+      "localComponent": "InfoButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "inline",
+        "popover",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "info"
+      ],
+      "localOwnProps": [
+        "children",
+        "info",
+        "inline",
+        "label",
+        "onOpenChange",
+        "open",
+        "placement",
+        "popover",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "info",
+        "label",
+        "onOpenChange",
+        "open",
+        "placement"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "infobutton",
+      "component": "InfoLabel",
+      "localComponent": "InfoLabel",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "info"
+      ],
+      "fluentSlotProps": [
+        "infoButton",
+        "label"
+      ],
+      "localOwnProps": [
+        "children",
+        "disabled",
+        "htmlFor",
+        "info",
+        "infoButton",
+        "infoButtonLabel",
+        "label",
+        "placement",
+        "required",
+        "size",
+        "weight"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "disabled",
+        "htmlFor",
+        "infoButton",
+        "infoButtonLabel",
+        "label",
+        "placement",
+        "required",
+        "size",
+        "weight"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "infolabel",
+      "component": "InfoButton",
+      "localComponent": "InfoButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "inline",
+        "popover",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "info"
+      ],
+      "localOwnProps": [
+        "children",
+        "info",
+        "inline",
+        "label",
+        "onOpenChange",
+        "open",
+        "placement",
+        "popover",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "info",
+        "label",
+        "onOpenChange",
+        "open",
+        "placement"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "infolabel",
+      "component": "InfoLabel",
+      "localComponent": "InfoLabel",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "info"
+      ],
+      "fluentSlotProps": [
+        "infoButton",
+        "label"
+      ],
+      "localOwnProps": [
+        "children",
+        "disabled",
+        "htmlFor",
+        "info",
+        "infoButton",
+        "infoButtonLabel",
+        "label",
+        "placement",
+        "required",
+        "size",
+        "weight"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "disabled",
+        "htmlFor",
+        "infoButton",
+        "infoButtonLabel",
+        "label",
+        "placement",
+        "required",
+        "size",
+        "weight"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "input",
+      "component": "Input",
+      "localComponent": "Input",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "children",
+        "defaultValue",
+        "onChange",
+        "size",
+        "type",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "contentAfter",
+        "contentBefore",
+        "input"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "contentAfter",
+        "contentBefore",
+        "defaultValue",
+        "disabled",
+        "input",
+        "name",
+        "onChange",
+        "onValueChange",
+        "placeholder",
+        "readOnly",
+        "required",
+        "size",
+        "type",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "contentAfter",
+        "contentBefore",
+        "disabled",
+        "input",
+        "name",
+        "onValueChange",
+        "placeholder",
+        "readOnly",
+        "required"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "input",
+      "component": "SearchBox",
+      "localComponent": "SearchBox",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "onChange"
+      ],
+      "fluentSlotProps": [
+        "dismiss"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "clearLabel",
+        "contentAfter",
+        "contentBefore",
+        "defaultValue",
+        "dismiss",
+        "label",
+        "onChange",
+        "onSearch",
+        "onValueChange",
+        "readOnly",
+        "size",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "appearance",
+        "clearLabel",
+        "contentAfter",
+        "contentBefore",
+        "defaultValue",
+        "dismiss",
+        "label",
+        "onSearch",
+        "onValueChange",
+        "readOnly",
+        "size",
+        "value"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "label",
+      "component": "Label",
+      "localComponent": "Label",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "disabled",
+        "required",
+        "size",
+        "weight"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "disabled",
+        "required",
+        "size",
+        "weight"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "link",
+      "component": "Link",
+      "localComponent": "Link",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "disabled",
+        "disabledFocusable",
+        "inline"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "appearance",
+        "as",
+        "children",
+        "disabled",
+        "disabledFocusable",
+        "download",
+        "href",
+        "hreflang",
+        "inline",
+        "referrerPolicy",
+        "rel",
+        "target",
+        "title",
+        "underline"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children",
+        "download",
+        "href",
+        "hreflang",
+        "referrerPolicy",
+        "rel",
+        "target",
+        "title",
+        "underline"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "list",
+      "component": "DataGrid",
+      "localComponent": "DataGrid",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "columnSizingOptions",
+        "containerWidthOffset",
+        "onColumnResize",
+        "onSelectionChange",
+        "onSortChange",
+        "resizableColumnsOptions",
+        "selectionMode"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "collapseGroupLabel",
+        "columnOrder",
+        "columnSizingOptions",
+        "columnWidths",
+        "columns",
+        "containerWidthOffset",
+        "dataSource",
+        "defaultColumnOrder",
+        "defaultColumnWidths",
+        "defaultSelectedItems",
+        "defaultSelectionModel",
+        "defaultSortState",
+        "editHint",
+        "expandGroupLabel",
+        "focusMode",
+        "getRowId",
+        "groupCountLabel",
+        "items",
+        "label",
+        "loadingLabel",
+        "onCellEdit",
+        "onColumnOrderChange",
+        "onColumnResize",
+        "onDataLoadError",
+        "onDataSourceGroupToggle",
+        "onDataSourceSelectionChange",
+        "onRenderedRange",
+        "onSelectionChange",
+        "onSortChange",
+        "overscan",
+        "reorderLabel",
+        "reorderableColumns",
+        "resizableColumns",
+        "resizableColumnsOptions",
+        "resizeLabel",
+        "rowHeight",
+        "rowLabel",
+        "selectedItems",
+        "selectionAppearance",
+        "selectionMode",
+        "selectionModel",
+        "sortState",
+        "validateCellEdit",
+        "virtualize"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "collapseGroupLabel",
+        "columnOrder",
+        "columnWidths",
+        "columns",
+        "dataSource",
+        "defaultColumnOrder",
+        "defaultColumnWidths",
+        "defaultSelectedItems",
+        "defaultSelectionModel",
+        "defaultSortState",
+        "editHint",
+        "expandGroupLabel",
+        "focusMode",
+        "getRowId",
+        "groupCountLabel",
+        "items",
+        "label",
+        "loadingLabel",
+        "onCellEdit",
+        "onColumnOrderChange",
+        "onDataLoadError",
+        "onDataSourceGroupToggle",
+        "onDataSourceSelectionChange",
+        "onRenderedRange",
+        "overscan",
+        "reorderLabel",
+        "reorderableColumns",
+        "resizableColumns",
+        "resizeLabel",
+        "rowHeight",
+        "rowLabel",
+        "selectedItems",
+        "selectionAppearance",
+        "selectionModel",
+        "sortState",
+        "validateCellEdit",
+        "virtualize"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "list",
+      "component": "List",
+      "localComponent": "List",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "defaultSelectedItems",
+        "navigationMode",
+        "onSelectionChange",
+        "selectedItems",
+        "selectionMode"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "defaultSelectedItems",
+        "navigationMode",
+        "onSelectionChange",
+        "selectedItems",
+        "selectionMode"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "list",
+      "component": "ListItem",
+      "localComponent": "ListItem",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "disabledSelection",
+        "onAction",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "checkmark"
+      ],
+      "localOwnProps": [
+        "checkmark",
+        "children",
+        "disabledSelection",
+        "onAction",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "checkmark",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "menu",
+      "component": "Menu",
+      "localComponent": "Menu",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "checkedValues",
+        "children",
+        "closeOnScroll",
+        "defaultCheckedValues",
+        "defaultOpen",
+        "hasCheckmarks",
+        "hasIcons",
+        "hoverDelay",
+        "inline",
+        "onCheckedValueChange",
+        "onOpenChange",
+        "open",
+        "openOnContext",
+        "openOnHover",
+        "persistOnItemClick",
+        "positioning"
+      ],
+      "fluentSlotProps": [
+        "surfaceMotion"
+      ],
+      "localOwnProps": [
+        "checkedValues",
+        "children",
+        "closeOnScroll",
+        "contextMenu",
+        "defaultCheckedValues",
+        "defaultOpen",
+        "hasCheckmarks",
+        "hasIcons",
+        "hoverDelay",
+        "inline",
+        "label",
+        "onCheckedValueChange",
+        "onOpenChange",
+        "onSelect",
+        "open",
+        "openOnContext",
+        "openOnHover",
+        "persistOnItemClick",
+        "placement",
+        "positioning",
+        "surfaceMotion",
+        "trigger"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "contextMenu",
+        "label",
+        "onSelect",
+        "placement",
+        "surfaceMotion",
+        "trigger"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "menu",
+      "component": "MenuDivider",
+      "localComponent": "MenuDivider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "menu",
+      "component": "MenuGroup",
+      "localComponent": "MenuGroup",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "label"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "label"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "menu",
+      "component": "MenuGroupHeader",
+      "localComponent": "MenuGroupHeader",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "menu",
+      "component": "MenuItem",
+      "localComponent": "MenuItem",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "disabled",
+        "disabledFocusable",
+        "hasSubmenu",
+        "persistOnClick"
+      ],
+      "fluentSlotProps": [
+        "checkmark",
+        "icon",
+        "secondaryContent",
+        "subText",
+        "submenuIndicator"
+      ],
+      "localOwnProps": [
+        "checked",
+        "checkmark",
+        "children",
+        "content",
+        "disabled",
+        "disabledFocusable",
+        "hasSubmenu",
+        "icon",
+        "kind",
+        "name",
+        "onCheckedChange",
+        "onSelect",
+        "persistOnClick",
+        "secondaryContent",
+        "subText",
+        "submenuIndicator",
+        "switchIndicator",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "checked",
+        "checkmark",
+        "children",
+        "content",
+        "icon",
+        "kind",
+        "name",
+        "onCheckedChange",
+        "onSelect",
+        "secondaryContent",
+        "subText",
+        "submenuIndicator",
+        "switchIndicator",
+        "value"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "menu",
+      "component": "MenuItemCheckbox",
+      "localComponent": "MenuItemCheckbox",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "disabled",
+        "disabledFocusable",
+        "hasSubmenu",
+        "name",
+        "persistOnClick",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "checkmark",
+        "icon",
+        "secondaryContent",
+        "subText",
+        "submenuIndicator"
+      ],
+      "localOwnProps": [
+        "checked",
+        "checkmark",
+        "children",
+        "content",
+        "defaultChecked",
+        "disabled",
+        "disabledFocusable",
+        "hasSubmenu",
+        "icon",
+        "name",
+        "onCheckedChange",
+        "persistOnClick",
+        "secondaryContent",
+        "subText",
+        "submenuIndicator",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "checked",
+        "checkmark",
+        "children",
+        "content",
+        "defaultChecked",
+        "icon",
+        "onCheckedChange",
+        "secondaryContent",
+        "subText",
+        "submenuIndicator"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "menu",
+      "component": "MenuItemLink",
+      "localComponent": "MenuItemLink",
+      "status": "review-slot-prop-gaps",
+      "fluentOwnProps": [
+        "disabled",
+        "href"
+      ],
+      "fluentSlotProps": [
+        "checkmark",
+        "content",
+        "icon",
+        "secondaryContent"
+      ],
+      "localOwnProps": [
+        "children",
+        "disabled",
+        "download",
+        "href",
+        "icon",
+        "rel",
+        "secondaryContent",
+        "target"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [
+        "checkmark",
+        "content"
+      ],
+      "localAdditions": [
+        "children",
+        "download",
+        "icon",
+        "rel",
+        "secondaryContent",
+        "target"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "menu",
+      "component": "MenuItemRadio",
+      "localComponent": "MenuItemRadio",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "disabled",
+        "disabledFocusable",
+        "hasSubmenu",
+        "name",
+        "persistOnClick",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "checkmark",
+        "icon",
+        "secondaryContent",
+        "subText",
+        "submenuIndicator"
+      ],
+      "localOwnProps": [
+        "checked",
+        "checkmark",
+        "children",
+        "content",
+        "defaultChecked",
+        "disabled",
+        "disabledFocusable",
+        "hasSubmenu",
+        "icon",
+        "name",
+        "onCheckedChange",
+        "persistOnClick",
+        "secondaryContent",
+        "subText",
+        "submenuIndicator",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "checked",
+        "checkmark",
+        "children",
+        "content",
+        "defaultChecked",
+        "icon",
+        "onCheckedChange",
+        "secondaryContent",
+        "subText",
+        "submenuIndicator"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "menu",
+      "component": "MenuItemSwitch",
+      "localComponent": "MenuItemSwitch",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "disabled",
+        "name",
+        "persistOnClick",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "content",
+        "icon",
+        "secondaryContent",
+        "subText",
+        "switchIndicator"
+      ],
+      "localOwnProps": [
+        "checked",
+        "checkmark",
+        "children",
+        "content",
+        "defaultChecked",
+        "disabled",
+        "disabledFocusable",
+        "hasSubmenu",
+        "icon",
+        "name",
+        "onCheckedChange",
+        "persistOnClick",
+        "secondaryContent",
+        "subText",
+        "submenuIndicator",
+        "switchIndicator",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "checked",
+        "checkmark",
+        "children",
+        "content",
+        "defaultChecked",
+        "disabledFocusable",
+        "hasSubmenu",
+        "icon",
+        "onCheckedChange",
+        "secondaryContent",
+        "subText",
+        "submenuIndicator",
+        "switchIndicator"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "menu",
+      "component": "MenuList",
+      "localComponent": "MenuList",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "checkedValues",
+        "defaultCheckedValues",
+        "hasCheckmarks",
+        "hasIcons",
+        "onCheckedValueChange"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "checkedValues",
+        "children",
+        "defaultCheckedValues",
+        "hasCheckmarks",
+        "hasIcons",
+        "onCheckedValueChange"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "menu",
+      "component": "MenuPopover",
+      "localComponent": "MenuPopover",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "menu",
+      "component": "MenuSplitGroup",
+      "localComponent": "MenuSplitGroup",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "orientation"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "orientation"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "menu",
+      "component": "MenuTrigger",
+      "localComponent": "MenuTrigger",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "disableButtonEnhancement"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "disableButtonEnhancement"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "message-bar",
+      "component": "MessageBar",
+      "localComponent": "MessageBar",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "intent",
+        "politeness",
+        "shape"
+      ],
+      "fluentSlotProps": [
+        "bottomReflowSpacer",
+        "icon"
+      ],
+      "localOwnProps": [
+        "bottomReflowSpacer",
+        "children",
+        "icon",
+        "intent",
+        "layout",
+        "politeness",
+        "shape"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "bottomReflowSpacer",
+        "children",
+        "icon",
+        "layout"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "message-bar",
+      "component": "MessageBarActions",
+      "localComponent": "MessageBarActions",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "containerAction"
+      ],
+      "localOwnProps": [
+        "children",
+        "containerAction"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "containerAction"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "message-bar",
+      "component": "MessageBarBody",
+      "localComponent": "MessageBarBody",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "message-bar",
+      "component": "MessageBarGroup",
+      "localComponent": "MessageBarGroup",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "animate",
+        "children"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "animate",
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "message-bar",
+      "component": "MessageBarTitle",
+      "localComponent": "MessageBarTitle",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "nav",
+      "component": "AppItem",
+      "localComponent": "AppItem",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "href"
+      ],
+      "fluentSlotProps": [
+        "icon"
+      ],
+      "localOwnProps": [
+        "avatar",
+        "children",
+        "disabled",
+        "href",
+        "icon",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "avatar",
+        "children",
+        "disabled",
+        "icon",
+        "value"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "nav",
+      "component": "AppItemStatic",
+      "localComponent": "AppItemStatic",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "icon"
+      ],
+      "localOwnProps": [
+        "children",
+        "icon"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "icon"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "nav",
+      "component": "Hamburger",
+      "localComponent": "Hamburger",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "disabled",
+        "label",
+        "onClick",
+        "open"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "disabled",
+        "label",
+        "onClick",
+        "open"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "nav",
+      "component": "Nav",
+      "localComponent": "Nav",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "defaultOpenCategories",
+        "defaultSelectedCategoryValue",
+        "defaultSelectedValue",
+        "density",
+        "multiple",
+        "onNavCategoryItemToggle",
+        "onNavItemSelect",
+        "openCategories",
+        "selectedCategoryValue",
+        "selectedValue"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "closeLabel",
+        "collapsed",
+        "collapsible",
+        "defaultCollapsed",
+        "defaultOpen",
+        "defaultOpenCategories",
+        "defaultSelectedCategoryValue",
+        "defaultSelectedValue",
+        "density",
+        "label",
+        "multiple",
+        "onCategoryToggle",
+        "onCollapsedChange",
+        "onItemSelect",
+        "onNavCategoryItemToggle",
+        "onNavItemSelect",
+        "onOpenChange",
+        "open",
+        "openCategories",
+        "openLabel",
+        "selectedCategoryValue",
+        "selectedValue",
+        "tabbable"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "closeLabel",
+        "collapsed",
+        "collapsible",
+        "defaultCollapsed",
+        "defaultOpen",
+        "label",
+        "onCategoryToggle",
+        "onCollapsedChange",
+        "onItemSelect",
+        "onOpenChange",
+        "open",
+        "openLabel",
+        "tabbable"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "nav",
+      "component": "NavCategory",
+      "localComponent": "NavCategory",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "children",
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "disabled",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "disabled"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "nav",
+      "component": "NavCategoryItem",
+      "localComponent": "NavCategoryItem",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "expandIcon",
+        "expandIconMotion",
+        "icon"
+      ],
+      "localOwnProps": [
+        "avatar",
+        "children",
+        "expandIcon",
+        "expandIconMotion",
+        "icon"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "avatar",
+        "children",
+        "expandIcon",
+        "expandIconMotion",
+        "icon"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "nav",
+      "component": "NavDivider",
+      "localComponent": "NavDivider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "nav",
+      "component": "NavDrawer",
+      "localComponent": "NavDrawer",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "defaultOpenCategories",
+        "defaultSelectedCategoryValue",
+        "defaultSelectedValue",
+        "density",
+        "multiple",
+        "onNavCategoryItemToggle",
+        "onNavItemSelect",
+        "openCategories",
+        "selectedCategoryValue",
+        "selectedValue",
+        "tabbable"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "closeLabel",
+        "collapsed",
+        "collapsible",
+        "defaultCollapsed",
+        "defaultOpen",
+        "defaultOpenCategories",
+        "defaultSelectedCategoryValue",
+        "defaultSelectedValue",
+        "density",
+        "dismissible",
+        "expandable",
+        "expanded",
+        "label",
+        "modal",
+        "multiple",
+        "onCategoryToggle",
+        "onCollapsedChange",
+        "onDismiss",
+        "onExpandedChange",
+        "onItemSelect",
+        "onNavCategoryItemToggle",
+        "onNavItemSelect",
+        "onOpenChange",
+        "open",
+        "openCategories",
+        "openLabel",
+        "position",
+        "selectedCategoryValue",
+        "selectedValue",
+        "separator",
+        "size",
+        "tabbable",
+        "type",
+        "unmountOnClose"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "closeLabel",
+        "collapsed",
+        "collapsible",
+        "defaultCollapsed",
+        "defaultOpen",
+        "dismissible",
+        "expandable",
+        "expanded",
+        "label",
+        "modal",
+        "onCategoryToggle",
+        "onCollapsedChange",
+        "onDismiss",
+        "onExpandedChange",
+        "onItemSelect",
+        "onOpenChange",
+        "open",
+        "openLabel",
+        "position",
+        "separator",
+        "size",
+        "type",
+        "unmountOnClose"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "nav",
+      "component": "NavDrawerBody",
+      "localComponent": "NavDrawerBody",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "nav",
+      "component": "NavDrawerFooter",
+      "localComponent": "NavDrawerFooter",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "nav",
+      "component": "NavDrawerHeader",
+      "localComponent": "NavDrawerHeader",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "nav",
+      "component": "NavItem",
+      "localComponent": "NavItem",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "href",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "icon"
+      ],
+      "localOwnProps": [
+        "avatar",
+        "children",
+        "disabled",
+        "href",
+        "icon",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "avatar",
+        "children",
+        "disabled",
+        "icon"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "nav",
+      "component": "NavSectionHeader",
+      "localComponent": "NavSectionHeader",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "nav",
+      "component": "NavSubItem",
+      "localComponent": "NavSubItem",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "href",
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "avatar",
+        "children",
+        "disabled",
+        "href",
+        "icon",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "avatar",
+        "children",
+        "disabled",
+        "icon"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "nav",
+      "component": "NavSubItemGroup",
+      "localComponent": "NavSubItemGroup",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "collapseMotion"
+      ],
+      "localOwnProps": [
+        "children",
+        "collapseMotion"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "collapseMotion"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "nav",
+      "component": "SplitNavItem",
+      "localComponent": "SplitNavItem",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "actionButton",
+        "actionButtonTooltip",
+        "menuButton",
+        "menuButtonTooltip",
+        "navItem",
+        "toggleButton",
+        "toggleButtonTooltip"
+      ],
+      "localOwnProps": [
+        "action",
+        "actionButton",
+        "actionButtonTooltip",
+        "actionLabel",
+        "children",
+        "disabled",
+        "href",
+        "icon",
+        "menuButton",
+        "menuButtonTooltip",
+        "navItem",
+        "onAction",
+        "toggleButton",
+        "toggleButtonTooltip",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "action",
+        "actionButton",
+        "actionButtonTooltip",
+        "actionLabel",
+        "children",
+        "disabled",
+        "href",
+        "icon",
+        "menuButton",
+        "menuButtonTooltip",
+        "navItem",
+        "onAction",
+        "toggleButton",
+        "toggleButtonTooltip",
+        "value"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "overflow",
+      "component": "Overflow",
+      "localComponent": "Overflow",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "children",
+        "onOverflowChange"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "hasHiddenItems",
+        "label",
+        "minimumVisible",
+        "onOverflowChange",
+        "onOverflowItemSelect",
+        "overflowAxis",
+        "overflowContent",
+        "overflowDirection",
+        "padding"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "hasHiddenItems",
+        "label",
+        "minimumVisible",
+        "onOverflowItemSelect",
+        "overflowAxis",
+        "overflowContent",
+        "overflowDirection",
+        "padding"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "overflow",
+      "component": "OverflowProvider",
+      "localComponent": "OverflowProvider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "overflow",
+      "component": "OverflowDivider",
+      "localComponent": "OverflowDivider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "children",
+        "groupId"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "groupId"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "overflow",
+      "component": "OverflowItem",
+      "localComponent": "OverflowItem",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "children",
+        "groupId",
+        "id",
+        "pinned",
+        "priority"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "groupId",
+        "id",
+        "overflowContent",
+        "overflowLabel",
+        "pinned",
+        "priority"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "overflowContent",
+        "overflowLabel"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "overflow",
+      "component": "OverflowReorderObserver",
+      "localComponent": "OverflowReorderObserver",
+      "status": "non-component-contract",
+      "reason": "Renderless overflow utility; this library's native overflow engine observes child-list mutations directly."
+    },
+    {
+      "family": "overflow",
+      "component": "useOverflowSnapshot",
+      "localComponent": "useOverflowSnapshot",
+      "status": "non-component-contract",
+      "reason": "React hook utility; it selects a value from the latest overflow snapshot."
+    },
+    {
+      "family": "persona",
+      "component": "Persona",
+      "localComponent": "Persona",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "name",
+        "presenceOnly",
+        "size",
+        "textAlignment",
+        "textPosition"
+      ],
+      "fluentSlotProps": [
+        "avatar",
+        "presence",
+        "primaryText",
+        "quaternaryText",
+        "secondaryText",
+        "tertiaryText"
+      ],
+      "localOwnProps": [
+        "avatar",
+        "children",
+        "color",
+        "image",
+        "initials",
+        "name",
+        "presence",
+        "presenceLabel",
+        "presenceOnly",
+        "primaryText",
+        "quaternaryText",
+        "secondaryText",
+        "size",
+        "tertiaryText",
+        "textAlignment",
+        "textPosition"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "avatar",
+        "children",
+        "color",
+        "image",
+        "initials",
+        "presence",
+        "presenceLabel",
+        "primaryText",
+        "quaternaryText",
+        "secondaryText",
+        "tertiaryText"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "popover",
+      "component": "Popover",
+      "localComponent": "Popover",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "children",
+        "closeOnIframeFocus",
+        "closeOnScroll",
+        "defaultOpen",
+        "inertTrapFocus",
+        "inline",
+        "legacyTrapFocus",
+        "mouseLeaveDelay",
+        "onOpenChange",
+        "open",
+        "openOnContext",
+        "openOnHover",
+        "positioning",
+        "size",
+        "trapFocus",
+        "unstable_disableAutoFocus",
+        "withArrow"
+      ],
+      "fluentSlotProps": [
+        "surfaceMotion"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "arrow",
+        "children",
+        "closeOnIframeFocus",
+        "closeOnScroll",
+        "defaultOpen",
+        "inertTrapFocus",
+        "inline",
+        "label",
+        "legacyTrapFocus",
+        "mouseLeaveDelay",
+        "onOpenChange",
+        "open",
+        "openOnContext",
+        "openOnHover",
+        "placement",
+        "positioning",
+        "size",
+        "surfaceMotion",
+        "trapFocus",
+        "trigger",
+        "unstable_disableAutoFocus",
+        "withArrow"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "arrow",
+        "label",
+        "placement",
+        "surfaceMotion",
+        "trigger"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "popover",
+      "component": "PopoverProvider",
+      "localComponent": "PopoverProvider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "popover",
+      "component": "PopoverSurface",
+      "localComponent": "PopoverSurface",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "popover",
+      "component": "PopoverTrigger",
+      "localComponent": "PopoverTrigger",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "disableButtonEnhancement"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "disableButtonEnhancement"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "progress",
+      "component": "ProgressBar",
+      "localComponent": "ProgressBar",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "color",
+        "max",
+        "shape",
+        "thickness",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "bar",
+        "indeterminateMotion"
+      ],
+      "localOwnProps": [
+        "bar",
+        "color",
+        "indeterminateMotion",
+        "label",
+        "max",
+        "shape",
+        "thickness",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "bar",
+        "indeterminateMotion",
+        "label"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "radio",
+      "component": "Radio",
+      "localComponent": "Radio",
+      "status": "review-slot-prop-gaps",
+      "fluentOwnProps": [
+        "disabled",
+        "labelPosition",
+        "onChange",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "indicator",
+        "input",
+        "label"
+      ],
+      "localOwnProps": [
+        "children",
+        "disabled",
+        "label",
+        "labelPosition",
+        "onChange",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [
+        "indicator",
+        "input"
+      ],
+      "localAdditions": [
+        "children",
+        "label"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "radio",
+      "component": "RadioGroup",
+      "localComponent": "RadioGroup",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "defaultValue",
+        "disabled",
+        "layout",
+        "name",
+        "onChange",
+        "required",
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "defaultValue",
+        "disabled",
+        "label",
+        "layout",
+        "name",
+        "onChange",
+        "onValueChange",
+        "orientation",
+        "required",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "label",
+        "onValueChange",
+        "orientation"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "rating",
+      "component": "Rating",
+      "localComponent": "Rating",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "color",
+        "defaultValue",
+        "iconFilled",
+        "iconOutline",
+        "itemLabel",
+        "max",
+        "name",
+        "onChange",
+        "size",
+        "step",
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "color",
+        "defaultValue",
+        "disabled",
+        "fullValueInput",
+        "halfValueInput",
+        "iconFilled",
+        "iconOutline",
+        "itemLabel",
+        "label",
+        "max",
+        "name",
+        "onChange",
+        "readOnly",
+        "required",
+        "size",
+        "step",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "disabled",
+        "fullValueInput",
+        "halfValueInput",
+        "label",
+        "readOnly",
+        "required"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "rating",
+      "component": "RatingDisplay",
+      "localComponent": "RatingDisplay",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "color",
+        "compact",
+        "count",
+        "icon",
+        "max",
+        "size",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "countText",
+        "valueText"
+      ],
+      "localOwnProps": [
+        "children",
+        "color",
+        "compact",
+        "count",
+        "countText",
+        "icon",
+        "label",
+        "max",
+        "size",
+        "value",
+        "valueText"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "countText",
+        "label",
+        "valueText"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "rating",
+      "component": "RatingItem",
+      "localComponent": "RatingItem + Rating",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "value"
+      ],
+      "fluentSlotProps": [
+        "fullValueInput",
+        "halfValueInput",
+        "selectedIcon",
+        "unselectedIcon"
+      ],
+      "localOwnProps": [
+        "color",
+        "defaultValue",
+        "disabled",
+        "fullValueInput",
+        "halfValueInput",
+        "iconFilled",
+        "iconOutline",
+        "itemLabel",
+        "label",
+        "max",
+        "name",
+        "onChange",
+        "readOnly",
+        "required",
+        "selectedIcon",
+        "size",
+        "step",
+        "unselectedIcon",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "color",
+        "defaultValue",
+        "disabled",
+        "fullValueInput",
+        "halfValueInput",
+        "iconFilled",
+        "iconOutline",
+        "itemLabel",
+        "label",
+        "max",
+        "name",
+        "onChange",
+        "readOnly",
+        "required",
+        "selectedIcon",
+        "size",
+        "step",
+        "unselectedIcon"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "search",
+      "component": "SearchBox",
+      "localComponent": "SearchBox",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "onChange"
+      ],
+      "fluentSlotProps": [
+        "dismiss"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "clearLabel",
+        "contentAfter",
+        "contentBefore",
+        "defaultValue",
+        "dismiss",
+        "label",
+        "onChange",
+        "onSearch",
+        "onValueChange",
+        "readOnly",
+        "size",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "appearance",
+        "clearLabel",
+        "contentAfter",
+        "contentBefore",
+        "defaultValue",
+        "dismiss",
+        "label",
+        "onSearch",
+        "onValueChange",
+        "readOnly",
+        "size",
+        "value"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "select",
+      "component": "Select",
+      "localComponent": "Select",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "onChange",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "icon",
+        "select"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "defaultValue",
+        "disabled",
+        "icon",
+        "label",
+        "name",
+        "onChange",
+        "onValueChange",
+        "required",
+        "select",
+        "size",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "defaultValue",
+        "disabled",
+        "icon",
+        "label",
+        "name",
+        "onValueChange",
+        "required",
+        "select",
+        "value"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "skeleton",
+      "component": "Skeleton",
+      "localComponent": "Skeleton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "animation",
+        "appearance",
+        "shape",
+        "size",
+        "width"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "animated",
+        "animation",
+        "appearance",
+        "children",
+        "height",
+        "shape",
+        "size",
+        "width"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "animated",
+        "children",
+        "height"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "skeleton",
+      "component": "SkeletonItem",
+      "localComponent": "SkeletonItem",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "animation",
+        "appearance",
+        "shape",
+        "size"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "animation",
+        "appearance",
+        "shape",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "slider",
+      "component": "Slider",
+      "localComponent": "Slider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "defaultValue",
+        "disabled",
+        "max",
+        "min",
+        "onChange",
+        "size",
+        "step",
+        "value",
+        "vertical"
+      ],
+      "fluentSlotProps": [
+        "input",
+        "rail",
+        "thumb"
+      ],
+      "localOwnProps": [
+        "defaultValue",
+        "disabled",
+        "input",
+        "label",
+        "max",
+        "min",
+        "name",
+        "onChange",
+        "onValueChange",
+        "rail",
+        "size",
+        "step",
+        "thumb",
+        "value",
+        "valueText",
+        "vertical"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "input",
+        "label",
+        "name",
+        "onValueChange",
+        "rail",
+        "thumb",
+        "valueText"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "spinbutton",
+      "component": "SpinButton",
+      "localComponent": "SpinButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "defaultValue",
+        "displayValue",
+        "max",
+        "min",
+        "onChange",
+        "precision",
+        "size",
+        "step",
+        "stepPage",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "decrementButton",
+        "incrementButton",
+        "input"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "decrementButton",
+        "decrementLabel",
+        "defaultValue",
+        "disabled",
+        "displayValue",
+        "incrementButton",
+        "incrementLabel",
+        "input",
+        "label",
+        "max",
+        "min",
+        "name",
+        "onChange",
+        "onValueChange",
+        "precision",
+        "readOnly",
+        "required",
+        "size",
+        "step",
+        "stepPage",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "decrementButton",
+        "decrementLabel",
+        "disabled",
+        "incrementButton",
+        "incrementLabel",
+        "input",
+        "label",
+        "name",
+        "onValueChange",
+        "readOnly",
+        "required"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "spinner",
+      "component": "Spinner",
+      "localComponent": "Spinner",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "delay",
+        "labelPosition",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "label",
+        "spinner",
+        "spinnerTail"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "delay",
+        "label",
+        "labelPosition",
+        "size",
+        "spinner",
+        "spinnerTail"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "label",
+        "spinner",
+        "spinnerTail"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "swatch-picker",
+      "component": "ColorSwatch",
+      "localComponent": "ColorSwatch",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "borderColor",
+        "color",
+        "disabled",
+        "shape",
+        "size",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "disabledIcon",
+        "icon"
+      ],
+      "localOwnProps": [
+        "borderColor",
+        "children",
+        "color",
+        "disabled",
+        "disabledIcon",
+        "icon",
+        "shape",
+        "size",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "disabledIcon",
+        "icon"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "swatch-picker",
+      "component": "EmptySwatch",
+      "localComponent": "EmptySwatch",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "shape",
+        "size"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "disabled",
+        "onAdd",
+        "shape",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "disabled",
+        "onAdd"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "swatch-picker",
+      "component": "ImageSwatch",
+      "localComponent": "ImageSwatch",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "shape",
+        "size",
+        "src",
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "disabled",
+        "shape",
+        "size",
+        "src",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "disabled"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "swatch-picker",
+      "component": "SwatchPicker",
+      "localComponent": "SwatchPicker",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "defaultSelectedValue",
+        "focusMode",
+        "layout",
+        "onSelectionChange",
+        "selectedValue",
+        "shape",
+        "size",
+        "spacing"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "columns",
+        "defaultSelectedValue",
+        "defaultSelectedValues",
+        "focusMode",
+        "layout",
+        "onSelectionChange",
+        "selectedValue",
+        "selectedValues",
+        "selectionMode",
+        "shape",
+        "size",
+        "spacing"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "columns",
+        "defaultSelectedValues",
+        "selectedValues",
+        "selectionMode"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "swatch-picker",
+      "component": "SwatchPickerRow",
+      "localComponent": "SwatchPickerRow",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "switch",
+      "component": "Switch",
+      "localComponent": "Switch",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "checked",
+        "defaultChecked",
+        "disabledFocusable",
+        "labelPosition",
+        "onChange",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "indicator",
+        "input",
+        "label"
+      ],
+      "localOwnProps": [
+        "checked",
+        "defaultChecked",
+        "disabled",
+        "disabledFocusable",
+        "indicator",
+        "input",
+        "label",
+        "labelPosition",
+        "name",
+        "onChange",
+        "onCheckedChange",
+        "required",
+        "size",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "disabled",
+        "indicator",
+        "input",
+        "label",
+        "name",
+        "onCheckedChange",
+        "required",
+        "value"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "ColumnIdContextProvider",
+      "localComponent": "ColumnIdContextProvider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "DataGrid",
+      "localComponent": "DataGrid",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "columnSizingOptions",
+        "containerWidthOffset",
+        "onColumnResize",
+        "onSelectionChange",
+        "onSortChange",
+        "resizableColumnsOptions",
+        "selectionMode"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "collapseGroupLabel",
+        "columnOrder",
+        "columnSizingOptions",
+        "columnWidths",
+        "columns",
+        "containerWidthOffset",
+        "dataSource",
+        "defaultColumnOrder",
+        "defaultColumnWidths",
+        "defaultSelectedItems",
+        "defaultSelectionModel",
+        "defaultSortState",
+        "editHint",
+        "expandGroupLabel",
+        "focusMode",
+        "getRowId",
+        "groupCountLabel",
+        "items",
+        "label",
+        "loadingLabel",
+        "onCellEdit",
+        "onColumnOrderChange",
+        "onColumnResize",
+        "onDataLoadError",
+        "onDataSourceGroupToggle",
+        "onDataSourceSelectionChange",
+        "onRenderedRange",
+        "onSelectionChange",
+        "onSortChange",
+        "overscan",
+        "reorderLabel",
+        "reorderableColumns",
+        "resizableColumns",
+        "resizableColumnsOptions",
+        "resizeLabel",
+        "rowHeight",
+        "rowLabel",
+        "selectedItems",
+        "selectionAppearance",
+        "selectionMode",
+        "selectionModel",
+        "sortState",
+        "validateCellEdit",
+        "virtualize"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "collapseGroupLabel",
+        "columnOrder",
+        "columnWidths",
+        "columns",
+        "dataSource",
+        "defaultColumnOrder",
+        "defaultColumnWidths",
+        "defaultSelectedItems",
+        "defaultSelectionModel",
+        "defaultSortState",
+        "editHint",
+        "expandGroupLabel",
+        "focusMode",
+        "getRowId",
+        "groupCountLabel",
+        "items",
+        "label",
+        "loadingLabel",
+        "onCellEdit",
+        "onColumnOrderChange",
+        "onDataLoadError",
+        "onDataSourceGroupToggle",
+        "onDataSourceSelectionChange",
+        "onRenderedRange",
+        "overscan",
+        "reorderLabel",
+        "reorderableColumns",
+        "resizableColumns",
+        "resizeLabel",
+        "rowHeight",
+        "rowLabel",
+        "selectedItems",
+        "selectionAppearance",
+        "selectionModel",
+        "sortState",
+        "validateCellEdit",
+        "virtualize"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "DataGridBody",
+      "localComponent": "DataGridBody",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "children"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "renderGroupRow"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "renderGroupRow"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "DataGridCell",
+      "localComponent": "DataGridCell",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "focusMode"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "columnId",
+        "columnIndex",
+        "editLabel",
+        "editType",
+        "editable",
+        "focusMode",
+        "rowIndex",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "columnId",
+        "columnIndex",
+        "editLabel",
+        "editType",
+        "editable",
+        "rowIndex",
+        "value"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "DataGridContextProvider",
+      "localComponent": "DataGridContextProvider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "DataGridHeader",
+      "localComponent": "DataGridHeader",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "DataGridHeaderCell",
+      "localComponent": "DataGridHeaderCell",
+      "status": "review-slot-prop-gaps",
+      "fluentOwnProps": [
+        "focusMode",
+        "sortDirection"
+      ],
+      "fluentSlotProps": [
+        "aside",
+        "button",
+        "sortIcon"
+      ],
+      "localOwnProps": [
+        "children",
+        "columnId",
+        "columnIndex",
+        "focusMode",
+        "rowIndex",
+        "sortDirection",
+        "sortable"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [
+        "aside",
+        "button",
+        "sortIcon"
+      ],
+      "localAdditions": [
+        "children",
+        "columnId",
+        "columnIndex",
+        "rowIndex",
+        "sortable"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "DataGridRow",
+      "localComponent": "DataGridRow",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "children"
+      ],
+      "fluentSlotProps": [
+        "selectionCell"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "item",
+        "rowId",
+        "rowIndex",
+        "selectionCell"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "item",
+        "rowId",
+        "rowIndex",
+        "selectionCell"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "DataGridSelectionCell",
+      "localComponent": "DataGridSelectionCell",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "checked",
+        "hidden",
+        "invisible",
+        "subtle",
+        "type"
+      ],
+      "fluentSlotProps": [
+        "checkboxIndicator",
+        "radioIndicator"
+      ],
+      "localOwnProps": [
+        "checkboxIndicator",
+        "checked",
+        "columnIndex",
+        "hidden",
+        "invisible",
+        "item",
+        "label",
+        "radioIndicator",
+        "rowIndex",
+        "subtle",
+        "type"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "checkboxIndicator",
+        "columnIndex",
+        "item",
+        "label",
+        "radioIndicator",
+        "rowIndex"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "Table",
+      "localComponent": "Table",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "noNativeElements",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "appearance",
+        "children",
+        "noNativeElements",
+        "size"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "TableBody",
+      "localComponent": "TableBody",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "TableCell",
+      "localComponent": "TableCell",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "TableCellActions",
+      "localComponent": "TableCellActions",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "visible"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "visible"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "TableCellLayout",
+      "localComponent": "TableCellLayout",
+      "status": "review-slot-prop-gaps",
+      "fluentOwnProps": [
+        "appearance",
+        "truncate"
+      ],
+      "fluentSlotProps": [
+        "description",
+        "main",
+        "media"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "truncate"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [
+        "description",
+        "main",
+        "media"
+      ],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "TableHeader",
+      "localComponent": "TableHeader",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "TableHeaderCell",
+      "localComponent": "TableHeaderCell",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "sortDirection",
+        "sortable"
+      ],
+      "fluentSlotProps": [
+        "aside",
+        "button",
+        "sortIcon"
+      ],
+      "localOwnProps": [
+        "aside",
+        "button",
+        "children",
+        "columnId",
+        "onSort",
+        "sortDirection",
+        "sortIcon",
+        "sortable"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "aside",
+        "button",
+        "children",
+        "columnId",
+        "onSort",
+        "sortIcon"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "TableResizeHandle",
+      "localComponent": "TableResizeHandle",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "label",
+        "max",
+        "min",
+        "onResize",
+        "step",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "label",
+        "max",
+        "min",
+        "onResize",
+        "step",
+        "value"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "TableRow",
+      "localComponent": "TableRow",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "selected"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "selected"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "TableSelectionCell",
+      "localComponent": "TableSelectionCell",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "checked",
+        "hidden",
+        "invisible",
+        "subtle",
+        "type"
+      ],
+      "fluentSlotProps": [
+        "checkboxIndicator",
+        "radioIndicator"
+      ],
+      "localOwnProps": [
+        "checkboxIndicator",
+        "checked",
+        "hidden",
+        "invisible",
+        "onSelectionChange",
+        "radioIndicator",
+        "subtle",
+        "type"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "checkboxIndicator",
+        "onSelectionChange",
+        "radioIndicator"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "table",
+      "component": "createTableColumn",
+      "localComponent": "createTableColumn",
+      "status": "non-component-contract",
+      "reason": "Generic column factory utility; it does not accept component props."
+    },
+    {
+      "family": "table",
+      "component": "useTableFeatures",
+      "localComponent": "useTableFeatures",
+      "status": "non-component-contract",
+      "reason": "React hook utility; it composes table state and feature plugins rather than rendering a component."
+    },
+    {
+      "family": "table",
+      "component": "useTableColumnSizing_unstable",
+      "localComponent": "useTableColumnSizing_unstable",
+      "status": "non-component-contract",
+      "reason": "React hook plugin factory; it adds measured column widths and resize behavior to useTableFeatures."
+    },
+    {
+      "family": "table",
+      "component": "useTableSelection",
+      "localComponent": "useTableSelection",
+      "status": "non-component-contract",
+      "reason": "React hook plugin factory; it adds row selection state to useTableFeatures."
+    },
+    {
+      "family": "table",
+      "component": "useTableSort",
+      "localComponent": "useTableSort",
+      "status": "non-component-contract",
+      "reason": "React hook plugin factory; it adds sorting state to useTableFeatures."
+    },
+    {
+      "family": "tabs",
+      "component": "Tab",
+      "localComponent": "Tab",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "disabled",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "icon"
+      ],
+      "localOwnProps": [
+        "children",
+        "content",
+        "disabled",
+        "icon",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "content",
+        "icon"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tabs",
+      "component": "TabList",
+      "localComponent": "TabList",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "defaultSelectedValue",
+        "disabled",
+        "onTabSelect",
+        "reserveSelectedTabSpace",
+        "selectTabOnFocus",
+        "selectedValue",
+        "size",
+        "vertical"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "defaultSelectedValue",
+        "disabled",
+        "onTabSelect",
+        "reserveSelectedTabSpace",
+        "selectTabOnFocus",
+        "selectedValue",
+        "size",
+        "vertical"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tabs",
+      "component": "TabListProvider",
+      "localComponent": "TabListProvider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tag-picker",
+      "component": "TagPicker",
+      "localComponent": "TagPicker",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "children",
+        "inline",
+        "noPopover",
+        "onOpenChange",
+        "onOptionSelect"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "defaultOpen",
+        "defaultSelectedValues",
+        "inline",
+        "inputValue",
+        "label",
+        "noPopover",
+        "onChange",
+        "onInputValueChange",
+        "onOpenChange",
+        "onOptionSelect",
+        "open",
+        "selectedValues"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "defaultOpen",
+        "defaultSelectedValues",
+        "inputValue",
+        "label",
+        "onChange",
+        "onInputValueChange",
+        "open",
+        "selectedValues"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tag-picker",
+      "component": "TagPickerButton",
+      "localComponent": "TagPickerButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "disabled"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "disabled",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "appearance",
+        "children",
+        "size"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tag-picker",
+      "component": "TagPickerControl",
+      "localComponent": "TagPickerControl",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "secondaryAction"
+      ],
+      "localOwnProps": [
+        "children",
+        "expandIcon",
+        "secondaryAction"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "expandIcon",
+        "secondaryAction"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tag-picker",
+      "component": "TagPickerGroup",
+      "localComponent": "TagPickerGroup",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "label"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "label"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tag-picker",
+      "component": "TagPickerInput",
+      "localComponent": "TagPickerInput",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "disabled",
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "appearance",
+        "clearable",
+        "disabled",
+        "onValueChange",
+        "placeholder",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "appearance",
+        "clearable",
+        "onValueChange",
+        "placeholder"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tag-picker",
+      "component": "TagPickerList",
+      "localComponent": "TagPickerList",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "disableAutoFocus"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "disableAutoFocus"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tag-picker",
+      "component": "TagPickerOption",
+      "localComponent": "TagPickerOption",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "children",
+        "text",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "media",
+        "secondaryContent"
+      ],
+      "localOwnProps": [
+        "children",
+        "disabled",
+        "group",
+        "label",
+        "media",
+        "secondaryContent",
+        "text",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "disabled",
+        "group",
+        "label",
+        "media",
+        "secondaryContent"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tag-picker",
+      "component": "TagPickerOptionGroup",
+      "localComponent": "TagPickerOptionGroup",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "disabled",
+        "label"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "disabled",
+        "label"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tags",
+      "component": "InteractionTag",
+      "localComponent": "InteractionTag",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "disabled",
+        "selected",
+        "shape",
+        "size",
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "disabled",
+        "label",
+        "onDismiss",
+        "onTagSelect",
+        "selected",
+        "shape",
+        "size",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "label",
+        "onDismiss",
+        "onTagSelect"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tags",
+      "component": "InteractionTagPrimary",
+      "localComponent": "InteractionTagPrimary",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "hasSecondaryAction"
+      ],
+      "fluentSlotProps": [
+        "icon",
+        "media",
+        "primaryText",
+        "secondaryText"
+      ],
+      "localOwnProps": [
+        "children",
+        "hasSecondaryAction",
+        "icon",
+        "media",
+        "primaryText",
+        "secondaryText"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "icon",
+        "media",
+        "primaryText",
+        "secondaryText"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tags",
+      "component": "InteractionTagSecondary",
+      "localComponent": "InteractionTagSecondary",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "label"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "label"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tags",
+      "component": "Tag",
+      "localComponent": "Tag",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "disabled",
+        "dismissible",
+        "selected",
+        "shape",
+        "size",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "dismissIcon",
+        "icon",
+        "media",
+        "primaryText",
+        "secondaryText"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "color",
+        "disabled",
+        "dismissIcon",
+        "dismissLabel",
+        "dismissible",
+        "icon",
+        "label",
+        "media",
+        "onDismiss",
+        "primaryText",
+        "secondaryText",
+        "selected",
+        "shape",
+        "size",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "color",
+        "dismissIcon",
+        "dismissLabel",
+        "icon",
+        "label",
+        "media",
+        "onDismiss",
+        "primaryText",
+        "secondaryText"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tags",
+      "component": "TagGroup",
+      "localComponent": "TagGroup",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "defaultSelectedValues",
+        "disabled",
+        "dismissible",
+        "onDismiss",
+        "onTagSelect",
+        "selectedValues",
+        "size"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "defaultSelectedValues",
+        "disabled",
+        "dismissible",
+        "label",
+        "onDismiss",
+        "onTagSelect",
+        "orientation",
+        "selectedValues",
+        "size"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "label",
+        "orientation"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "teaching-popover",
+      "component": "TeachingPopover",
+      "localComponent": "TeachingPopover",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "label",
+        "onOpenChange",
+        "open",
+        "placement",
+        "trigger"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "label",
+        "onOpenChange",
+        "open",
+        "placement",
+        "trigger"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "teaching-popover",
+      "component": "TeachingPopoverBody",
+      "localComponent": "TeachingPopoverBody",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "mediaLength"
+      ],
+      "fluentSlotProps": [
+        "media"
+      ],
+      "localOwnProps": [
+        "children",
+        "media",
+        "mediaLength"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "media"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "teaching-popover",
+      "component": "TeachingPopoverCarousel",
+      "localComponent": "TeachingPopoverCarousel",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "announcement",
+        "defaultValue",
+        "onFinish",
+        "onValueChange",
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "announcement",
+        "children",
+        "defaultValue",
+        "onAnnouncement",
+        "onFinish",
+        "onValueChange",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "onAnnouncement"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "teaching-popover",
+      "component": "TeachingPopoverCarouselCard",
+      "localComponent": "TeachingPopoverCarouselCard",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "teaching-popover",
+      "component": "TeachingPopoverCarouselFooter",
+      "localComponent": "TeachingPopoverCarouselFooter",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "finalStepText",
+        "initialStepText",
+        "layout"
+      ],
+      "fluentSlotProps": [
+        "next",
+        "previous"
+      ],
+      "localOwnProps": [
+        "children",
+        "finalStepText",
+        "initialStepText",
+        "layout",
+        "next",
+        "previous"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "next",
+        "previous"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "teaching-popover",
+      "component": "TeachingPopoverCarouselFooterButton",
+      "localComponent": "TeachingPopoverCarouselFooterButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "altText",
+        "navType"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "altText",
+        "children",
+        "navType",
+        "onClick"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "onClick"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "teaching-popover",
+      "component": "TeachingPopoverCarouselNav",
+      "localComponent": "TeachingPopoverCarouselNav",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "children"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "teaching-popover",
+      "component": "TeachingPopoverCarouselNavButton",
+      "localComponent": "TeachingPopoverCarouselNavButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "value"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "teaching-popover",
+      "component": "TeachingPopoverCarouselPageCount",
+      "localComponent": "TeachingPopoverCarouselPageCount",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "children"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "teaching-popover",
+      "component": "TeachingPopoverFooter",
+      "localComponent": "TeachingPopoverFooter",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "footerLayout"
+      ],
+      "fluentSlotProps": [
+        "primary",
+        "secondary"
+      ],
+      "localOwnProps": [
+        "children",
+        "footerLayout",
+        "primary",
+        "secondary"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "primary",
+        "secondary"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "teaching-popover",
+      "component": "TeachingPopoverHeader",
+      "localComponent": "TeachingPopoverHeader",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "dismissButton",
+        "icon"
+      ],
+      "localOwnProps": [
+        "children",
+        "dismissButton",
+        "dismissLabel",
+        "icon",
+        "onDismiss"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "dismissButton",
+        "dismissLabel",
+        "icon",
+        "onDismiss"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "teaching-popover",
+      "component": "TeachingPopoverSurface",
+      "localComponent": "TeachingPopoverSurface",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "teaching-popover",
+      "component": "TeachingPopoverTitle",
+      "localComponent": "TeachingPopoverTitle",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "dismissButton"
+      ],
+      "localOwnProps": [
+        "children",
+        "dismissButton"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "dismissButton"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "teaching-popover",
+      "component": "TeachingPopoverTrigger",
+      "localComponent": "TeachingPopoverTrigger",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "Body1",
+      "localComponent": "Body1",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "Body1Strong",
+      "localComponent": "Body1Strong",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "Body1Stronger",
+      "localComponent": "Body1Stronger",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "Body2",
+      "localComponent": "Body2",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "Caption1",
+      "localComponent": "Caption1",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "Caption1Strong",
+      "localComponent": "Caption1Strong",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "Caption1Stronger",
+      "localComponent": "Caption1Stronger",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "Caption2",
+      "localComponent": "Caption2",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "Caption2Strong",
+      "localComponent": "Caption2Strong",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "Display",
+      "localComponent": "Display",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "LargeTitle",
+      "localComponent": "LargeTitle",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "Subtitle1",
+      "localComponent": "Subtitle1",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "Subtitle2",
+      "localComponent": "Subtitle2",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "Subtitle2Stronger",
+      "localComponent": "Subtitle2Stronger",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "Text",
+      "localComponent": "Text",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "font",
+        "italic",
+        "size",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "weight",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "font",
+        "italic",
+        "size",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "weight",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "Title1",
+      "localComponent": "Title1",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "Title2",
+      "localComponent": "Title2",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "text",
+      "component": "Title3",
+      "localComponent": "Title3",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "align",
+        "block",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "align",
+        "as",
+        "block",
+        "children",
+        "italic",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "wrap"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "as",
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "textarea",
+      "component": "Textarea",
+      "localComponent": "TextArea",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "defaultValue",
+        "onChange",
+        "resize",
+        "size",
+        "value"
+      ],
+      "fluentSlotProps": [
+        "textarea"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "defaultValue",
+        "disabled",
+        "label",
+        "onChange",
+        "onValueChange",
+        "placeholder",
+        "readOnly",
+        "required",
+        "resize",
+        "rows",
+        "size",
+        "textarea",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "disabled",
+        "label",
+        "onValueChange",
+        "placeholder",
+        "readOnly",
+        "required",
+        "rows",
+        "textarea"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "toast",
+      "component": "Toast",
+      "localComponent": "Toast",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "action",
+        "appearance",
+        "children",
+        "dismissLabel",
+        "id",
+        "intent",
+        "onAction",
+        "onDismiss",
+        "pauseOnHover",
+        "pauseOnWindowBlur",
+        "politeness",
+        "priority",
+        "timeout",
+        "title"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "action",
+        "children",
+        "dismissLabel",
+        "id",
+        "intent",
+        "onAction",
+        "onDismiss",
+        "pauseOnHover",
+        "pauseOnWindowBlur",
+        "politeness",
+        "priority",
+        "timeout",
+        "title"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "toast",
+      "component": "ToastBody",
+      "localComponent": "ToastBody",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "subtitle"
+      ],
+      "localOwnProps": [
+        "children",
+        "subtitle"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "subtitle"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "toast",
+      "component": "ToastFooter",
+      "localComponent": "ToastFooter",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "toast",
+      "component": "ToastTitle",
+      "localComponent": "ToastTitle",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "action",
+        "media"
+      ],
+      "localOwnProps": [
+        "action",
+        "children",
+        "media"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "action",
+        "children",
+        "media"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "toast",
+      "component": "ToastTrigger",
+      "localComponent": "ToastTrigger",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "disableButtonEnhancement"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "disableButtonEnhancement"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "toast",
+      "component": "Toaster",
+      "localComponent": "Toaster",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "announce",
+        "inline"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "announce",
+        "children",
+        "inline",
+        "limit",
+        "position"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "limit",
+        "position"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "toast",
+      "component": "useToastController",
+      "localComponent": "useToastController",
+      "status": "non-component-contract",
+      "reason": "React hook utility; its parameters are not component props."
+    },
+    {
+      "family": "toolbar",
+      "component": "Toolbar",
+      "localComponent": "Toolbar",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "checkedValues",
+        "defaultCheckedValues",
+        "onCheckedValueChange",
+        "size",
+        "vertical"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "checkedValues",
+        "children",
+        "defaultCheckedValues",
+        "label",
+        "loop",
+        "onCheckedValueChange",
+        "orientation",
+        "size",
+        "vertical"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "label",
+        "loop",
+        "orientation"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "toolbar",
+      "component": "ToolbarButton",
+      "localComponent": "ToolbarButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "vertical"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "shape",
+        "size",
+        "vertical"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "shape",
+        "size"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "toolbar",
+      "component": "ToolbarDivider",
+      "localComponent": "ToolbarDivider",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "vertical"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "vertical"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "toolbar",
+      "component": "ToolbarGroup",
+      "localComponent": "ToolbarGroup",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "label"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "label"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "toolbar",
+      "component": "ToolbarRadioButton",
+      "localComponent": "ToolbarRadioButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "name",
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "disabled",
+        "name",
+        "size",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "disabled",
+        "size"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "toolbar",
+      "component": "ToolbarRadioGroup",
+      "localComponent": "ToolbarRadioGroup",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "label"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "label"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "toolbar",
+      "component": "ToolbarToggleButton",
+      "localComponent": "ToolbarToggleButton",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "name",
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "appearance",
+        "children",
+        "defaultPressed",
+        "name",
+        "onPressedChange",
+        "pressed",
+        "shape",
+        "size",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "defaultPressed",
+        "onPressedChange",
+        "pressed",
+        "shape",
+        "size"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tooltip",
+      "component": "Tooltip",
+      "localComponent": "Tooltip",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "hideDelay",
+        "onVisibleChange",
+        "positioning",
+        "relationship",
+        "showDelay",
+        "visible",
+        "withArrow"
+      ],
+      "fluentSlotProps": [
+        "content"
+      ],
+      "localOwnProps": [
+        "align",
+        "appearance",
+        "children",
+        "content",
+        "delay",
+        "disabled",
+        "hideDelay",
+        "offset",
+        "onOpenChange",
+        "onVisibleChange",
+        "open",
+        "placement",
+        "positioning",
+        "relationship",
+        "showDelay",
+        "visible",
+        "withArrow"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "align",
+        "children",
+        "content",
+        "delay",
+        "disabled",
+        "offset",
+        "onOpenChange",
+        "open",
+        "placement"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tree",
+      "component": "FlatTree",
+      "localComponent": "FlatTree",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "checkedItems",
+        "navigationMode",
+        "onCheckedChange",
+        "onNavigation",
+        "onOpenChange",
+        "openItems",
+        "selectionMode",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "collapseMotion"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "checkedItems",
+        "children",
+        "collapseMotion",
+        "defaultCheckedItems",
+        "defaultExpandedKeys",
+        "defaultOpenItems",
+        "defaultSelectedKeys",
+        "emptyMessage",
+        "expandedKeys",
+        "label",
+        "navigationMode",
+        "onCheckedChange",
+        "onExpandedChange",
+        "onNavigation",
+        "onOpenChange",
+        "onSelectionChange",
+        "openItems",
+        "renderItem",
+        "selectedKeys",
+        "selectionMode",
+        "size",
+        "toggleLabel"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "collapseMotion",
+        "defaultCheckedItems",
+        "defaultExpandedKeys",
+        "defaultOpenItems",
+        "defaultSelectedKeys",
+        "emptyMessage",
+        "expandedKeys",
+        "label",
+        "onExpandedChange",
+        "onSelectionChange",
+        "renderItem",
+        "selectedKeys",
+        "toggleLabel"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tree",
+      "component": "FlatTreeItem",
+      "localComponent": "FlatTreeItem",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "aria-level",
+        "aria-posinset",
+        "aria-setsize",
+        "itemType",
+        "onOpenChange",
+        "open",
+        "parentValue",
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "aria-level",
+        "aria-posinset",
+        "aria-setsize",
+        "children",
+        "disabled",
+        "itemType",
+        "onOpenChange",
+        "open",
+        "parentValue",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "disabled"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tree",
+      "component": "Tree",
+      "localComponent": "Tree",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "appearance",
+        "checkedItems",
+        "defaultOpenItems",
+        "navigationMode",
+        "onCheckedChange",
+        "onNavigation",
+        "onOpenChange",
+        "openItems",
+        "selectionMode",
+        "size"
+      ],
+      "fluentSlotProps": [
+        "collapseMotion"
+      ],
+      "localOwnProps": [
+        "appearance",
+        "checkedItems",
+        "children",
+        "collapseMotion",
+        "defaultCheckedItems",
+        "defaultExpandedKeys",
+        "defaultOpenItems",
+        "defaultSelectedKeys",
+        "emptyMessage",
+        "expandedKeys",
+        "items",
+        "label",
+        "navigationMode",
+        "onCheckedChange",
+        "onExpandedChange",
+        "onNavigation",
+        "onOpenChange",
+        "onSelectionChange",
+        "openItems",
+        "renderItem",
+        "selectedKeys",
+        "selectionMode",
+        "size",
+        "toggleLabel"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "collapseMotion",
+        "defaultCheckedItems",
+        "defaultExpandedKeys",
+        "defaultSelectedKeys",
+        "emptyMessage",
+        "expandedKeys",
+        "items",
+        "label",
+        "onExpandedChange",
+        "onSelectionChange",
+        "renderItem",
+        "selectedKeys",
+        "toggleLabel"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tree",
+      "component": "TreeItem",
+      "localComponent": "TreeItem",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "itemType",
+        "onOpenChange",
+        "open",
+        "parentValue",
+        "value"
+      ],
+      "fluentSlotProps": [],
+      "localOwnProps": [
+        "children",
+        "disabled",
+        "itemType",
+        "onOpenChange",
+        "open",
+        "parentValue",
+        "value"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
+        "disabled"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tree",
+      "component": "TreeItemLayout",
+      "localComponent": "TreeItemLayout",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "actions",
+        "aside",
+        "expandIcon",
+        "iconAfter",
+        "iconBefore",
+        "main",
+        "selector"
+      ],
+      "localOwnProps": [
+        "actions",
+        "aside",
+        "children",
+        "expandIcon",
+        "iconAfter",
+        "iconBefore",
+        "main",
+        "selector"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "actions",
+        "aside",
+        "children",
+        "expandIcon",
+        "iconAfter",
+        "iconBefore",
+        "main",
+        "selector"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "tree",
+      "component": "TreeItemPersonaLayout",
+      "localComponent": "TreeItemPersonaLayout",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [],
+      "fluentSlotProps": [
+        "actions",
+        "aside",
+        "description",
+        "expandIcon",
+        "main",
+        "media",
+        "selector"
+      ],
+      "localOwnProps": [
+        "actions",
+        "aside",
+        "children",
+        "description",
+        "expandIcon",
+        "main",
+        "media",
+        "selector"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "actions",
+        "aside",
+        "children",
+        "description",
+        "expandIcon",
+        "main",
+        "media",
+        "selector"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "virtualizer",
+      "component": "Virtualizer",
+      "localComponent": "Virtualizer",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "axis",
+        "bufferItems",
+        "bufferSize",
+        "children",
+        "containerSizeRef",
+        "enableScrollLoad",
+        "flaggedIndex",
+        "gap",
+        "getItemSize",
+        "imperativeVirtualizerRef",
+        "itemSize",
+        "numItems",
+        "onRenderedFlaggedIndex",
+        "reversed",
+        "scrollViewRef",
+        "updateScrollPosition",
+        "virtualizerContext",
+        "virtualizerLength"
+      ],
+      "fluentSlotProps": [
+        "after",
+        "afterContainer",
+        "before",
+        "beforeContainer"
+      ],
+      "localOwnProps": [
+        "after",
+        "afterContainer",
+        "axis",
+        "before",
+        "beforeContainer",
+        "bufferItems",
+        "bufferSize",
+        "children",
+        "containerSizeRef",
+        "enablePagination",
+        "enableScrollLoad",
+        "flaggedIndex",
+        "gap",
+        "getItemSize",
+        "imperativeRef",
+        "imperativeVirtualizerRef",
+        "itemSize",
+        "label",
+        "measureItems",
+        "numItems",
+        "onRenderedFlaggedIndex",
+        "onRenderedRange",
+        "reversed",
+        "scrollMode",
+        "scrollViewRef",
+        "updateScrollPosition",
+        "virtualizerContext",
+        "virtualizerLength"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "after",
+        "afterContainer",
+        "before",
+        "beforeContainer",
+        "enablePagination",
+        "imperativeRef",
+        "label",
+        "measureItems",
+        "onRenderedRange",
+        "scrollMode"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "virtualizer",
+      "component": "VirtualizerScrollView",
+      "localComponent": "VirtualizerScrollView",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "children",
+        "enablePagination",
+        "imperativeRef",
+        "itemSize",
+        "numItems"
+      ],
+      "fluentSlotProps": [
+        "after",
+        "afterContainer",
+        "before",
+        "beforeContainer",
+        "container"
+      ],
+      "localOwnProps": [
+        "after",
+        "afterContainer",
+        "axis",
+        "before",
+        "beforeContainer",
+        "bufferItems",
+        "bufferSize",
+        "children",
+        "container",
+        "containerSizeRef",
+        "enablePagination",
+        "enableScrollLoad",
+        "flaggedIndex",
+        "gap",
+        "getItemSize",
+        "imperativeRef",
+        "imperativeVirtualizerRef",
+        "itemSize",
+        "label",
+        "numItems",
+        "onRenderedFlaggedIndex",
+        "reversed",
+        "scrollViewRef",
+        "updateScrollPosition",
+        "virtualizerContext",
+        "virtualizerLength"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "after",
+        "afterContainer",
+        "axis",
+        "before",
+        "beforeContainer",
+        "bufferItems",
+        "bufferSize",
+        "container",
+        "containerSizeRef",
+        "enableScrollLoad",
+        "flaggedIndex",
+        "gap",
+        "getItemSize",
+        "imperativeVirtualizerRef",
+        "label",
+        "onRenderedFlaggedIndex",
+        "reversed",
+        "scrollViewRef",
+        "updateScrollPosition",
+        "virtualizerContext",
+        "virtualizerLength"
+      ],
+      "missingLiteralValues": []
+    },
+    {
+      "family": "virtualizer",
+      "component": "VirtualizerScrollViewDynamic",
+      "localComponent": "VirtualizerScrollViewDynamic",
+      "status": "own-prop-names-covered",
+      "fluentOwnProps": [
+        "children",
+        "enablePagination",
+        "getItemSize",
+        "imperativeRef",
+        "itemSize",
+        "numItems",
+        "virtualizerContext"
+      ],
+      "fluentSlotProps": [
+        "after",
+        "afterContainer",
+        "before",
+        "beforeContainer",
+        "container"
+      ],
+      "localOwnProps": [
+        "after",
+        "afterContainer",
+        "axis",
+        "before",
+        "beforeContainer",
+        "bufferItems",
+        "bufferSize",
+        "children",
+        "container",
+        "containerSizeRef",
+        "enablePagination",
+        "enableScrollLoad",
+        "flaggedIndex",
+        "gap",
+        "getItemSize",
+        "imperativeRef",
+        "imperativeVirtualizerRef",
+        "itemSize",
+        "label",
+        "numItems",
+        "onRenderedFlaggedIndex",
+        "reversed",
+        "scrollViewRef",
+        "updateScrollPosition",
+        "virtualizerContext",
+        "virtualizerLength"
+      ],
+      "missingLocally": [],
+      "missingSlotProps": [],
+      "localAdditions": [
+        "after",
+        "afterContainer",
+        "axis",
+        "before",
+        "beforeContainer",
+        "bufferItems",
+        "bufferSize",
+        "container",
+        "containerSizeRef",
+        "enableScrollLoad",
+        "flaggedIndex",
+        "gap",
+        "imperativeVirtualizerRef",
+        "label",
+        "onRenderedFlaggedIndex",
+        "reversed",
+        "scrollViewRef",
+        "updateScrollPosition",
+        "virtualizerLength"
+      ],
+      "missingLiteralValues": []
+    }
+  ]
+}

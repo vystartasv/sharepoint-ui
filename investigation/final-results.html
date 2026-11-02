@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SharePoint UI · measured foundation</title>
+<style>
+:root { font: 14px/1.5 system-ui, sans-serif; }
+body { margin: 0; color: var(--foreground); font-family: var(--font-sans); }
+main { max-width: 920px; margin: 0 auto; padding: 8px 0 20px; }
+h1 { font-size: 25px; line-height: 1.2; margin: 4px 0 6px; }
+h2 { font-size: 17px; margin: 0 0 14px; }
+p { margin: 4px 0 16px; color: var(--muted-foreground); }
+.grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; min-width: 0; }
+.barrow { display: grid; grid-template-columns: 154px 1fr 63px; align-items: center; gap: 8px; margin: 11px 0; }
+.label { font-size: 12px; line-height: 1.25; }
+.track { height: 14px; background: var(--secondary); border-radius: 7px; overflow: hidden; }
+.bar { height: 100%; background: var(--chart-1); border-radius: 7px; }
+.ours { background: var(--chart-2); }
+.value { text-align: right; font-variant-numeric: tabular-nums; font-size: 12px; }
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.stat { background: var(--secondary); border-radius: var(--radius); padding: 10px; }
+.stat strong { display: block; font-size: 19px; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; color: var(--muted-foreground); }
+.fine { font-size: 12px; margin: 11px 0 0; }
+.wide { margin-top: 14px; }
+@media(max-width:650px) { .grid { grid-template-columns: 1fr; } .barrow { grid-template-columns: 126px 1fr 56px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>SharePoint UI · measured foundation</h1>
+  <p>SPFx 1.24 · Vilius tenant · package 1.0.0.20 · 31 October 2026</p>
+  <div class="grid">
+    <section>
+      <h2>Current measured library slices</h2>
+      <div class="barrow"><span class="label">All 9 controls + provider</span><div class="track"><div class="bar ours" style="width:100%"></div></div><span class="value">4.55 kB</span></div>
+      <div class="barrow"><span class="label">Forms: 5 controls</span><div class="track"><div class="bar ours" style="width:77%"></div></div><span class="value">3.51 kB</span></div>
+      <div class="barrow"><span class="label">Spinner + MessageBar</span><div class="track"><div class="bar ours" style="width:44%"></div></div><span class="value">2.02 kB</span></div>
+      <p class="fine">Historical v0.1.0.8 isolated React export slices; React externalized. Use the current deployed SPFx bundle measurement at right for v1.0.0.20. These measurements are different workloads.</p>
+    </section>
+    <section>
+      <h2>Published tenant run</h2>
+      <div class="compare">
+        <div class="stat"><strong>86,927 B</strong><span>deployed web-part JS response body</span></div>
+        <div class="stat"><strong>16.69 / 14.31 kB</strong><span>local gzip / Brotli</span></div>
+        <div class="stat"><strong>9.5 ms</strong><span>component mount</span></div>
+        <div class="stat"><strong>14.3 / 29.6 ms</strong><span>Save click → frame p50/p95</span></div>
+        <div class="stat"><strong>14.8 / 16.6 ms</strong><span>dialog open → frame p50/p95</span></div>
+        <div class="stat"><strong>4 views + Dialog + ProgressBar</strong><span>document, person, task, approval, modal, progress</span></div>
+      </div>
+    </section>
+  </div>
+  <section class="wide">
+    <h2>Tree-shaken native element slices</h2>
+    <div class="compare">
+      <div class="stat"><strong>1,833 / 1,571 B</strong><span>isolated Dialog gzip / Brotli</span></div>
+      <div class="stat"><strong>3 modules</strong><span>leaf import; no React runtime</span></div>
+      <div class="stat"><strong>Focus returned</strong><span>Escape and close button validated on tenant</span></div>
+      <div class="stat"><strong>8 cycles</strong><span>dialog open/close; dismissible behavior checked</span></div>
+      <div class="stat"><strong>860 / 682 B</strong><span>ProgressBar gzip / Brotli · 3 modules</span></div>
+    </div>
+  </section>
+  <section class="wide">
+    <h2>Glass derives from the selected base</h2>
+    <div class="compare">
+      <div class="stat"><strong>#bf3b8d</strong><span>custom base accent used on the tenant page</span></div>
+      <div class="stat"><strong>24 → 26.88 px</strong><span>card padding · base → glass (×1.12)</span></div>
+      <div class="stat"><strong>16 → 17.92 px</strong><span>iOS control padding · base → glass (×1.12)</span></div>
+      <div class="stat"><strong>1.04×</strong><span>glass control-height scale</span></div>
+      <div class="stat"><strong>rgb(242, 242, 247)</strong><span>iOS text under emulated dark color scheme</span></div>
+      <div class="stat"><strong>Pass</strong><span>custom color and spacing read back from the published SharePoint page</span></div>
+    </div>
+  </section>
+  <section class="wide">
+    <h2>React slice comparison · action + field + dialog</h2>
+    <div class="barrow"><span class="label">Fluent React v8</span><div class="track"><div class="bar" style="width:100%"></div></div><span class="value">71.6 kB</span></div>
+    <div class="barrow"><span class="label">MUI</span><div class="track"><div class="bar" style="width:95.4%"></div></div><span class="value">68.3 kB</span></div>
+    <div class="barrow"><span class="label">Fluent React v9</span><div class="track"><div class="bar" style="width:74.3%"></div></div><span class="value">53.2 kB</span></div>
+    <div class="barrow"><span class="label">React Aria</span><div class="track"><div class="bar" style="width:39.8%"></div></div><span class="value">28.5 kB</span></div>
+    <div class="barrow"><span class="label">Radix + native</span><div class="track"><div class="bar" style="width:19.5%"></div></div><span class="value">14.0 kB</span></div>
+    <p class="fine">These are separate, non-equivalent comparisons documented in the report. CSS/behavior differences apply; use per-family results as implementation grows.</p>
+  </section>
+  <section class="wide">
+    <h2>Framework-free import slice</h2>
+    <div class="barrow"><span class="label">Our Button + Field + Card</span><div class="track"><div class="bar ours" style="width:4.4%"></div></div><span class="value">1.88 kB gzip</span></div>
+    <div class="barrow"><span class="label">Fluent WC button + input + dialog</span><div class="track"><div class="bar" style="width:51.1%"></div></div><span class="value">21.82 kB gzip</span></div>
+    <div class="barrow"><span class="label">Web Awesome button + input + dialog</span><div class="track"><div class="bar" style="width:100%"></div></div><span class="value">42.73 kB gzip</span></div>
+    <p class="fine">esbuild tree-shaken ESM. The custom slice has no dialog, so functionality and style setup are not equivalent; competitor CSS/theme setup was not counted. Web Awesome's AI/agent docs make it a candidate for an assembly-speed pilot, while Fluent WC is the closer token reference.</p>
+  </section>
+  <p class="fine">Theme bridge observed 156 SPFx theme entries and 459 Fluent tokens. 90 theme/appearance/strong-background combinations passed; minimum body text contrast was 5.16:1 and primary-action label contrast 4.52:1; iOS dark card text measured 9.77:1. Native Select keyboard selection and updates passed; RadioGroup arrow navigation, required validation, FormData submission, and reset passed; SpinButton ArrowUp and min/max/step behavior passed; its leaf is 4,253 B raw / 1,588 B gzip / 1,320 B Brotli; its leaf slice is 4,372 B raw / 1,610 B gzip / 1,358 B Brotli. Keyboard, RTL/Arabic, custom font, and six appearance/dark-mode checks passed. Measurements are small-sample observations; SharePoint host memory and long-task costs cannot be attributed to this web part. Automated axe injection was blocked by the page CSP. Fluent v9 parity remains incomplete.</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,32 @@
+name: Publish SharePoint UI to npm
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - run: npm ci
+      - name: Verify release tag matches package version
+        run: |
+          package_version=$(node -p "require('./packages/sharepoint-ui/package.json').version")
+          tag_version=${GITHUB_REF_NAME#v}
+          if [ "$tag_version" != "$package_version" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match package version $package_version" >&2
+            exit 1
+          fi
+      - run: npm run build:library
+      - run: npm publish --workspace @vilius/sharepoint-ui

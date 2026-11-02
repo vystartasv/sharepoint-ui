@@ -1,0 +1,47 @@
+---
+title: Get started
+description: Install SharePoint UI and use it in an SPFx 1.24 web part.
+---
+
+## Install
+
+:::note[First npm release in progress]
+The package is not yet on the public npm registry. This install command will work after the first release.
+:::
+
+```sh
+npm install @vilius/sharepoint-ui
+```
+
+React consumers can import the adapter. Framework-neutral consumers can import only the custom-element factory they need.
+
+## React in SPFx
+
+```tsx
+import { SharePointUIProvider, Button, TextField } from "@vilius/sharepoint-ui/react";
+
+export function RequestForm() {
+  return (
+    <SharePointUIProvider lang={this.context.pageContext.cultureInfo.currentUICultureName}>
+      <TextField label="Request title" name="title" required />
+      <Button appearance="primary" type="submit">Create request</Button>
+    </SharePointUIProvider>
+  );
+}
+```
+
+Use the SPFx locale instead of hard-coding direction. Arabic and other right-to-left locales receive RTL layout from the language value.
+
+## Custom elements
+
+```ts
+import { defineButton } from "@vilius/sharepoint-ui/elements/button";
+
+defineButton();
+```
+
+```html
+<spui-button appearance="primary">Create request</spui-button>
+```
+
+For component-specific factories, slots, events, and styling hooks, use the [component catalog](/sharepoint-ui-docs/catalog/).

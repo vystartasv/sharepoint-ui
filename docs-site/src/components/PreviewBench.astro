@@ -1,0 +1,48 @@
+<section class="preview-bench" aria-label="Live SharePoint UI component preview">
+  <div class="preview-copy">
+    <p class="preview-label">One theme, every surface</p>
+    <h2>Built for the page you already have.</h2>
+    <p>Controls inherit the active SharePoint palette and keep their layout inside the section that hosts them.</p>
+    <div class="preview-actions">
+      <spui-button appearance="primary" id="preview-save">Save update</spui-button>
+      <spui-button appearance="secondary" id="preview-theme">Change accent</spui-button>
+    </div>
+  </div>
+  <div class="preview-surface" id="preview-surface">
+    <div class="preview-toolbar">
+      <span class="preview-dot" aria-hidden="true"></span>
+      <span>Request review</span>
+      <spui-tag appearance="brand" size="small">In progress</spui-tag>
+    </div>
+    <label class="preview-field-label" for="preview-title">Work item</label>
+    <spui-input id="preview-title" aria-label="Work item" value="Quarterly access review" size="medium"></spui-input>
+    <div class="preview-status">
+      <spui-badge appearance="tint" color="success">Ready for review</spui-badge>
+      <span>Updated just now</span>
+    </div>
+    <output id="preview-message" class="preview-message" aria-live="polite"></output>
+  </div>
+</section>
+
+<script>
+  import { defineBadge, defineButton, defineInput, defineTag } from "@vilius/sharepoint-ui/elements";
+
+  defineBadge();
+  defineButton();
+  defineInput();
+  defineTag();
+
+  const previewMessage = document.querySelector<HTMLDivElement>("#preview-message");
+  document.querySelector("#preview-save")?.addEventListener("click", () => {
+    if (previewMessage) previewMessage.textContent = "Your update is ready to save.";
+  });
+  document.querySelector("#preview-theme")?.addEventListener("click", () => {
+    const preview = document.querySelector<HTMLElement>("#preview-surface");
+    const next = preview?.dataset.theme === "blue" ? "stone" : "blue";
+    if (preview) {
+      preview.dataset.theme = next;
+      preview.style.setProperty("--spui-ui-accent", next === "blue" ? "#0078d4" : "#78716c");
+      preview.style.setProperty("--spui-focus-ring", next === "blue" ? "#0078d4" : "#78716c");
+    }
+  });
+</script>

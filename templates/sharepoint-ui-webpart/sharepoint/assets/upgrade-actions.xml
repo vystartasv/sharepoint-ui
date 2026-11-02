@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ApplyElementManifests xmlns="http://schemas.microsoft.com/sharepoint/">
+  <ElementManifest Location="<%= featureId %>\WebPart_<%= componentId %>.xml" />
+</ApplyElementManifests>

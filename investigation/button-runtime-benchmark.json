@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-02",
+  "browser": "Chromium 153.0.8010.12",
+  "workload": "Mount identical text Buttons, commit or upgrade to DOM, force first layout",
+  "method": {
+    "runner": "scripts/benchmark-button-mount.mjs",
+    "warmupRounds": 5,
+    "measuredRounds": 20,
+    "counts": [100, 500],
+    "nativeInsertion": "DocumentFragment batch insertion",
+    "adapters": [
+      "Fluent React 9.75.0 Button in FluentProvider",
+      "SharePoint UI React Button in SharePointUIProvider",
+      "SharePoint UI spui-button custom element"
+    ]
+  },
+  "results": [
+    {
+      "phase": "before-optimization",
+      "count": 100,
+      "fluentReact": { "medianMs": 2.2, "p95Ms": 2.4 },
+      "sharePointReact": { "medianMs": 10.3, "p95Ms": 10.6 }
+    },
+    {
+      "phase": "before-optimization",
+      "count": 500,
+      "fluentReact": { "medianMs": 8.8, "p95Ms": 9.4 },
+      "sharePointReact": { "medianMs": 73.2, "p95Ms": 76.8 }
+    },
+    {
+      "phase": "after-focus-fix",
+      "count": 500,
+      "runs": [
+        { "fluentReact": { "medianMs": 8.5, "p95Ms": 9.3 }, "sharePointReact": { "medianMs": 25.2, "p95Ms": 26.8 } },
+        { "fluentReact": { "medianMs": 8.9, "p95Ms": 10.6 }, "sharePointReact": { "medianMs": 27.4, "p95Ms": 29.0 } },
+        { "fluentReact": { "medianMs": 8.8, "p95Ms": 10.0 }, "sharePointReact": { "medianMs": 25.2, "p95Ms": 27.5 } }
+      ]
+    },
+    {
+      "phase": "after-default-token-write-elision",
+      "count": 100,
+      "runs": [
+        { "fluentReact": { "medianMs": 1.9, "p95Ms": 2.3 }, "sharePointReact": { "medianMs": 1.9, "p95Ms": 2.0 } },
+        { "fluentReact": { "medianMs": 1.9, "p95Ms": 2.2 }, "sharePointReact": { "medianMs": 1.9, "p95Ms": 2.0 } }
+      ]
+    },
+    {
+      "phase": "after-default-token-write-elision",
+      "count": 500,
+      "runs": [
+        { "fluentReact": { "medianMs": 9.3, "p95Ms": 11.1 }, "sharePointReact": { "medianMs": 10.7, "p95Ms": 11.4 } },
+        { "fluentReact": { "medianMs": 8.5, "p95Ms": 10.1 }, "sharePointReact": { "medianMs": 9.8, "p95Ms": 10.8 } },
+        { "fluentReact": { "medianMs": 8.3, "p95Ms": 9.5 }, "sharePointReact": { "medianMs": 9.7, "p95Ms": 12.0 } },
+        { "fluentReact": { "medianMs": 8.7, "p95Ms": 9.9 }, "sharePointReact": { "medianMs": 9.4, "p95Ms": 10.2 } }
+      ]
+    }
+  ],
+  "stylesheetExperiment": {
+    "change": "One shared constructable CSSStyleSheet adopted by each Button shadow root",
+    "500ButtonResultsMs": {
+      "fluentReact": { "median": 8.9, "p95": 9.7 },
+      "sharePointReact": { "median": 108.7, "p95": 138.6 },
+      "sharePointNative": { "median": 186.7, "p95": 247.7 }
+    },
+    "decision": "Reverted; did not improve this workload."
+  },
+  "findings": [
+    "The Button renderer considered null previous control equal to null activeElement on first render, so it called focus() on every newly mounted Button. Requiring a non-null previous control removed this work and preserved focus on actual rerenders.",
+    "In default Fluent appearance, default CSS fallbacks already inherit SharePoint semantic tokens. The React adapter now skips writing the full default token map to every host, retaining the default font and color scheme; explicit themes, Fluent tokens, custom properties, non-default appearances, densities, and direct style overrides retain host tokens.",
+    "After both optimizations, the 500-Button SPUI React median is 9.4–10.7 ms versus Fluent 8.3–9.3 ms; 100-Button medians are 1.9 ms for both. The matched Button mount gap is nearly closed, with a remaining 0.7–1.4 ms median difference at 500.",
+    "The post-change CPU profile no longer samples focus calls; the most common measured operation is the benchmark's forced getBoundingClientRect layout."
+  ],
+  "checks": [
+    "npm run verify:button-parity (includes no focus steal on mount and focus restoration after attribute changes)",
+    "npm run verify:theme-ramps (theme ramps, 29 shared theme/layer roles, inherited SharePoint/default theme coverage, and 2,400 contrast control states)",
+    "npm run verify:sharepoint-theme-extras"
+  ],
+  "caveats": [
+    "Single local headless Chromium process; repeated runs reproduced Fluent and SPUI React timing closely, but the custom-element native path showed high p95 variance.",
+    "Not a cross-browser, SharePoint-host, or user-perceived latency benchmark.",
+    "The native path is not used as the React adapter performance claim."
+  ],
+  "status": "Button mount performance is close to Fluent in this synthetic local workload; cross-browser, tenant, update, and large-list scrolling performance remain unverified."
+}

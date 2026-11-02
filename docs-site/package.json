@@ -1,0 +1,15 @@
+{
+  "name": "@vilius/sharepoint-ui-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "node scripts/generate-catalog.mjs && astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "0.42.8",
+    "@vilius/sharepoint-ui": "0.4.0",
+    "astro": "7.2.10"
+  }
+}
