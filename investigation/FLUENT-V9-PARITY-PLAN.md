@@ -2,7 +2,7 @@
 
 ### SearchBox native constraint validation — Fluent 9.75.0 input behavior and local Chromium, 2026-11-03
 
-The SearchBox custom element forwarded native constraints such as `minlength` and `pattern` to its shadow input but only reflected `required` through `ElementInternals`. The enclosing form therefore missed native `tooShort` and `patternMismatch` states. It now maps the shadow input's `ValidityState` flags and validation message to the form-associated host. `verify:search-box-parity` confirms short and pattern-mismatched values fail the associated form and valid text restores `:valid`; the full `parity:check` also passes. Cross-browser, assistive-technology, tenant, and SearchBox-wide visual/performance parity remain open.
+The SearchBox custom element forwarded native constraints such as `minlength` and `pattern` to its shadow input but only reflected `required` through `ElementInternals`. The enclosing form therefore missed native `tooShort` and `patternMismatch` states. It now maps the shadow input's `ValidityState` flags and validation message to the form-associated host. `verify:search-box-parity` confirms short and pattern-mismatched values fail the associated form and valid text restores `:valid`; it is now included in the form-controls sweep. The full `parity:check` also passes. Cross-browser, assistive-technology, tenant, and SearchBox-wide visual/performance parity remain open.
 
 ### ComboBox prefix activation and stale-selection clearing — Fluent 9.75.0 declarations/runtime and local Chromium, 2026-11-03
 
