@@ -6,13 +6,14 @@
     "comparedComponents": 231,
     "missingLocalComponentExports": 0,
     "componentsWithPropNameGaps": 0,
-    "componentsWithSlotPropGaps": 6,
+    "componentsWithSlotPropGaps": 0,
     "componentsWithPropValueGaps": 0,
     "manualReviewComponents": 0,
     "unavailableBaselineComponents": 0,
-    "nonComponentContracts": 8,
+    "nonComponentContracts": 10,
     "missingOwnPropCount": 0,
-    "missingSlotPropCount": 16,
+    "declaredSlotPropCount": 240,
+    "missingSlotPropCount": 0,
     "missingLiteralValueCount": 0
   },
   "components": [
@@ -278,15 +279,15 @@
       "family": "avatar",
       "component": "AvatarGroupItem",
       "localComponent": "AvatarGroupItem",
-      "status": "review-slot-prop-gaps",
+      "status": "own-prop-names-covered",
       "fluentOwnProps": [],
       "fluentSlotProps": [
-        "avatar",
         "overflowLabel"
       ],
       "localOwnProps": [
         "active",
         "activeAppearance",
+        "avatar",
         "badge",
         "color",
         "icon",
@@ -294,17 +295,16 @@
         "image",
         "initials",
         "name",
+        "overflowLabel",
         "shape",
         "size"
       ],
       "missingLocally": [],
-      "missingSlotProps": [
-        "avatar",
-        "overflowLabel"
-      ],
+      "missingSlotProps": [],
       "localAdditions": [
         "active",
         "activeAppearance",
+        "avatar",
         "badge",
         "color",
         "icon",
@@ -312,6 +312,7 @@
         "image",
         "initials",
         "name",
+        "overflowLabel",
         "shape",
         "size"
       ],
@@ -321,7 +322,7 @@
       "family": "avatar",
       "component": "AvatarGroupPopover",
       "localComponent": "AvatarGroupPopover",
-      "status": "review-slot-prop-gaps",
+      "status": "own-prop-names-covered",
       "fluentOwnProps": [
         "children",
         "count",
@@ -335,26 +336,29 @@
       ],
       "localOwnProps": [
         "children",
+        "content",
         "count",
         "indicator",
         "label",
         "onOpenChange",
         "open",
         "placement",
+        "popoverSurface",
+        "tooltip",
+        "triggerButton",
         "triggerLabel"
       ],
       "missingLocally": [],
-      "missingSlotProps": [
-        "content",
-        "popoverSurface",
-        "tooltip",
-        "triggerButton"
-      ],
+      "missingSlotProps": [],
       "localAdditions": [
+        "content",
         "label",
         "onOpenChange",
         "open",
         "placement",
+        "popoverSurface",
+        "tooltip",
+        "triggerButton",
         "triggerLabel"
       ],
       "missingLiteralValues": []
@@ -514,13 +518,16 @@
         "current",
         "size"
       ],
-      "fluentSlotProps": [],
+      "fluentSlotProps": [
+        "icon"
+      ],
       "localOwnProps": [
         "children",
         "current",
         "disabled",
         "disabledFocusable",
         "href",
+        "icon",
         "rel",
         "size",
         "target",
@@ -533,6 +540,7 @@
         "disabled",
         "disabledFocusable",
         "href",
+        "icon",
         "rel",
         "target",
         "type"
@@ -601,6 +609,11 @@
         "disabledFocusable",
         "download",
         "form",
+        "formAction",
+        "formEncType",
+        "formMethod",
+        "formNoValidate",
+        "formTarget",
         "href",
         "hrefLang",
         "icon",
@@ -623,6 +636,11 @@
         "as",
         "download",
         "form",
+        "formAction",
+        "formEncType",
+        "formMethod",
+        "formNoValidate",
+        "formTarget",
         "href",
         "hrefLang",
         "icon",
@@ -1004,8 +1022,11 @@
       "fluentOwnProps": [
         "onCheckedChange"
       ],
-      "fluentSlotProps": [],
+      "fluentSlotProps": [
+        "icon"
+      ],
       "localOwnProps": [
+        "icon",
         "onCheckedChange",
         "pauseLabel",
         "playLabel",
@@ -1014,6 +1035,7 @@
       "missingLocally": [],
       "missingSlotProps": [],
       "localAdditions": [
+        "icon",
         "pauseLabel",
         "playLabel",
         "slot"
@@ -1028,9 +1050,12 @@
       "fluentOwnProps": [
         "navType"
       ],
-      "fluentSlotProps": [],
+      "fluentSlotProps": [
+        "icon"
+      ],
       "localOwnProps": [
         "children",
+        "icon",
         "label",
         "navType",
         "slot"
@@ -1039,6 +1064,7 @@
       "missingSlotProps": [],
       "localAdditions": [
         "children",
+        "icon",
         "label",
         "slot"
       ],
@@ -1256,7 +1282,6 @@
       ],
       "fluentSlotProps": [
         "indicator",
-        "input",
         "label"
       ],
       "localOwnProps": [
@@ -1265,6 +1290,7 @@
         "defaultChecked",
         "disabled",
         "disabledFocusable",
+        "form",
         "indicator",
         "input",
         "label",
@@ -1282,6 +1308,7 @@
       "localAdditions": [
         "disabled",
         "disabledFocusable",
+        "form",
         "indicator",
         "input",
         "label",
@@ -1381,6 +1408,7 @@
         "defaultAlpha",
         "defaultColor",
         "defaultValue",
+        "form",
         "format",
         "label",
         "name",
@@ -1402,6 +1430,7 @@
         "defaultAlpha",
         "defaultColor",
         "defaultValue",
+        "form",
         "format",
         "label",
         "name",
@@ -1428,7 +1457,6 @@
         "vertical"
       ],
       "fluentSlotProps": [
-        "input",
         "rail",
         "thumb"
       ],
@@ -1481,7 +1509,6 @@
       "fluentSlotProps": [
         "clearIcon",
         "expandIcon",
-        "input",
         "listbox"
       ],
       "localOwnProps": [
@@ -1496,6 +1523,7 @@
         "disableAutoFocus",
         "disabled",
         "expandIcon",
+        "form",
         "freeform",
         "inlinePopup",
         "input",
@@ -1525,6 +1553,7 @@
         "clearIcon",
         "disabled",
         "expandIcon",
+        "form",
         "input",
         "label",
         "listbox",
@@ -1582,7 +1611,6 @@
         "value"
       ],
       "fluentSlotProps": [
-        "button",
         "clearButton",
         "expandIcon",
         "listbox"
@@ -1599,6 +1627,7 @@
         "disableAutoFocus",
         "disabled",
         "expandIcon",
+        "form",
         "inlinePopup",
         "label",
         "listbox",
@@ -1621,6 +1650,7 @@
         "clearButton",
         "disabled",
         "expandIcon",
+        "form",
         "label",
         "listbox"
       ],
@@ -2276,8 +2306,7 @@
         "info"
       ],
       "fluentSlotProps": [
-        "infoButton",
-        "label"
+        "infoButton"
       ],
       "localOwnProps": [
         "children",
@@ -2353,8 +2382,7 @@
         "info"
       ],
       "fluentSlotProps": [
-        "infoButton",
-        "label"
+        "infoButton"
       ],
       "localOwnProps": [
         "children",
@@ -2401,39 +2429,84 @@
       ],
       "fluentSlotProps": [
         "contentAfter",
-        "contentBefore",
-        "input"
+        "contentBefore"
       ],
       "localOwnProps": [
+        "accept",
+        "alt",
         "appearance",
+        "autoComplete",
+        "capture",
+        "checked",
         "children",
         "contentAfter",
         "contentBefore",
+        "defaultChecked",
         "defaultValue",
         "disabled",
+        "form",
+        "formAction",
+        "formEncType",
+        "formMethod",
+        "formNoValidate",
+        "formTarget",
+        "height",
         "input",
+        "list",
+        "max",
+        "maxLength",
+        "min",
+        "minLength",
+        "multiple",
         "name",
         "onChange",
         "onValueChange",
+        "pattern",
         "placeholder",
         "readOnly",
         "required",
         "size",
+        "src",
+        "step",
         "type",
-        "value"
+        "value",
+        "width"
       ],
       "missingLocally": [],
       "missingSlotProps": [],
       "localAdditions": [
+        "accept",
+        "alt",
+        "autoComplete",
+        "capture",
+        "checked",
         "contentAfter",
         "contentBefore",
+        "defaultChecked",
         "disabled",
+        "form",
+        "formAction",
+        "formEncType",
+        "formMethod",
+        "formNoValidate",
+        "formTarget",
+        "height",
         "input",
+        "list",
+        "max",
+        "maxLength",
+        "min",
+        "minLength",
+        "multiple",
         "name",
         "onValueChange",
+        "pattern",
         "placeholder",
         "readOnly",
-        "required"
+        "required",
+        "src",
+        "step",
+        "width"
       ],
       "missingLiteralValues": []
     },
@@ -2446,38 +2519,94 @@
         "onChange"
       ],
       "fluentSlotProps": [
+        "contentAfter",
+        "contentBefore",
         "dismiss"
       ],
       "localOwnProps": [
+        "accept",
+        "alt",
         "appearance",
+        "autoComplete",
+        "capture",
+        "checked",
         "clearLabel",
         "contentAfter",
         "contentBefore",
+        "defaultChecked",
         "defaultValue",
+        "disabled",
         "dismiss",
+        "form",
+        "formAction",
+        "formEncType",
+        "formMethod",
+        "formNoValidate",
+        "formTarget",
+        "height",
         "label",
+        "list",
+        "max",
+        "maxLength",
+        "min",
+        "minLength",
+        "multiple",
+        "name",
         "onChange",
         "onSearch",
         "onValueChange",
+        "pattern",
+        "placeholder",
         "readOnly",
+        "required",
         "size",
-        "value"
+        "src",
+        "step",
+        "value",
+        "width"
       ],
       "missingLocally": [],
       "missingSlotProps": [],
       "localAdditions": [
+        "accept",
+        "alt",
         "appearance",
+        "autoComplete",
+        "capture",
+        "checked",
         "clearLabel",
         "contentAfter",
         "contentBefore",
+        "defaultChecked",
         "defaultValue",
+        "disabled",
         "dismiss",
+        "form",
+        "formAction",
+        "formEncType",
+        "formMethod",
+        "formNoValidate",
+        "formTarget",
+        "height",
         "label",
+        "list",
+        "max",
+        "maxLength",
+        "min",
+        "minLength",
+        "multiple",
+        "name",
         "onSearch",
         "onValueChange",
+        "pattern",
+        "placeholder",
         "readOnly",
+        "required",
         "size",
-        "value"
+        "src",
+        "step",
+        "value",
+        "width"
       ],
       "missingLiteralValues": []
     },
@@ -2524,12 +2653,16 @@
         "disabledFocusable",
         "download",
         "href",
+        "hrefLang",
         "hreflang",
         "inline",
+        "media",
+        "ping",
         "referrerPolicy",
         "rel",
         "target",
         "title",
+        "type",
         "underline"
       ],
       "missingLocally": [],
@@ -2539,11 +2672,15 @@
         "children",
         "download",
         "href",
+        "hrefLang",
         "hreflang",
+        "media",
+        "ping",
         "referrerPolicy",
         "rel",
         "target",
         "title",
+        "type",
         "underline"
       ],
       "missingLiteralValues": []
@@ -2607,6 +2744,7 @@
         "selectionMode",
         "selectionModel",
         "sortState",
+        "subtleSelection",
         "validateCellEdit",
         "virtualize"
       ],
@@ -2649,6 +2787,7 @@
         "selectionAppearance",
         "selectionModel",
         "sortState",
+        "subtleSelection",
         "validateCellEdit",
         "virtualize"
       ],
@@ -2937,7 +3076,7 @@
       "family": "menu",
       "component": "MenuItemLink",
       "localComponent": "MenuItemLink",
-      "status": "review-slot-prop-gaps",
+      "status": "own-prop-names-covered",
       "fluentOwnProps": [
         "disabled",
         "href"
@@ -2949,7 +3088,9 @@
         "secondaryContent"
       ],
       "localOwnProps": [
+        "checkmark",
         "children",
+        "content",
         "disabled",
         "download",
         "href",
@@ -2959,12 +3100,11 @@
         "target"
       ],
       "missingLocally": [],
-      "missingSlotProps": [
-        "checkmark",
-        "content"
-      ],
+      "missingSlotProps": [],
       "localAdditions": [
+        "checkmark",
         "children",
+        "content",
         "download",
         "icon",
         "rel",
@@ -3331,10 +3471,13 @@
       "localComponent": "Hamburger",
       "status": "own-prop-names-covered",
       "fluentOwnProps": [],
-      "fluentSlotProps": [],
+      "fluentSlotProps": [
+        "icon"
+      ],
       "localOwnProps": [
         "children",
         "disabled",
+        "icon",
         "label",
         "onClick",
         "open"
@@ -3344,6 +3487,7 @@
       "localAdditions": [
         "children",
         "disabled",
+        "icon",
         "label",
         "onClick",
         "open"
@@ -3471,11 +3615,17 @@
       "localComponent": "NavDivider",
       "status": "own-prop-names-covered",
       "fluentOwnProps": [],
-      "fluentSlotProps": [],
-      "localOwnProps": [],
+      "fluentSlotProps": [
+        "wrapper"
+      ],
+      "localOwnProps": [
+        "wrapper"
+      ],
       "missingLocally": [],
       "missingSlotProps": [],
-      "localAdditions": [],
+      "localAdditions": [
+        "wrapper"
+      ],
       "missingLiteralValues": []
     },
     {
@@ -4098,7 +4248,7 @@
       "family": "radio",
       "component": "Radio",
       "localComponent": "Radio",
-      "status": "review-slot-prop-gaps",
+      "status": "own-prop-names-covered",
       "fluentOwnProps": [
         "disabled",
         "labelPosition",
@@ -4107,24 +4257,24 @@
       ],
       "fluentSlotProps": [
         "indicator",
-        "input",
         "label"
       ],
       "localOwnProps": [
         "children",
         "disabled",
+        "indicator",
+        "input",
         "label",
         "labelPosition",
         "onChange",
         "value"
       ],
       "missingLocally": [],
-      "missingSlotProps": [
-        "indicator",
-        "input"
-      ],
+      "missingSlotProps": [],
       "localAdditions": [
         "children",
+        "indicator",
+        "input",
         "label"
       ],
       "missingLiteralValues": []
@@ -4147,6 +4297,7 @@
       "localOwnProps": [
         "defaultValue",
         "disabled",
+        "form",
         "label",
         "layout",
         "name",
@@ -4159,6 +4310,7 @@
       "missingLocally": [],
       "missingSlotProps": [],
       "localAdditions": [
+        "form",
         "label",
         "onValueChange",
         "orientation"
@@ -4188,6 +4340,7 @@
         "color",
         "defaultValue",
         "disabled",
+        "form",
         "fullValueInput",
         "halfValueInput",
         "iconFilled",
@@ -4207,6 +4360,7 @@
       "missingSlotProps": [],
       "localAdditions": [
         "disabled",
+        "form",
         "fullValueInput",
         "halfValueInput",
         "label",
@@ -4274,6 +4428,7 @@
         "color",
         "defaultValue",
         "disabled",
+        "form",
         "fullValueInput",
         "halfValueInput",
         "iconFilled",
@@ -4297,6 +4452,7 @@
         "color",
         "defaultValue",
         "disabled",
+        "form",
         "fullValueInput",
         "halfValueInput",
         "iconFilled",
@@ -4324,38 +4480,94 @@
         "onChange"
       ],
       "fluentSlotProps": [
+        "contentAfter",
+        "contentBefore",
         "dismiss"
       ],
       "localOwnProps": [
+        "accept",
+        "alt",
         "appearance",
+        "autoComplete",
+        "capture",
+        "checked",
         "clearLabel",
         "contentAfter",
         "contentBefore",
+        "defaultChecked",
         "defaultValue",
+        "disabled",
         "dismiss",
+        "form",
+        "formAction",
+        "formEncType",
+        "formMethod",
+        "formNoValidate",
+        "formTarget",
+        "height",
         "label",
+        "list",
+        "max",
+        "maxLength",
+        "min",
+        "minLength",
+        "multiple",
+        "name",
         "onChange",
         "onSearch",
         "onValueChange",
+        "pattern",
+        "placeholder",
         "readOnly",
+        "required",
         "size",
-        "value"
+        "src",
+        "step",
+        "value",
+        "width"
       ],
       "missingLocally": [],
       "missingSlotProps": [],
       "localAdditions": [
+        "accept",
+        "alt",
         "appearance",
+        "autoComplete",
+        "capture",
+        "checked",
         "clearLabel",
         "contentAfter",
         "contentBefore",
+        "defaultChecked",
         "defaultValue",
+        "disabled",
         "dismiss",
+        "form",
+        "formAction",
+        "formEncType",
+        "formMethod",
+        "formNoValidate",
+        "formTarget",
+        "height",
         "label",
+        "list",
+        "max",
+        "maxLength",
+        "min",
+        "minLength",
+        "multiple",
+        "name",
         "onSearch",
         "onValueChange",
+        "pattern",
+        "placeholder",
         "readOnly",
+        "required",
         "size",
-        "value"
+        "src",
+        "step",
+        "value",
+        "width"
       ],
       "missingLiteralValues": []
     },
@@ -4370,16 +4582,18 @@
         "size"
       ],
       "fluentSlotProps": [
-        "icon",
-        "select"
+        "icon"
       ],
       "localOwnProps": [
         "appearance",
+        "autoComplete",
         "children",
         "defaultValue",
         "disabled",
+        "form",
         "icon",
         "label",
+        "multiple",
         "name",
         "onChange",
         "onValueChange",
@@ -4391,11 +4605,14 @@
       "missingLocally": [],
       "missingSlotProps": [],
       "localAdditions": [
+        "autoComplete",
         "children",
         "defaultValue",
         "disabled",
+        "form",
         "icon",
         "label",
+        "multiple",
         "name",
         "onValueChange",
         "required",
@@ -4476,13 +4693,13 @@
         "vertical"
       ],
       "fluentSlotProps": [
-        "input",
         "rail",
         "thumb"
       ],
       "localOwnProps": [
         "defaultValue",
         "disabled",
+        "form",
         "input",
         "label",
         "max",
@@ -4501,6 +4718,7 @@
       "missingLocally": [],
       "missingSlotProps": [],
       "localAdditions": [
+        "form",
         "input",
         "label",
         "name",
@@ -4531,8 +4749,7 @@
       ],
       "fluentSlotProps": [
         "decrementButton",
-        "incrementButton",
-        "input"
+        "incrementButton"
       ],
       "localOwnProps": [
         "appearance",
@@ -4541,6 +4758,7 @@
         "defaultValue",
         "disabled",
         "displayValue",
+        "form",
         "incrementButton",
         "incrementLabel",
         "input",
@@ -4564,6 +4782,7 @@
         "decrementButton",
         "decrementLabel",
         "disabled",
+        "form",
         "incrementButton",
         "incrementLabel",
         "input",
@@ -4774,7 +4993,6 @@
       ],
       "fluentSlotProps": [
         "indicator",
-        "input",
         "label"
       ],
       "localOwnProps": [
@@ -4782,6 +5000,7 @@
         "defaultChecked",
         "disabled",
         "disabledFocusable",
+        "form",
         "indicator",
         "input",
         "label",
@@ -4797,6 +5016,7 @@
       "missingSlotProps": [],
       "localAdditions": [
         "disabled",
+        "form",
         "indicator",
         "input",
         "label",
@@ -4886,6 +5106,7 @@
         "selectionMode",
         "selectionModel",
         "sortState",
+        "subtleSelection",
         "validateCellEdit",
         "virtualize"
       ],
@@ -4928,6 +5149,7 @@
         "selectionAppearance",
         "selectionModel",
         "sortState",
+        "subtleSelection",
         "validateCellEdit",
         "virtualize"
       ],
@@ -5009,6 +5231,13 @@
     },
     {
       "family": "table",
+      "component": "useDataGridContext_unstable",
+      "localComponent": "useDataGridContext_unstable",
+      "status": "non-component-contract",
+      "reason": "React hook utility; it selects from this library's composed DataGrid context."
+    },
+    {
+      "family": "table",
       "component": "DataGridHeader",
       "localComponent": "DataGridHeader",
       "status": "own-prop-names-covered",
@@ -5028,7 +5257,7 @@
       "family": "table",
       "component": "DataGridHeaderCell",
       "localComponent": "DataGridHeaderCell",
-      "status": "review-slot-prop-gaps",
+      "status": "own-prop-names-covered",
       "fluentOwnProps": [
         "focusMode",
         "sortDirection"
@@ -5039,25 +5268,27 @@
         "sortIcon"
       ],
       "localOwnProps": [
+        "aside",
+        "button",
         "children",
         "columnId",
         "columnIndex",
         "focusMode",
         "rowIndex",
         "sortDirection",
+        "sortIcon",
         "sortable"
       ],
       "missingLocally": [],
-      "missingSlotProps": [
+      "missingSlotProps": [],
+      "localAdditions": [
         "aside",
         "button",
-        "sortIcon"
-      ],
-      "localAdditions": [
         "children",
         "columnId",
         "columnIndex",
         "rowIndex",
+        "sortIcon",
         "sortable"
       ],
       "missingLiteralValues": []
@@ -5144,7 +5375,8 @@
         "appearance",
         "children",
         "noNativeElements",
-        "size"
+        "size",
+        "sortable"
       ],
       "missingLocally": [],
       "missingSlotProps": [],
@@ -5152,7 +5384,8 @@
         "appearance",
         "children",
         "noNativeElements",
-        "size"
+        "size",
+        "sortable"
       ],
       "missingLiteralValues": []
     },
@@ -5214,7 +5447,7 @@
       "family": "table",
       "component": "TableCellLayout",
       "localComponent": "TableCellLayout",
-      "status": "review-slot-prop-gaps",
+      "status": "own-prop-names-covered",
       "fluentOwnProps": [
         "appearance",
         "truncate"
@@ -5227,16 +5460,18 @@
       "localOwnProps": [
         "appearance",
         "children",
+        "description",
+        "main",
+        "media",
         "truncate"
       ],
       "missingLocally": [],
-      "missingSlotProps": [
+      "missingSlotProps": [],
+      "localAdditions": [
+        "children",
         "description",
         "main",
         "media"
-      ],
-      "localAdditions": [
-        "children"
       ],
       "missingLiteralValues": []
     },
@@ -5400,6 +5635,13 @@
     },
     {
       "family": "table",
+      "component": "useTableCompositeNavigation",
+      "localComponent": "useTableCompositeNavigation",
+      "status": "non-component-contract",
+      "reason": "React keyboard-navigation utility; it supplies grid/row Tabster attributes and table focus handoff behavior."
+    },
+    {
+      "family": "table",
       "component": "useTableSelection",
       "localComponent": "useTableSelection",
       "status": "non-component-contract",
@@ -5513,6 +5755,7 @@
         "children",
         "defaultOpen",
         "defaultSelectedValues",
+        "form",
         "inline",
         "inputValue",
         "label",
@@ -5529,6 +5772,7 @@
       "localAdditions": [
         "defaultOpen",
         "defaultSelectedValues",
+        "form",
         "inputValue",
         "label",
         "onChange",
@@ -5569,6 +5813,7 @@
       "status": "own-prop-names-covered",
       "fluentOwnProps": [],
       "fluentSlotProps": [
+        "expandIcon",
         "secondaryAction"
       ],
       "localOwnProps": [
@@ -5693,7 +5938,9 @@
       "localComponent": "TagPickerOptionGroup",
       "status": "own-prop-names-covered",
       "fluentOwnProps": [],
-      "fluentSlotProps": [],
+      "fluentSlotProps": [
+        "label"
+      ],
       "localOwnProps": [
         "children",
         "disabled",
@@ -6840,14 +7087,19 @@
         "size",
         "value"
       ],
-      "fluentSlotProps": [
-        "textarea"
-      ],
+      "fluentSlotProps": [],
       "localOwnProps": [
         "appearance",
+        "autoComplete",
+        "cols",
         "defaultValue",
+        "dirName",
         "disabled",
+        "form",
         "label",
+        "maxLength",
+        "minLength",
+        "name",
         "onChange",
         "onValueChange",
         "placeholder",
@@ -6857,19 +7109,28 @@
         "rows",
         "size",
         "textarea",
-        "value"
+        "value",
+        "wrap"
       ],
       "missingLocally": [],
       "missingSlotProps": [],
       "localAdditions": [
+        "autoComplete",
+        "cols",
+        "dirName",
         "disabled",
+        "form",
         "label",
+        "maxLength",
+        "minLength",
+        "name",
         "onValueChange",
         "placeholder",
         "readOnly",
         "required",
         "rows",
-        "textarea"
+        "textarea",
+        "wrap"
       ],
       "missingLiteralValues": []
     },
@@ -6896,7 +7157,8 @@
         "politeness",
         "priority",
         "timeout",
-        "title"
+        "title",
+        "toastId"
       ],
       "missingLocally": [],
       "missingSlotProps": [],
@@ -6913,7 +7175,8 @@
         "politeness",
         "priority",
         "timeout",
-        "title"
+        "title",
+        "toastId"
       ],
       "missingLiteralValues": []
     },
@@ -7014,14 +7277,16 @@
         "children",
         "inline",
         "limit",
-        "position"
+        "position",
+        "toasterId"
       ],
       "missingLocally": [],
       "missingSlotProps": [],
       "localAdditions": [
         "children",
         "limit",
-        "position"
+        "position",
+        "toasterId"
       ],
       "missingLiteralValues": []
     },
@@ -7075,10 +7340,13 @@
         "appearance",
         "vertical"
       ],
-      "fluentSlotProps": [],
+      "fluentSlotProps": [
+        "icon"
+      ],
       "localOwnProps": [
         "appearance",
         "children",
+        "icon",
         "shape",
         "size",
         "vertical"
@@ -7087,6 +7355,7 @@
       "missingSlotProps": [],
       "localAdditions": [
         "children",
+        "icon",
         "shape",
         "size"
       ],
@@ -7100,13 +7369,18 @@
       "fluentOwnProps": [
         "vertical"
       ],
-      "fluentSlotProps": [],
+      "fluentSlotProps": [
+        "wrapper"
+      ],
       "localOwnProps": [
-        "vertical"
+        "vertical",
+        "wrapper"
       ],
       "missingLocally": [],
       "missingSlotProps": [],
-      "localAdditions": [],
+      "localAdditions": [
+        "wrapper"
+      ],
       "missingLiteralValues": []
     },
     {
@@ -7138,11 +7412,14 @@
         "name",
         "value"
       ],
-      "fluentSlotProps": [],
+      "fluentSlotProps": [
+        "icon"
+      ],
       "localOwnProps": [
         "appearance",
         "children",
         "disabled",
+        "icon",
         "name",
         "size",
         "value"
@@ -7152,6 +7429,7 @@
       "localAdditions": [
         "children",
         "disabled",
+        "icon",
         "size"
       ],
       "missingLiteralValues": []
@@ -7185,11 +7463,14 @@
         "name",
         "value"
       ],
-      "fluentSlotProps": [],
+      "fluentSlotProps": [
+        "icon"
+      ],
       "localOwnProps": [
         "appearance",
         "children",
         "defaultPressed",
+        "icon",
         "name",
         "onPressedChange",
         "pressed",
@@ -7202,6 +7483,7 @@
       "localAdditions": [
         "children",
         "defaultPressed",
+        "icon",
         "onPressedChange",
         "pressed",
         "shape",

@@ -318,6 +318,8 @@ export function defineCarousel(): void {
     private slides: HTMLElement[] = [];
     private current = 0;
     private pageSize = 1;
+    private pageGroups: number[][] = [];
+    private slidePages: number[] = [];
     private requestedTarget: number | null = null;
     private requestedSource?: CarouselIndexChangeSource;
     private pendingScrollSource?: CarouselIndexChangeSource;
@@ -350,7 +352,7 @@ export function defineCarousel(): void {
       this.contentObserver.observe(this, { childList: true, subtree: true });
       if (typeof ResizeObserver !== "undefined") {
         this.resizeObserver?.disconnect();
-        this.resizeObserver = new ResizeObserver(() => { if (this.updatePageSize()) this.syncSlides(); else this.syncWhitespace(); });
+        this.resizeObserver = new ResizeObserver(() => { if (this.updatePageSize()) this.syncSlides(false); else this.syncWhitespace(); });
         this.resizeObserver.observe(this.viewport);
       }
       this.viewport.addEventListener("scroll", this.onScroll, { passive: true, signal: this.events.signal });
@@ -446,32 +448,64 @@ export function defineCarousel(): void {
       this.style.setProperty("--spui-carousel-slide-size", CSS.supports("flex-basis", value) ? value : "100%");
     }
     private updatePageSize(): boolean {
-      const previousSize = this.pageSize;
-      const previousFirstSlide = this.current * previousSize;
+      const previousGroups = this.pageGroups;
+      const activeSlide = previousGroups[this.current]?.[0] ?? 0;
       const raw = this.getAttribute("group-size") || "auto";
-      let next = 1;
+      const groups: number[][] = [];
       if (raw !== "auto") {
         const requested = Number(raw);
-        next = Number.isFinite(requested) && requested >= 1 ? Math.floor(requested) : 1;
+        const size = Number.isFinite(requested) && requested >= 1 ? Math.floor(requested) : 1;
+        for (let index = 0; index < this.slides.length; index += size) groups.push(Array.from({ length: Math.min(size, this.slides.length - index) }, (_, offset) => index + offset));
       } else if (this.viewport && this.slides.length) {
         const available = this.viewport.clientWidth;
-        const first = this.slides[0].getBoundingClientRect().width;
         const gap = Number.parseFloat(getComputedStyle(this.viewport).columnGap) || 0;
-        if (available > 0 && first > 0) next = Math.max(1, Math.floor((available + gap) / (first + gap)));
+        if (available > 0) {
+          let group: number[] = [];
+          let used = 0;
+          this.slides.forEach((slide, index) => {
+            const measured = slide.getBoundingClientRect().width;
+            const width = measured > 0 ? measured : available;
+            const nextUsed = used + (group.length ? gap : 0) + width;
+            if (group.length && nextUsed > available + 0.5) {
+              groups.push(group);
+              group = [];
+              used = 0;
+            }
+            used += (group.length ? gap : 0) + width;
+            group.push(index);
+          });
+          if (group.length) groups.push(group);
+        } else {
+          for (let index = 0; index < this.slides.length; index++) groups.push([index]);
+        }
+      } else {
+        for (let index = 0; index < this.slides.length; index++) groups.push([index]);
       }
-      const changed = next !== this.pageSize;
-      this.pageSize = next;
-      this.current = Math.min(Math.floor(previousFirstSlide / this.pageSize), Math.max(0, this.pageCount - 1));
+      const changed = groups.length !== previousGroups.length || groups.some((group, page) => group.length !== previousGroups[page]?.length || group.some((index, offset) => index !== previousGroups[page]?.[offset]));
+      if (changed) {
+        this.requestedTarget = null;
+        this.requestedSource = undefined;
+        this.pendingScrollSource = undefined;
+        this.stopSlideAnimation();
+      }
+      this.pageGroups = groups;
+      this.slidePages = Array(this.slides.length).fill(0);
+      groups.forEach((group, page) => group.forEach(index => { this.slidePages[index] = page; }));
+      this.pageSize = groups.reduce((largest, group) => Math.max(largest, group.length), 1);
+      this.current = Math.min(this.slidePages[activeSlide] ?? 0, Math.max(0, this.pageCount - 1));
       this.style.setProperty("--spui-carousel-page-size", String(this.pageSize));
       return changed;
     }
-    private get pageCount(): number { return Math.ceil(this.slides.length / this.pageSize); }
+    private get pageCount(): number { return this.pageGroups.length; }
+    private pageForSlide(index: number): number { return this.slidePages[index] ?? 0; }
+    private firstSlideForPage(page: number): HTMLElement | undefined { return this.slides[this.pageGroups[page]?.[0] ?? 0]; }
+    private columnForSlide(index: number): number { return (this.pageGroups[this.pageForSlide(index)]?.indexOf(index) ?? 0) + 1; }
     private syncPresentation(): void {
       this.style.setProperty("--spui-carousel-align", this.align);
       this.style.setProperty("--spui-carousel-motion-duration", `${this.motionDuration}ms`);
       this.querySelectorAll<HTMLElement>("spui-carousel-slider, spui-carousel-viewport").forEach(wrapper => wrapper.toggleAttribute("data-spui-carousel-motion", this.motion === "fade"));
       this.syncWhitespace();
-      this.slides.forEach((slide, index) => this.applySlideState(slide, Math.floor(index / this.pageSize) === this.current, index));
+      this.slides.forEach((slide, index) => this.applySlideState(slide, this.pageForSlide(index) === this.current, index));
     }
     private syncWhitespace(): void {
       const viewportWidth = this.viewport?.clientWidth || 0;
@@ -503,7 +537,7 @@ export function defineCarousel(): void {
       slide.toggleAttribute("data-spui-carousel-motion", this.motion === "fade");
       if (this.motion !== "fade") { this.restoreSlideState(slide); return; }
       if (!this.originalSlideColumn.has(slide)) this.originalSlideColumn.set(slide, { value: slide.style.getPropertyValue("--spui-carousel-slide-column"), gridArea: slide.style.gridArea });
-      slide.style.setProperty("--spui-carousel-slide-column", String(index % this.pageSize + 1));
+      slide.style.setProperty("--spui-carousel-slide-column", String(this.columnForSlide(index)));
       slide.style.gridArea = "1 / var(--spui-carousel-slide-column) / 2 / span 1";
       slide.toggleAttribute("data-spui-carousel-active", active);
       if (!active && (slide.contains(document.activeElement) || slide.shadowRoot?.activeElement)) this.viewport?.focus({ preventScroll: true });
@@ -585,7 +619,7 @@ export function defineCarousel(): void {
     private onMotionPreference = (event: MediaQueryListEvent): void => { if (event.matches) { this.autoplayRunning = false; this.autoplayExplicitlyStarted = false; this.syncAutoplay(); } };
     private toggleAutoplay = (): void => { this.autoplayRunning = !this.autoplayRunning; this.autoplayExplicitlyStarted = this.autoplayRunning; this.syncAutoplay(); };
 
-    private syncSlides(): void {
+    private syncSlides(recalculateGroups = true): void {
       if (!this.slideSlot) return;
       const collectSlides = (element: HTMLElement): HTMLElement[] => {
         if (element.localName === "spui-carousel-slider" || element.localName === "spui-carousel-viewport") return [...element.children].filter((child): child is HTMLElement => child instanceof HTMLElement).flatMap(collectSlides);
@@ -594,7 +628,7 @@ export function defineCarousel(): void {
       const nextSlides = this.slideSlot.assignedElements({ flatten: true }).filter((element): element is HTMLElement => element instanceof HTMLElement).flatMap(collectSlides);
       this.slides.filter(slide => !nextSlides.includes(slide)).forEach(slide => { this.resizeObserver?.unobserve(slide); this.restoreSlideState(slide); this.restoreSlideLayout(slide); });
       this.slides = nextSlides;
-      this.updatePageSize();
+      if (recalculateGroups) this.updatePageSize();
       this.slides.forEach(slide => this.resizeObserver?.observe(slide));
       this.syncWhitespace();
       this.slides.forEach((slide, index) => {
@@ -644,14 +678,14 @@ export function defineCarousel(): void {
     }
 
     private dispatch(index: number, source?: CarouselIndexChangeSource): void {
-      const groups = Array.from({ length: this.pageCount }, (_, page) => Array.from({ length: Math.min(this.pageSize, this.slides.length - page * this.pageSize) }, (__, offset) => page * this.pageSize + offset));
+      const groups = this.pageGroups.map(group => [...group]);
       this.liveRegion.textContent = this.announcement?.(index, this.pageCount, groups) || this.formatPageLabel(index);
       const changeSource = source ?? { event: new Event("programmatic"), type: "programmatic" as const };
       this.dispatchEvent(new CustomEvent("spui-carousel-change", { bubbles: true, composed: true, detail: { value: index, index, type: "select", event: changeSource.event, eventType: changeSource.type } }));
     }
 
     private scrollToIndex(index: number, behavior: ScrollBehavior): void {
-      const slide = this.slides[index * this.pageSize];
+      const slide = this.firstSlideForPage(index);
       if (!slide) return;
       const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
       if (behavior === "smooth" && !reduced && this.motion !== "fade" && this.slideMotionDuration > 0) {
@@ -724,8 +758,8 @@ export function defineCarousel(): void {
         if (index === this.current) button.setAttribute("aria-current", "step"); else button.removeAttribute("aria-current");
         button.tabIndex = index === this.current ? 0 : -1;
       });
-      this.slides.forEach((slide, index) => { if (slide.dataset.spuiCarouselGeneratedLabel !== undefined) slide.setAttribute("aria-label", this.formatSlideLabel(Math.floor(index / this.pageSize))); });
-      this.slides.forEach((slide, index) => this.applySlideState(slide, Math.floor(index / this.pageSize) === this.current, index));
+      this.slides.forEach((slide, index) => { if (slide.dataset.spuiCarouselGeneratedLabel !== undefined) slide.setAttribute("aria-label", this.formatPageLabel(this.pageForSlide(index))); });
+      this.slides.forEach((slide, index) => this.applySlideState(slide, this.pageForSlide(index) === this.current, index));
       this.querySelectorAll<HTMLElement>("spui-carousel-nav-button,spui-carousel-nav-image-button").forEach(button => {
         const buttonIndex = Number(button.getAttribute("index"));
         button.toggleAttribute("selected", buttonIndex === this.current);
@@ -738,7 +772,7 @@ export function defineCarousel(): void {
 
     private onSlotChange = (): void => this.syncSlides();
     private onNavSelect = (event: Event): void => { const detail = (event as CustomEvent<{ index: number; event?: MouseEvent }>).detail; this.requestIndex(Number(detail?.index), { event: detail?.event ?? new MouseEvent("click"), type: "click" }); };
-    private onCardFocus = (event: Event): void => { const detail = (event as CustomEvent<{ index: number; event?: KeyboardEvent }>).detail; this.requestIndex(Math.floor(Number(detail?.index) / this.pageSize), { event: detail?.event ?? new KeyboardEvent("keydown"), type: "keydown" }); };
+    private onCardFocus = (event: Event): void => { const detail = (event as CustomEvent<{ index: number; event?: KeyboardEvent }>).detail; this.requestIndex(this.pageForSlide(Number(detail?.index)), { event: detail?.event ?? new KeyboardEvent("keydown"), type: "keydown" }); };
     private onButtonActivate = (event: Event): void => { const detail = (event as CustomEvent<{ navType: "prev" | "next"; event?: MouseEvent }>).detail; this.requestIndex(this.current + (detail?.navType === "prev" ? -1 : 1), { event: detail?.event ?? new MouseEvent("click"), type: "click" }); };
 
     private onScroll = (event: Event): void => {
@@ -804,7 +838,7 @@ export function defineCarousel(): void {
         const distance = Math.abs(point - target);
         return distance < best.distance ? { index, distance } : best;
       }, { index: 0, distance: Number.POSITIVE_INFINITY }).index;
-      return Math.floor(nearest / this.pageSize);
+      return this.pageForSlide(nearest);
     }
 
     private onScrollEnd = (event?: Event): void => {

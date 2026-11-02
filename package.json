@@ -116,7 +116,7 @@
     "verify:textarea-parity": "npm run build:library && node scripts/verify-textarea-parity.mjs",
     "verify:file-upload": "npm run build:library && node scripts/verify-file-upload.mjs",
     "verify:spinner-parity": "npm run build:library && node scripts/verify-spinner-parity.mjs && node scripts/verify-spinner-context.mjs",
-    "verify:carousel-autoplay": "npm run build:library && node scripts/verify-carousel-autoplay.mjs",
+    "verify:carousel-autoplay": "npm run build:library && node scripts/verify-carousel-autoplay.mjs && node scripts/verify-carousel-auto-groups.mjs",
     "verify:carousel-autoplay-callback": "npm run build:library && node scripts/verify-carousel-autoplay-callback.mjs",
     "verify:drawer-expand": "npm run build:library && node scripts/verify-drawer-expand.mjs",
     "verify:field-composition": "npm run build:library && node scripts/verify-field-composition.mjs",
