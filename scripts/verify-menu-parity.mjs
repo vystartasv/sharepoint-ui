@@ -7,7 +7,7 @@ import ts from "typescript";
 
 const root = resolve(process.cwd());
 const typeFixturePath = resolve("packages/sharepoint-ui/src/.menu-checked-event-type-contract.tsx");
-const typeFixture = `import { Menu, type MenuProps, type MenuCheckedValueChangeEvent } from "./react.js"; type Assert<T extends true> = T; type EventOf<T> = NonNullable<T> extends (event: infer E, ...args: any[]) => unknown ? E : never; type EventMatches = Assert<EventOf<MenuProps["onCheckedValueChange"]> extends MenuCheckedValueChangeEvent ? true : false>; const example = <Menu onCheckedValueChange={(event, data) => { const typedEvent: MenuCheckedValueChangeEvent = event; const target: Element = event.currentTarget; const name: string = data.name; const nativeEvent: Event = event.nativeEvent; void [typedEvent, target, name, nativeEvent]; }} />;`;
+const typeFixture = `import { Menu, type MenuProps, type MenuCheckedValueChangeEvent } from "./react.js"; type Assert<T extends true> = T; type EventOf<T> = NonNullable<T> extends (event: infer E, ...args: any[]) => unknown ? E : never; type EventMatches = Assert<EventOf<MenuProps["onCheckedValueChange"]> extends MenuCheckedValueChangeEvent ? true : false>; const example = <Menu onCheckedValueChange={(event, data) => { const typedEvent: MenuCheckedValueChangeEvent = event; const target: Element = event.currentTarget; const name: string = data.name; const nativeEvent: Event = event.nativeEvent; void [typedEvent, target, name, nativeEvent]; }} onOpenChange={(event, data) => { if (data.type === "scrollOutside" || data.type === "menuMouseEnter") { const eventData: MouseEvent | TouchEvent = data.event; void [eventData, event]; } }} />;`;
 const originalReadFile = ts.sys.readFile;
 const originalGetSourceFile = ts.createCompilerHost({}).getSourceFile;
 const typeOptions = { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.NodeNext, moduleResolution: ts.ModuleResolutionKind.NodeNext, jsx: ts.JsxEmit.ReactJSX, strict: true, skipLibCheck: true, noEmit: true };
@@ -133,8 +133,14 @@ try {
   await page.emulateMedia({ forcedColors: "none" });
   await page.getByTestId("scroll-trigger").click();
   assert.equal(await page.getByTestId("scroll").evaluate(node => node.open), true);
-  await page.evaluate(() => window.dispatchEvent(new Event("scroll")));
-  assert.equal(await page.getByTestId("scroll").evaluate(node => node.open), false, "closeOnScroll closes outside menu scrolls");assert.deepEqual(await page.evaluate(()=>window.scrollChanges.at(-1)),{open:false,type:"scrollOutside",eventType:"scroll",sameEvent:true});
+  await page.evaluate(() => document.dispatchEvent(new WheelEvent("wheel", { bubbles: true })));
+  assert.equal(await page.getByTestId("scroll").evaluate(node => node.open), false, "closeOnScroll closes after an outside wheel gesture");assert.deepEqual(await page.evaluate(()=>window.scrollChanges.at(-1)),{open:false,type:"scrollOutside",eventType:"wheel",sameEvent:true});
+
+  await page.getByTestId("hover").evaluate(node => { node.open = true; });
+  await inline.evaluate(node => { node.open = true; });
+  await inline.locator("spui-menu-item").first().hover();
+  assert.equal(await page.getByTestId("hover").evaluate(node => node.open), false, "entering a sibling menu dismisses the open hover menu");
+  assert.deepEqual(await page.evaluate(() => window.hoverChanges.at(-1)), { open: false, type: "menuMouseEnter", eventType: "mouseover", sameEvent: true }, "menuMouseEnter preserves Fluent's originating mouse event");
 
   await page.evaluate(() => window.mountNative());
   const native = page.locator("#native");

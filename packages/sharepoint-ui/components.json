@@ -170,7 +170,7 @@
       "registered": true,
       "summary": "Present a controlled or uncontrolled sequence of guided steps.",
       "api": {
-        "reactSignature": "{ children, defaultValue, value, onValueChange, onAnnouncement, announcement, onFinish, ...props }: ElementProps & { children?: React.ReactNode; value?: string; defaultValue?: string; onValueChange?: (event: TeachingPopoverCarouselChangeEvent, data: TeachingPopoverCarouselValueChangeData) => void; onAnnouncement?: (message: string) => void; announcement?: (newValue: string) => string; onFinish?: (event: React.MouseEvent<HTMLElement>, data: TeachingPopoverCarouselFinishData) => void }",
+        "reactSignature": "{ children, defaultValue, value, onValueChange, onAnnouncement, announcement, onFinish, ...props }: ElementProps & { children?: React.ReactNode; value?: string; defaultValue?: string; onValueChange?: (event: TeachingPopoverCarouselChangeEvent, data: TeachingPopoverCarouselValueChangeData) => void; onAnnouncement?: (message: string) => void; announcement?: (newValue: string) => string; onFinish?: (event: TeachingPopoverCarouselChangeEvent, data: TeachingPopoverCarouselFinishData) => void }",
         "callbackProps": [
           "onValueChange",
           "onAnnouncement",
@@ -3699,7 +3699,11 @@
       "module": "list",
       "category": "collections",
       "api": {
-        "reactSignature": "{ value, disabledSelection = false, checkmark, onAction, children, ...props }: ElementProps & { value?: ListItemValue; disabledSelection?: boolean; checkmark?: React.ReactNode; onAction?: (event: ListItemActionEvent, data: SharePointUIEventData<ListItemActionData>) => void; children?: React.ReactNode }",
+        "reactSignature": "{ value, disabledSelection = false, checkmark, onAction, children, ...props }: ElementProps & { value?: ListItemValue; disabledSelection?: boolean; checkmark?: React.ReactNode; onAction?: (event: SharePointUIEvent, data: ListItemReactActionData) => void; children?: React.ReactNode }",
+        "reactHelpers": [
+          "ListItemReactActionData",
+          "ListItemReactActionEvent"
+        ],
         "callbackProps": [
           "onAction"
         ],

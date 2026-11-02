@@ -105,7 +105,7 @@ type SharePointUIEventData<T> = T extends { event: unknown }
     ? Omit<T, "event"> & { event?: SharePointUIEvent }
     : T;
 type MenuEventData<T> = T extends { type: infer Type; event: infer E }
-  ? Type extends "clickOutside" | "scrollOutside"
+  ? Type extends "clickOutside" | "scrollOutside" | "menuMouseEnter"
     ? Omit<T, "event"> & { event: E }
     : Type extends "menuSafeZoneMouseEnter"
       ? Omit<T, "event"> & { event: React.MouseEvent<Element> }
@@ -1708,14 +1708,24 @@ export const List = React.forwardRef<HTMLElement, ElementProps & { navigationMod
   return React.createElement("spui-list", useCustomElementProps({ ...props, ref, "navigation-mode": navigationMode, "selection-mode": selectionMode }), children);
 });
 
-export const ListItem = React.forwardRef<HTMLElement, ElementProps & { value?: ListItemValue; disabledSelection?: boolean; checkmark?: React.ReactNode; onAction?: (event: ListItemActionEvent, data: SharePointUIEventData<ListItemActionData>) => void; children?: React.ReactNode }>(function ListItem({ value, disabledSelection = false, checkmark, onAction, children, ...props }: ElementProps & { value?: ListItemValue; disabledSelection?: boolean; checkmark?: React.ReactNode; onAction?: (event: ListItemActionEvent, data: SharePointUIEventData<ListItemActionData>) => void; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export type ListItemReactActionEvent = CustomEvent<{ originalEvent: React.MouseEvent | React.KeyboardEvent }>;
+export type ListItemReactActionData =
+  | { event: SharePointUIEvent; type: undefined; value: ListItemValue }
+  | { event: ListItemReactActionEvent; type: "ListItemAction"; value: ListItemValue };
+
+export const ListItem = React.forwardRef<HTMLElement, ElementProps & { value?: ListItemValue; disabledSelection?: boolean; checkmark?: React.ReactNode; onAction?: (event: SharePointUIEvent, data: ListItemReactActionData) => void; children?: React.ReactNode }>(function ListItem({ value, disabledSelection = false, checkmark, onAction, children, ...props }: ElementProps & { value?: ListItemValue; disabledSelection?: boolean; checkmark?: React.ReactNode; onAction?: (event: SharePointUIEvent, data: ListItemReactActionData) => void; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   ensureDefined(defineListItem);
   useSpuiEvent(ref, "spui-list-item-action", (detail, event) => {
     const actionEvent = event as ListItemActionEvent;
+    const sourceEvent = actionEvent.detail.originalEvent;
+    const originalEvent = createReactEventBridge(sourceEvent, actionEvent, ref.current!) as unknown as React.MouseEvent | React.KeyboardEvent;
     const actionValue = (detail.value ?? "") as ListItemValue;
-    onAction?.(actionEvent, { event: actionEvent, type: "ListItemAction", value: actionValue });
+    const callbackEvent = new CustomEvent("ListItemAction", { bubbles: true, cancelable: true, detail: { originalEvent } }) as ListItemReactActionEvent;
+    onAction?.(callbackEvent, { event: callbackEvent, type: "ListItemAction", value: actionValue });
+    if (callbackEvent.defaultPrevented) actionEvent.preventDefault();
+    if (callbackEvent.cancelBubble) actionEvent.stopPropagation();
   });
   React.useLayoutEffect(() => {
     const element = ref.current as (HTMLElement & { value?: ListItemValue }) | null;
@@ -1753,7 +1763,7 @@ export const CarouselButton = React.forwardRef<HTMLElement, Omit<ElementProps, "
 
 export type CarouselAutoplayChangeData = { checked: boolean } & (
   | { event: SharePointUIEvent; type: undefined }
-  | { event: React.MouseEvent<HTMLButtonElement>; type: "click" }
+  | { event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>; type: "click" }
 );
 
 export const CarouselAutoplayButton = React.forwardRef<HTMLElement, Omit<ElementProps, "slot"> & { icon?: React.ReactNode; playLabel?: string; pauseLabel?: string; onCheckedChange?: (event: SharePointUIEvent, data: CarouselAutoplayChangeData) => void; slot?: string | null }>(function CarouselAutoplayButton({ icon, playLabel, pauseLabel, onCheckedChange, ...props }: Omit<ElementProps, "slot"> & { icon?: React.ReactNode; playLabel?: string; pauseLabel?: string; onCheckedChange?: (event: SharePointUIEvent, data: CarouselAutoplayChangeData) => void; slot?: string | null }, forwardedRef): React.ReactElement {
@@ -1765,7 +1775,7 @@ export const CarouselAutoplayButton = React.forwardRef<HTMLElement, Omit<Element
     const change = detail as CarouselAutoplayChangeData;
     const sourceEvent = change.event instanceof Event ? change.event : event;
     const target = sourceEventTarget(sourceEvent, ref.current!);
-    const callbackEvent = createReactEventBridge(sourceEvent, event, target as HTMLButtonElement) as React.MouseEvent<HTMLButtonElement>;
+    const callbackEvent = createReactEventBridge(sourceEvent, event, target as HTMLButtonElement | HTMLAnchorElement) as React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>;
     onCheckedChange?.(callbackEvent, { ...change, event: callbackEvent } as CarouselAutoplayChangeData);
   });
   return React.createElement("spui-carousel-autoplay-button", useCustomElementProps({ ...props, ref, slot: props.slot === null ? null : props.slot || "autoplay", "play-label": playLabel || strings.carouselPlay || "Play", "pause-label": pauseLabel || strings.carouselPause || "Pause" }), renderIconSlot(icon));
@@ -2305,10 +2315,15 @@ export const PopoverSurface = React.forwardRef<HTMLElement, ElementProps & { chi
   return React.createElement("spui-popover-surface", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
 
-export type TeachingPopoverCarouselValueChangeData = { value?: string; event: SharePointUIEvent; type: TeachingPopoverCarouselValueChangeType };
-export type TeachingPopoverCarouselFinishData = { value?: string; event: SharePointUIEvent; type: "click" };
-export type TeachingPopoverCarouselChangeEvent = Event | React.SyntheticEvent<HTMLElement>;
-type TeachingCarouselContextValue = { index: number; count: number; value: string; values: string[]; initialStepText?: string; finalStepText?: string; onValueChange?: (event: TeachingPopoverCarouselChangeEvent, data: TeachingPopoverCarouselValueChangeData) => void; onFinish?: (event: React.MouseEvent<HTMLElement>, data: TeachingPopoverCarouselFinishData) => void; setIndex: (index: number, event: TeachingPopoverCarouselChangeEvent) => void; selectValue: (value: string, event: TeachingPopoverCarouselChangeEvent) => void };
+type TeachingPopoverCarouselEventData<TType extends string> =
+  | { type: undefined; event: Event | React.SyntheticEvent }
+  | (TType extends "click" ? { type: TType; event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement> }
+    : TType extends "keydown" ? { type: TType; event: React.KeyboardEvent<HTMLElement> }
+      : { type: TType; event: Event });
+export type TeachingPopoverCarouselValueChangeData = TeachingPopoverCarouselEventData<TeachingPopoverCarouselValueChangeType> & { value?: string };
+export type TeachingPopoverCarouselFinishData = TeachingPopoverCarouselEventData<"click"> & { value?: string };
+export type TeachingPopoverCarouselChangeEvent = Event | React.SyntheticEvent;
+type TeachingCarouselContextValue = { index: number; count: number; value: string; values: string[]; initialStepText?: string; finalStepText?: string; onValueChange?: (event: TeachingPopoverCarouselChangeEvent, data: TeachingPopoverCarouselValueChangeData) => void; onFinish?: (event: TeachingPopoverCarouselChangeEvent, data: TeachingPopoverCarouselFinishData) => void; setIndex: (index: number, event: TeachingPopoverCarouselChangeEvent) => void; selectValue: (value: string, event: TeachingPopoverCarouselChangeEvent) => void };
 const TeachingCarouselContext = React.createContext<TeachingCarouselContextValue | null>(null);
 
 /** Guided, keyboard-contained help surface. Its parts use native React composition and add no runtime dependency. */
@@ -2395,7 +2410,7 @@ export const TeachingPopoverFooter = React.forwardRef<HTMLElement, ElementProps 
   return React.createElement("spui-teaching-popover-footer", useCustomElementProps({ ref: forwardedRef, ...props, "data-footer-layout": footerLayout, style: { display: "flex", flexDirection: horizontal ? "row" : "column", alignItems: horizontal ? "center" : "stretch", justifyContent: horizontal ? "flex-end" : "initial", flexWrap: horizontal ? "wrap" : "nowrap", gap: "8px", paddingBlockStart: "12px", ...props.style } }), action("primary", primary, "primary"), action("secondary", secondary, "secondary"), children);
 });
 
-export function TeachingPopoverCarousel({ children, defaultValue, value, onValueChange, onAnnouncement, announcement, onFinish, ...props }: ElementProps & { children?: React.ReactNode; value?: string; defaultValue?: string; onValueChange?: (event: TeachingPopoverCarouselChangeEvent, data: TeachingPopoverCarouselValueChangeData) => void; onAnnouncement?: (message: string) => void; announcement?: (newValue: string) => string; onFinish?: (event: React.MouseEvent<HTMLElement>, data: TeachingPopoverCarouselFinishData) => void }): React.ReactElement {
+export function TeachingPopoverCarousel({ children, defaultValue, value, onValueChange, onAnnouncement, announcement, onFinish, ...props }: ElementProps & { children?: React.ReactNode; value?: string; defaultValue?: string; onValueChange?: (event: TeachingPopoverCarouselChangeEvent, data: TeachingPopoverCarouselValueChangeData) => void; onAnnouncement?: (message: string) => void; announcement?: (newValue: string) => string; onFinish?: (event: TeachingPopoverCarouselChangeEvent, data: TeachingPopoverCarouselFinishData) => void }): React.ReactElement {
   const context = React.useContext(UIContext);
   const parts = React.Children.toArray(children);
   const cards = parts.filter((child): child is React.ReactElement<{ value: string }> => React.isValidElement(child) && child.type === TeachingPopoverCarouselCard);
@@ -2420,7 +2435,12 @@ export function TeachingPopoverCarousel({ children, defaultValue, value, onValue
     const nextValue = cards[bounded]?.props.value;
     if (nextValue === undefined || bounded === index) return;
     if (value === undefined) setUncontrolled(nextValue);
-    onValueChange?.(event, { value: nextValue, event, type: event.type as TeachingPopoverCarouselValueChangeType });
+    const eventData = event.type === "click"
+      ? { type: "click" as const, event: event as React.MouseEvent<HTMLButtonElement | HTMLAnchorElement> }
+      : event.type === "keydown"
+        ? { type: "keydown" as const, event: event as React.KeyboardEvent<HTMLElement> }
+        : { type: undefined, event };
+    onValueChange?.(event, { ...eventData, value: nextValue });
   };
   const selectValue = (nextValue: string, event: TeachingPopoverCarouselChangeEvent): void => { const nextIndex = cards.findIndex(card => card.props.value === nextValue); if (nextIndex >= 0) setIndex(nextIndex, event); };
   const onKeyDown = (event: React.KeyboardEvent<HTMLElement>): void => {
@@ -2465,7 +2485,7 @@ export function TeachingPopoverCarouselFooterButton({ navType, altText, children
     if (event.defaultPrevented) return;
     if (previous) carousel?.setIndex((carousel.index || 0) - 1, event);
     else if (navType === "next") carousel?.setIndex((carousel.index || 0) + 1, event);
-    if (navType === "next" && atEdge) carousel?.onFinish?.(event, { value: carousel.value, event, type: "click" });
+    if (navType === "next" && atEdge) carousel?.onFinish?.(event, { value: carousel.value, event: event as React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>, type: "click" });
   };
   const buttonProps = useHostProps({ ...props, type: "button", appearance: navType === "next" ? "primary" : dismiss ? "subtle" : "secondary", size: "medium", style: { minWidth: "96px", ...props.style }, "aria-label": label, "data-spui-popover-close": dismiss ? "" : undefined, onClick: click }) as Parameters<typeof Button>[0];
   return React.createElement(Button, buttonProps, buttonText);
@@ -2530,11 +2550,11 @@ export function Menu({ children, trigger, label, placement, positioning, open, d
     const change = detail as MenuOpenChangeData;
     if (open === undefined) setMotionState(change.open);
     const sourceEvent = change.event;
-    const callbackEvent = sourceEvent instanceof MouseEvent || sourceEvent instanceof KeyboardEvent
+    const nativeEventType = change.type === "clickOutside" || change.type === "scrollOutside" || change.type === "menuMouseEnter";
+    const callbackEvent = !nativeEventType && (sourceEvent instanceof MouseEvent || sourceEvent instanceof KeyboardEvent)
       ? createReactEventBridge(sourceEvent, event, sourceEventTarget(sourceEvent, ref.current!))
       : sourceEvent;
-    const dataEvent = change.type === "clickOutside" || change.type === "scrollOutside" ? sourceEvent : callbackEvent;
-    onOpenChange?.(callbackEvent as MenuReactOpenChangeEvent, { ...change, event: dataEvent } as MenuReactOpenChangeData);
+    onOpenChange?.(callbackEvent as MenuReactOpenChangeEvent, { ...change, event: callbackEvent } as MenuReactOpenChangeData);
   });
   useSpuiEvent(ref, "spui-select", detail => onSelect?.(String(detail.value ?? ""), String(detail.label ?? ""), Boolean(detail.checked)));
   const selection = React.useMemo<MenuSelectionContextValue>(() => ({

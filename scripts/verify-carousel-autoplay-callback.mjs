@@ -6,7 +6,7 @@ import ts from "typescript";
 import { chromium } from "playwright";
 
 const typeFixturePath = resolve("packages/sharepoint-ui/src/.carousel-autoplay-event-type-contract.tsx");
-const typeFixture = `import * as React from "react"; import { CarouselAutoplayButton } from "./react.js"; const example = <CarouselAutoplayButton onCheckedChange={(event, data) => { const callbackEvent: Event | React.SyntheticEvent = event; if (data.type === "click") { const branch: React.MouseEvent<HTMLButtonElement> = data.event; const checked: boolean = data.checked; void [branch, checked]; } else { const branch: Event | React.SyntheticEvent = data.event; void branch; } void callbackEvent; }} />;`;
+const typeFixture = `import * as React from "react"; import { CarouselAutoplayButton } from "./react.js"; const example = <CarouselAutoplayButton onCheckedChange={(event, data) => { const callbackEvent: Event | React.SyntheticEvent = event; if (data.type === "click") { const branch: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement> = data.event; const checked: boolean = data.checked; void [branch, checked]; } else { const branch: Event | React.SyntheticEvent = data.event; void branch; } void callbackEvent; }} />;`;
 const typeOptions = { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.NodeNext, moduleResolution: ts.ModuleResolutionKind.NodeNext, jsx: ts.JsxEmit.ReactJSX, strict: true, skipLibCheck: true, noEmit: true };
 const originalReadFile = ts.sys.readFile;
 const originalGetSourceFile = ts.createCompilerHost(typeOptions).getSourceFile;

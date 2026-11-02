@@ -4,8 +4,8 @@ export type MenuOpenChangeType = "menuTriggerContextMenu" | "menuTriggerClick" |
 type MenuOpenChangeSourceData =
   | { type: "menuTriggerContextMenu" | "menuTriggerClick" | "menuTriggerMouseEnter" | "menuSafeZoneMouseEnter" | "menuTriggerMouseLeave" | "menuTriggerMouseMove" | "menuItemClick" | "menuPopoverMouseEnter"; event: MouseEvent }
   | { type: "menuTriggerKeyDown" | "menuPopoverKeyDown"; event: KeyboardEvent; keyboard?: boolean }
-  | { type: "menuSafeZoneTimeout" | "scrollOutside" | "programmatic"; event: Event }
-  | { type: "clickOutside"; event: MouseEvent | TouchEvent };
+  | { type: "menuSafeZoneTimeout" | "programmatic"; event: Event }
+  | { type: "clickOutside" | "scrollOutside" | "menuMouseEnter"; event: MouseEvent | TouchEvent };
 export type MenuOpenChangeData = { bubble?: boolean; keyboard?: boolean; open: boolean } & MenuOpenChangeSourceData;
 type MenuOpenChangeSource = MenuOpenChangeSourceData & { keyboard?: boolean };
 
@@ -321,9 +321,13 @@ export function defineMenu(): void {
       this.addEventListener("keydown", this.onContextMenuKeyDown, options);
       this.addEventListener("pointerover", this.onPointerOver, options);
       this.addEventListener("pointerout", this.onPointerOut, options);
+      this.addEventListener("mouseover", this.onPanelMouseOver, options);
       this.ownerDocument.addEventListener("pointerdown", this.onOutsidePointerDown, { ...options, capture: true });
+      this.ownerDocument.addEventListener("spui-menu-enter", this.onMenuEnter, options);
+      this.ownerDocument.addEventListener("wheel", this.onScrollOutside, { ...options, capture: true });
+      this.ownerDocument.addEventListener("touchmove", this.onScrollOutside, { ...options, capture: true });
       window.addEventListener("resize", this.position, options);
-      window.addEventListener("scroll", this.onScroll, { ...options, capture: true });
+      window.addEventListener("scroll", this.position, { ...options, capture: true });
       this.shadowRoot?.querySelector("slot[name=trigger]")?.addEventListener("slotchange", this.syncTrigger, options);
       this.panel = this.shadowRoot?.querySelector<HTMLElement>(".surface") as (HTMLElement & { showPopover?: () => void; hidePopover?: () => void }) | undefined;
       if (!this.hasAttribute("placement")) this.setAttribute("placement", this.parentMenu() ? "end" : "bottom");
@@ -514,9 +518,21 @@ export function defineMenu(): void {
       this.clearHoverTimer();
       this.hoverTimer = setTimeout(() => this.setOpen(false, { event, type: "menuTriggerMouseLeave" }), this.hoverDelay());
     };
-    private onScroll = (event: Event): void => {
-      if (this.hasAttribute("close-on-scroll") && this.isOpen && !event.composedPath().some(target => target === this || target instanceof Node && (this.contains(target) || this.shadowRoot?.contains(target)))) this.setOpen(false, { event, type: "scrollOutside" });
-      else this.position();
+    private onPanelMouseOver = (event: MouseEvent): void => {
+      if (!this.panel || !event.composedPath().includes(this.panel)) return;
+      this.dispatchEvent(new CustomEvent("spui-menu-enter", { bubbles: true, composed: true, detail: { nativeEvent: event } }));
+    };
+    private onMenuEnter = (event: Event): void => {
+      const target = event.target;
+      if (!this.isOpen || target === this || target instanceof Node && (this.contains(target) || this.shadowRoot?.contains(target))) return;
+      const nativeEvent = (event as CustomEvent<{ nativeEvent?: Event }>).detail?.nativeEvent;
+      if (nativeEvent instanceof MouseEvent) this.setOpen(false, { event: nativeEvent, type: "menuMouseEnter" });
+    };
+    private onScrollOutside = (event: WheelEvent | TouchEvent): void => {
+      if (!(this.hasAttribute("close-on-scroll") || this.contextEnabled()) || !this.isOpen) return;
+      if (!event.composedPath().some(target => target === this || target instanceof Node && (this.contains(target) || this.shadowRoot?.contains(target)))) {
+        this.setOpen(false, { event, type: "scrollOutside" });
+      }
     };
     private onKeyDown = (event: KeyboardEvent): void => {
       const direction = getComputedStyle(this).direction;

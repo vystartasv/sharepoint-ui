@@ -11,167 +11,31 @@
     "inheritedHandlerCollisions": 0,
     "eventTypeMismatches": 0,
     "payloadEventTypeMismatches": 0,
-    "payloadEventBranchMismatches": 15,
+    "payloadEventBranchMismatches": 0,
     "payloadEventBranchExtensions": 12
   },
   "inheritedHandlerCollisions": [],
   "eventTypeMismatches": [],
   "payloadEventTypeMismatches": [],
-  "payloadEventBranchMismatches": [
-    {
-      "component": "Carousel",
-      "callback": "onActiveIndexChange",
-      "typeBranch": "undefined",
-      "fluentDataEventType": "Event | import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").SyntheticEvent<Element, Event>",
-      "localDataEventType": "<missing>",
-      "fluentAssignableToLocal": false,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "Carousel",
-      "callback": "onActiveIndexChange",
-      "typeBranch": "\"click\"",
-      "fluentDataEventType": "import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "Carousel",
-      "callback": "onActiveIndexChange",
-      "typeBranch": "\"focus\"",
-      "fluentDataEventType": "import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").FocusEvent<Element, Element>",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "Carousel",
-      "callback": "onActiveIndexChange",
-      "typeBranch": "\"drag\"",
-      "fluentDataEventType": "PointerEvent | MouseEvent",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "Carousel",
-      "callback": "onActiveIndexChange",
-      "typeBranch": "\"autoplay\"",
-      "fluentDataEventType": "Event",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "CarouselAutoplayButton",
-      "callback": "onCheckedChange",
-      "typeBranch": "undefined",
-      "fluentDataEventType": "Event | import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").SyntheticEvent<Element, Event>",
-      "localDataEventType": "<missing>",
-      "fluentAssignableToLocal": false,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "CarouselAutoplayButton",
-      "callback": "onCheckedChange",
-      "typeBranch": "\"click\"",
-      "fluentDataEventType": "import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "ListItem",
-      "callback": "onAction",
-      "typeBranch": "undefined",
-      "fluentDataEventType": "Event | import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").SyntheticEvent<Element, Event>",
-      "localDataEventType": "<missing>",
-      "fluentAssignableToLocal": false,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "ListItem",
-      "callback": "onAction",
-      "typeBranch": "\"ListItemAction\"",
-      "fluentDataEventType": "CustomEvent<{ originalEvent: import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").MouseEvent | import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").KeyboardEvent; }>",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "Menu",
-      "callback": "onOpenChange",
-      "typeBranch": "\"scrollOutside\"",
-      "fluentDataEventType": "MouseEvent | TouchEvent",
-      "localDataEventType": "Event",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "Menu",
-      "callback": "onOpenChange",
-      "typeBranch": "\"menuMouseEnter\"",
-      "fluentDataEventType": "MouseEvent | TouchEvent",
-      "localDataEventType": "<missing>",
-      "fluentAssignableToLocal": false,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "TeachingPopoverCarousel",
-      "callback": "onFinish",
-      "typeBranch": "undefined",
-      "fluentDataEventType": "Event | import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").SyntheticEvent<Element, Event>",
-      "localDataEventType": "<missing>",
-      "fluentAssignableToLocal": false,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "TeachingPopoverCarousel",
-      "callback": "onFinish",
-      "typeBranch": "\"click\"",
-      "fluentDataEventType": "import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "TeachingPopoverCarousel",
-      "callback": "onValueChange",
-      "typeBranch": "undefined",
-      "fluentDataEventType": "Event | import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").SyntheticEvent<Element, Event>",
-      "localDataEventType": "<missing>",
-      "fluentAssignableToLocal": false,
-      "localAssignableToFluent": false
-    },
-    {
-      "component": "TeachingPopoverCarousel",
-      "callback": "onValueChange",
-      "typeBranch": "\"click\"",
-      "fluentDataEventType": "import(\"/Users/vilius/.t3/projects/sharepoint-ui/examples/spfx124-webpart/node_modules/@types/react/index\").MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>",
-      "localDataEventType": "SharePointUIEvent",
-      "fluentAssignableToLocal": true,
-      "localAssignableToFluent": false
-    }
-  ],
+  "payloadEventBranchMismatches": [],
   "payloadEventBranchExtensions": [
     {
       "component": "Carousel",
       "callback": "onActiveIndexChange",
       "typeBranch": "\"scroll\"",
-      "localDataEventType": "SharePointUIEvent"
+      "localDataEventType": "Event"
     },
     {
       "component": "Carousel",
       "callback": "onActiveIndexChange",
       "typeBranch": "\"programmatic\"",
-      "localDataEventType": "SharePointUIEvent"
+      "localDataEventType": "Event"
     },
     {
       "component": "Carousel",
       "callback": "onActiveIndexChange",
       "typeBranch": "\"keydown\"",
-      "localDataEventType": "SharePointUIEvent"
+      "localDataEventType": "React.KeyboardEvent<HTMLElement>"
     },
     {
       "component": "Menu",
@@ -219,13 +83,13 @@
       "component": "TeachingPopoverCarousel",
       "callback": "onValueChange",
       "typeBranch": "\"programmatic\"",
-      "localDataEventType": "SharePointUIEvent"
+      "localDataEventType": "Event"
     },
     {
       "component": "TeachingPopoverCarousel",
       "callback": "onValueChange",
       "typeBranch": "\"keydown\"",
-      "localDataEventType": "SharePointUIEvent"
+      "localDataEventType": "React.KeyboardEvent<HTMLElement>"
     }
   ],
   "candidates": []
