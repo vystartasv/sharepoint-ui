@@ -96,7 +96,7 @@
     "verify:table-hooks": "npm run build:library && node scripts/verify-table-hooks.mjs",
     "verify:tabs-parity": "npm run build:library && node scripts/verify-tabs-parity.mjs",
     "verify:date-picker": "npm run build:library && node scripts/verify-date-picker.mjs",
-    "verify:popover-positioning": "npm run build:library && node scripts/verify-popover-positioning.mjs",
+    "verify:popover-positioning": "npm run build:library && node scripts/verify-popover-positioning-contract.mjs && node scripts/verify-popover-positioning.mjs",
     "verify:popover-appearance-size": "npm run build:library && node scripts/verify-popover-appearance-size.mjs",
     "verify:popover-close-scroll": "npm run build:library && node scripts/verify-popover-close-scroll.mjs",
     "verify:popover-default-open": "npm run build:library && node scripts/verify-popover-default-open.mjs",

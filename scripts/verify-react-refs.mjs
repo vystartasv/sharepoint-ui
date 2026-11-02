@@ -46,7 +46,7 @@ try {
     failures: window.probeFailures,
   }));
   const missingRefs = Object.entries(result.refs).filter(([, value]) => !value.tagName || !value.connected).map(([name]) => name);
-  if (missingRefs.length) throw new Error(`React host refs did not mount for ${missingRefs.join(", ")}; probe errors: ${JSON.stringify(result.failures)}; page errors: ${errors.join(" | ")}`);
+  if (missingRefs.length) throw new Error(`React host refs did not mount for ${missingRefs.join(", ")}; probe errors: ${JSON.stringify(result.failures)}; Option probe: ${JSON.stringify(result.refs.Option)}; option nodes: ${await page.locator("[role=option]").count()}; page errors: ${errors.join(" | ")}`);
   for (const component of refComponents) {
     const ref = result.refs[component.react];
     const expectedTag = ({ InfoLabel: "SPAN", Option: "DIV", OptionGroup: "DIV" })[component.react] ?? component.tag.toUpperCase();

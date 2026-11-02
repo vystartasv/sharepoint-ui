@@ -389,7 +389,7 @@
       ],
       "localStatus": "partial",
       "purpose": "Show a non-modal surface associated with a trigger.",
-      "coverageNote": "Popover supports composable Trigger and Surface parts in React and custom elements, collision-aware placement, ordered fallbackPositions, pinned placement, autoSize modes, matchTargetSize, RTL, and viewport clamping. Focused Chromium checks cover fallback priority, sizing, and interactions. Configurable collision boundaries and strategy, assistive technology, tenant, and performance parity remain open."
+      "coverageNote": "Popover supports composable Trigger and Surface parts in React and custom elements plus the Fluent PositioningShorthand contract: ordered fallbacks, explicit/clipping/scroll boundaries, sizing, width matching, offset callbacks, virtual targets, positioning refs, strategy, transforms, resize-observer control, target covering, and positioning-end events. Chromium checks cover RTL, clipping, boundary intersections, retargeting, update refs, transform placement, offset callbacks, resize behavior, and zero page errors. Cross-browser, assistive-technology, SharePoint tenant, visual, and family performance parity remain open."
     },
     {
       "family": "progress",

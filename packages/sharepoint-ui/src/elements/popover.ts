@@ -7,10 +7,17 @@ export type PopoverAlignment = FloatingAlign;
 export type PopoverAutoSize = boolean | "always" | "width" | "width-always" | "height" | "height-always";
 export type PopoverBoundaryRect = { x: number; y: number; width: number; height: number };
 export type PopoverBoundary = Element | DOMRectReadOnly | PopoverBoundaryRect | readonly Element[] | "clippingParents" | "scrollParent" | "window" | null;
-export type PopoverOffset = number | { mainAxis?: number; crossAxis?: number };
+export type PopoverPositioningTargetRect = PopoverBoundaryRect & Pick<DOMRectReadOnly, "top" | "left" | "bottom" | "right">;
+export type PopoverOffsetParams = { positionedRect: PopoverBoundaryRect; targetRect: PopoverBoundaryRect; position: "above" | "below" | "before" | "after"; alignment?: PopoverAlignment };
+export type PopoverOffset = number | { mainAxis: number; crossAxis?: number } | ((params: PopoverOffsetParams) => number | { mainAxis: number; crossAxis?: number });
 export type PopoverBoundaryPadding = number | Partial<Record<"top" | "end" | "bottom" | "start", number>>;
-export type PopoverTarget = Element | { getBoundingClientRect: () => DOMRectReadOnly; contextElement?: Element } | null;
-export type PopoverPositioning = PopoverPosition | `${"above" | "below" | "before" | "after"}-${"start" | "end" | "top" | "bottom"}` | { position?: PopoverPosition; align?: PopoverAlignment; offset?: PopoverOffset; fallbackPositions?: Array<PopoverPosition | `${"above" | "below" | "before" | "after"}-${"start" | "end" | "top" | "bottom"}`>; autoSize?: PopoverAutoSize; matchTargetSize?: boolean; pinned?: boolean; flipBoundary?: PopoverBoundary; overflowBoundary?: PopoverBoundary; overflowBoundaryPadding?: PopoverBoundaryPadding; positionFixed?: boolean; strategy?: "absolute" | "fixed"; target?: PopoverTarget; coverTarget?: boolean; arrowPadding?: number };
+export type PopoverTarget = Element | { getBoundingClientRect: () => PopoverPositioningTargetRect; contextElement?: Element } | null;
+export type PopoverPositioningPlacement = "top" | "top-start" | "top-end" | "right" | "right-start" | "right-end" | "bottom" | "bottom-start" | "bottom-end" | "left" | "left-start" | "left-end";
+export type PopoverPositioningEndData = { placement: PopoverPositioningPlacement; escaped: boolean; referenceHidden: boolean };
+export type PopoverPositioningImperativeRef = { updatePosition: () => void; setTarget: (target: PopoverTarget) => void };
+export type PopoverPositioningRef = { readonly current: PopoverPositioningImperativeRef | null } | ((value: PopoverPositioningImperativeRef | null) => void) | null;
+export type PopoverPositioningOptions = { position?: PopoverPosition; align?: PopoverAlignment; offset?: PopoverOffset; fallbackPositions?: Array<PopoverPosition | `${"above" | "below" | "before" | "after"}-${"start" | "end" | "top" | "bottom"}`>; autoSize?: PopoverAutoSize; matchTargetSize?: boolean | "width"; pinned?: boolean; flipBoundary?: PopoverBoundary; overflowBoundary?: PopoverBoundary; overflowBoundaryPadding?: PopoverBoundaryPadding; positionFixed?: boolean; strategy?: "absolute" | "fixed"; target?: PopoverTarget; coverTarget?: boolean; arrowPadding?: number; positioningRef?: PopoverPositioningRef; onPositioningEnd?: (event: CustomEvent<PopoverPositioningEndData>) => void; disableUpdateOnResize?: boolean; shiftToCoverTarget?: boolean; useTransform?: boolean };
+export type PopoverPositioning = PopoverPosition | `${"above" | "below" | "before" | "after"}-${"start" | "end" | "top" | "bottom"}` | PopoverPositioningOptions;
 
 type BoundaryEdges = Pick<DOMRectReadOnly, "left" | "top" | "right" | "bottom">;
 
@@ -156,7 +163,7 @@ export function definePopover(): void {
     }
 
     get positioning(): PopoverPositioning { return this.positioningValue ?? this.getAttribute("positioning") as PopoverPositioning ?? this.getAttribute("placement") as PopoverPosition ?? (this.hasAttribute("open-on-context") ? "above" : "bottom"); }
-    set positioning(value: PopoverPositioning) { this.positioningValue = value; this.position(); }
+    set positioning(value: PopoverPositioning) { this.positioningValue = value; this.syncPositionObserver(); this.position(); }
 
     get open(): boolean { return this.isOpen; }
     set open(value: boolean) { this.setOpen(Boolean(value)); }
@@ -188,8 +195,8 @@ export function definePopover(): void {
       this.panel = this.shadowRoot?.querySelector<HTMLElement>(".surface") as (HTMLElement & { showPopover?: () => void; hidePopover?: () => void }) | undefined;
       this.panel?.addEventListener("pointerenter", this.onHoverEnter, options);
       this.panel?.addEventListener("pointerleave", this.onHoverLeave, options);
-      this.resizeObserver = new ResizeObserver(this.position);
-      if (this.panel) this.resizeObserver.observe(this.panel);
+      this.resizeObserver = new ResizeObserver(() => { if (!this.positioningOptions?.disableUpdateOnResize) this.position(); });
+      this.syncPositionObserver();
       this.isOpen = this.hasAttribute("open") || this.hasAttribute("default-open");
       this.syncTrigger();
       this.syncLabel();
@@ -200,6 +207,9 @@ export function definePopover(): void {
       this.observer?.disconnect();
       this.resizeObserver?.disconnect();
       this.events?.abort();
+      const positioningRef = this.positioningOptions?.positioningRef;
+      if (typeof positioningRef === "function") positioningRef(null);
+      else if (positioningRef) (positioningRef as { current: PopoverPositioningImperativeRef | null }).current = null;
       if (this.hoverTimer !== undefined) clearTimeout(this.hoverTimer);
       if (this.iframeBlurTimer !== undefined) clearTimeout(this.iframeBlurTimer);
       this.restoreTrigger();
@@ -383,6 +393,33 @@ export function definePopover(): void {
       syncInertFocusState(this.ownerDocument, this, this.assigned("trigger"), this.isOpen && this.trapFocusEnabled && this.inertTrapFocusEnabled);
     }
 
+    private get positioningOptions(): PopoverPositioningOptions | undefined { return typeof this.positioning === "object" && this.positioning !== null ? this.positioning : undefined; }
+
+    private syncPositionObserver(): void {
+      if (!this.resizeObserver) return;
+      this.resizeObserver.disconnect();
+      const options = this.positioningOptions;
+      const target = options?.target;
+      const context = target && "contextElement" in target ? target.contextElement : target && "nodeType" in target ? target as Element : undefined;
+      this.positioningTarget = context;
+      if (!options?.disableUpdateOnResize) {
+        if (this.panel) this.resizeObserver.observe(this.panel);
+        if (this.trigger) this.resizeObserver.observe(this.trigger);
+        if (context && context !== this.trigger) this.resizeObserver.observe(context);
+      }
+      const ref = options?.positioningRef;
+      const value: PopoverPositioningImperativeRef = {
+        updatePosition: this.position,
+        setTarget: targetValue => {
+          this.positioningValue = { ...(this.positioningOptions ?? {}), target: targetValue };
+          this.syncPositionObserver();
+          this.position();
+        },
+      };
+      if (typeof ref === "function") ref(value);
+      else if (ref) (ref as { current: PopoverPositioningImperativeRef | null }).current = value;
+    }
+
     private position = (): void => {
       const trigger = this.trigger;
       const panel = this.panel;
@@ -407,14 +444,20 @@ export function definePopover(): void {
       const placement = aliases[rawPosition as keyof typeof aliases] ?? rawPosition as FloatingPlacement;
       const align = (typeof configured === "object" ? configured.align : undefined) ?? shorthandAlign ?? this.getAttribute("align") as FloatingAlign | null ?? "center";
       const rawOffset = typeof configured === "object" ? configured.offset : undefined;
-      const offset = typeof rawOffset === "number" ? rawOffset : rawOffset?.mainAxis ?? Number(this.getAttribute("offset") ?? 8);
-      const crossAxisOffset = typeof rawOffset === "object" ? rawOffset.crossAxis ?? 0 : 0;
+      const computedOffset = typeof rawOffset === "function" ? rawOffset({
+        positionedRect: { x: 0, y: 0, width: panel.offsetWidth, height: panel.offsetHeight },
+        targetRect: { x: anchor.x, y: anchor.y, width: anchor.width, height: anchor.height },
+        position: rawPosition === "above" || rawPosition === "below" || rawPosition === "before" || rawPosition === "after" ? rawPosition : "below",
+        alignment: align,
+      }) : rawOffset;
+      const offset = typeof computedOffset === "number" ? computedOffset : computedOffset?.mainAxis ?? Number(this.getAttribute("offset") ?? 8);
+      const crossAxisOffset = typeof computedOffset === "object" ? computedOffset.crossAxis ?? 0 : 0;
       const fallbackPlacements = typeof configured === "object" ? (configured.fallbackPositions ?? []).map(fallback => {
         const [fallbackSide, fallbackAlign] = fallback.split(/-(?=(?:start|end|top|bottom)$)/) as [PopoverPosition, FloatingAlign?];
         return { placement: aliases[fallbackSide as keyof typeof aliases] ?? fallbackSide as FloatingPlacement, align: fallbackAlign ?? align };
       }) : [];
       const autoSize = typeof configured === "object" ? configured.autoSize : false;
-      const matchTargetSize = typeof configured === "object" && configured.matchTargetSize === true;
+      const matchTargetSize = typeof configured === "object" && (configured.matchTargetSize === true || configured.matchTargetSize === "width");
       const pinned = typeof configured === "object" && configured.pinned === true;
       const coverTarget = typeof configured === "object" && configured.coverTarget === true;
       const arrowPadding = Math.max(0, typeof configured === "object" ? configured.arrowPadding ?? 8 : 8);
@@ -432,7 +475,11 @@ export function definePopover(): void {
       panel.style.overflowX = "";
       panel.style.overflowY = "";
       panel.style.width = matchTargetSize ? `${anchor.width}px` : "";
-      const result = getFloatingPosition(anchor, { width: panel.offsetWidth, height: panel.offsetHeight }, placement, direction === "rtl" ? "rtl" : "ltr", offset, undefined, align, fallbackPlacements, pinned, flipBoundary, overflowBoundary, { crossAxisOffset, coverTarget, overflowBoundaryPadding: boundaryPadding });
+      const modifiers = { crossAxisOffset, coverTarget, overflowBoundaryPadding: boundaryPadding };
+      let result = getFloatingPosition(anchor, { width: panel.offsetWidth, height: panel.offsetHeight }, placement, direction === "rtl" ? "rtl" : "ltr", offset, undefined, align, fallbackPlacements, pinned, flipBoundary, overflowBoundary, modifiers);
+      const flipBounds = flipBoundary ?? viewportBoundaryRect();
+      const overflowsFlipBoundary = result.left < flipBounds.left || result.top < flipBounds.top || result.left + panel.offsetWidth > flipBounds.right || result.top + panel.offsetHeight > flipBounds.bottom;
+      if (this.positioningOptions?.shiftToCoverTarget && overflowsFlipBoundary && !coverTarget) result = getFloatingPosition(anchor, { width: panel.offsetWidth, height: panel.offsetHeight }, placement, direction === "rtl" ? "rtl" : "ltr", offset, undefined, align, fallbackPlacements, pinned, flipBoundary, overflowBoundary, { ...modifiers, coverTarget: true });
       const clampArrow = (value: number, size: number): number => Math.max(arrowPadding, Math.min(value, Math.max(arrowPadding, size - arrowPadding - 8)));
       const arrowInline = direction === "rtl" ? result.left + panel.offsetWidth - anchor.left - anchor.width / 2 - 4 : anchor.left + anchor.width / 2 - result.left - 4;
       const arrowBlock = anchor.top + anchor.height / 2 - result.top - 4;
@@ -453,8 +500,24 @@ export function definePopover(): void {
         if (panel.offsetHeight > availableHeight) { panel.style.height = `${availableHeight}px`; panel.style.overflowY = "auto"; }
       }
       panel.dataset.placement = result.placement;
-      panel.style.left = `${result.left}px`;
-      panel.style.top = `${result.top}px`;
+      const strategy = this.positioningOptions?.strategy ?? (this.positioningOptions?.positionFixed === true ? "fixed" : "absolute");
+      panel.style.position = strategy;
+      const pageOffset = strategy === "absolute" ? { x: window.scrollX, y: window.scrollY } : { x: 0, y: 0 };
+      const left = result.left + pageOffset.x;
+      const top = result.top + pageOffset.y;
+      const useTransform = this.positioningOptions?.useTransform !== false;
+      panel.style.left = useTransform ? "0px" : `${left}px`;
+      panel.style.top = useTransform ? "0px" : `${top}px`;
+      panel.style.translate = useTransform ? `${left}px ${top}px` : "0px 0px";
+      const inlinePlacement = result.placement === "top" || result.placement === "bottom" ? result.align === "start" || result.align === "end" ? `-${result.align}` : "" : result.align === "top" ? "-start" : result.align === "bottom" ? "-end" : "";
+      const bounds = overflowBoundary ?? viewportBoundaryRect();
+      const detail: PopoverPositioningEndData = {
+        placement: `${result.placement}${inlinePlacement}` as PopoverPositioningPlacement,
+        escaped: result.left < bounds.left || result.top < bounds.top || result.left + panel.offsetWidth > bounds.right || result.top + panel.offsetHeight > bounds.bottom,
+        referenceHidden: anchor.bottom <= 0 || anchor.top >= window.innerHeight || anchor.right <= 0 || anchor.left >= window.innerWidth,
+      };
+      this.positioningOptions?.onPositioningEnd?.(new CustomEvent("fui-positioningend", { detail }));
+      panel.dispatchEvent(new CustomEvent("fui-positioningend", { bubbles: true, detail }));
     };
 
     private onScroll = (event: Event): void => {

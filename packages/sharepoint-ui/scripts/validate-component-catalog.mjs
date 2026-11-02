@@ -17,8 +17,8 @@ for (const component of catalog.components) {
   if (!component.reactOnly && !exportName) errors.push(`${component.react}: missing custom-element definition or native-element factory`);
   const signature = component.api.reactRefType
     ? (() => {
-      const declaration = `export const ${component.react} = React.forwardRef<${component.api.reactRefType},`;
-      const declarationIndex = adapter.indexOf(declaration);
+      const declaration = new RegExp(`export const ${component.react} = (?:/\\* @__PURE__ \\*/ )?React\\.forwardRef<${component.api.reactRefType},`);
+      const declarationIndex = adapter.search(declaration);
       const generic = component.api.generic ? `<${component.api.generic}>` : "";
       const forwardedRef = component.api.forwardRefParameterType ? `forwardedRef: ${component.api.forwardRefParameterType}` : "forwardedRef";
       const functionSignature = `function ${component.react}${generic}(${component.api.reactSignature}, ${forwardedRef})`;

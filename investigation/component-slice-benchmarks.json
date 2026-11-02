@@ -7514,7 +7514,7 @@
     "caveat": "Local SPFx 1.24 production package after Compound Combobox and Virtualizer scroll-view work, including lazy dynamic size caching and RTL end anchoring. Cumulative package size, not per-component attribution; not tenant-deployed."
   },
   "popoverFallbackPositions": {
-    "measuredOn": "2026-11-01",
+    "measuredOn": "2026-11-02",
     "reference": "@fluentui/react-components@9.75.0 Popover positioning via @fluentui/react-positioning",
     "verifier": "scripts/verify-popover-positioning-prop.mjs and scripts/verify-popover-positioning.mjs",
     "checks": {
@@ -7528,23 +7528,37 @@
       "autoSizeWidth": true,
       "matchTargetSize": true,
       "pinnedPlacement": true,
-      "crossAxisFitAndFallbackAlignment": true
+      "crossAxisFitAndFallbackAlignment": true,
+      "positioningRef": true,
+      "virtualTargetRetarget": true,
+      "offsetCallback": true,
+      "positioningEndEvent": true,
+      "disableUpdateOnResize": true,
+      "shiftToCoverTarget": true,
+      "absolutePageScrollCompensation": true,
+      "pureForwardRefTreeShaking": true
     },
     "customElement": {
-      "rawBytes": 20124,
-      "gzipBytes": 6148,
-      "brotliBytes": 5475,
+      "rawBytes": 27559,
+      "gzipBytes": 8300,
+      "brotliBytes": 7434,
       "inputModules": 4,
       "includedModules": 4
     },
     "reactAdapter": {
-      "rawBytes": 43696,
-      "gzipBytes": 11678,
-      "brotliBytes": 10305,
-      "inputModules": 68,
+      "rawBytes": 58860,
+      "gzipBytes": 16181,
+      "brotliBytes": 14293,
+      "inputModules": 69,
       "includedModules": 6
     },
-    "caveat": "Tree-shaken minified JavaScript excludes React runtime, CSS, and host costs. Configurable collision boundaries and positioning strategy remain open."
+    "reactAdapterBeforePureAnnotations": {
+      "rawBytes": 865827,
+      "gzipBytes": 186806,
+      "brotliBytes": 140558,
+      "includedModules": 62
+    },
+    "caveat": "The React adapter measures one selected export with React externalized. Pure annotations on all React.forwardRef wrappers reduce this Popover slice from 186,806 to 16,181 gzip bytes (91.3%); 69 graph modules are examined and 6 remain in the bundle. These figures exclude React runtime, CSS, and SharePoint host costs. This local slice measurement does not establish page-level or tenant performance."
   },
   "latestPopoverSpfxBuild": {
     "measuredOn": "2026-11-01",

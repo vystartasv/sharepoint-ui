@@ -58,7 +58,7 @@ import { defineTabs } from "./elements/tabs.js";
 import { defineTooltip, type TooltipAppearance, type TooltipPositioning, type TooltipRelationship, type TooltipVisibleChangeData } from "./elements/tooltip.js";
 export type { TooltipPositioning, TooltipPositioningBoundary, TooltipPositioningEndData, TooltipPositioningImperativeRef, TooltipPositioningOffset, TooltipPositioningOffsetParams, TooltipPositioningOptions, TooltipPositioningPlacement, TooltipPositioningRect, TooltipPositioningRef, TooltipPositioningShorthand, TooltipPositioningTarget, TooltipPositioningTargetRect } from "./elements/tooltip.js";
 import { definePopover, type PopoverOpenChangeData, type PopoverPositioning } from "./elements/popover.js";
-export type { PopoverAlignment, PopoverAutoSize, PopoverBoundary, PopoverBoundaryPadding, PopoverBoundaryRect, PopoverOffset, PopoverOpenChangeData, PopoverPosition, PopoverPositioning, PopoverTarget } from "./elements/popover.js";
+export type { PopoverAlignment, PopoverAutoSize, PopoverBoundary, PopoverBoundaryPadding, PopoverBoundaryRect, PopoverOffset, PopoverOffsetParams, PopoverOpenChangeData, PopoverPosition, PopoverPositioning, PopoverPositioningEndData, PopoverPositioningImperativeRef, PopoverPositioningOptions, PopoverPositioningPlacement, PopoverPositioningRef, PopoverPositioningTargetRect, PopoverTarget } from "./elements/popover.js";
 import { defineTeachingPopover as defineNativeTeachingPopover, type TeachingPopoverCarouselValueChangeType } from "./elements/teaching-popover.js";
 export type { TeachingPopoverCarouselValueChangeType, TeachingPopoverCarouselValueChangeDetail, TeachingPopoverFinishDetail } from "./elements/teaching-popover.js";
 import { defineMenu, defineMenuItem, defineMenuItemLink, defineMenuDivider, defineMenuGroup, defineMenuGroupHeader, defineMenuList, defineMenuPopover, defineMenuSplitGroup, defineMenuTrigger, defineMenuBar as defineNativeMenuBar, defineMenuBarItem, type MenuOpenChangeData } from "./elements/menu.js";
@@ -388,7 +388,7 @@ export function SharePointUIProvider({ children, lang, dir, appearance, baseAppe
 }
 
 export type TextProps = ElementProps & { as?: TextTag; size?: TextSize; weight?: TextWeight; font?: TextFont; align?: "start" | "center" | "end" | "justify"; italic?: boolean; underline?: boolean; strikethrough?: boolean; truncate?: boolean; wrap?: boolean; block?: boolean; children?: React.ReactNode };
-export const Text = React.forwardRef<HTMLElement, TextProps>(function Text({ as = "span", size = 300, weight, font = "base", align = "start", italic = false, underline = false, strikethrough = false, truncate = false, wrap = true, block = false, children, ...props }: TextProps, forwardedRef): React.ReactElement {
+export const Text = /* @__PURE__ */ React.forwardRef<HTMLElement, TextProps>(function Text({ as = "span", size = 300, weight, font = "base", align = "start", italic = false, underline = false, strikethrough = false, truncate = false, wrap = true, block = false, children, ...props }: TextProps, forwardedRef): React.ReactElement {
   ensureDefined(defineText);
   return React.createElement("spui-text", useCustomElementProps({ ...props, ref: forwardedRef, as, size, weight, font, align, italic: italic || undefined, underline: underline || undefined, strikethrough: strikethrough || undefined, truncate: truncate || undefined, wrap: wrap ? undefined : "false", block: block || undefined }), children);
 });
@@ -429,7 +429,7 @@ export function Label({ htmlFor, size = "medium", weight = "regular", required =
 
 export type InfoButtonPopoverProps = { label?: string; placement?: InfoPlacement; arrow?: boolean; trapFocus?: boolean };
 
-export const InfoButton = React.forwardRef<HTMLElement, ElementProps & { info?: React.ReactNode; children?: React.ReactNode; label?: string; placement?: InfoPlacement; size?: "small" | "medium" | "large"; inline?: boolean; popover?: InfoButtonPopoverProps; open?: boolean; onOpenChange?: (open: boolean) => void }>(function InfoButton({ info, children, label, placement = "top", size = "medium", inline = true, popover, open, onOpenChange, ...props }: ElementProps & { info?: React.ReactNode; children?: React.ReactNode; label?: string; placement?: InfoPlacement; size?: "small" | "medium" | "large"; inline?: boolean; popover?: InfoButtonPopoverProps; open?: boolean; onOpenChange?: (open: boolean) => void }, forwardedRef): React.ReactElement {
+export const InfoButton = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { info?: React.ReactNode; children?: React.ReactNode; label?: string; placement?: InfoPlacement; size?: "small" | "medium" | "large"; inline?: boolean; popover?: InfoButtonPopoverProps; open?: boolean; onOpenChange?: (open: boolean) => void }>(function InfoButton({ info, children, label, placement = "top", size = "medium", inline = true, popover, open, onOpenChange, ...props }: ElementProps & { info?: React.ReactNode; children?: React.ReactNode; label?: string; placement?: InfoPlacement; size?: "small" | "medium" | "large"; inline?: boolean; popover?: InfoButtonPopoverProps; open?: boolean; onOpenChange?: (open: boolean) => void }, forwardedRef): React.ReactElement {
   const context = React.useContext(UIContext);
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -446,7 +446,7 @@ export type InfoLabelLabelSlot = React.ReactElement<any> | Omit<Parameters<typeo
 export type InfoLabelButtonSlot = React.ReactElement<any> | Omit<Parameters<typeof InfoButton>[0], "children" | "info">;
 
 export type InfoLabelProps = React.HTMLAttributes<HTMLSpanElement> & { children?: React.ReactNode; info: React.ReactNode; htmlFor?: string; size?: LabelSize; weight?: LabelWeight; required?: LabelRequired; disabled?: boolean; infoButtonLabel?: string; placement?: InfoPlacement; label?: InfoLabelLabelSlot; infoButton?: InfoLabelButtonSlot | null };
-export const InfoLabel = React.forwardRef<HTMLSpanElement, InfoLabelProps>(function InfoLabel({ children, info, htmlFor, size = "medium", weight = "regular", required = false, disabled = false, infoButtonLabel, placement = "top", label, infoButton, style, ...props }: InfoLabelProps, forwardedRef): React.ReactElement {
+export const InfoLabel = /* @__PURE__ */ React.forwardRef<HTMLSpanElement, InfoLabelProps>(function InfoLabel({ children, info, htmlFor, size = "medium", weight = "regular", required = false, disabled = false, infoButtonLabel, placement = "top", label, infoButton, style, ...props }: InfoLabelProps, forwardedRef): React.ReactElement {
   const context = React.useContext(UIContext);
   const labelElement = label as React.ReactElement<any> | undefined;
   const infoButtonElement = infoButton as React.ReactElement<any> | null | undefined;
@@ -469,7 +469,7 @@ export function useButtonContext(): ButtonContextValue { return React.useContext
 
 export type ButtonProps = ElementProps & { as?: "button" | "a"; href?: string; target?: string; rel?: string; download?: string | boolean; hrefLang?: string; referrerPolicy?: string; form?: string; formAction?: string; formEncType?: string; formMethod?: string; formNoValidate?: boolean; formTarget?: string; name?: string; value?: string | number | readonly string[]; type?: "button" | "submit" | "reset"; variant?: "primary" | "default"; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; iconOnly?: boolean; disabled?: boolean; disabledFocusable?: boolean; vertical?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after" };
 
-export const Button = React.forwardRef<HTMLElement, ButtonProps>(function Button({ as = "button", icon, iconPosition = "before", disabledFocusable = false, vertical = false, download, hrefLang, referrerPolicy, formAction, formEncType, formMethod, formNoValidate, formTarget, value, ...props }: ButtonProps, forwardedRef): React.ReactElement {
+export const Button = /* @__PURE__ */ React.forwardRef<HTMLElement, ButtonProps>(function Button({ as = "button", icon, iconPosition = "before", disabledFocusable = false, vertical = false, download, hrefLang, referrerPolicy, formAction, formEncType, formMethod, formNoValidate, formTarget, value, ...props }: ButtonProps, forwardedRef): React.ReactElement {
   ensureDefined(defineButton);
   const buttonContext = useButtonContext();
   const iconOnly = props.iconOnly ?? (icon != null && props.children == null);
@@ -477,7 +477,7 @@ export const Button = React.forwardRef<HTMLElement, ButtonProps>(function Button
 });
 
 /** A themed menu trigger. Compose it as Menu's trigger; Menu owns open state, focus, and dismissal. */
-export const MenuButton = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; menuIcon?: React.ReactNode; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; type?: "button" | "submit" | "reset" }>(function MenuButton({ children, icon, menuIcon, appearance = "secondary", size = "medium", shape = "rounded", disabled, disabledFocusable = false, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; menuIcon?: React.ReactNode; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; type?: "button" | "submit" | "reset" }, forwardedRef): React.ReactElement {
+export const MenuButton = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; menuIcon?: React.ReactNode; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; type?: "button" | "submit" | "reset" }>(function MenuButton({ children, icon, menuIcon, appearance = "secondary", size = "medium", shape = "rounded", disabled, disabledFocusable = false, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; menuIcon?: React.ReactNode; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; type?: "button" | "submit" | "reset" }, forwardedRef): React.ReactElement {
   ensureDefined(defineMenuButton);
   return React.createElement("spui-menu-button", useCustomElementProps({ ref: forwardedRef, ...props, appearance, size, shape, disabled: disabled || undefined, "disabled-focusable": disabledFocusable || undefined }),
     icon == null ? null : React.createElement("span", { slot: "icon", "aria-hidden": true }, icon),
@@ -485,12 +485,12 @@ export const MenuButton = React.forwardRef<HTMLElement, ElementProps & { childre
     menuIcon == null ? null : React.createElement("span", { slot: "menu-icon", "aria-hidden": true }, menuIcon));
 });
 
-export const ButtonGroup = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; orientation?: "horizontal" | "vertical"; label?: string }>(function ButtonGroup({ children, orientation = "horizontal", label, ...props }: ElementProps & { children?: React.ReactNode; orientation?: "horizontal" | "vertical"; label?: string }, forwardedRef): React.ReactElement {
+export const ButtonGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; orientation?: "horizontal" | "vertical"; label?: string }>(function ButtonGroup({ children, orientation = "horizontal", label, ...props }: ElementProps & { children?: React.ReactNode; orientation?: "horizontal" | "vertical"; label?: string }, forwardedRef): React.ReactElement {
   ensureDefined(defineButtonGroup);
   return React.createElement("spui-button-group", useCustomElementProps({ ref: forwardedRef, ...props, orientation, "aria-label": label ?? props["aria-label"] }), children);
 });
 
-export const CompoundButton = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; secondaryContent?: React.ReactNode; contentContainer?: React.ReactElement; icon?: React.ReactNode; iconPosition?: "before" | "after"; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean }>(function CompoundButton({ children, secondaryContent, contentContainer, icon, iconPosition = "before", appearance = "secondary", size = "medium", shape = "rounded", disabled, disabledFocusable = false, ...props }: ElementProps & { children?: React.ReactNode; secondaryContent?: React.ReactNode; contentContainer?: React.ReactElement; icon?: React.ReactNode; iconPosition?: "before" | "after"; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean }, forwardedRef): React.ReactElement {
+export const CompoundButton = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; secondaryContent?: React.ReactNode; contentContainer?: React.ReactElement; icon?: React.ReactNode; iconPosition?: "before" | "after"; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean }>(function CompoundButton({ children, secondaryContent, contentContainer, icon, iconPosition = "before", appearance = "secondary", size = "medium", shape = "rounded", disabled, disabledFocusable = false, ...props }: ElementProps & { children?: React.ReactNode; secondaryContent?: React.ReactNode; contentContainer?: React.ReactElement; icon?: React.ReactNode; iconPosition?: "before" | "after"; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean }, forwardedRef): React.ReactElement {
   ensureDefined(defineCompoundButton);
   const customContent = contentContainer == null ? null : React.cloneElement(contentContainer, { slot: "content-container" },
     React.createElement("span", { className: "title", "data-content-title": "", style: { fontWeight: 600 } }, children),
@@ -501,7 +501,7 @@ export const CompoundButton = React.forwardRef<HTMLElement, ElementProps & { chi
     customContent == null && secondaryContent != null ? React.createElement("span", { slot: "secondary-content" }, secondaryContent) : null);
 });
 
-export const ToggleButton = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; pressed?: boolean; defaultPressed?: boolean; checked?: boolean; defaultChecked?: boolean; isAccessible?: boolean; onPressedChange?: (pressed: boolean) => void; onCheckedChange?: (checked: boolean) => void; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after"; name?: string; value?: string }>(function ToggleButton({ children, pressed, defaultPressed, checked, defaultChecked, isAccessible = false, onPressedChange, onCheckedChange, appearance = "secondary", size = "medium", shape = "rounded", disabled, disabledFocusable = false, icon, iconPosition = "before", ...props }: ElementProps & { children?: React.ReactNode; pressed?: boolean; defaultPressed?: boolean; checked?: boolean; defaultChecked?: boolean; isAccessible?: boolean; onPressedChange?: (pressed: boolean) => void; onCheckedChange?: (checked: boolean) => void; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after"; name?: string; value?: string }, forwardedRef): React.ReactElement {
+export const ToggleButton = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; pressed?: boolean; defaultPressed?: boolean; checked?: boolean; defaultChecked?: boolean; isAccessible?: boolean; onPressedChange?: (pressed: boolean) => void; onCheckedChange?: (checked: boolean) => void; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after"; name?: string; value?: string }>(function ToggleButton({ children, pressed, defaultPressed, checked, defaultChecked, isAccessible = false, onPressedChange, onCheckedChange, appearance = "secondary", size = "medium", shape = "rounded", disabled, disabledFocusable = false, icon, iconPosition = "before", ...props }: ElementProps & { children?: React.ReactNode; pressed?: boolean; defaultPressed?: boolean; checked?: boolean; defaultChecked?: boolean; isAccessible?: boolean; onPressedChange?: (pressed: boolean) => void; onCheckedChange?: (checked: boolean) => void; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after"; name?: string; value?: string }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   ensureDefined(defineToggleButton);
@@ -514,7 +514,7 @@ export const ToggleButton = React.forwardRef<HTMLElement, ElementProps & { child
 
 function isReactElement(value: unknown): value is React.ReactElement { return React.isValidElement(value); }
 
-export const SplitButton = React.forwardRef<HTMLElement, ElementProps & { children: React.ReactNode; menuItems: React.ReactNode; menuLabel?: string; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after"; menuIcon?: React.ReactNode; onClick?: React.MouseEventHandler<HTMLElement>; primaryActionButton?: React.ReactElement | Partial<React.ComponentProps<typeof Button>>; menuButton?: React.ReactElement | Partial<React.ComponentProps<typeof MenuButton>> }>(function SplitButton({ children, menuItems, menuLabel, appearance = "primary", size = "medium", shape = "rounded", disabled, disabledFocusable = false, icon, iconPosition = "before", menuIcon, onClick, primaryActionButton, menuButton, ...props }: ElementProps & { children: React.ReactNode; menuItems: React.ReactNode; menuLabel?: string; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after"; menuIcon?: React.ReactNode; onClick?: React.MouseEventHandler<HTMLElement>; primaryActionButton?: React.ReactElement | Partial<React.ComponentProps<typeof Button>>; menuButton?: React.ReactElement | Partial<React.ComponentProps<typeof MenuButton>> }, forwardedRef): React.ReactElement {
+export const SplitButton = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children: React.ReactNode; menuItems: React.ReactNode; menuLabel?: string; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after"; menuIcon?: React.ReactNode; onClick?: React.MouseEventHandler<HTMLElement>; primaryActionButton?: React.ReactElement | Partial<React.ComponentProps<typeof Button>>; menuButton?: React.ReactElement | Partial<React.ComponentProps<typeof MenuButton>> }>(function SplitButton({ children, menuItems, menuLabel, appearance = "primary", size = "medium", shape = "rounded", disabled, disabledFocusable = false, icon, iconPosition = "before", menuIcon, onClick, primaryActionButton, menuButton, ...props }: ElementProps & { children: React.ReactNode; menuItems: React.ReactNode; menuLabel?: string; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after"; menuIcon?: React.ReactNode; onClick?: React.MouseEventHandler<HTMLElement>; primaryActionButton?: React.ReactElement | Partial<React.ComponentProps<typeof Button>>; menuButton?: React.ReactElement | Partial<React.ComponentProps<typeof MenuButton>> }, forwardedRef): React.ReactElement {
   ensureDefined(defineSplitButton);
   const strings = React.useContext(UIContext).strings;
   const resolvedMenuLabel = menuLabel ?? strings.splitButtonMenuLabel ?? "More options";
@@ -537,7 +537,7 @@ export type ToolbarCheckedValueChangeEvent = React.MouseEvent | React.KeyboardEv
 export type ToolbarCheckedValueChangeData = { name: string; checkedItems: string[] };
 export type ToolbarProps = ElementProps & { children?: React.ReactNode; label?: string; orientation?: "horizontal" | "vertical"; vertical?: boolean; loop?: boolean; size?: "small" | "medium" | "large"; checkedValues?: ToolbarCheckedValues; defaultCheckedValues?: ToolbarCheckedValues; onCheckedValueChange?: (event: ToolbarCheckedValueChangeEvent, data: ToolbarCheckedValueChangeData) => void };
 
-export const Toolbar = React.forwardRef<HTMLElement, ToolbarProps>(function Toolbar({ children, label, orientation = "horizontal", vertical, loop = true, size = "medium", checkedValues, defaultCheckedValues, onCheckedValueChange, ...props }: ToolbarProps, forwardedRef): React.ReactElement {
+export const Toolbar = /* @__PURE__ */ React.forwardRef<HTMLElement, ToolbarProps>(function Toolbar({ children, label, orientation = "horizontal", vertical, loop = true, size = "medium", checkedValues, defaultCheckedValues, onCheckedValueChange, ...props }: ToolbarProps, forwardedRef): React.ReactElement {
   const ref = React.useRef<(HTMLElement & { checkedValues?: ToolbarCheckedValues; defaultCheckedValues?: ToolbarCheckedValues }) | null>(null)
   useExposeHostRef(ref, forwardedRef);;
   ensureDefined(defineToolbar);
@@ -560,12 +560,12 @@ export const Toolbar = React.forwardRef<HTMLElement, ToolbarProps>(function Tool
   return React.createElement("spui-toolbar", useCustomElementProps({ ...props, ref, label: accessibleLabel, orientation: resolvedOrientation, size, loop: loop ? undefined : "false" }), children);
 });
 
-export const ToolbarGroup = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string }>(function ToolbarGroup({ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }, forwardedRef): React.ReactElement {
+export const ToolbarGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string }>(function ToolbarGroup({ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }, forwardedRef): React.ReactElement {
   ensureDefined(defineToolbarGroup);
   return React.createElement("spui-toolbar-group", useCustomElementProps({ ref: forwardedRef, ...props, label, "aria-label": props["aria-label"] ?? label }), children);
 });
 
-export const ToolbarSeparator = React.forwardRef<HTMLElement, ElementProps>(function ToolbarSeparator(props: ElementProps = {}, forwardedRef): React.ReactElement {
+export const ToolbarSeparator = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps>(function ToolbarSeparator(props: ElementProps = {}, forwardedRef): React.ReactElement {
   ensureDefined(defineToolbarSeparator);
   return React.createElement("spui-toolbar-separator", useCustomElementProps({ ref: forwardedRef, ...props }));
 });
@@ -578,17 +578,17 @@ export function ToolbarToggleButton({ children, icon, name, value, appearance = 
   return React.createElement(ToggleButton, { ...props, name, value, appearance, size, shape, icon }, children);
 }
 
-export const ToolbarRadioGroup = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string }>(function ToolbarRadioGroup({ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }, forwardedRef): React.ReactElement {
+export const ToolbarRadioGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string }>(function ToolbarRadioGroup({ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }, forwardedRef): React.ReactElement {
   ensureDefined(defineToolbarRadioGroup);
   return React.createElement("spui-toolbar-radio-group", useCustomElementProps({ ref: forwardedRef, ...props, label, "aria-label": props["aria-label"] ?? label }), children);
 });
 
-export const ToolbarRadioButton = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; name: string; value: string; appearance?: "primary" | "subtle" | "transparent"; size?: "small" | "medium" | "large"; disabled?: boolean }>(function ToolbarRadioButton({ children, icon, name, value, appearance = "subtle", size, disabled, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; name: string; value: string; appearance?: "primary" | "subtle" | "transparent"; size?: "small" | "medium" | "large"; disabled?: boolean }, forwardedRef): React.ReactElement {
+export const ToolbarRadioButton = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; name: string; value: string; appearance?: "primary" | "subtle" | "transparent"; size?: "small" | "medium" | "large"; disabled?: boolean }>(function ToolbarRadioButton({ children, icon, name, value, appearance = "subtle", size, disabled, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; name: string; value: string; appearance?: "primary" | "subtle" | "transparent"; size?: "small" | "medium" | "large"; disabled?: boolean }, forwardedRef): React.ReactElement {
   ensureDefined(defineToolbarRadioButton);
   return React.createElement("spui-toolbar-radio-button", useCustomElementProps({ ref: forwardedRef, ...props, name, value, appearance, size, disabled }), renderIconSlot(icon), children);
 });
 
-export const ToolbarDivider = React.forwardRef<HTMLElement, ElementProps & { vertical?: boolean; wrapper?: DividerWrapper }>(function ToolbarDivider({ vertical, wrapper, ...props }: ElementProps & { vertical?: boolean; wrapper?: DividerWrapper } = {}, forwardedRef): React.ReactElement {
+export const ToolbarDivider = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { vertical?: boolean; wrapper?: DividerWrapper }>(function ToolbarDivider({ vertical, wrapper, ...props }: ElementProps & { vertical?: boolean; wrapper?: DividerWrapper } = {}, forwardedRef): React.ReactElement {
   ensureDefined(defineToolbarSeparator);
   return React.createElement("spui-toolbar-separator", useCustomElementProps({ ref: forwardedRef, ...props, vertical: vertical === undefined ? undefined : String(vertical) }), renderDividerWrapper(wrapper));
 });
@@ -596,13 +596,13 @@ export const ToolbarDivider = React.forwardRef<HTMLElement, ElementProps & { ver
 type OverflowItemBaseProps = ElementProps & { id: string; groupId?: string; overflowLabel?: string; overflowContent?: React.ReactNode; children?: React.ReactNode };
 export type OverflowItemProps = OverflowItemBaseProps & ({ pinned: true; priority?: never } | { pinned?: false; priority?: number });
 
-export const OverflowItem = React.forwardRef<HTMLElement, OverflowItemProps>(function OverflowItem({ id, priority = 0, pinned = false, groupId, overflowLabel, overflowContent, children, ...props }: OverflowItemProps, forwardedRef): React.ReactElement {
+export const OverflowItem = /* @__PURE__ */ React.forwardRef<HTMLElement, OverflowItemProps>(function OverflowItem({ id, priority = 0, pinned = false, groupId, overflowLabel, overflowContent, children, ...props }: OverflowItemProps, forwardedRef): React.ReactElement {
   ensureDefined(defineOverflowItem);
   void overflowLabel; void overflowContent;
   return React.createElement("spui-overflow-item", useCustomElementProps({ ref: forwardedRef, ...props, id, priority, pinned: pinned || undefined, "group-id": groupId }), children);
 });
 
-export const OverflowDivider = React.forwardRef<HTMLElement, ElementProps & { groupId: string; children?: React.ReactNode }>(function OverflowDivider({ groupId, children, ...props }: ElementProps & { groupId: string; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const OverflowDivider = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { groupId: string; children?: React.ReactNode }>(function OverflowDivider({ groupId, children, ...props }: ElementProps & { groupId: string; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineOverflowDivider);
   return React.createElement("spui-overflow-divider", useCustomElementProps({ ref: forwardedRef, ...props, "aria-hidden": true, "group-id": groupId }), children);
 });
@@ -789,7 +789,7 @@ export function Overflow({ children, label, minimumVisible = 0, overflowDirectio
 
 export type CardOnSelectionChangeEvent = React.MouseEvent | React.KeyboardEvent | React.ChangeEvent;
 export type CardProps = ElementProps & { appearance?: CardAppearance; orientation?: CardOrientation; size?: CardSize; focusMode?: CardFocusMode; selected?: boolean; defaultSelected?: boolean; disabled?: boolean; selectionLabel?: string; checkbox?: React.ReactElement<HTMLInputElement>; floatingAction?: React.ReactNode; onSelectionChange?: (event: CardOnSelectionChangeEvent, data: { selected: boolean }) => void };
-export const Card = React.forwardRef<HTMLElement, CardProps>(function Card({ children, appearance = "filled", orientation = "vertical", size = "medium", focusMode, selected, defaultSelected, disabled = false, selectionLabel, checkbox, floatingAction, onSelectionChange, ...props }: CardProps, forwardedRef): React.ReactElement {
+export const Card = /* @__PURE__ */ React.forwardRef<HTMLElement, CardProps>(function Card({ children, appearance = "filled", orientation = "vertical", size = "medium", focusMode, selected, defaultSelected, disabled = false, selectionLabel, checkbox, floatingAction, onSelectionChange, ...props }: CardProps, forwardedRef): React.ReactElement {
   ensureDefined(defineCard);
   const ref = React.useRef<HTMLElement | null>(null);
   const attachRef = React.useCallback((element: HTMLElement | null) => {
@@ -820,7 +820,7 @@ export const SharePointCard = Card;
 
 export type { CardAppearance, CardFocusMode, CardOrientation, CardSize };
 
-export const CardHeader = React.forwardRef<HTMLElement, ElementProps & { image?: React.ReactNode; header?: React.ReactNode; description?: React.ReactNode; action?: React.ReactNode }>(function CardHeader({ image, header, description, action, children, ...props }: ElementProps & { image?: React.ReactNode; header?: React.ReactNode; description?: React.ReactNode; action?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const CardHeader = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { image?: React.ReactNode; header?: React.ReactNode; description?: React.ReactNode; action?: React.ReactNode }>(function CardHeader({ image, header, description, action, children, ...props }: ElementProps & { image?: React.ReactNode; header?: React.ReactNode; description?: React.ReactNode; action?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineCardHeader);
   const headerContent = header ?? children;
   return React.createElement("spui-card-header", useCustomElementProps({ ...props, ref: forwardedRef }),
@@ -830,19 +830,19 @@ export const CardHeader = React.forwardRef<HTMLElement, ElementProps & { image?:
     action == null ? null : React.createElement("span", { slot: "action" }, action));
 });
 
-export const CardFooter = React.forwardRef<HTMLElement, ElementProps & { action?: React.ReactNode }>(function CardFooter({ action, children, ...props }: ElementProps & { action?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const CardFooter = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { action?: React.ReactNode }>(function CardFooter({ action, children, ...props }: ElementProps & { action?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineCardFooter);
   return React.createElement("spui-card-footer", useCustomElementProps({ ...props, ref: forwardedRef }), children,
     action == null ? null : React.createElement("span", { slot: "action" }, action));
 });
 
-export const CardPreview = React.forwardRef<HTMLElement, ElementProps & { logo?: React.ReactNode }>(function CardPreview({ logo, children, ...props }: ElementProps & { logo?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const CardPreview = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { logo?: React.ReactNode }>(function CardPreview({ logo, children, ...props }: ElementProps & { logo?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineCardPreview);
   return React.createElement("spui-card-preview", useCustomElementProps({ ...props, ref: forwardedRef }), children,
     logo == null ? null : React.createElement("span", { slot: "logo" }, logo));
 });
 
-export const ViewCard = React.forwardRef<HTMLElement, ElementProps & { kind: "document" | "person" | "task" | "approval" | "list-item"; title: string; subtitle?: string; description?: string }>(function ViewCard({ kind, title, subtitle, description, children, ...props }: ElementProps & { kind: "document" | "person" | "task" | "approval" | "list-item"; title: string; subtitle?: string; description?: string }, forwardedRef): React.ReactElement {
+export const ViewCard = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { kind: "document" | "person" | "task" | "approval" | "list-item"; title: string; subtitle?: string; description?: string }>(function ViewCard({ kind, title, subtitle, description, children, ...props }: ElementProps & { kind: "document" | "person" | "task" | "approval" | "list-item"; title: string; subtitle?: string; description?: string }, forwardedRef): React.ReactElement {
   ensureDefined(defineViewCard);
   return React.createElement("spui-view-card", useCustomElementProps({ ref: forwardedRef, ...props, kind, title, subtitle, description }), children);
 });
@@ -877,7 +877,7 @@ function getDialogSurfaceOptions(children: React.ReactNode): { backdropAppearanc
   return result;
 }
 
-export const Dialog = React.forwardRef<HTMLElement, ElementProps & { open?: boolean; defaultOpen?: boolean; title?: string; modal?: boolean; modalType?: "modal" | "non-modal" | "alert"; inertTrapFocus?: boolean; dismissible?: boolean; closeLabel?: string; unmountOnClose?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>; actions?: React.ReactNode; onOpenChange?: (event: DialogOpenChangeEvent, data: DialogOnOpenChangeData) => void; children?: React.ReactNode }>(function Dialog({ open, defaultOpen = false, title, modal = true, modalType, inertTrapFocus = false, dismissible = true, closeLabel, unmountOnClose = true, surfaceMotion, actions, onOpenChange, children, ...props }: ElementProps & { open?: boolean; defaultOpen?: boolean; title?: string; modal?: boolean; modalType?: "modal" | "non-modal" | "alert"; inertTrapFocus?: boolean; dismissible?: boolean; closeLabel?: string; unmountOnClose?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>; actions?: React.ReactNode; onOpenChange?: (event: DialogOpenChangeEvent, data: DialogOnOpenChangeData) => void; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const Dialog = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { open?: boolean; defaultOpen?: boolean; title?: string; modal?: boolean; modalType?: "modal" | "non-modal" | "alert"; inertTrapFocus?: boolean; dismissible?: boolean; closeLabel?: string; unmountOnClose?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>; actions?: React.ReactNode; onOpenChange?: (event: DialogOpenChangeEvent, data: DialogOnOpenChangeData) => void; children?: React.ReactNode }>(function Dialog({ open, defaultOpen = false, title, modal = true, modalType, inertTrapFocus = false, dismissible = true, closeLabel, unmountOnClose = true, surfaceMotion, actions, onOpenChange, children, ...props }: ElementProps & { open?: boolean; defaultOpen?: boolean; title?: string; modal?: boolean; modalType?: "modal" | "non-modal" | "alert"; inertTrapFocus?: boolean; dismissible?: boolean; closeLabel?: string; unmountOnClose?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>; actions?: React.ReactNode; onOpenChange?: (event: DialogOpenChangeEvent, data: DialogOnOpenChangeData) => void; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   const context = React.useContext(UIContext);
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -925,27 +925,27 @@ export function DialogSurface({ children, backdrop, backdropMotion, ...props }: 
   return React.createElement(React.Fragment, null, backdropContent, surfaceContent);
 }
 
-export const DialogTitle = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; action?: React.ReactNode }>(function DialogTitle({ children, action, ...props }: ElementProps & { children?: React.ReactNode; action?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const DialogTitle = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; action?: React.ReactNode }>(function DialogTitle({ children, action, ...props }: ElementProps & { children?: React.ReactNode; action?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineDialogTitle);
   return React.createElement("spui-dialog-title", useCustomElementProps({ ref: forwardedRef, ...props, role: props.role ?? "heading", "aria-level": props["aria-level"] ?? 2 }), children, action == null ? null : React.createElement("div", { slot: "action" }, action));
 });
 
-export const DialogContent = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function DialogContent({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const DialogContent = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function DialogContent({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineDialogContent);
   return React.createElement("spui-dialog-content", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
 
-export const DialogBody = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function DialogBody({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const DialogBody = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function DialogBody({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineDialogBody);
   return React.createElement("spui-dialog-body", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
 
-export const DialogActions = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; fluid?: boolean; position?: "start" | "end" }>(function DialogActions({ children, fluid = false, position = "end", ...props }: ElementProps & { children?: React.ReactNode; fluid?: boolean; position?: "start" | "end" }, forwardedRef): React.ReactElement {
+export const DialogActions = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; fluid?: boolean; position?: "start" | "end" }>(function DialogActions({ children, fluid = false, position = "end", ...props }: ElementProps & { children?: React.ReactNode; fluid?: boolean; position?: "start" | "end" }, forwardedRef): React.ReactElement {
   ensureDefined(defineDialogActions);
   return React.createElement("spui-dialog-actions", useCustomElementProps({ ref: forwardedRef, ...props, fluid: fluid || undefined, position }), children);
 });
 
-export const DialogTrigger = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; action?: "open" | "close"; disableButtonEnhancement?: boolean }>(function DialogTrigger({ children, action, disableButtonEnhancement = false, ...props }: ElementProps & { children?: React.ReactNode; action?: "open" | "close"; disableButtonEnhancement?: boolean }, forwardedRef): React.ReactElement {
+export const DialogTrigger = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; action?: "open" | "close"; disableButtonEnhancement?: boolean }>(function DialogTrigger({ children, action, disableButtonEnhancement = false, ...props }: ElementProps & { children?: React.ReactNode; action?: "open" | "close"; disableButtonEnhancement?: boolean }, forwardedRef): React.ReactElement {
   ensureDefined(defineDialogTrigger);
   return React.createElement("spui-dialog-trigger", useCustomElementProps({ ref: forwardedRef, ...props, action, "disable-button-enhancement": disableButtonEnhancement || undefined }), children);
 });
@@ -1023,7 +1023,7 @@ export function OverlayDrawer({ open, defaultOpen, modalType = "modal", position
   return React.createElement(Drawer, { ...props, type: "overlay", open: actualOpen, modal: modalType !== "non-modal", position, size, onOpenChange: handleOpenChange });
 }
 
-export const ProgressBar = React.forwardRef<HTMLElement, ElementProps & { value?: number; max?: number; label?: string; color?: ProgressBarColor; shape?: ProgressBarShape; thickness?: ProgressBarThickness; bar?: React.ReactNode; indeterminateMotion?: React.ReactNode }>(function ProgressBar({ value, max = 1, label, color, shape = "rounded", thickness = "medium", bar, indeterminateMotion, ...props }: ElementProps & { value?: number; max?: number; label?: string; color?: ProgressBarColor; shape?: ProgressBarShape; thickness?: ProgressBarThickness; bar?: React.ReactNode; indeterminateMotion?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const ProgressBar = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { value?: number; max?: number; label?: string; color?: ProgressBarColor; shape?: ProgressBarShape; thickness?: ProgressBarThickness; bar?: React.ReactNode; indeterminateMotion?: React.ReactNode }>(function ProgressBar({ value, max = 1, label, color, shape = "rounded", thickness = "medium", bar, indeterminateMotion, ...props }: ElementProps & { value?: number; max?: number; label?: string; color?: ProgressBarColor; shape?: ProgressBarShape; thickness?: ProgressBarThickness; bar?: React.ReactNode; indeterminateMotion?: React.ReactNode }, forwardedRef): React.ReactElement {
   const context = React.useContext(UIContext);
   const field = React.useContext(FieldContext);
   ensureDefined(defineProgressBar);
@@ -1047,7 +1047,7 @@ export type SelectChangeEvent = React.ChangeEvent<HTMLSelectElement>;
 export type { SelectAppearance, SelectSize, SelectChangeData } from "./elements/select.js";
 export type SelectProps = Omit<ElementProps, "onChange"> & { label?: string; value?: string | number | readonly string[]; defaultValue?: string | number | readonly string[]; autoComplete?: string; required?: boolean; disabled?: boolean; name?: string; form?: string; multiple?: boolean; size?: "small" | "medium" | "large"; appearance?: "outline" | "underline" | "filled-darker" | "filled-lighter"; icon?: React.ReactNode; select?: React.ReactElement<React.SelectHTMLAttributes<HTMLSelectElement>> | React.SelectHTMLAttributes<HTMLSelectElement>; onValueChange?: (value: string) => void; onChange?: (event: SelectChangeEvent, data: { value: string }) => void; children?: React.ReactNode };
 
-export const Select = React.forwardRef<HTMLElement, SelectProps>(function Select(inputProps: SelectProps, forwardedRef): React.ReactElement {
+export const Select = /* @__PURE__ */ React.forwardRef<HTMLElement, SelectProps>(function Select(inputProps: SelectProps, forwardedRef): React.ReactElement {
   const { label, value, defaultValue, autoComplete, required, disabled, name, form, multiple, size = "medium", appearance = "outline", icon, select, onValueChange, onChange, children, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true, supportsSize: true });
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -1078,7 +1078,7 @@ export const Select = React.forwardRef<HTMLElement, SelectProps>(function Select
 
 export type RadioGroupProps = Omit<ElementProps, "onChange"> & { label?: string; value?: string; defaultValue?: string; name?: string; form?: string; required?: boolean; disabled?: boolean; layout?: "vertical" | "horizontal" | "horizontal-stacked"; orientation?: "vertical" | "horizontal"; onValueChange?: (value: string) => void; onChange?: (event: React.FormEvent<HTMLDivElement>, data: { value: string }) => void };
 
-export const RadioGroup = React.forwardRef<HTMLElement, RadioGroupProps>(function RadioGroup(inputProps: RadioGroupProps, forwardedRef): React.ReactElement {
+export const RadioGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, RadioGroupProps>(function RadioGroup(inputProps: RadioGroupProps, forwardedRef): React.ReactElement {
   const { label, value, defaultValue, name, required, disabled, layout, orientation, onValueChange, onChange, children, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true });
   const ref = React.useRef<HTMLElement>(null)
   const callbackRoot = React.useRef<HTMLDivElement>(null);
@@ -1105,7 +1105,7 @@ export type RadioInputSlot = React.ReactElement<React.InputHTMLAttributes<HTMLIn
 export type RadioIndicatorSlot = React.ReactElement<React.HTMLAttributes<HTMLSpanElement>> | React.HTMLAttributes<HTMLSpanElement>;
 export type RadioProps = Omit<ElementProps, "onChange"> & { value?: string; label?: React.ReactNode; labelPosition?: "after" | "below"; disabled?: boolean; input?: RadioInputSlot; indicator?: RadioIndicatorSlot; onChange?: (event: React.ChangeEvent<HTMLInputElement>, data: { value: string }) => void; children?: React.ReactNode };
 
-export const Radio = React.forwardRef<HTMLElement, RadioProps>(function Radio({ value, label, labelPosition, disabled, input, indicator, onChange, children, ...props }: RadioProps, forwardedRef): React.ReactElement {
+export const Radio = /* @__PURE__ */ React.forwardRef<HTMLElement, RadioProps>(function Radio({ value, label, labelPosition, disabled, input, indicator, onChange, children, ...props }: RadioProps, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   ensureDefined(defineRadioGroup);
@@ -1131,7 +1131,7 @@ export type SpinButtonChangeEvent = React.MouseEvent<HTMLButtonElement> | React.
 export type SpinButtonOnChangeData = { value?: number | null; displayValue?: string };
 export type SpinButtonProps = Omit<ElementProps, "onChange"> & { label?: string; value?: number | null; defaultValue?: number | null; displayValue?: string; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; incrementButton?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; decrementButton?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; min?: number; max?: number; step?: number; stepPage?: number; precision?: number; appearance?: "outline" | "underline" | "filled-darker" | "filled-lighter"; size?: "small" | "medium"; incrementLabel?: string; decrementLabel?: string; name?: string; form?: string; required?: boolean; disabled?: boolean; readOnly?: boolean; onValueChange?: (value: number | undefined) => void; onChange?: (event: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => void };
 
-export const SpinButton = React.forwardRef<HTMLElement, SpinButtonProps>(function SpinButton(inputProps: SpinButtonProps, forwardedRef): React.ReactElement {
+export const SpinButton = /* @__PURE__ */ React.forwardRef<HTMLElement, SpinButtonProps>(function SpinButton(inputProps: SpinButtonProps, forwardedRef): React.ReactElement {
   const { label, value, defaultValue, displayValue, input, incrementButton, decrementButton, min, max, step, stepPage, precision, appearance = "outline", size = "medium", incrementLabel, decrementLabel, name, required, disabled, readOnly, onValueChange, onChange, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true, supportsSize: true });
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -1159,7 +1159,7 @@ export const SpinButton = React.forwardRef<HTMLElement, SpinButtonProps>(functio
 export type SliderOnChangeData = { value: number };
 export type SliderProps = Omit<ElementProps, "onChange"> & { label?: string; value?: number; defaultValue?: number; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; rail?: React.ReactNode; thumb?: React.ReactNode; min?: number; max?: number; step?: number; size?: "small" | "medium"; vertical?: boolean; name?: string; form?: string; disabled?: boolean; valueText?: string; onValueChange?: (value: number) => void; onChange?: (event: React.ChangeEvent<HTMLInputElement>, data: SliderOnChangeData) => void };
 
-export const Slider = React.forwardRef<HTMLElement, SliderProps>(function Slider(inputProps: SliderProps, forwardedRef): React.ReactElement {
+export const Slider = /* @__PURE__ */ React.forwardRef<HTMLElement, SliderProps>(function Slider(inputProps: SliderProps, forwardedRef): React.ReactElement {
   const { label, value, defaultValue, input, rail, thumb, min = 0, max = 100, step = 1, size = "medium", vertical, name, disabled, valueText, onValueChange, onChange, ...props } = useFieldControlProps_unstable(inputProps, { supportsSize: true });
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -1178,7 +1178,7 @@ export const Slider = React.forwardRef<HTMLElement, SliderProps>(function Slider
 
 export type DatePickerProps = ElementProps & { label?: string; value?: string; defaultValue?: string; min?: string; max?: string; name?: string; form?: string; placeholder?: string; required?: boolean; disabled?: boolean; readOnly?: boolean; calendarLabel?: string; previousMonthLabel?: string; nextMonthLabel?: string; invalidDateMessage?: string; requiredMessage?: string; onValueChange?: (value: string) => void };
 
-export const DatePicker = React.forwardRef<HTMLElement, DatePickerProps>(function DatePicker(inputProps: DatePickerProps, forwardedRef): React.ReactElement {
+export const DatePicker = /* @__PURE__ */ React.forwardRef<HTMLElement, DatePickerProps>(function DatePicker(inputProps: DatePickerProps, forwardedRef): React.ReactElement {
   const { label, value, defaultValue, min, max, name, placeholder, required, disabled, readOnly, calendarLabel, previousMonthLabel, nextMonthLabel, invalidDateMessage, requiredMessage, onValueChange, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true });
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -1202,7 +1202,7 @@ export type ComboboxActiveOptionChangeData =
   | { event: CustomEvent<{ id: string; previousId: string | null }>; type: "change"; previousOption: ComboboxOptionValue | null | undefined; nextOption: ComboboxOptionValue | null | undefined };
 export type ComboBoxProps = ElementProps & { label?: string; value?: string; defaultValue?: string; selectedValue?: string; selectedOptions?: readonly string[]; defaultSelectedOptions?: readonly string[]; multiselect?: boolean; name?: string; form?: string; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; listbox?: React.ReactElement; placeholder?: string; required?: boolean; disabled?: boolean; freeform?: boolean; allowFreeform?: boolean; noResults?: string; clearable?: boolean; clearIcon?: React.ReactNode; expandIcon?: React.ReactNode; defaultOpen?: boolean; disableAutoFocus?: boolean; inlinePopup?: boolean; open?: boolean; appearance?: "filled-darker" | "filled-lighter" | "outline" | "underline"; size?: "small" | "medium" | "large"; positioning?: ComboboxPositioning; children?: React.ReactNode; onValueChange?: (value: string) => void; onOptionSelect?: (event: ComboboxSelectionEvent, data: ComboboxOptionSelectData) => void; onSelectedOptionsChange?: (selectedOptions: string[]) => void; onOpenChange?: (event: ComboboxOpenChangeEvent, data: { open: boolean }) => void; onActiveOptionChange?: (event: React.SyntheticEvent | Event, data: ComboboxActiveOptionChangeData) => void };
 
-export const ComboBox = React.forwardRef<HTMLElement, ComboBoxProps>(function ComboBox(inputProps: ComboBoxProps, forwardedRef): React.ReactElement {
+export const ComboBox = /* @__PURE__ */ React.forwardRef<HTMLElement, ComboBoxProps>(function ComboBox(inputProps: ComboBoxProps, forwardedRef): React.ReactElement {
   const { label, value, defaultValue, selectedValue, selectedOptions, defaultSelectedOptions, multiselect = false, name, input, listbox, placeholder, required, disabled, freeform, allowFreeform, noResults, clearable, clearIcon, expandIcon, defaultOpen, disableAutoFocus, inlinePopup, open, appearance, size, positioning, onValueChange, onOptionSelect, onSelectedOptionsChange, onOpenChange, onActiveOptionChange, children, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true, supportsSize: true });
   const ref = React.useRef<HTMLElement & { selectedOptions: string[] }>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -1269,7 +1269,7 @@ export const ComboBox = React.forwardRef<HTMLElement, ComboBoxProps>(function Co
   return React.createElement(CompoundComboboxContext.Provider, { value: { ...provider, mode: "combobox", value: value ?? provider?.value, selectedOptions: selectedOptions ?? provider?.selectedOptions, multiselect } }, React.createElement("spui-combobox", useCustomElementProps({ ...props, ref, label, value: value ?? defaultValue ?? provider?.value, "selected-value": selectedValue, multiselect: multiselect || undefined, name, placeholder, required, disabled, "allow-freeform": freeform ?? allowFreeform, "no-results": noResults ?? context.strings.noResults, clearable, "default-open": open === undefined && provider?.open === undefined ? defaultOpen : undefined, open: open ?? provider?.open ? "" : undefined, "disable-auto-focus": disableAutoFocus, appearance: appearance ?? provider?.appearance, size: size ?? provider?.size, positioning: typeof positioning === "string" ? positioning : positioning?.position ? `${positioning.position}${positioning.align && positioning.align !== "center" ? `-${positioning.align}` : ""}` : undefined, "inline-popup": inlinePopup }), children, inputSlot, clearIconSlot, expandIconSlot, listboxSlot));
 });
 
-export const ComboOption = React.forwardRef<HTMLElement, { value: string; label?: string; disabled?: boolean; children?: React.ReactNode }>(function ComboOption({ value, label, disabled, children }: { value: string; label?: string; disabled?: boolean; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const ComboOption = /* @__PURE__ */ React.forwardRef<HTMLElement, { value: string; label?: string; disabled?: boolean; children?: React.ReactNode }>(function ComboOption({ value, label, disabled, children }: { value: string; label?: string; disabled?: boolean; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineCombobox);
   return React.createElement("spui-combobox-option", useCustomElementProps({ ref: forwardedRef, value, label, disabled }), children);
 });
@@ -1339,7 +1339,7 @@ export type DropdownProps = ElementProps & {
 };
 
 /** Selection-only combobox that shares the theme, form, and keyboard engine with ComboBox. */
-export const Dropdown = React.forwardRef<HTMLElement, DropdownProps>(function Dropdown({ label, button, listbox, value, defaultValue, selectedOptions, defaultSelectedOptions, multiselect = false, disabled, placeholder, onOptionSelect, onOpenChange, onActiveOptionChange, defaultOpen, open, clearable, clearButton, expandIcon, disableAutoFocus, appearance, size, positioning, inlinePopup, children, ...props }: DropdownProps, forwardedRef): React.ReactElement {
+export const Dropdown = /* @__PURE__ */ React.forwardRef<HTMLElement, DropdownProps>(function Dropdown({ label, button, listbox, value, defaultValue, selectedOptions, defaultSelectedOptions, multiselect = false, disabled, placeholder, onOptionSelect, onOpenChange, onActiveOptionChange, defaultOpen, open, clearable, clearButton, expandIcon, disableAutoFocus, appearance, size, positioning, inlinePopup, children, ...props }: DropdownProps, forwardedRef): React.ReactElement {
   const strings = React.useContext(UIContext).strings;
   const provider = React.useContext(CompoundComboboxContext);
   const ref = React.useRef<HTMLElement>(null)
@@ -1414,7 +1414,7 @@ export function Listbox({ children, selectedOptions, defaultSelectedOptions = []
 
 export type OptionProps = ElementProps & { value?: string; text?: string; disabled?: boolean; checkIcon?: React.ReactNode; children?: React.ReactNode };
 /** Option for Dropdown/ComboBox or a standalone Listbox. */
-export const Option = React.forwardRef<HTMLElement, OptionProps>(function Option({ value, text, disabled = false, checkIcon, children, ...props }: OptionProps, forwardedRef): React.ReactElement {
+export const Option = /* @__PURE__ */ React.forwardRef<HTMLElement, OptionProps>(function Option({ value, text, disabled = false, checkIcon, children, ...props }: OptionProps, forwardedRef): React.ReactElement {
   const context = React.useContext(CompoundComboboxContext);
   const optionText = text ?? (typeof children === "string" ? children : "");
   const optionValue = value ?? optionText;
@@ -1427,12 +1427,12 @@ export const Option = React.forwardRef<HTMLElement, OptionProps>(function Option
   }, [context?.mode, context?.registerOption, disabled, optionText, optionValue]);
   if (context?.mode === "combobox") return React.createElement("spui-combobox-option", useCustomElementProps({ ref: optionRef, ...props, value: optionValue, label: optionText, disabled: disabled || undefined }), children);
   const selected = context?.selectedOptions?.includes(optionValue) ?? false;
-  return <div {...props} ref={forwardedRef as React.Ref<HTMLDivElement>} role="option" aria-selected={selected} aria-disabled={disabled || undefined} tabIndex={-1} style={{ display: "flex", alignItems: "center", minHeight: 36, padding: "8px 10px", borderRadius: "var(--spui-control-radius,4px)", background: selected ? "var(--spui-ui-surface-hover,var(--spui-ui-canvas,#f5f5f5))" : "transparent", color: "var(--spui-ui-text,inherit)", cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.55 : 1, ...props.style }} onClick={event => { props.onClick?.(event); if (!disabled) context?.select?.(event, optionValue, optionText); }}>{checkIcon ?? (selected ? <span aria-hidden="true">✓</span> : null)}{children}</div>;
+  return <div {...props} ref={optionRef as unknown as React.Ref<HTMLDivElement>} role="option" aria-selected={selected} aria-disabled={disabled || undefined} tabIndex={-1} style={{ display: "flex", alignItems: "center", minHeight: 36, padding: "8px 10px", borderRadius: "var(--spui-control-radius,4px)", background: selected ? "var(--spui-ui-surface-hover,var(--spui-ui-canvas,#f5f5f5))" : "transparent", color: "var(--spui-ui-text,inherit)", cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.55 : 1, ...props.style }} onClick={event => { props.onClick?.(event); if (!disabled) context?.select?.(event, optionValue, optionText); }}>{checkIcon ?? (selected ? <span aria-hidden="true">✓</span> : null)}{children}</div>;
 });
 
 export type OptionGroupProps = ElementProps & { label?: string; children?: React.ReactNode };
 /** Group related options under an accessible label. */
-export const OptionGroup = React.forwardRef<HTMLElement, OptionGroupProps>(function OptionGroup({ label, children, ...props }: OptionGroupProps, forwardedRef): React.ReactElement {
+export const OptionGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, OptionGroupProps>(function OptionGroup({ label, children, ...props }: OptionGroupProps, forwardedRef): React.ReactElement {
   const context = React.useContext(CompoundComboboxContext);
   if (context?.mode === "combobox") return React.createElement("spui-combobox-option-group", useCustomElementProps({ ref: forwardedRef, ...props, label }), children);
   return <div {...props} ref={forwardedRef as React.Ref<HTMLDivElement>} role="group" aria-label={label}>{label ? <div>{label}</div> : null}{children}</div>;
@@ -1440,7 +1440,7 @@ export const OptionGroup = React.forwardRef<HTMLElement, OptionGroupProps>(funct
 
 export type RichTextEditorProps = ElementProps & { label?: string; value?: string; defaultValue?: string; placeholder?: string; disabled?: boolean; readOnly?: boolean; required?: boolean; name?: string; form?: string; onValueChange?: (html: string) => void; onImageUpload?: (file: File) => Promise<string> };
 
-export const RichTextEditor = React.forwardRef<HTMLElement, RichTextEditorProps>(function RichTextEditor(inputProps: RichTextEditorProps, forwardedRef): React.ReactElement {
+export const RichTextEditor = /* @__PURE__ */ React.forwardRef<HTMLElement, RichTextEditorProps>(function RichTextEditor(inputProps: RichTextEditorProps, forwardedRef): React.ReactElement {
   const { label, value, defaultValue, placeholder, disabled, readOnly, required, name, onValueChange, onImageUpload, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true });
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -1465,23 +1465,23 @@ export const RichTextEditor = React.forwardRef<HTMLElement, RichTextEditorProps>
 });
 
 export type BadgeProps = ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; appearance?: BadgeAppearance; color?: BadgeColor; iconPosition?: "before" | "after"; shape?: BadgeShape; size?: BadgeSize };
-export const Badge = React.forwardRef<HTMLElement, BadgeProps>(function Badge({ children, icon, appearance = "filled", color = "brand", iconPosition = "before", shape = "circular", size = "medium", ...props }: BadgeProps, forwardedRef): React.ReactElement {
+export const Badge = /* @__PURE__ */ React.forwardRef<HTMLElement, BadgeProps>(function Badge({ children, icon, appearance = "filled", color = "brand", iconPosition = "before", shape = "circular", size = "medium", ...props }: BadgeProps, forwardedRef): React.ReactElement {
   ensureDefined(defineBadge);
   return React.createElement("spui-badge", useCustomElementProps({ ...props, ref: forwardedRef, appearance, color, "icon-position": iconPosition, shape, size }), icon == null ? null : React.createElement("span", { slot: "icon", "aria-hidden": true }, icon), children);
 });
 
-export const CounterBadge = React.forwardRef<HTMLElement, ElementProps & { count?: number; dot?: boolean; overflowCount?: number; showZero?: boolean; appearance?: "filled" | "ghost"; color?: Extract<BadgeColor, "brand" | "danger" | "important" | "informative">; shape?: "circular" | "rounded"; size?: BadgeSize; icon?: React.ReactNode; iconPosition?: "before" | "after" }>(function CounterBadge({ count = 0, dot = false, overflowCount = 99, showZero = false, appearance = "filled", color = "brand", shape = "circular", size = "medium", icon, iconPosition = "before", ...props }: ElementProps & { count?: number; dot?: boolean; overflowCount?: number; showZero?: boolean; appearance?: "filled" | "ghost"; color?: Extract<BadgeColor, "brand" | "danger" | "important" | "informative">; shape?: "circular" | "rounded"; size?: BadgeSize; icon?: React.ReactNode; iconPosition?: "before" | "after" }, forwardedRef): React.ReactElement {
+export const CounterBadge = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { count?: number; dot?: boolean; overflowCount?: number; showZero?: boolean; appearance?: "filled" | "ghost"; color?: Extract<BadgeColor, "brand" | "danger" | "important" | "informative">; shape?: "circular" | "rounded"; size?: BadgeSize; icon?: React.ReactNode; iconPosition?: "before" | "after" }>(function CounterBadge({ count = 0, dot = false, overflowCount = 99, showZero = false, appearance = "filled", color = "brand", shape = "circular", size = "medium", icon, iconPosition = "before", ...props }: ElementProps & { count?: number; dot?: boolean; overflowCount?: number; showZero?: boolean; appearance?: "filled" | "ghost"; color?: Extract<BadgeColor, "brand" | "danger" | "important" | "informative">; shape?: "circular" | "rounded"; size?: BadgeSize; icon?: React.ReactNode; iconPosition?: "before" | "after" }, forwardedRef): React.ReactElement {
   ensureDefined(defineCounterBadge);
   return React.createElement("spui-counter-badge", useCustomElementProps({ ref: forwardedRef, ...props, count, dot: dot || undefined, "overflow-count": overflowCount, "show-zero": showZero || undefined, appearance, color, shape, size, "icon-position": iconPosition }), icon == null ? null : React.createElement("span", { slot: "icon", "aria-hidden": true }, icon));
 });
 
-export const PresenceBadge = React.forwardRef<HTMLElement, ElementProps & { status?: PresenceBadgeStatus; outOfOffice?: boolean; size?: BadgeSize; icon?: React.ReactNode }>(function PresenceBadge({ status = "available", outOfOffice = false, size = "medium", icon, ...props }: ElementProps & { status?: PresenceBadgeStatus; outOfOffice?: boolean; size?: BadgeSize; icon?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const PresenceBadge = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { status?: PresenceBadgeStatus; outOfOffice?: boolean; size?: BadgeSize; icon?: React.ReactNode }>(function PresenceBadge({ status = "available", outOfOffice = false, size = "medium", icon, ...props }: ElementProps & { status?: PresenceBadgeStatus; outOfOffice?: boolean; size?: BadgeSize; icon?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(definePresenceBadge);
   return React.createElement("spui-presence-badge", useCustomElementProps({ ref: forwardedRef, ...props, status, "out-of-office": outOfOffice || undefined, size }), icon == null ? null : React.createElement("span", { slot: "icon", "aria-hidden": true }, icon));
 });
 
 export type TagProps = ElementProps & { children?: React.ReactNode; appearance?: "filled" | "outline" | "brand"; size?: "extra-small" | "small" | "medium" | "large"; shape?: "rounded" | "circular"; color?: "neutral" | "success" | "warning" | "danger" | "informative"; value?: string; label?: string; disabled?: boolean; selected?: boolean; dismissible?: boolean; dismissLabel?: string; onDismiss?: (value: string, label: string) => void; media?: React.ReactNode; icon?: React.ReactNode; primaryText?: React.ReactNode; secondaryText?: React.ReactNode; dismissIcon?: React.ReactNode };
-export const Tag = React.forwardRef<HTMLElement, TagProps>(function Tag({ children, appearance, size, shape = "rounded", color, value, label, disabled = false, selected = false, dismissible = false, dismissLabel, onDismiss, media, icon, primaryText, secondaryText, dismissIcon, ...props }: TagProps, forwardedRef): React.ReactElement {
+export const Tag = /* @__PURE__ */ React.forwardRef<HTMLElement, TagProps>(function Tag({ children, appearance, size, shape = "rounded", color, value, label, disabled = false, selected = false, dismissible = false, dismissLabel, onDismiss, media, icon, primaryText, secondaryText, dismissIcon, ...props }: TagProps, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement | null>(null);
   const attachRef = React.useCallback((element: HTMLElement | null) => {
     ref.current = element;
@@ -1499,7 +1499,7 @@ export const Tag = React.forwardRef<HTMLElement, TagProps>(function Tag({ childr
     dismissIcon == null ? null : React.createElement("span", { slot: "dismiss-icon", "aria-hidden": true }, dismissIcon));
 });
 
-export const InteractionTag = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; appearance?: "filled" | "outline" | "brand"; size?: "extra-small" | "small" | "medium"; shape?: "rounded" | "circular"; value?: string; label?: string; disabled?: boolean; selected?: boolean; onTagSelect?: (event: Event, data: InteractionTagSelectData) => void; onDismiss?: (event: TagDismissEvent, data: { value: string }) => void }>(function InteractionTag({ children, appearance, size, shape = "rounded", value, label, disabled = false, selected = false, onTagSelect, onDismiss, ...props }: ElementProps & { children?: React.ReactNode; appearance?: "filled" | "outline" | "brand"; size?: "extra-small" | "small" | "medium"; shape?: "rounded" | "circular"; value?: string; label?: string; disabled?: boolean; selected?: boolean; onTagSelect?: (event: Event, data: InteractionTagSelectData) => void; onDismiss?: (event: TagDismissEvent, data: { value: string }) => void }, forwardedRef): React.ReactElement {
+export const InteractionTag = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; appearance?: "filled" | "outline" | "brand"; size?: "extra-small" | "small" | "medium"; shape?: "rounded" | "circular"; value?: string; label?: string; disabled?: boolean; selected?: boolean; onTagSelect?: (event: Event, data: InteractionTagSelectData) => void; onDismiss?: (event: TagDismissEvent, data: { value: string }) => void }>(function InteractionTag({ children, appearance, size, shape = "rounded", value, label, disabled = false, selected = false, onTagSelect, onDismiss, ...props }: ElementProps & { children?: React.ReactNode; appearance?: "filled" | "outline" | "brand"; size?: "extra-small" | "small" | "medium"; shape?: "rounded" | "circular"; value?: string; label?: string; disabled?: boolean; selected?: boolean; onTagSelect?: (event: Event, data: InteractionTagSelectData) => void; onDismiss?: (event: TagDismissEvent, data: { value: string }) => void }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   ensureDefined(defineInteractionTag);
@@ -1508,7 +1508,7 @@ export const InteractionTag = React.forwardRef<HTMLElement, ElementProps & { chi
   return React.createElement("spui-interaction-tag", useCustomElementProps({ ...props, ref, appearance, size, shape, value, label, disabled: disabled || undefined, selected: selected || undefined }), children);
 });
 
-export const InteractionTagPrimary = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; media?: React.ReactNode; icon?: React.ReactNode; primaryText?: React.ReactNode; secondaryText?: React.ReactNode; hasSecondaryAction?: boolean }>(function InteractionTagPrimary({ children, media, icon, primaryText, secondaryText, hasSecondaryAction = false, ...props }: ElementProps & { children?: React.ReactNode; media?: React.ReactNode; icon?: React.ReactNode; primaryText?: React.ReactNode; secondaryText?: React.ReactNode; hasSecondaryAction?: boolean }, forwardedRef): React.ReactElement {
+export const InteractionTagPrimary = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; media?: React.ReactNode; icon?: React.ReactNode; primaryText?: React.ReactNode; secondaryText?: React.ReactNode; hasSecondaryAction?: boolean }>(function InteractionTagPrimary({ children, media, icon, primaryText, secondaryText, hasSecondaryAction = false, ...props }: ElementProps & { children?: React.ReactNode; media?: React.ReactNode; icon?: React.ReactNode; primaryText?: React.ReactNode; secondaryText?: React.ReactNode; hasSecondaryAction?: boolean }, forwardedRef): React.ReactElement {
   ensureDefined(defineInteractionTagPrimary);
   return React.createElement("spui-interaction-tag-primary", useCustomElementProps({ ref: forwardedRef, ...props, "has-secondary-action": hasSecondaryAction || undefined, "data-spui-explicit-has-secondary-action": hasSecondaryAction || undefined }),
     media == null ? null : React.createElement("span", { slot: "media", "aria-hidden": true }, media),
@@ -1517,7 +1517,7 @@ export const InteractionTagPrimary = React.forwardRef<HTMLElement, ElementProps 
     secondaryText == null ? null : React.createElement("span", { slot: "secondary-text" }, secondaryText));
 });
 
-export const InteractionTagSecondary = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string }>(function InteractionTagSecondary({ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }, forwardedRef): React.ReactElement {
+export const InteractionTagSecondary = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string }>(function InteractionTagSecondary({ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }, forwardedRef): React.ReactElement {
   const strings = React.useContext(UIContext).strings;
   ensureDefined(defineInteractionTagSecondary);
   return React.createElement("spui-interaction-tag-secondary", useCustomElementProps({ ref: forwardedRef, ...props, label, "remove-label": strings.remove }), children);
@@ -1528,7 +1528,7 @@ export type TagGroupReactSelectData = Omit<TagGroupSelectData, "event" | "type">
   | { event: SharePointUIEvent; type: undefined }
   | { event: React.MouseEvent<HTMLButtonElement>; type: "click" }
 );
-export const TagGroup = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; orientation?: "horizontal" | "vertical"; label?: string; appearance?: TagAppearance; size?: TagSize; disabled?: boolean; dismissible?: boolean; selectedValues?: string[]; defaultSelectedValues?: string[]; onTagSelect?: (event: SharePointUIEvent, data: TagGroupReactSelectData) => void; onDismiss?: (event: TagDismissEvent, data: { value: string }) => void }>(function TagGroup({ children, orientation = "horizontal", label, appearance = "filled", size = "medium", disabled = false, dismissible = false, selectedValues, defaultSelectedValues, onTagSelect, onDismiss, ...props }: ElementProps & { children?: React.ReactNode; orientation?: "horizontal" | "vertical"; label?: string; appearance?: TagAppearance; size?: TagSize; disabled?: boolean; dismissible?: boolean; selectedValues?: string[]; defaultSelectedValues?: string[]; onTagSelect?: (event: SharePointUIEvent, data: TagGroupReactSelectData) => void; onDismiss?: (event: TagDismissEvent, data: { value: string }) => void }, forwardedRef): React.ReactElement {
+export const TagGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; orientation?: "horizontal" | "vertical"; label?: string; appearance?: TagAppearance; size?: TagSize; disabled?: boolean; dismissible?: boolean; selectedValues?: string[]; defaultSelectedValues?: string[]; onTagSelect?: (event: SharePointUIEvent, data: TagGroupReactSelectData) => void; onDismiss?: (event: TagDismissEvent, data: { value: string }) => void }>(function TagGroup({ children, orientation = "horizontal", label, appearance = "filled", size = "medium", disabled = false, dismissible = false, selectedValues, defaultSelectedValues, onTagSelect, onDismiss, ...props }: ElementProps & { children?: React.ReactNode; orientation?: "horizontal" | "vertical"; label?: string; appearance?: TagAppearance; size?: TagSize; disabled?: boolean; dismissible?: boolean; selectedValues?: string[]; defaultSelectedValues?: string[]; onTagSelect?: (event: SharePointUIEvent, data: TagGroupReactSelectData) => void; onDismiss?: (event: TagDismissEvent, data: { value: string }) => void }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   ensureDefined(defineTagGroup);
@@ -1560,7 +1560,7 @@ type TagPickerReactOptionSelectData = { value: string; selectedOptions: string[]
   | { type: "keydown"; event: React.KeyboardEvent<HTMLDivElement> }
 );
 export type TagPickerProps = Omit<ElementProps, "onChange"> & { children?: React.ReactNode; label?: string; form?: string; selectedValues?: string[]; defaultSelectedValues?: string[]; inputValue?: string; open?: boolean; defaultOpen?: boolean; inline?: boolean; noPopover?: boolean; onOpenChange?: (event: SharePointUIEvent, data: TagPickerReactOpenChangeData) => void; onOptionSelect?: (event: SharePointUIEvent, data: TagPickerReactOptionSelectData) => void; onInputValueChange?: (value: string) => void; onChange?: (values: string[]) => void };
-export const TagPicker = React.forwardRef<HTMLElement, TagPickerProps>(function TagPicker({ children, label, selectedValues, defaultSelectedValues, inputValue, open, defaultOpen, inline = false, noPopover = false, onOpenChange, onOptionSelect, onInputValueChange, onChange, ...props }: TagPickerProps, forwardedRef): React.ReactElement {
+export const TagPicker = /* @__PURE__ */ React.forwardRef<HTMLElement, TagPickerProps>(function TagPicker({ children, label, selectedValues, defaultSelectedValues, inputValue, open, defaultOpen, inline = false, noPopover = false, onOpenChange, onOptionSelect, onInputValueChange, onChange, ...props }: TagPickerProps, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   const strings = React.useContext(UIContext).strings;
@@ -1600,11 +1600,11 @@ export function TagPickerControl({ children, secondaryAction, expandIcon }: Elem
     expandIcon == null ? null : React.createElement("span", { slot: "expand-icon", "aria-hidden": true }, expandIcon));
 }
 
-export const TagPickerGroup = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string }>(function TagPickerGroup({ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }, forwardedRef): React.ReactElement {
+export const TagPickerGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string }>(function TagPickerGroup({ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }, forwardedRef): React.ReactElement {
   return React.createElement("spui-tag-picker-group", useCustomElementProps({ ref: forwardedRef, ...props, slot: "selected-group", role: "group", "aria-label": props["aria-label"] ?? label }), children);
 });
 
-export const TagPickerInput = React.forwardRef<HTMLElement, Omit<ElementProps, "children"> & { value?: string; placeholder?: string; disabled?: boolean; clearable?: boolean; appearance?: "filled-darker" | "filled-lighter" | "outline"; onValueChange?: (value: string) => void }>(function TagPickerInput({ value, placeholder, disabled = false, clearable = false, appearance, onValueChange, ...props }: Omit<ElementProps, "children"> & { value?: string; placeholder?: string; disabled?: boolean; clearable?: boolean; appearance?: "filled-darker" | "filled-lighter" | "outline"; onValueChange?: (value: string) => void }, forwardedRef): React.ReactElement {
+export const TagPickerInput = /* @__PURE__ */ React.forwardRef<HTMLElement, Omit<ElementProps, "children"> & { value?: string; placeholder?: string; disabled?: boolean; clearable?: boolean; appearance?: "filled-darker" | "filled-lighter" | "outline"; onValueChange?: (value: string) => void }>(function TagPickerInput({ value, placeholder, disabled = false, clearable = false, appearance, onValueChange, ...props }: Omit<ElementProps, "children"> & { value?: string; placeholder?: string; disabled?: boolean; clearable?: boolean; appearance?: "filled-darker" | "filled-lighter" | "outline"; onValueChange?: (value: string) => void }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   React.useEffect(() => {
@@ -1625,14 +1625,14 @@ export function TagPickerButton({ children, appearance = "secondary", size = "me
   return React.createElement(Button, { ...props, slot: "button", type: "button", appearance, size, disabled: disabled || undefined }, children);
 }
 
-export const TagPickerOption = React.forwardRef<HTMLElement, ElementProps & { value: string; text?: string; label?: string; group?: string; media?: React.ReactNode; secondaryContent?: React.ReactNode; disabled?: boolean; children?: React.ReactNode }>(function TagPickerOption({ value, text, label, group, media, secondaryContent, disabled = false, children, ...props }: ElementProps & { value: string; text?: string; label?: string; group?: string; media?: React.ReactNode; secondaryContent?: React.ReactNode; disabled?: boolean; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const TagPickerOption = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { value: string; text?: string; label?: string; group?: string; media?: React.ReactNode; secondaryContent?: React.ReactNode; disabled?: boolean; children?: React.ReactNode }>(function TagPickerOption({ value, text, label, group, media, secondaryContent, disabled = false, children, ...props }: ElementProps & { value: string; text?: string; label?: string; group?: string; media?: React.ReactNode; secondaryContent?: React.ReactNode; disabled?: boolean; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   return React.createElement("spui-tag-picker-option", useCustomElementProps({ ref: forwardedRef, ...props, value, text, label, group, disabled: disabled || undefined }),
     media == null ? null : React.createElement("span", { slot: "media" }, media),
     React.createElement("span", { slot: "label" }, children),
     secondaryContent == null ? null : React.createElement("span", { slot: "secondary-content" }, secondaryContent));
 });
 
-export const TagPickerOptionGroup = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label: string; disabled?: boolean }>(function TagPickerOptionGroup({ children, label, disabled = false }: ElementProps & { children?: React.ReactNode; label: string; disabled?: boolean }, forwardedRef): React.ReactElement {
+export const TagPickerOptionGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label: string; disabled?: boolean }>(function TagPickerOptionGroup({ children, label, disabled = false }: ElementProps & { children?: React.ReactNode; label: string; disabled?: boolean }, forwardedRef): React.ReactElement {
   return React.createElement("spui-tag-picker-option-group", useCustomElementProps({ ref: forwardedRef, label, disabled: disabled || undefined }), children);
 });
 
@@ -1644,7 +1644,7 @@ export type RatingInputSlot = React.ReactElement<any> | Omit<React.InputHTMLAttr
 
 export type RatingProps = Omit<ElementProps, "onChange"> & { value?: number; defaultValue?: number; max?: number; step?: 0.5 | 1; size?: "small" | "medium" | "large" | "extra-large"; color?: "brand" | "marigold" | "neutral"; label?: string; itemLabel?: (rating: number) => string; iconFilled?: React.ElementType; iconOutline?: React.ElementType; fullValueInput?: RatingInputSlot; halfValueInput?: RatingInputSlot; name?: string; form?: string; disabled?: boolean; readOnly?: boolean; required?: boolean; onChange?: (event: SharePointUIEvent, data: RatingOnChangeData) => void };
 
-export const Rating = React.forwardRef<HTMLElement, RatingProps>(function Rating({ value, defaultValue = 0, max = 5, step = 1, size = "extra-large", color = "neutral", label, itemLabel, iconFilled, iconOutline, fullValueInput, halfValueInput, name, disabled = false, readOnly = false, required = false, onChange, ...props }: RatingProps, forwardedRef): React.ReactElement {
+export const Rating = /* @__PURE__ */ React.forwardRef<HTMLElement, RatingProps>(function Rating({ value, defaultValue = 0, max = 5, step = 1, size = "extra-large", color = "neutral", label, itemLabel, iconFilled, iconOutline, fullValueInput, halfValueInput, name, disabled = false, readOnly = false, required = false, onChange, ...props }: RatingProps, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   const strings = React.useContext(UIContext).strings;
@@ -1671,14 +1671,14 @@ export const Rating = React.forwardRef<HTMLElement, RatingProps>(function Rating
     inputSlot(fullValueInput, "full-value-input"), inputSlot(halfValueInput, "half-value-input"));
 });
 
-export const RatingItem = React.forwardRef<HTMLElement, ElementProps & { value?: number; selectedIcon?: React.ReactNode; unselectedIcon?: React.ReactNode }>(function RatingItem({ value = 1, selectedIcon, unselectedIcon, ...props }: ElementProps & { value?: number; selectedIcon?: React.ReactNode; unselectedIcon?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const RatingItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { value?: number; selectedIcon?: React.ReactNode; unselectedIcon?: React.ReactNode }>(function RatingItem({ value = 1, selectedIcon, unselectedIcon, ...props }: ElementProps & { value?: number; selectedIcon?: React.ReactNode; unselectedIcon?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineRatingItem);
   return React.createElement("spui-rating-item", useCustomElementProps({ ref: forwardedRef, ...props, value }),
     unselectedIcon == null ? null : React.createElement("span", { slot: "unselected-icon" }, unselectedIcon),
     selectedIcon == null ? null : React.createElement("span", { slot: "selected-icon" }, selectedIcon));
 });
 
-export const RatingDisplay = React.forwardRef<HTMLElement, ElementProps & { value?: number; max?: number; count?: number; compact?: boolean; color?: "brand" | "marigold" | "neutral"; size?: "small" | "medium" | "large" | "extra-large"; icon?: React.ElementType; label?: string; valueText?: React.ReactNode; countText?: React.ReactNode; children?: React.ReactNode }>(function RatingDisplay({ value, max = 5, count, compact = false, color = "neutral", size = "medium", icon, label, valueText, countText, children, ...props }: ElementProps & { value?: number; max?: number; count?: number; compact?: boolean; color?: "brand" | "marigold" | "neutral"; size?: "small" | "medium" | "large" | "extra-large"; icon?: React.ElementType; label?: string; valueText?: React.ReactNode; countText?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const RatingDisplay = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { value?: number; max?: number; count?: number; compact?: boolean; color?: "brand" | "marigold" | "neutral"; size?: "small" | "medium" | "large" | "extra-large"; icon?: React.ElementType; label?: string; valueText?: React.ReactNode; countText?: React.ReactNode; children?: React.ReactNode }>(function RatingDisplay({ value, max = 5, count, compact = false, color = "neutral", size = "medium", icon, label, valueText, countText, children, ...props }: ElementProps & { value?: number; max?: number; count?: number; compact?: boolean; color?: "brand" | "marigold" | "neutral"; size?: "small" | "medium" | "large" | "extra-large"; icon?: React.ElementType; label?: string; valueText?: React.ReactNode; countText?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineRatingDisplay); ensureDefined(defineRatingItem);
   const items = children ?? (icon ? Array.from({ length: compact ? 1 : max }, (_, index) => React.createElement(RatingItem, { key: index + 1, value: index + 1, selectedIcon: React.createElement(icon), unselectedIcon: React.createElement(icon) })) : undefined);
   return React.createElement("spui-rating-display", useCustomElementProps({ ref: forwardedRef, ...props, value, max, count, compact: compact || undefined, color, size, "aria-label": label }),
@@ -1690,7 +1690,7 @@ export type ListOnSelectionChangeData =
   | { event: SharePointUIEvent; type: undefined; selectedItems: ListItemValue[] }
   | { event: React.SyntheticEvent; type: "change"; selectedItems: ListItemValue[] };
 
-export const List = React.forwardRef<HTMLElement, ElementProps & { navigationMode?: ListNavigationMode; selectionMode?: ListSelectionMode; selectedItems?: ListItemValue[]; defaultSelectedItems?: ListItemValue[]; onSelectionChange?: (event: SharePointUIEvent, data: ListOnSelectionChangeData) => void; children?: React.ReactNode }>(function List({ navigationMode, selectionMode, selectedItems, defaultSelectedItems, onSelectionChange, children, ...props }: ElementProps & { navigationMode?: ListNavigationMode; selectionMode?: ListSelectionMode; selectedItems?: ListItemValue[]; defaultSelectedItems?: ListItemValue[]; onSelectionChange?: (event: SharePointUIEvent, data: ListOnSelectionChangeData) => void; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const List = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { navigationMode?: ListNavigationMode; selectionMode?: ListSelectionMode; selectedItems?: ListItemValue[]; defaultSelectedItems?: ListItemValue[]; onSelectionChange?: (event: SharePointUIEvent, data: ListOnSelectionChangeData) => void; children?: React.ReactNode }>(function List({ navigationMode, selectionMode, selectedItems, defaultSelectedItems, onSelectionChange, children, ...props }: ElementProps & { navigationMode?: ListNavigationMode; selectionMode?: ListSelectionMode; selectedItems?: ListItemValue[]; defaultSelectedItems?: ListItemValue[]; onSelectionChange?: (event: SharePointUIEvent, data: ListOnSelectionChangeData) => void; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   ensureDefined(defineList);
@@ -1714,7 +1714,7 @@ export type ListItemReactActionData =
   | { event: SharePointUIEvent; type: undefined; value: ListItemValue }
   | { event: ListItemReactActionEvent; type: "ListItemAction"; value: ListItemValue };
 
-export const ListItem = React.forwardRef<HTMLElement, ElementProps & { value?: ListItemValue; disabledSelection?: boolean; checkmark?: React.ReactNode; onAction?: (event: SharePointUIEvent, data: ListItemReactActionData) => void; children?: React.ReactNode }>(function ListItem({ value, disabledSelection = false, checkmark, onAction, children, ...props }: ElementProps & { value?: ListItemValue; disabledSelection?: boolean; checkmark?: React.ReactNode; onAction?: (event: SharePointUIEvent, data: ListItemReactActionData) => void; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const ListItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { value?: ListItemValue; disabledSelection?: boolean; checkmark?: React.ReactNode; onAction?: (event: SharePointUIEvent, data: ListItemReactActionData) => void; children?: React.ReactNode }>(function ListItem({ value, disabledSelection = false, checkmark, onAction, children, ...props }: ElementProps & { value?: ListItemValue; disabledSelection?: boolean; checkmark?: React.ReactNode; onAction?: (event: SharePointUIEvent, data: ListItemReactActionData) => void; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   ensureDefined(defineListItem);
@@ -1736,28 +1736,28 @@ export const ListItem = React.forwardRef<HTMLElement, ElementProps & { value?: L
     children, checkmark == null ? null : React.createElement("span", { slot: "checkmark" }, checkmark));
 });
 
-export const CarouselCard = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; autoSize?: boolean }>(function CarouselCard({ children, autoSize = false, ...props }: ElementProps & { children?: React.ReactNode; autoSize?: boolean }, forwardedRef): React.ReactElement {
+export const CarouselCard = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; autoSize?: boolean }>(function CarouselCard({ children, autoSize = false, ...props }: ElementProps & { children?: React.ReactNode; autoSize?: boolean }, forwardedRef): React.ReactElement {
   ensureDefined(defineCarouselCard);
   return React.createElement("spui-carousel-card", useCustomElementProps({ ref: forwardedRef, ...props, "auto-size": autoSize || undefined }), children);
 });
 
-export const CarouselNav = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string; appearance?: "brand"; slot?: string }>(function CarouselNav({ children, label, appearance, slot = "navigation", ...props }: ElementProps & { children?: React.ReactNode; label?: string; appearance?: "brand"; slot?: string }, forwardedRef): React.ReactElement {
+export const CarouselNav = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string; appearance?: "brand"; slot?: string }>(function CarouselNav({ children, label, appearance, slot = "navigation", ...props }: ElementProps & { children?: React.ReactNode; label?: string; appearance?: "brand"; slot?: string }, forwardedRef): React.ReactElement {
   const strings = React.useContext(UIContext).strings;
   ensureDefined(defineCarouselNav); ensureDefined(defineCarouselNavButton); ensureDefined(defineCarouselNavImageButton);
   return React.createElement("spui-carousel-nav", useCustomElementProps({ ref: forwardedRef, ...props, slot, "aria-label": label || strings.carouselNavigation, appearance }), children);
 });
 
-export const CarouselNavButton = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; index: number; label?: string; selected?: boolean; disabled?: boolean }>(function CarouselNavButton({ children, index, label, selected = false, disabled = false, ...props }: ElementProps & { children?: React.ReactNode; index: number; label?: string; selected?: boolean; disabled?: boolean }, forwardedRef): React.ReactElement {
+export const CarouselNavButton = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; index: number; label?: string; selected?: boolean; disabled?: boolean }>(function CarouselNavButton({ children, index, label, selected = false, disabled = false, ...props }: ElementProps & { children?: React.ReactNode; index: number; label?: string; selected?: boolean; disabled?: boolean }, forwardedRef): React.ReactElement {
   ensureDefined(defineCarouselNavButton);
   return React.createElement("spui-carousel-nav-button", useCustomElementProps({ ref: forwardedRef, ...props, index, label, selected: selected || undefined, disabled: disabled || undefined }), children);
 });
 
-export const CarouselNavImageButton = React.forwardRef<HTMLElement, ElementProps & { index: number; src: string; alt: string; label?: string; image?: React.ReactElement; selected?: boolean; disabled?: boolean }>(function CarouselNavImageButton({ index, src, alt, label, image, selected = false, disabled = false, ...props }: ElementProps & { index: number; src: string; alt: string; label?: string; image?: React.ReactElement; selected?: boolean; disabled?: boolean }, forwardedRef): React.ReactElement {
+export const CarouselNavImageButton = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { index: number; src: string; alt: string; label?: string; image?: React.ReactElement; selected?: boolean; disabled?: boolean }>(function CarouselNavImageButton({ index, src, alt, label, image, selected = false, disabled = false, ...props }: ElementProps & { index: number; src: string; alt: string; label?: string; image?: React.ReactElement; selected?: boolean; disabled?: boolean }, forwardedRef): React.ReactElement {
   ensureDefined(defineCarouselNavImageButton);
   return React.createElement("spui-carousel-nav-image-button", useCustomElementProps({ ref: forwardedRef, ...props, index, src, alt, label, selected: selected || undefined, disabled: disabled || undefined }), image == null ? null : React.cloneElement(image, { slot: "image" }));
 });
 
-export const CarouselButton = React.forwardRef<HTMLElement, Omit<ElementProps, "slot"> & { children?: React.ReactNode; icon?: React.ReactNode; navType?: "prev" | "next"; label?: string; slot?: string | null }>(function CarouselButton({ children, icon, navType = "next", label, ...props }: Omit<ElementProps, "slot"> & { children?: React.ReactNode; icon?: React.ReactNode; navType?: "prev" | "next"; label?: string; slot?: string | null }, forwardedRef): React.ReactElement {
+export const CarouselButton = /* @__PURE__ */ React.forwardRef<HTMLElement, Omit<ElementProps, "slot"> & { children?: React.ReactNode; icon?: React.ReactNode; navType?: "prev" | "next"; label?: string; slot?: string | null }>(function CarouselButton({ children, icon, navType = "next", label, ...props }: Omit<ElementProps, "slot"> & { children?: React.ReactNode; icon?: React.ReactNode; navType?: "prev" | "next"; label?: string; slot?: string | null }, forwardedRef): React.ReactElement {
   ensureDefined(defineCarouselButton);
   return React.createElement("spui-carousel-button", useCustomElementProps({ ref: forwardedRef, ...props, slot: props.slot === null ? null : props.slot || (navType === "prev" ? "previous" : "next"), "nav-type": navType, label }), renderIconSlot(icon), children);
 });
@@ -1767,7 +1767,7 @@ export type CarouselAutoplayChangeData = { checked: boolean } & (
   | { event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>; type: "click" }
 );
 
-export const CarouselAutoplayButton = React.forwardRef<HTMLElement, Omit<ElementProps, "slot"> & { icon?: React.ReactNode; playLabel?: string; pauseLabel?: string; onCheckedChange?: (event: SharePointUIEvent, data: CarouselAutoplayChangeData) => void; slot?: string | null }>(function CarouselAutoplayButton({ icon, playLabel, pauseLabel, onCheckedChange, ...props }: Omit<ElementProps, "slot"> & { icon?: React.ReactNode; playLabel?: string; pauseLabel?: string; onCheckedChange?: (event: SharePointUIEvent, data: CarouselAutoplayChangeData) => void; slot?: string | null }, forwardedRef): React.ReactElement {
+export const CarouselAutoplayButton = /* @__PURE__ */ React.forwardRef<HTMLElement, Omit<ElementProps, "slot"> & { icon?: React.ReactNode; playLabel?: string; pauseLabel?: string; onCheckedChange?: (event: SharePointUIEvent, data: CarouselAutoplayChangeData) => void; slot?: string | null }>(function CarouselAutoplayButton({ icon, playLabel, pauseLabel, onCheckedChange, ...props }: Omit<ElementProps, "slot"> & { icon?: React.ReactNode; playLabel?: string; pauseLabel?: string; onCheckedChange?: (event: SharePointUIEvent, data: CarouselAutoplayChangeData) => void; slot?: string | null }, forwardedRef): React.ReactElement {
   const strings = React.useContext(UIContext).strings;
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -1806,7 +1806,7 @@ function createCarouselChangeEvent(change: { event: Event; eventType: CarouselIn
   return change.event;
 }
 
-export const CarouselNavContainer = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; prev?: CarouselNavButtonSlotProps | null; next?: CarouselNavButtonSlotProps | null; autoplay?: CarouselAutoplaySlotProps | null; prevTooltip?: CarouselTooltipSlotProps | null; nextTooltip?: CarouselTooltipSlotProps | null; autoplayTooltip?: CarouselTooltipSlotProps | null; layout?: "inline" | "inline-wide" | "overlay" | "overlay-wide" | "overlay-expanded" }>(function CarouselNavContainer({ children, prev, next, autoplay, prevTooltip, nextTooltip, autoplayTooltip, layout = "inline", ...props }: ElementProps & { children?: React.ReactNode; prev?: CarouselNavButtonSlotProps | null; next?: CarouselNavButtonSlotProps | null; autoplay?: CarouselAutoplaySlotProps | null; prevTooltip?: CarouselTooltipSlotProps | null; nextTooltip?: CarouselTooltipSlotProps | null; autoplayTooltip?: CarouselTooltipSlotProps | null; layout?: "inline" | "inline-wide" | "overlay" | "overlay-wide" | "overlay-expanded" }, forwardedRef): React.ReactElement {
+export const CarouselNavContainer = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; prev?: CarouselNavButtonSlotProps | null; next?: CarouselNavButtonSlotProps | null; autoplay?: CarouselAutoplaySlotProps | null; prevTooltip?: CarouselTooltipSlotProps | null; nextTooltip?: CarouselTooltipSlotProps | null; autoplayTooltip?: CarouselTooltipSlotProps | null; layout?: "inline" | "inline-wide" | "overlay" | "overlay-wide" | "overlay-expanded" }>(function CarouselNavContainer({ children, prev, next, autoplay, prevTooltip, nextTooltip, autoplayTooltip, layout = "inline", ...props }: ElementProps & { children?: React.ReactNode; prev?: CarouselNavButtonSlotProps | null; next?: CarouselNavButtonSlotProps | null; autoplay?: CarouselAutoplaySlotProps | null; prevTooltip?: CarouselTooltipSlotProps | null; nextTooltip?: CarouselTooltipSlotProps | null; autoplayTooltip?: CarouselTooltipSlotProps | null; layout?: "inline" | "inline-wide" | "overlay" | "overlay-wide" | "overlay-expanded" }, forwardedRef): React.ReactElement {
   const strings = React.useContext(UIContext).strings;
   ensureDefined(defineCarouselNavContainer);
   const flattenChildren = (nodes: React.ReactNode): React.ReactNode[] => React.Children.toArray(nodes).flatMap(child => React.isValidElement(child) && child.type === React.Fragment ? flattenChildren(child.props.children) : [child]);
@@ -1857,17 +1857,17 @@ export function useCarouselContext(): CarouselContextValue | undefined {
   return React.useContext(CarouselContext);
 }
 
-export const CarouselSlider = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; cardFocus?: boolean }>(function CarouselSlider({ children, cardFocus = false, ...props }: ElementProps & { children?: React.ReactNode; cardFocus?: boolean }, forwardedRef): React.ReactElement {
+export const CarouselSlider = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; cardFocus?: boolean }>(function CarouselSlider({ children, cardFocus = false, ...props }: ElementProps & { children?: React.ReactNode; cardFocus?: boolean }, forwardedRef): React.ReactElement {
   ensureDefined(defineCarouselSlider);
   return React.createElement("spui-carousel-slider", useCustomElementProps({ ref: forwardedRef, ...props, "card-focus": cardFocus || undefined }), children);
 });
 
-export const CarouselViewport = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function CarouselViewport({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const CarouselViewport = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function CarouselViewport({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineCarouselViewport);
   return React.createElement("spui-carousel-viewport", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
 
-export const Carousel = React.forwardRef<HTMLElement, ElementProps & {
+export const Carousel = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & {
   children?: React.ReactNode; label?: string; roleDescription?: string; previousLabel?: string; nextLabel?: string; slideLabel?: string; slideGroupLabel?: string; navigationLabel?: string; playLabel?: string; pauseLabel?: string; slideWidth?: string;
   align?: CarouselAlign; appearance?: CarouselAppearance; motion?: CarouselMotion; motionDuration?: number; autoplay?: boolean; autoplayInterval?: number; selectedIndex?: number; activeIndex?: number; defaultSelectedIndex?: number; defaultActiveIndex?: number; wrap?: boolean; circular?: boolean; groupSize?: number | "auto"; draggable?: boolean; whitespace?: boolean; announcement?: CarouselAnnouncerFunction; onIndexChange?: (index: number) => void; onActiveIndexChange?: (event: SharePointUIEvent, data: CarouselReactIndexChangeData) => void
 }>(function Carousel({ children, label, roleDescription, previousLabel, nextLabel, slideLabel, slideGroupLabel, navigationLabel, playLabel, pauseLabel, slideWidth, align = "center", appearance = "flat", motion = "slide", motionDuration = 240, autoplay = false, autoplayInterval = 4000, selectedIndex, activeIndex, defaultSelectedIndex, defaultActiveIndex, wrap = false, circular = false, groupSize = "auto", draggable = false, whitespace = false, announcement, onIndexChange, onActiveIndexChange, ...props }: ElementProps & {
@@ -1887,7 +1887,7 @@ export const Carousel = React.forwardRef<HTMLElement, ElementProps & {
   return React.createElement("spui-carousel", useCustomElementProps({ ...props, ref, "aria-label": label || strings.carouselDescription, "aria-roledescription": roleDescription || strings.carouselRoleDescription, "previous-label": previousLabel || strings.carouselPrevious, "next-label": nextLabel || strings.carouselNext, "slide-label": slideLabel || strings.carouselSlide, "slide-group-label": slideGroupLabel || strings.carouselSlides, "navigation-label": navigationLabel || strings.carouselNavigation, "play-label": playLabel || strings.carouselPlay || "Play", "pause-label": pauseLabel || strings.carouselPause || "Pause", "slide-width": slideWidth, "group-size": groupSize, draggable: draggable || undefined, whitespace: whitespace || undefined, align, appearance, motion: motionKind, "motion-physics-duration": motionPhysicsDuration, "motion-duration": motionDuration, autoplay: autoplay || undefined, "autoplay-interval": autoplayInterval, "selected-index": controlledIndex, "active-index": activeIndex, "default-selected-index": defaultActiveIndex ?? defaultSelectedIndex, "default-active-index": defaultActiveIndex, controlled: controlledIndex !== undefined || undefined, wrap: wrap || undefined, circular: circular || undefined }), children);
 });
 
-export const Breadcrumb = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string; focusMode?: "tab" | "arrow"; size?: "small" | "medium" | "large"; separator?: string; list?: React.ReactElement }>(function Breadcrumb({ children, label, focusMode = "tab", size = "medium", separator, list, ...props }: ElementProps & { children?: React.ReactNode; label?: string; focusMode?: "tab" | "arrow"; size?: "small" | "medium" | "large"; separator?: string; list?: React.ReactElement }, forwardedRef): React.ReactElement {
+export const Breadcrumb = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string; focusMode?: "tab" | "arrow"; size?: "small" | "medium" | "large"; separator?: string; list?: React.ReactElement }>(function Breadcrumb({ children, label, focusMode = "tab", size = "medium", separator, list, ...props }: ElementProps & { children?: React.ReactNode; label?: string; focusMode?: "tab" | "arrow"; size?: "small" | "medium" | "large"; separator?: string; list?: React.ReactElement }, forwardedRef): React.ReactElement {
   ensureDefined(defineBreadcrumb);
   ensureDefined(defineBreadcrumbItem);
   ensureDefined(defineBreadcrumbButton);
@@ -1897,24 +1897,24 @@ export const Breadcrumb = React.forwardRef<HTMLElement, ElementProps & { childre
   return React.createElement(BreadcrumbSizeContext.Provider, { value: size }, React.createElement("spui-breadcrumb", useCustomElementProps({ ref: forwardedRef, ...props, label: label ?? strings.breadcrumbLabel, "focus-mode": focusMode, size, separator }), listSlot ?? children));
 });
 
-export const BreadcrumbItem = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; current?: boolean; size?: BreadcrumbSize }>(function BreadcrumbItem({ children, current = false, size, ...props }: ElementProps & { children?: React.ReactNode; current?: boolean; size?: BreadcrumbSize }, forwardedRef): React.ReactElement {
+export const BreadcrumbItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; current?: boolean; size?: BreadcrumbSize }>(function BreadcrumbItem({ children, current = false, size, ...props }: ElementProps & { children?: React.ReactNode; current?: boolean; size?: BreadcrumbSize }, forwardedRef): React.ReactElement {
   const inheritedSize = React.useContext(BreadcrumbSizeContext);
   ensureDefined(defineBreadcrumbItem);
   return React.createElement("spui-breadcrumb-item", useCustomElementProps({ ref: forwardedRef, ...props, current: current || undefined, size: size ?? inheritedSize }), children);
 });
 
-export const BreadcrumbButton = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; href?: string; target?: string; rel?: string; type?: "button" | "submit" | "reset"; current?: boolean; disabled?: boolean; disabledFocusable?: boolean; size?: BreadcrumbSize }>(function BreadcrumbButton({ children, icon, href, target, rel, type = "button", current = false, disabled = false, disabledFocusable = false, size, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; href?: string; target?: string; rel?: string; type?: "button" | "submit" | "reset"; current?: boolean; disabled?: boolean; disabledFocusable?: boolean; size?: BreadcrumbSize }, forwardedRef): React.ReactElement {
+export const BreadcrumbButton = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; href?: string; target?: string; rel?: string; type?: "button" | "submit" | "reset"; current?: boolean; disabled?: boolean; disabledFocusable?: boolean; size?: BreadcrumbSize }>(function BreadcrumbButton({ children, icon, href, target, rel, type = "button", current = false, disabled = false, disabledFocusable = false, size, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; href?: string; target?: string; rel?: string; type?: "button" | "submit" | "reset"; current?: boolean; disabled?: boolean; disabledFocusable?: boolean; size?: BreadcrumbSize }, forwardedRef): React.ReactElement {
   const inheritedSize = React.useContext(BreadcrumbSizeContext);
   ensureDefined(defineBreadcrumbButton);
   return React.createElement("spui-breadcrumb-button", useCustomElementProps({ ref: forwardedRef, ...props, href, target, rel, type, current: current || undefined, disabled: disabled || undefined, "disabled-focusable": disabledFocusable || undefined, "aria-current": current ? props["aria-current"] ?? "page" : props["aria-current"], size: size ?? inheritedSize }), renderIconSlot(icon), children);
 });
 
-export const BreadcrumbDivider = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function BreadcrumbDivider({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const BreadcrumbDivider = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function BreadcrumbDivider({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineBreadcrumbDivider);
   return React.createElement("spui-breadcrumb-divider", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
 
-export const Nav = React.forwardRef<HTMLElement, Omit<ElementProps, "onSelect"> & { children?: React.ReactNode; label?: string; selectedValue?: string | null; defaultSelectedValue?: string | null; selectedCategoryValue?: string | null; defaultSelectedCategoryValue?: string | null; openCategories?: readonly string[]; defaultOpenCategories?: readonly string[]; open?: boolean; defaultOpen?: boolean; collapsed?: boolean; defaultCollapsed?: boolean; collapsible?: boolean; multiple?: boolean; density?: "small" | "medium" | "large"; tabbable?: boolean | "true" | "false"; openLabel?: string; closeLabel?: string; onItemSelect?: (value: string, href: string | null, label: string) => void; onCategoryToggle?: (value: string, open: boolean, openCategories: string[]) => void; onNavItemSelect?: (event: SharePointUIEvent, data: NavReactItemSelectData) => void; onNavCategoryItemToggle?: (event: SharePointUIEvent, data: NavReactCategoryToggleData) => void; onOpenChange?: (open: boolean) => void; onCollapsedChange?: (collapsed: boolean) => void }>(function Nav({ children, label = "Navigation", selectedValue, defaultSelectedValue, selectedCategoryValue, defaultSelectedCategoryValue, openCategories, defaultOpenCategories = [], open, defaultOpen, collapsed, defaultCollapsed, collapsible = false, multiple = true, density = "medium", openLabel, closeLabel, onItemSelect, onCategoryToggle, onNavItemSelect, onNavCategoryItemToggle, onOpenChange, onCollapsedChange, ...props }: Omit<ElementProps, "onSelect"> & { children?: React.ReactNode; label?: string; selectedValue?: string | null; defaultSelectedValue?: string | null; selectedCategoryValue?: string | null; defaultSelectedCategoryValue?: string | null; openCategories?: readonly string[]; defaultOpenCategories?: readonly string[]; open?: boolean; defaultOpen?: boolean; collapsed?: boolean; defaultCollapsed?: boolean; collapsible?: boolean; multiple?: boolean; density?: "small" | "medium" | "large"; tabbable?: boolean | "true" | "false"; openLabel?: string; closeLabel?: string; onItemSelect?: (value: string, href: string | null, label: string) => void; onCategoryToggle?: (value: string, open: boolean, openCategories: string[]) => void; onNavItemSelect?: (event: SharePointUIEvent, data: NavReactItemSelectData) => void; onNavCategoryItemToggle?: (event: SharePointUIEvent, data: NavReactCategoryToggleData) => void; onOpenChange?: (open: boolean) => void; onCollapsedChange?: (collapsed: boolean) => void }, forwardedRef): React.ReactElement {
+export const Nav = /* @__PURE__ */ React.forwardRef<HTMLElement, Omit<ElementProps, "onSelect"> & { children?: React.ReactNode; label?: string; selectedValue?: string | null; defaultSelectedValue?: string | null; selectedCategoryValue?: string | null; defaultSelectedCategoryValue?: string | null; openCategories?: readonly string[]; defaultOpenCategories?: readonly string[]; open?: boolean; defaultOpen?: boolean; collapsed?: boolean; defaultCollapsed?: boolean; collapsible?: boolean; multiple?: boolean; density?: "small" | "medium" | "large"; tabbable?: boolean | "true" | "false"; openLabel?: string; closeLabel?: string; onItemSelect?: (value: string, href: string | null, label: string) => void; onCategoryToggle?: (value: string, open: boolean, openCategories: string[]) => void; onNavItemSelect?: (event: SharePointUIEvent, data: NavReactItemSelectData) => void; onNavCategoryItemToggle?: (event: SharePointUIEvent, data: NavReactCategoryToggleData) => void; onOpenChange?: (open: boolean) => void; onCollapsedChange?: (collapsed: boolean) => void }>(function Nav({ children, label = "Navigation", selectedValue, defaultSelectedValue, selectedCategoryValue, defaultSelectedCategoryValue, openCategories, defaultOpenCategories = [], open, defaultOpen, collapsed, defaultCollapsed, collapsible = false, multiple = true, density = "medium", openLabel, closeLabel, onItemSelect, onCategoryToggle, onNavItemSelect, onNavCategoryItemToggle, onOpenChange, onCollapsedChange, ...props }: Omit<ElementProps, "onSelect"> & { children?: React.ReactNode; label?: string; selectedValue?: string | null; defaultSelectedValue?: string | null; selectedCategoryValue?: string | null; defaultSelectedCategoryValue?: string | null; openCategories?: readonly string[]; defaultOpenCategories?: readonly string[]; open?: boolean; defaultOpen?: boolean; collapsed?: boolean; defaultCollapsed?: boolean; collapsible?: boolean; multiple?: boolean; density?: "small" | "medium" | "large"; tabbable?: boolean | "true" | "false"; openLabel?: string; closeLabel?: string; onItemSelect?: (value: string, href: string | null, label: string) => void; onCategoryToggle?: (value: string, open: boolean, openCategories: string[]) => void; onNavItemSelect?: (event: SharePointUIEvent, data: NavReactItemSelectData) => void; onNavCategoryItemToggle?: (event: SharePointUIEvent, data: NavReactCategoryToggleData) => void; onOpenChange?: (open: boolean) => void; onCollapsedChange?: (collapsed: boolean) => void }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   const defaultsApplied = React.useRef(false);
@@ -1946,7 +1946,7 @@ function renderNavAvatar(avatar?: React.ReactElement): React.ReactElement | null
   return avatar ? React.cloneElement(avatar, { slot: "avatar", ...(avatar.type === Avatar ? { decorative: true } : {}) } as React.HTMLAttributes<HTMLElement>) : null;
 }
 
-export const NavItem = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }>(function NavItem({ children, value, href, disabled = false, icon, avatar, ...props }: ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }, forwardedRef): React.ReactElement {
+export const NavItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }>(function NavItem({ children, value, href, disabled = false, icon, avatar, ...props }: ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }, forwardedRef): React.ReactElement {
   ensureDefined(defineNavItem);
   return React.createElement("spui-nav-item", useCustomElementProps({ ref: forwardedRef, ...props, value, href, disabled: disabled || undefined }), renderNavAvatar(avatar), icon === undefined ? null : React.createElement("span", { slot: "icon" }, icon), children);
 });
@@ -1954,7 +1954,7 @@ export const NavItem = React.forwardRef<HTMLElement, ElementProps & { children?:
 type NavCategoryMotionContextValue = { open: boolean; setOpen: (open: boolean) => void };
 const NavCategoryMotionContext = React.createContext<NavCategoryMotionContextValue | undefined>(undefined);
 
-export const NavCategory = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; value: string; disabled?: boolean }>(function NavCategory({ children, value, disabled = false, ...props }: ElementProps & { children?: React.ReactNode; value: string; disabled?: boolean }, forwardedRef): React.ReactElement {
+export const NavCategory = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; value: string; disabled?: boolean }>(function NavCategory({ children, value, disabled = false, ...props }: ElementProps & { children?: React.ReactNode; value: string; disabled?: boolean }, forwardedRef): React.ReactElement {
   ensureDefined(defineNavCategory);
   ensureDefined(defineNavCategoryItem); ensureDefined(defineNavSubItemGroup); ensureDefined(defineNavSubItem);
   const [open, setOpen] = React.useState(false);
@@ -1962,7 +1962,7 @@ export const NavCategory = React.forwardRef<HTMLElement, ElementProps & { childr
   return React.createElement(NavCategoryMotionContext.Provider, { value: context }, React.createElement("spui-nav-category", useCustomElementProps({ ref: forwardedRef, ...props, value, disabled: disabled || undefined }), children));
 });
 
-export const NavCategoryItem = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; avatar?: React.ReactElement; expandIcon?: React.ReactNode; expandIconMotion?: React.ComponentType<PresenceMotionSlotProps> }>(function NavCategoryItem({ children, icon, avatar, expandIcon, expandIconMotion, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; avatar?: React.ReactElement; expandIcon?: React.ReactNode; expandIconMotion?: React.ComponentType<PresenceMotionSlotProps> }, forwardedRef): React.ReactElement {
+export const NavCategoryItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; avatar?: React.ReactElement; expandIcon?: React.ReactNode; expandIconMotion?: React.ComponentType<PresenceMotionSlotProps> }>(function NavCategoryItem({ children, icon, avatar, expandIcon, expandIconMotion, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; avatar?: React.ReactElement; expandIcon?: React.ReactNode; expandIconMotion?: React.ComponentType<PresenceMotionSlotProps> }, forwardedRef): React.ReactElement {
   const category = React.useContext(NavCategoryMotionContext);
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -1983,40 +1983,40 @@ export const NavCategoryItem = React.forwardRef<HTMLElement, ElementProps & { ch
   return React.createElement("spui-nav-category-item", useCustomElementProps({ ...props, ref }), renderNavAvatar(avatar), icon === undefined ? null : React.createElement("span", { slot: "icon" }, icon), children, renderedExpandIcon == null ? null : React.createElement("span", { slot: "expand-icon" }, renderedExpandIcon));
 });
 
-export const NavSubItemGroup = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; collapseMotion?: React.ComponentType<PresenceMotionSlotProps> }>(function NavSubItemGroup({ children, collapseMotion, ...props }: ElementProps & { children?: React.ReactNode; collapseMotion?: React.ComponentType<PresenceMotionSlotProps> }, forwardedRef): React.ReactElement {
+export const NavSubItemGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; collapseMotion?: React.ComponentType<PresenceMotionSlotProps> }>(function NavSubItemGroup({ children, collapseMotion, ...props }: ElementProps & { children?: React.ReactNode; collapseMotion?: React.ComponentType<PresenceMotionSlotProps> }, forwardedRef): React.ReactElement {
   const category = React.useContext(NavCategoryMotionContext);
   ensureDefined(defineNavSubItemGroup);
   const content = collapseMotion ? React.createElement(collapseMotion, { visible: category?.open ?? false, unmountOnExit: true }, children) : children;
   return React.createElement("spui-nav-sub-item-group", useCustomElementProps({ ref: forwardedRef, ...props, motion: collapseMotion ? true : undefined }), content);
 });
 
-export const NavSubItem = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }>(function NavSubItem({ children, value, href, disabled = false, icon, avatar, ...props }: ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }, forwardedRef): React.ReactElement {
+export const NavSubItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }>(function NavSubItem({ children, value, href, disabled = false, icon, avatar, ...props }: ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }, forwardedRef): React.ReactElement {
   ensureDefined(defineNavSubItem);
   return React.createElement("spui-nav-sub-item", useCustomElementProps({ ref: forwardedRef, ...props, value, href, disabled: disabled || undefined }), renderNavAvatar(avatar), icon === undefined ? null : React.createElement("span", { slot: "icon" }, icon), children);
 });
 
 export type NavDividerProps = ElementProps & { wrapper?: DividerWrapper };
-export const NavDivider = React.forwardRef<HTMLElement, NavDividerProps>(function NavDivider({ wrapper, ...props }: NavDividerProps, forwardedRef): React.ReactElement {
+export const NavDivider = /* @__PURE__ */ React.forwardRef<HTMLElement, NavDividerProps>(function NavDivider({ wrapper, ...props }: NavDividerProps, forwardedRef): React.ReactElement {
   ensureDefined(defineNavDivider);
   return React.createElement("spui-nav-divider", useCustomElementProps({ ref: forwardedRef, ...props }), renderDividerWrapper(wrapper));
 });
 
-export const NavSectionHeader = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function NavSectionHeader({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const NavSectionHeader = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function NavSectionHeader({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineNavSectionHeader);
   return React.createElement("spui-nav-section-header", useCustomElementProps({ ref: forwardedRef, ...props }), children);
 });
 
-export const AppItem = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }>(function AppItem({ children, value, href, disabled = false, icon, avatar, ...props }: ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }, forwardedRef): React.ReactElement {
+export const AppItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }>(function AppItem({ children, value, href, disabled = false, icon, avatar, ...props }: ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }, forwardedRef): React.ReactElement {
   ensureDefined(defineAppItem);
   return React.createElement("spui-app-item", useCustomElementProps({ ref: forwardedRef, ...props, value, href, disabled: disabled || undefined }), renderNavAvatar(avatar), icon === undefined ? null : React.createElement("span", { slot: "icon" }, icon), children);
 });
 
-export const AppItemStatic = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode }>(function AppItemStatic({ children, icon, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const AppItemStatic = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode }>(function AppItemStatic({ children, icon, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineAppItemStatic);
   return React.createElement("spui-app-item-static", useCustomElementProps({ ...props, ref: forwardedRef }), icon === undefined ? null : React.createElement("span", { slot: "icon" }, icon), children);
 });
 
-export const Hamburger = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; open?: boolean; label?: string; disabled?: boolean; onClick?: React.MouseEventHandler<HTMLElement> }>(function Hamburger({ children, icon, open = false, label, disabled = false, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; open?: boolean; label?: string; disabled?: boolean; onClick?: React.MouseEventHandler<HTMLElement> }, forwardedRef): React.ReactElement {
+export const Hamburger = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; open?: boolean; label?: string; disabled?: boolean; onClick?: React.MouseEventHandler<HTMLElement> }>(function Hamburger({ children, icon, open = false, label, disabled = false, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; open?: boolean; label?: string; disabled?: boolean; onClick?: React.MouseEventHandler<HTMLElement> }, forwardedRef): React.ReactElement {
   ensureDefined(defineHamburger);
   const strings = React.useContext(UIContext).strings;
   const resolvedLabel = label ?? strings.navigationToggle ?? "Toggle navigation";
@@ -2031,7 +2031,7 @@ export type NavDrawerProps = Omit<React.ComponentProps<typeof Nav>, "children" |
   onExpandedChange?: (expanded: boolean) => void; tabbable?: boolean;
 };
 
-export const NavDrawer = React.forwardRef<HTMLElement, NavDrawerProps>(function NavDrawer({ children, type = "overlay", open, defaultOpen, modal = true, dismissible = true, position = "start", size = "medium", expandable = false, expanded, unmountOnClose = true, separator = false, closeLabel, onOpenChange, onDismiss, onExpandedChange, tabbable = false, ...props }: NavDrawerProps, forwardedRef): React.ReactElement {
+export const NavDrawer = /* @__PURE__ */ React.forwardRef<HTMLElement, NavDrawerProps>(function NavDrawer({ children, type = "overlay", open, defaultOpen, modal = true, dismissible = true, position = "start", size = "medium", expandable = false, expanded, unmountOnClose = true, separator = false, closeLabel, onOpenChange, onDismiss, onExpandedChange, tabbable = false, ...props }: NavDrawerProps, forwardedRef): React.ReactElement {
   ensureDefined(defineNavDrawer);
   const { "data-testid": testId, label = "Navigation", ...navProps } = props;
   return React.createElement("spui-nav-drawer", useCustomElementProps({ ref: forwardedRef, "data-testid": testId, "data-type": type }),
@@ -2039,22 +2039,22 @@ export const NavDrawer = React.forwardRef<HTMLElement, NavDrawerProps>(function 
       React.createElement(Nav, { ...navProps, label, "data-drawer-type": type, tabbable: tabbable ? "true" : "false" }, children)));
 });
 
-export const NavDrawerHeader = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function NavDrawerHeader({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const NavDrawerHeader = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function NavDrawerHeader({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineNavDrawerHeader);
   return React.createElement("spui-nav-drawer-header", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
 
-export const NavDrawerBody = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function NavDrawerBody({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const NavDrawerBody = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function NavDrawerBody({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineNavDrawerBody);
   return React.createElement("spui-nav-drawer-body", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
 
-export const NavDrawerFooter = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function NavDrawerFooter({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const NavDrawerFooter = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function NavDrawerFooter({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineNavDrawerFooter);
   return React.createElement("spui-nav-drawer-footer", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
 
-export const SplitNavItem = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; action?: React.ReactNode; actionLabel?: string; onAction?: React.MouseEventHandler<HTMLButtonElement>; navItem?: React.ReactElement; actionButton?: React.ReactElement; actionButtonTooltip?: React.ReactElement; menuButton?: React.ReactElement; menuButtonTooltip?: React.ReactElement; toggleButton?: React.ReactElement; toggleButtonTooltip?: React.ReactElement }>(function SplitNavItem({ children, value, href, disabled = false, icon, action, actionLabel, onAction, navItem, actionButton, actionButtonTooltip, menuButton, menuButtonTooltip, toggleButton, toggleButtonTooltip, ...props }: ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; action?: React.ReactNode; actionLabel?: string; onAction?: React.MouseEventHandler<HTMLButtonElement>; navItem?: React.ReactElement; actionButton?: React.ReactElement; actionButtonTooltip?: React.ReactElement; menuButton?: React.ReactElement; menuButtonTooltip?: React.ReactElement; toggleButton?: React.ReactElement; toggleButtonTooltip?: React.ReactElement }, forwardedRef): React.ReactElement {
+export const SplitNavItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; action?: React.ReactNode; actionLabel?: string; onAction?: React.MouseEventHandler<HTMLButtonElement>; navItem?: React.ReactElement; actionButton?: React.ReactElement; actionButtonTooltip?: React.ReactElement; menuButton?: React.ReactElement; menuButtonTooltip?: React.ReactElement; toggleButton?: React.ReactElement; toggleButtonTooltip?: React.ReactElement }>(function SplitNavItem({ children, value, href, disabled = false, icon, action, actionLabel, onAction, navItem, actionButton, actionButtonTooltip, menuButton, menuButtonTooltip, toggleButton, toggleButtonTooltip, ...props }: ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; action?: React.ReactNode; actionLabel?: string; onAction?: React.MouseEventHandler<HTMLButtonElement>; navItem?: React.ReactElement; actionButton?: React.ReactElement; actionButtonTooltip?: React.ReactElement; menuButton?: React.ReactElement; menuButtonTooltip?: React.ReactElement; toggleButton?: React.ReactElement; toggleButtonTooltip?: React.ReactElement }, forwardedRef): React.ReactElement {
   ensureDefined(defineSplitNavItem);
   const strings = React.useContext(UIContext).strings;
   const resolvedActionLabel = actionLabel ?? strings.splitNavItemActionLabel ?? "More actions";
@@ -2115,7 +2115,7 @@ function retainTabValue(value: TabValue): () => void {
   };
 }
 
-export const Tabs = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; selectedValue?: any; defaultSelectedValue?: any; disabled?: boolean; onTabSelect?: (value: any) => void }>(function Tabs<T = string>({ children, selectedValue, defaultSelectedValue, disabled = false, onTabSelect, ...props }: ElementProps & { children?: React.ReactNode; selectedValue?: T; defaultSelectedValue?: T; disabled?: boolean; onTabSelect?: (value: T) => void }, forwardedRef: React.ForwardedRef<HTMLElement>): React.ReactElement {
+export const Tabs = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; selectedValue?: any; defaultSelectedValue?: any; disabled?: boolean; onTabSelect?: (value: any) => void }>(function Tabs<T = string>({ children, selectedValue, defaultSelectedValue, disabled = false, onTabSelect, ...props }: ElementProps & { children?: React.ReactNode; selectedValue?: T; defaultSelectedValue?: T; disabled?: boolean; onTabSelect?: (value: T) => void }, forwardedRef: React.ForwardedRef<HTMLElement>): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null);
   useExposeHostRef(ref, forwardedRef);
   ensureDefined(defineTabs);
@@ -2147,7 +2147,7 @@ export function TabListProvider({ value, children }: { value: TabListProviderVal
 
 export type TabListProps = ElementProps & { children?: React.ReactNode; selectedValue?: TabValue; defaultSelectedValue?: TabValue; selectTabOnFocus?: boolean; reserveSelectedTabSpace?: boolean; vertical?: boolean; disabled?: boolean; appearance?: "transparent" | "subtle" | "subtle-circular" | "filled-circular"; size?: "small" | "medium" | "large"; onTabSelect?: (event: TabSelectEvent, data: TabSelectData) => void };
 
-export const TabList = React.forwardRef<HTMLElement, TabListProps>(function TabList({ children, selectedValue, defaultSelectedValue, selectTabOnFocus, reserveSelectedTabSpace, vertical, disabled, appearance, size, onTabSelect, ...props }: TabListProps, forwardedRef): React.ReactElement {
+export const TabList = /* @__PURE__ */ React.forwardRef<HTMLElement, TabListProps>(function TabList({ children, selectedValue, defaultSelectedValue, selectTabOnFocus, reserveSelectedTabSpace, vertical, disabled, appearance, size, onTabSelect, ...props }: TabListProps, forwardedRef): React.ReactElement {
   const provider = React.useContext(TabListContext);
   const resolvedSelectedValue = selectedValue !== undefined ? selectedValue : provider?.selectedValue;
   const resolvedSelectOnFocus = selectTabOnFocus ?? provider?.selectTabOnFocus ?? false;
@@ -2172,7 +2172,7 @@ export const TabList = React.forwardRef<HTMLElement, TabListProps>(function TabL
   return React.createElement("spui-tab-list", useCustomElementProps({ ...props, ref, "selected-value": resolvedSelectedValue === undefined ? undefined : encodeTabValue(resolvedSelectedValue), "default-selected-value": defaultSelectedValue === undefined ? undefined : encodeTabValue(defaultSelectedValue), "select-on-focus": resolvedSelectOnFocus || undefined, "reserve-selected-tab-space": resolvedReserveSpace ? undefined : "false", vertical: resolvedVertical || undefined, disabled: resolvedDisabled || undefined, appearance: resolvedAppearance, size: resolvedSize }), children);
 });
 
-export const Tab = React.forwardRef<HTMLElement, ElementProps & { value: TabValue; disabled?: boolean; icon?: React.ReactNode; content?: React.ReactNode; children?: React.ReactNode }>(function Tab({ value, disabled = false, icon, content, children, ...props }: ElementProps & { value: TabValue; disabled?: boolean; icon?: React.ReactNode; content?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const Tab = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { value: TabValue; disabled?: boolean; icon?: React.ReactNode; content?: React.ReactNode; children?: React.ReactNode }>(function Tab({ value, disabled = false, icon, content, children, ...props }: ElementProps & { value: TabValue; disabled?: boolean; icon?: React.ReactNode; content?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   const provider = React.useContext(TabListContext);
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -2187,13 +2187,13 @@ export const Tab = React.forwardRef<HTMLElement, ElementProps & { value: TabValu
   return React.createElement("spui-tab", useCustomElementProps({ ...props, ref, value: encodeTabValue(value), "data-spui-tab-value-type": tabValueType(value), disabled: disabled || undefined }), icon == null ? null : React.createElement("span", { slot: "icon", "aria-hidden": true }, icon), content == null ? children : React.createElement("span", { slot: "content" }, content));
 });
 
-export const TabPanel = React.forwardRef<HTMLElement, ElementProps & { value: TabValue; children?: React.ReactNode }>(function TabPanel({ value, children, ...props }: ElementProps & { value: TabValue; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const TabPanel = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { value: TabValue; children?: React.ReactNode }>(function TabPanel({ value, children, ...props }: ElementProps & { value: TabValue; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineTabs);
   return React.createElement("spui-tab-panel", useCustomElementProps({ ref: forwardedRef, ...props, value: encodeTabValue(value) }), children);
 });
 
 export type TooltipVisibleChangeEvent = React.PointerEvent<HTMLElement> | React.FocusEvent<HTMLElement> | undefined;
-export const Tooltip = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; content?: React.ReactNode; placement?: "top" | "bottom" | "start" | "end" | "left" | "right"; positioning?: TooltipPositioning; align?: "start" | "center" | "end"; offset?: number; appearance?: TooltipAppearance; relationship?: TooltipRelationship; disabled?: boolean; open?: boolean; visible?: boolean; delay?: number; showDelay?: number; hideDelay?: number; withArrow?: boolean; onOpenChange?: (open: boolean) => void; onVisibleChange?: (event: TooltipVisibleChangeEvent, data: TooltipVisibleChangeData) => void }>(function Tooltip({ children, content, placement = "top", positioning, align, offset, appearance = "normal", relationship = "description", disabled = false, open, visible, delay, showDelay, hideDelay, withArrow = false, onOpenChange, onVisibleChange, ...props }: ElementProps & { children?: React.ReactNode; content?: React.ReactNode; placement?: "top" | "bottom" | "start" | "end" | "left" | "right"; positioning?: TooltipPositioning; align?: "start" | "center" | "end"; offset?: number; appearance?: TooltipAppearance; relationship?: TooltipRelationship; disabled?: boolean; open?: boolean; visible?: boolean; delay?: number; showDelay?: number; hideDelay?: number; withArrow?: boolean; onOpenChange?: (open: boolean) => void; onVisibleChange?: (event: TooltipVisibleChangeEvent, data: TooltipVisibleChangeData) => void }, forwardedRef): React.ReactElement {
+export const Tooltip = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; content?: React.ReactNode; placement?: "top" | "bottom" | "start" | "end" | "left" | "right"; positioning?: TooltipPositioning; align?: "start" | "center" | "end"; offset?: number; appearance?: TooltipAppearance; relationship?: TooltipRelationship; disabled?: boolean; open?: boolean; visible?: boolean; delay?: number; showDelay?: number; hideDelay?: number; withArrow?: boolean; onOpenChange?: (open: boolean) => void; onVisibleChange?: (event: TooltipVisibleChangeEvent, data: TooltipVisibleChangeData) => void }>(function Tooltip({ children, content, placement = "top", positioning, align, offset, appearance = "normal", relationship = "description", disabled = false, open, visible, delay, showDelay, hideDelay, withArrow = false, onOpenChange, onVisibleChange, ...props }: ElementProps & { children?: React.ReactNode; content?: React.ReactNode; placement?: "top" | "bottom" | "start" | "end" | "left" | "right"; positioning?: TooltipPositioning; align?: "start" | "center" | "end"; offset?: number; appearance?: TooltipAppearance; relationship?: TooltipRelationship; disabled?: boolean; open?: boolean; visible?: boolean; delay?: number; showDelay?: number; hideDelay?: number; withArrow?: boolean; onOpenChange?: (open: boolean) => void; onVisibleChange?: (event: TooltipVisibleChangeEvent, data: TooltipVisibleChangeData) => void }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   const controlledVisible = visible ?? open;
@@ -2241,7 +2241,7 @@ export function PopoverProvider({ value, children }: { value: PopoverContextValu
 }
 
 export type PopoverOpenChangeEvent = MouseEvent | TouchEvent | FocusEvent | React.FocusEvent<HTMLElement> | React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement>;
-export const Popover = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; trigger?: React.ReactElement; label?: string; placement?: "top" | "bottom" | "start" | "end"; positioning?: PopoverPositioning; open?: boolean; defaultOpen?: boolean; openOnContext?: boolean; openOnHover?: boolean; mouseLeaveDelay?: number; closeOnIframeFocus?: boolean; onOpenChange?: (event: PopoverOpenChangeEvent, data: PopoverOpenChangeData) => void; inline?: boolean; trapFocus?: boolean; inertTrapFocus?: boolean; legacyTrapFocus?: boolean; unstable_disableAutoFocus?: boolean; arrow?: boolean; withArrow?: boolean; appearance?: "brand" | "inverted"; size?: "small" | "medium" | "large"; closeOnScroll?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps> }>(function Popover({ children, trigger, label, placement = "bottom", positioning, open, defaultOpen = false, openOnContext, openOnHover, mouseLeaveDelay, closeOnIframeFocus = true, onOpenChange, inline, trapFocus, inertTrapFocus, legacyTrapFocus, unstable_disableAutoFocus = false, arrow, withArrow, appearance, size, closeOnScroll = false, surfaceMotion, ...props }: ElementProps & { children?: React.ReactNode; trigger?: React.ReactElement; label?: string; placement?: "top" | "bottom" | "start" | "end"; positioning?: PopoverPositioning; open?: boolean; defaultOpen?: boolean; openOnContext?: boolean; openOnHover?: boolean; mouseLeaveDelay?: number; closeOnIframeFocus?: boolean; onOpenChange?: (event: PopoverOpenChangeEvent, data: PopoverOpenChangeData) => void; inline?: boolean; trapFocus?: boolean; inertTrapFocus?: boolean; legacyTrapFocus?: boolean; unstable_disableAutoFocus?: boolean; arrow?: boolean; withArrow?: boolean; appearance?: "brand" | "inverted"; size?: "small" | "medium" | "large"; closeOnScroll?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps> }, forwardedRef): React.ReactElement {
+export const Popover = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; trigger?: React.ReactElement; label?: string; placement?: "top" | "bottom" | "start" | "end"; positioning?: PopoverPositioning; open?: boolean; defaultOpen?: boolean; openOnContext?: boolean; openOnHover?: boolean; mouseLeaveDelay?: number; closeOnIframeFocus?: boolean; onOpenChange?: (event: PopoverOpenChangeEvent, data: PopoverOpenChangeData) => void; inline?: boolean; trapFocus?: boolean; inertTrapFocus?: boolean; legacyTrapFocus?: boolean; unstable_disableAutoFocus?: boolean; arrow?: boolean; withArrow?: boolean; appearance?: "brand" | "inverted"; size?: "small" | "medium" | "large"; closeOnScroll?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps> }>(function Popover({ children, trigger, label, placement = "bottom", positioning, open, defaultOpen = false, openOnContext, openOnHover, mouseLeaveDelay, closeOnIframeFocus = true, onOpenChange, inline, trapFocus, inertTrapFocus, legacyTrapFocus, unstable_disableAutoFocus = false, arrow, withArrow, appearance, size, closeOnScroll = false, surfaceMotion, ...props }: ElementProps & { children?: React.ReactNode; trigger?: React.ReactElement; label?: string; placement?: "top" | "bottom" | "start" | "end"; positioning?: PopoverPositioning; open?: boolean; defaultOpen?: boolean; openOnContext?: boolean; openOnHover?: boolean; mouseLeaveDelay?: number; closeOnIframeFocus?: boolean; onOpenChange?: (event: PopoverOpenChangeEvent, data: PopoverOpenChangeData) => void; inline?: boolean; trapFocus?: boolean; inertTrapFocus?: boolean; legacyTrapFocus?: boolean; unstable_disableAutoFocus?: boolean; arrow?: boolean; withArrow?: boolean; appearance?: "brand" | "inverted"; size?: "small" | "medium" | "large"; closeOnScroll?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps> }, forwardedRef): React.ReactElement {
   const provider = React.useContext(PopoverContext);
   const resolvedOpen = open ?? provider?.open;
   const resolvedOpenOnContext = openOnContext ?? provider?.openOnContext ?? false;
@@ -2307,12 +2307,12 @@ export const Popover = React.forwardRef<HTMLElement, ElementProps & { children?:
       : surfaceNode));
 });
 
-export const PopoverTrigger = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; disableButtonEnhancement?: boolean }>(function PopoverTrigger({ children, disableButtonEnhancement = false, ...props }: ElementProps & { children?: React.ReactNode; disableButtonEnhancement?: boolean }, forwardedRef): React.ReactElement {
+export const PopoverTrigger = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; disableButtonEnhancement?: boolean }>(function PopoverTrigger({ children, disableButtonEnhancement = false, ...props }: ElementProps & { children?: React.ReactNode; disableButtonEnhancement?: boolean }, forwardedRef): React.ReactElement {
   ensureDefined(definePopover);
   return React.createElement("spui-popover-trigger", useCustomElementProps({ ref: forwardedRef, ...props, "disable-button-enhancement": disableButtonEnhancement || undefined }), children);
 });
 
-export const PopoverSurface = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function PopoverSurface({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const PopoverSurface = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function PopoverSurface({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(definePopover);
   return React.createElement("spui-popover-surface", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
@@ -2390,7 +2390,7 @@ export function TeachingPopoverBody({ children, media, mediaLength = "medium", .
     children);
 }
 
-export const TeachingPopoverFooter = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; primary: React.ReactNode | Parameters<typeof Button>[0]; secondary?: React.ReactNode | Parameters<typeof Button>[0]; footerLayout?: "horizontal" | "vertical" }>(function TeachingPopoverFooter({ children, primary, secondary, footerLayout = "horizontal", ...props }: ElementProps & { children?: React.ReactNode; primary: React.ReactNode | Parameters<typeof Button>[0]; secondary?: React.ReactNode | Parameters<typeof Button>[0]; footerLayout?: "horizontal" | "vertical" }, forwardedRef): React.ReactElement {
+export const TeachingPopoverFooter = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; primary: React.ReactNode | Parameters<typeof Button>[0]; secondary?: React.ReactNode | Parameters<typeof Button>[0]; footerLayout?: "horizontal" | "vertical" }>(function TeachingPopoverFooter({ children, primary, secondary, footerLayout = "horizontal", ...props }: ElementProps & { children?: React.ReactNode; primary: React.ReactNode | Parameters<typeof Button>[0]; secondary?: React.ReactNode | Parameters<typeof Button>[0]; footerLayout?: "horizontal" | "vertical" }, forwardedRef): React.ReactElement {
   const horizontal = footerLayout === "horizontal";
   const closeOnAction = (event: React.MouseEvent<HTMLElement>): void => {
     if (!event.defaultPrevented) event.currentTarget.dispatchEvent(new CustomEvent("spui-popover-request-close", { bubbles: true, composed: true, detail: { sourceEvent: event.nativeEvent } }));
@@ -2593,19 +2593,19 @@ export function ContextMenu(props: MenuProps): React.ReactElement {
   return React.createElement(Menu, { ...props, contextMenu: true });
 }
 
-export const MenuBar = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string }>(function MenuBar({ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }, forwardedRef): React.ReactElement {
+export const MenuBar = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string }>(function MenuBar({ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }, forwardedRef): React.ReactElement {
   ensureDefined(defineNativeMenuBar);
   const strings = React.useContext(UIContext).strings;
   const accessibleLabel = label || (typeof props["aria-label"] === "string" ? props["aria-label"] : strings.menuBarLabel || "Menu bar");
   return React.createElement("spui-menu-bar", useCustomElementProps({ ref: forwardedRef, ...props, "aria-label": accessibleLabel }), children);
 });
 
-export const MenuBarItem = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function MenuBarItem({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const MenuBarItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function MenuBarItem({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineMenuBarItem);
   return React.createElement("spui-menu-bar-item", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
 
-export const MenuItem = React.forwardRef<HTMLElement, Omit<ElementProps, "onSelect"> & { children?: React.ReactNode; content?: React.ReactNode; checkmark?: React.ReactNode; submenuIndicator?: React.ReactNode; icon?: React.ReactNode; secondaryContent?: React.ReactNode; subText?: React.ReactNode; switchIndicator?: React.ReactNode; kind?: "default" | "checkbox" | "radio" | "switch"; value?: string; name?: string; checked?: boolean; disabled?: boolean; disabledFocusable?: boolean; persistOnClick?: boolean; hasSubmenu?: boolean; onSelect?: (value: string, label: string, checked: boolean) => void; onCheckedChange?: (checked: boolean, event?: MenuCheckedValueChangeEvent) => void }>(function MenuItem({ children, content, checkmark, submenuIndicator, icon, secondaryContent, subText, switchIndicator, kind = "default", value, name, checked, disabled = false, disabledFocusable: _disabledFocusable, persistOnClick = false, hasSubmenu = false, onSelect, onCheckedChange, ...props }: Omit<ElementProps, "onSelect"> & { children?: React.ReactNode; content?: React.ReactNode; checkmark?: React.ReactNode; submenuIndicator?: React.ReactNode; icon?: React.ReactNode; secondaryContent?: React.ReactNode; subText?: React.ReactNode; switchIndicator?: React.ReactNode; kind?: "default" | "checkbox" | "radio" | "switch"; value?: string; name?: string; checked?: boolean; disabled?: boolean; disabledFocusable?: boolean; persistOnClick?: boolean; hasSubmenu?: boolean; onSelect?: (value: string, label: string, checked: boolean) => void; onCheckedChange?: (checked: boolean, event?: MenuCheckedValueChangeEvent) => void }, forwardedRef): React.ReactElement {
+export const MenuItem = /* @__PURE__ */ React.forwardRef<HTMLElement, Omit<ElementProps, "onSelect"> & { children?: React.ReactNode; content?: React.ReactNode; checkmark?: React.ReactNode; submenuIndicator?: React.ReactNode; icon?: React.ReactNode; secondaryContent?: React.ReactNode; subText?: React.ReactNode; switchIndicator?: React.ReactNode; kind?: "default" | "checkbox" | "radio" | "switch"; value?: string; name?: string; checked?: boolean; disabled?: boolean; disabledFocusable?: boolean; persistOnClick?: boolean; hasSubmenu?: boolean; onSelect?: (value: string, label: string, checked: boolean) => void; onCheckedChange?: (checked: boolean, event?: MenuCheckedValueChangeEvent) => void }>(function MenuItem({ children, content, checkmark, submenuIndicator, icon, secondaryContent, subText, switchIndicator, kind = "default", value, name, checked, disabled = false, disabledFocusable: _disabledFocusable, persistOnClick = false, hasSubmenu = false, onSelect, onCheckedChange, ...props }: Omit<ElementProps, "onSelect"> & { children?: React.ReactNode; content?: React.ReactNode; checkmark?: React.ReactNode; submenuIndicator?: React.ReactNode; icon?: React.ReactNode; secondaryContent?: React.ReactNode; subText?: React.ReactNode; switchIndicator?: React.ReactNode; kind?: "default" | "checkbox" | "radio" | "switch"; value?: string; name?: string; checked?: boolean; disabled?: boolean; disabledFocusable?: boolean; persistOnClick?: boolean; hasSubmenu?: boolean; onSelect?: (value: string, label: string, checked: boolean) => void; onCheckedChange?: (checked: boolean, event?: MenuCheckedValueChangeEvent) => void }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   const checkedRef = React.useRef(checked);
@@ -2636,7 +2636,7 @@ export function MenuItemCheckbox(props: MenuItemSelectableProps): React.ReactEle
 export function MenuItemRadio(props: MenuItemSelectableProps): React.ReactElement { return React.createElement(MenuSelectableItem, { ...props, kind: "radio" }); }
 export function MenuItemSwitch(props: MenuItemSwitchProps): React.ReactElement { return React.createElement(MenuSelectableItem, { ...props, kind: "switch" }); }
 export type MenuItemLinkProps = ElementProps & { href: string; target?: string; rel?: string; download?: string | boolean; disabled?: boolean; icon?: SpanSlotProps; checkmark?: SpanSlotProps; content?: SpanSlotProps; secondaryContent?: SpanSlotProps; children?: React.ReactNode };
-export const MenuItemLink = React.forwardRef<HTMLElement, MenuItemLinkProps>(function MenuItemLink({ href, target, rel, download, disabled = false, icon, checkmark, content, secondaryContent, children, ...props }: MenuItemLinkProps, forwardedRef): React.ReactElement {
+export const MenuItemLink = /* @__PURE__ */ React.forwardRef<HTMLElement, MenuItemLinkProps>(function MenuItemLink({ href, target, rel, download, disabled = false, icon, checkmark, content, secondaryContent, children, ...props }: MenuItemLinkProps, forwardedRef): React.ReactElement {
   ensureDefined(defineMenuItemLink);
   return React.createElement("spui-menu-item-link", useCustomElementProps({ ref: forwardedRef, ...props, href, target, rel, download: download === true ? "" : download, disabled: disabled || undefined }), renderSpanSlot(checkmark, "checkmark"), renderSpanSlot(icon, "icon"), renderSpanSlot(content ?? children, "content"), renderSpanSlot(secondaryContent, "secondary-content"));
 });
@@ -2653,7 +2653,7 @@ export function MenuTrigger({ children, disableButtonEnhancement = false, ...pro
   const child = React.cloneElement(children as React.ReactElement<{ slot?: string; role?: string; tabIndex?: number; "aria-haspopup"?: string; onKeyDown?: React.KeyboardEventHandler<HTMLElement> }>, { ...props, slot: props.slot as string | undefined, "aria-haspopup": "menu", ...(!disableButtonEnhancement && !nativeControl ? { role: "button", tabIndex: childProps.tabIndex ?? 0, onKeyDown } : {}) });
   return child;
 }
-export const MenuPopover = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function MenuPopover({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const MenuPopover = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function MenuPopover({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineMenuPopover);
   return React.createElement("spui-menu-popover", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
@@ -2680,17 +2680,17 @@ export function MenuList({ children, checkedValues, defaultCheckedValues, hasChe
   const list = React.createElement("spui-menu-list", useCustomElementProps({ ...props, "has-checkmarks": hasCheckmarks ? "" : undefined, "has-icons": hasIcons ? "" : undefined }), children);
   return selection ? React.createElement(MenuSelectionContext.Provider, { value: selection }, list) : list;
 }
-export const MenuSplitGroup = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; orientation?: "horizontal" | "vertical" }>(function MenuSplitGroup({ children, orientation = "horizontal", ...props }: ElementProps & { children?: React.ReactNode; orientation?: "horizontal" | "vertical" }, forwardedRef): React.ReactElement {
+export const MenuSplitGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; orientation?: "horizontal" | "vertical" }>(function MenuSplitGroup({ children, orientation = "horizontal", ...props }: ElementProps & { children?: React.ReactNode; orientation?: "horizontal" | "vertical" }, forwardedRef): React.ReactElement {
   ensureDefined(defineMenuSplitGroup);
   return React.createElement("spui-menu-split-group", useCustomElementProps({ ref: forwardedRef, ...props, orientation }), children);
 });
 
-export const MenuDivider = React.forwardRef<HTMLElement, ElementProps>(function MenuDivider(props: ElementProps, forwardedRef): React.ReactElement {
+export const MenuDivider = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps>(function MenuDivider(props: ElementProps, forwardedRef): React.ReactElement {
   ensureDefined(defineMenuDivider);
   return React.createElement("spui-menu-divider", useCustomElementProps({ ref: forwardedRef, ...props }));
 });
 
-export const MenuGroup = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label: string }>(function MenuGroup({ children, label, ...props }: ElementProps & { children?: React.ReactNode; label: string }, forwardedRef): React.ReactElement {
+export const MenuGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label: string }>(function MenuGroup({ children, label, ...props }: ElementProps & { children?: React.ReactNode; label: string }, forwardedRef): React.ReactElement {
   const headerId = React.useId();
   const containsHeader = (nodes: React.ReactNode): boolean => React.Children.toArray(nodes).some(child => {
     if (!React.isValidElement(child)) return false;
@@ -2703,14 +2703,14 @@ export const MenuGroup = React.forwardRef<HTMLElement, ElementProps & { children
   return React.createElement(MenuGroupHeaderContext.Provider, { value: headerId }, group);
 });
 
-export const MenuGroupHeader = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function MenuGroupHeader({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const MenuGroupHeader = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function MenuGroupHeader({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   const headerId = React.useContext(MenuGroupHeaderContext);
   ensureDefined(defineMenuGroupHeader);
   return React.createElement("spui-menu-group-header", useCustomElementProps({ ...props, ref: forwardedRef, id: props.id ?? headerId }), children);
 });
 
 export type AvatarProps = ElementProps & { name?: string; image?: string; initials?: string; size?: number | string; shape?: "circular" | "square"; color?: AvatarColor; active?: "active" | "inactive" | "unset"; activeAppearance?: "ring" | "shadow" | "ring-shadow"; idForColor?: string; decorative?: boolean; icon?: React.ReactNode; badge?: React.ReactNode; children?: React.ReactNode };
-export const Avatar = React.forwardRef<HTMLElement, AvatarProps>(function Avatar({ name, image, initials, size = 32, shape = "circular", color = "neutral", active, activeAppearance = "ring", idForColor, decorative = false, icon, badge, children, ...props }: AvatarProps, forwardedRef): React.ReactElement {
+export const Avatar = /* @__PURE__ */ React.forwardRef<HTMLElement, AvatarProps>(function Avatar({ name, image, initials, size = 32, shape = "circular", color = "neutral", active, activeAppearance = "ring", idForColor, decorative = false, icon, badge, children, ...props }: AvatarProps, forwardedRef): React.ReactElement {
   ensureDefined(defineAvatar);
   return React.createElement("spui-avatar", useCustomElementProps({ ...props, ref: forwardedRef, name, image, initials, size, shape, color, active: active === "unset" ? undefined : active, "active-appearance": activeAppearance, "id-for-color": idForColor, decorative: decorative || undefined }),
     icon || children ? React.createElement("span", { slot: "icon" }, icon ?? children) : null,
@@ -2721,7 +2721,7 @@ export function AvatarGroupProvider({ value, children }: { value: AvatarGroupCon
   return React.createElement(AvatarGroupContext.Provider, { value }, React.createElement(AvatarGroupSizeContext.Provider, { value: value.size }, React.createElement(AvatarGroupOverflowContext.Provider, { value: Boolean(value.isOverflow) }, children)));
 }
 
-export const AvatarGroup = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string; maxVisible?: number; layout?: "stack" | "spread" | "pie"; size?: number; expanded?: boolean; showMoreLabel?: string; showLessLabel?: string; onExpandedChange?: (expanded: boolean) => void }>(function AvatarGroup({ children, label, maxVisible = 5, layout, size, expanded, showMoreLabel, showLessLabel, onExpandedChange, ...props }: ElementProps & { children?: React.ReactNode; label?: string; maxVisible?: number; layout?: "stack" | "spread" | "pie"; size?: number; expanded?: boolean; showMoreLabel?: string; showLessLabel?: string; onExpandedChange?: (expanded: boolean) => void }, forwardedRef): React.ReactElement {
+export const AvatarGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string; maxVisible?: number; layout?: "stack" | "spread" | "pie"; size?: number; expanded?: boolean; showMoreLabel?: string; showLessLabel?: string; onExpandedChange?: (expanded: boolean) => void }>(function AvatarGroup({ children, label, maxVisible = 5, layout, size, expanded, showMoreLabel, showLessLabel, onExpandedChange, ...props }: ElementProps & { children?: React.ReactNode; label?: string; maxVisible?: number; layout?: "stack" | "spread" | "pie"; size?: number; expanded?: boolean; showMoreLabel?: string; showLessLabel?: string; onExpandedChange?: (expanded: boolean) => void }, forwardedRef): React.ReactElement {
   const context = React.useContext(UIContext);
   const groupContext = React.useContext(AvatarGroupContext);
   const resolvedSize = size ?? groupContext?.size ?? 32;
@@ -2750,7 +2750,7 @@ export type AvatarGroupItemAvatarSlot = React.ReactElement | Parameters<typeof A
 export type AvatarGroupItemProps = ElementProps & { name: string; avatar?: AvatarGroupItemAvatarSlot; overflowLabel?: SpanSlotProps; image?: string; initials?: string; size?: number; shape?: "circular" | "square"; color?: AvatarColor; active?: "active" | "inactive" | "unset"; activeAppearance?: "ring" | "shadow" | "ring-shadow"; idForColor?: string; icon?: React.ReactNode; badge?: React.ReactNode };
 
 /** One identity in an AvatarGroup; inside AvatarGroupPopover it renders as a named list row. */
-export const AvatarGroupItem = React.forwardRef<HTMLElement, AvatarGroupItemProps>(function AvatarGroupItem({ name, avatar, overflowLabel, image, initials, size, shape = "circular", color = "neutral", active, activeAppearance = "ring", idForColor, icon, badge, ...props }: AvatarGroupItemProps, forwardedRef): React.ReactElement {
+export const AvatarGroupItem = /* @__PURE__ */ React.forwardRef<HTMLElement, AvatarGroupItemProps>(function AvatarGroupItem({ name, avatar, overflowLabel, image, initials, size, shape = "circular", color = "neutral", active, activeAppearance = "ring", idForColor, icon, badge, ...props }: AvatarGroupItemProps, forwardedRef): React.ReactElement {
   const overflow = React.useContext(AvatarGroupOverflowContext);
   const groupSize = React.useContext(AvatarGroupSizeContext);
   ensureDefined(defineAvatarGroupItem);
@@ -2815,7 +2815,7 @@ export function AvatarGroupPopover({ children, count, indicator, label, triggerL
   }, surfaceContent);
 }
 
-export const Persona = React.forwardRef<HTMLElement, ElementProps & { name: string; image?: string; initials?: string; primaryText?: React.ReactNode; secondaryText?: React.ReactNode; tertiaryText?: React.ReactNode; quaternaryText?: React.ReactNode; presence?: PersonaPresence; presenceLabel?: string; size?: PersonaSize; color?: AvatarColor; textPosition?: "after" | "before" | "below"; textAlignment?: "start" | "center"; presenceOnly?: boolean; avatar?: React.ReactNode; children?: React.ReactNode }>(function Persona({ name, image, initials, primaryText, secondaryText, tertiaryText, quaternaryText, presence, presenceLabel, size = "medium", color = "neutral", textPosition = "after", textAlignment = "start", presenceOnly = false, avatar, children, ...props }: ElementProps & { name: string; image?: string; initials?: string; primaryText?: React.ReactNode; secondaryText?: React.ReactNode; tertiaryText?: React.ReactNode; quaternaryText?: React.ReactNode; presence?: PersonaPresence; presenceLabel?: string; size?: PersonaSize; color?: AvatarColor; textPosition?: "after" | "before" | "below"; textAlignment?: "start" | "center"; presenceOnly?: boolean; avatar?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const Persona = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { name: string; image?: string; initials?: string; primaryText?: React.ReactNode; secondaryText?: React.ReactNode; tertiaryText?: React.ReactNode; quaternaryText?: React.ReactNode; presence?: PersonaPresence; presenceLabel?: string; size?: PersonaSize; color?: AvatarColor; textPosition?: "after" | "before" | "below"; textAlignment?: "start" | "center"; presenceOnly?: boolean; avatar?: React.ReactNode; children?: React.ReactNode }>(function Persona({ name, image, initials, primaryText, secondaryText, tertiaryText, quaternaryText, presence, presenceLabel, size = "medium", color = "neutral", textPosition = "after", textAlignment = "start", presenceOnly = false, avatar, children, ...props }: ElementProps & { name: string; image?: string; initials?: string; primaryText?: React.ReactNode; secondaryText?: React.ReactNode; tertiaryText?: React.ReactNode; quaternaryText?: React.ReactNode; presence?: PersonaPresence; presenceLabel?: string; size?: PersonaSize; color?: AvatarColor; textPosition?: "after" | "before" | "below"; textAlignment?: "start" | "center"; presenceOnly?: boolean; avatar?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(definePersona);
   const textSlot = (node: React.ReactNode, slot: "primary-text" | "secondary-text" | "tertiary-text" | "quaternary-text"): React.ReactNode => node == null ? null : React.isValidElement(node)
     ? React.cloneElement(node as React.ReactElement<{ slot?: string }>, { slot })
@@ -5063,7 +5063,7 @@ export function FlatTree({ children, ...props }: FlatTreeProps): React.ReactElem
 
 export type TextFieldProps = ElementProps & { label?: string; value?: string; onValueChange?: (value: string) => void; name?: string; required?: boolean; disabled?: boolean; readOnly?: boolean; placeholder?: string; type?: string };
 
-export const TextField = React.forwardRef<HTMLElement, TextFieldProps>(function TextField(inputProps: TextFieldProps, forwardedRef): React.ReactElement {
+export const TextField = /* @__PURE__ */ React.forwardRef<HTMLElement, TextFieldProps>(function TextField(inputProps: TextFieldProps, forwardedRef): React.ReactElement {
   const { label, value, onValueChange, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true });
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -5179,7 +5179,7 @@ export function Field({ children, label, hint, validationMessage, validationMess
 export type InputProps = Omit<ElementProps, "children" | "onChange" | "defaultValue" | "defaultChecked"> & { children?: never; type?: InputType; value?: string | number | readonly string[]; defaultValue?: string | number | readonly string[]; checked?: boolean; defaultChecked?: boolean; accept?: string; alt?: string; autoComplete?: string; capture?: boolean | string; form?: string; formAction?: string; formEncType?: string; formMethod?: string; formNoValidate?: boolean; formTarget?: string; height?: number | string; list?: string; max?: number | string; maxLength?: number; min?: number | string; minLength?: number; multiple?: boolean; pattern?: string; src?: string; step?: number | string; width?: number | string; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; onValueChange?: (value: string) => void; onChange?: (event: React.ChangeEvent<HTMLInputElement>, data: { value: string }) => void; contentBefore?: React.ReactNode; contentAfter?: React.ReactNode; size?: InputSize; appearance?: InputAppearance; disabled?: boolean; required?: boolean; readOnly?: boolean; placeholder?: string; name?: string };
 
 /** Bare input primitive. Supply aria-label or aria-labelledby; use TextField when a shadow-safe visible label is needed. */
-export const Input = React.forwardRef<HTMLElement, InputProps>(function Input(inputProps: InputProps, forwardedRef): React.ReactElement {
+export const Input = /* @__PURE__ */ React.forwardRef<HTMLElement, InputProps>(function Input(inputProps: InputProps, forwardedRef): React.ReactElement {
   const { type = "text", value, defaultValue, checked, defaultChecked, input: inputControl, onValueChange, onChange, contentBefore, contentAfter, size = "medium", appearance = "outline", disabled, required, readOnly, placeholder, capture, formNoValidate, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true, supportsSize: true });
   const ref = React.useRef<HTMLElement & { value: string; defaultValue: string; type: string; checked: boolean }>(null);
   React.useImperativeHandle(forwardedRef, () => ref.current!, []);
@@ -5210,7 +5210,7 @@ export const Input = React.forwardRef<HTMLElement, InputProps>(function Input(in
 
 export type FileUploadProps = ElementProps & { label?: string; name?: string; form?: string; accept?: string; multiple?: boolean; disabled?: boolean; required?: boolean; maxFiles?: number; maxFileSize?: number; browseLabel?: string; dropLabel?: string; removeLabel?: string; selectedLabel?: string; onFilesChange?: (files: File[]) => void; onFilesError?: (errors: FileUploadError[]) => void };
 
-export const FileUpload = React.forwardRef<HTMLElement, FileUploadProps>(function FileUpload(inputProps: FileUploadProps, forwardedRef): React.ReactElement {
+export const FileUpload = /* @__PURE__ */ React.forwardRef<HTMLElement, FileUploadProps>(function FileUpload(inputProps: FileUploadProps, forwardedRef): React.ReactElement {
   const { label, name, accept, multiple = false, disabled = false, required = false, maxFiles, maxFileSize, browseLabel, dropLabel, removeLabel, selectedLabel, onFilesChange, onFilesError, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true });
   const context = React.useContext(UIContext);
   const ref = React.useRef<HTMLElement>(null)
@@ -5240,7 +5240,7 @@ export function Image({ alt, fit = "none", shape = "square", block, bordered, sh
 export type SearchBoxChangeEvent = React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLSpanElement>;
 export type SearchBoxProps = Omit<InputProps, "appearance" | "children" | "defaultValue" | "input" | "onChange" | "size" | "type" | "value"> & { label?: string; value?: string; defaultValue?: string; onValueChange?: (value: string) => void; onSearch?: (value: string) => void; onChange?: (event: SearchBoxChangeEvent, data: { value: string }) => void; size?: SearchSize; appearance?: SearchAppearance; clearLabel?: string; contentBefore?: React.ReactNode; contentAfter?: React.ReactNode; dismiss?: React.ReactNode };
 
-export const SearchBox = React.forwardRef<HTMLElement, SearchBoxProps>(function SearchBox(inputProps: SearchBoxProps, forwardedRef): React.ReactElement {
+export const SearchBox = /* @__PURE__ */ React.forwardRef<HTMLElement, SearchBoxProps>(function SearchBox(inputProps: SearchBoxProps, forwardedRef): React.ReactElement {
   const { label, value, defaultValue, onValueChange, onSearch, onChange, size = "medium", appearance = "outline", clearLabel, readOnly, contentBefore, contentAfter, dismiss, ...props } = useFieldControlProps_unstable(inputProps, { supportsSize: true });
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -5273,7 +5273,7 @@ type FluentEventData<TChangeEvent extends Event | React.SyntheticEvent> =
 export type ColorPickerOnColorChangeData = FluentEventData<React.ChangeEvent<HTMLInputElement>>;
 export type ColorPickerProps = Omit<ElementProps, "color"> & { label?: string; name?: string; form?: string; color?: ColorPickerHsvColor; defaultColor?: ColorPickerHsvColor; value?: string; defaultValue?: string; alpha?: number; defaultAlpha?: number; colors?: readonly string[]; format?: ColorPickerFormat; onColorChange?: (event: SharePointUIEvent, data: ColorPickerOnColorChangeData) => void; onValueChange?: (value: string, alpha: number) => void; onFormatChange?: (format: ColorPickerFormat) => void; size?: ColorPickerSize; shape?: ColorPickerShape; readOnly?: boolean; required?: boolean; children?: React.ReactNode };
 
-export const ColorPicker = React.forwardRef<HTMLElement, ColorPickerProps>(function ColorPicker(inputProps: ColorPickerProps, forwardedRef): React.ReactElement {
+export const ColorPicker = /* @__PURE__ */ React.forwardRef<HTMLElement, ColorPickerProps>(function ColorPicker(inputProps: ColorPickerProps, forwardedRef): React.ReactElement {
   const { children, label, color, defaultColor, value, defaultValue, alpha, defaultAlpha, colors, format, onColorChange, onValueChange, onFormatChange, size = "medium", shape = "rounded", readOnly, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true, supportsSize: true });
   const ref = React.useRef<HTMLElement & { color?: ColorPickerHsvColor; defaultColor?: ColorPickerHsvColor; format?: ColorPickerFormat }>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -5317,7 +5317,7 @@ export type ColorAreaProps = Omit<ElementProps, "color" | "onChange"> & { color?
 export type ColorSliderProps = Omit<ElementProps, "color" | "onChange"> & { color?: ColorPickerHsvColor; defaultColor?: ColorPickerHsvColor; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; rail?: React.ReactNode; thumb?: React.ReactNode; channel?: ColorSliderChannel; vertical?: boolean; shape?: ColorPickerShape; onChange?: ColorControlChangeHandler };
 export type AlphaSliderProps = Omit<ColorSliderProps, "channel"> & { transparency?: boolean };
 
-export const ColorArea = React.forwardRef<HTMLElement, ColorAreaProps>(function ColorArea({ children, color, defaultColor, inputX, inputY, thumb, shape, onChange, ...props }: ColorAreaProps, forwardedRef): React.ReactElement {
+export const ColorArea = /* @__PURE__ */ React.forwardRef<HTMLElement, ColorAreaProps>(function ColorArea({ children, color, defaultColor, inputX, inputY, thumb, shape, onChange, ...props }: ColorAreaProps, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   ensureDefined(defineColorArea);
@@ -5342,7 +5342,7 @@ export const ColorArea = React.forwardRef<HTMLElement, ColorAreaProps>(function 
   return React.createElement("spui-color-area", useCustomElementProps({ ...props, ref, color: undefined, defaultColor: undefined, shape, slot: "area" }), inputSlot(inputX, "inputX"), inputSlot(inputY, "inputY"), thumb == null ? null : React.createElement("span", { slot: "thumb", "aria-hidden": true }, thumb), children);
 });
 
-export const ColorSlider = React.forwardRef<HTMLElement, ColorSliderProps>(function ColorSlider({ channel = "hue", vertical, color, defaultColor, input, rail, thumb, shape, onChange, ...props }: ColorSliderProps, forwardedRef): React.ReactElement {
+export const ColorSlider = /* @__PURE__ */ React.forwardRef<HTMLElement, ColorSliderProps>(function ColorSlider({ channel = "hue", vertical, color, defaultColor, input, rail, thumb, shape, onChange, ...props }: ColorSliderProps, forwardedRef): React.ReactElement {
   const context = React.useContext(UIContext);
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -5369,7 +5369,7 @@ export const ColorSlider = React.forwardRef<HTMLElement, ColorSliderProps>(funct
   return React.createElement("spui-color-slider", useCustomElementProps({ ...props, ref, color: undefined, defaultColor: undefined, channel, shape, vertical: vertical || undefined, slot: "sliders", "aria-label": props["aria-label"] || (channel === "hue" ? context.strings.colorHue : channel === "saturation" ? context.strings.colorSaturation : context.strings.colorValue) }), inputSlot, railSlot, thumbSlot);
 });
 
-export const AlphaSlider = React.forwardRef<HTMLElement, AlphaSliderProps>(function AlphaSlider({ transparency, vertical, color, defaultColor, shape, onChange, ...props }: AlphaSliderProps, forwardedRef): React.ReactElement {
+export const AlphaSlider = /* @__PURE__ */ React.forwardRef<HTMLElement, AlphaSliderProps>(function AlphaSlider({ transparency, vertical, color, defaultColor, shape, onChange, ...props }: AlphaSliderProps, forwardedRef): React.ReactElement {
   const context = React.useContext(UIContext);
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -5394,7 +5394,7 @@ export type SwatchPickerOnSelectionChangeData =
   | (SwatchPickerSelection & { event: React.MouseEvent<HTMLButtonElement>; type: "click"; selectedSwatch: string });
 export type SwatchPickerProps = ElementProps & { selectedValue?: string; defaultSelectedValue?: string; selectedValues?: string[]; defaultSelectedValues?: string[]; selectionMode?: "single" | "multiple"; layout?: "row" | "grid"; size?: "extra-small" | "small" | "medium" | "large"; shape?: "rounded" | "square" | "circular"; spacing?: "small" | "medium"; focusMode?: "arrow" | "tab"; columns?: number; onSelectionChange?: (event: SwatchPickerSelectionChangeEvent, data: SwatchPickerOnSelectionChangeData) => void; children?: React.ReactNode };
 
-export const SwatchPicker = React.forwardRef<HTMLElement, SwatchPickerProps>(function SwatchPicker({ children, selectedValue, defaultSelectedValue, selectedValues, defaultSelectedValues, selectionMode = "single", layout = "grid", size = "medium", shape = "square", spacing = "medium", focusMode = "arrow", columns = 6, onSelectionChange, ...props }: SwatchPickerProps, forwardedRef): React.ReactElement {
+export const SwatchPicker = /* @__PURE__ */ React.forwardRef<HTMLElement, SwatchPickerProps>(function SwatchPicker({ children, selectedValue, defaultSelectedValue, selectedValues, defaultSelectedValues, selectionMode = "single", layout = "grid", size = "medium", shape = "square", spacing = "medium", focusMode = "arrow", columns = 6, onSelectionChange, ...props }: SwatchPickerProps, forwardedRef): React.ReactElement {
   const strings = React.useContext(UIContext).strings;
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -5408,17 +5408,17 @@ export const SwatchPicker = React.forwardRef<HTMLElement, SwatchPickerProps>(fun
   return React.createElement("spui-swatch-picker", useCustomElementProps({ ...props, ref, selectedValue: undefined, defaultSelectedValue: undefined, selectedValues: undefined, defaultSelectedValues: undefined, "aria-label": props["aria-label"] ?? strings.colorSwatches, "selected-value": selectedValue, "default-selected-value": defaultSelectedValue, "selected-values": selectedValues === undefined ? undefined : JSON.stringify(selectedValues), "default-selected-values": defaultSelectedValues === undefined ? undefined : JSON.stringify(defaultSelectedValues), "selection-mode": selectionMode, layout, size, shape, spacing, "focus-mode": focusMode, columns }), children);
 });
 
-export const ColorSwatch = React.forwardRef<HTMLElement, ElementProps & { color: string; value: string; disabled?: boolean; borderColor?: string; size?: SwatchPickerProps["size"]; shape?: SwatchPickerProps["shape"]; icon?: React.ReactNode; disabledIcon?: React.ReactNode; children?: React.ReactNode }>(function ColorSwatch({ color, value, disabled, borderColor, size, shape, icon, disabledIcon, children, ...props }: ElementProps & { color: string; value: string; disabled?: boolean; borderColor?: string; size?: SwatchPickerProps["size"]; shape?: SwatchPickerProps["shape"]; icon?: React.ReactNode; disabledIcon?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const ColorSwatch = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { color: string; value: string; disabled?: boolean; borderColor?: string; size?: SwatchPickerProps["size"]; shape?: SwatchPickerProps["shape"]; icon?: React.ReactNode; disabledIcon?: React.ReactNode; children?: React.ReactNode }>(function ColorSwatch({ color, value, disabled, borderColor, size, shape, icon, disabledIcon, children, ...props }: ElementProps & { color: string; value: string; disabled?: boolean; borderColor?: string; size?: SwatchPickerProps["size"]; shape?: SwatchPickerProps["shape"]; icon?: React.ReactNode; disabledIcon?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineNativeSwatchPicker);
   return React.createElement("spui-color-swatch", useCustomElementProps({ ref: forwardedRef, ...props, color, value, disabled: disabled || undefined, size, shape, "border-color": borderColor }), children, icon == null ? null : React.createElement("span", { slot: "icon" }, icon), disabledIcon == null ? null : React.createElement("span", { slot: "disabled-icon" }, disabledIcon));
 });
 
-export const ImageSwatch = React.forwardRef<HTMLElement, ElementProps & { src: string; value: string; disabled?: boolean; size?: SwatchPickerProps["size"]; shape?: SwatchPickerProps["shape"]; children?: React.ReactNode }>(function ImageSwatch({ src, value, disabled, size, shape, children, ...props }: ElementProps & { src: string; value: string; disabled?: boolean; size?: SwatchPickerProps["size"]; shape?: SwatchPickerProps["shape"]; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const ImageSwatch = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { src: string; value: string; disabled?: boolean; size?: SwatchPickerProps["size"]; shape?: SwatchPickerProps["shape"]; children?: React.ReactNode }>(function ImageSwatch({ src, value, disabled, size, shape, children, ...props }: ElementProps & { src: string; value: string; disabled?: boolean; size?: SwatchPickerProps["size"]; shape?: SwatchPickerProps["shape"]; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineNativeSwatchPicker);
   return React.createElement("spui-image-swatch", useCustomElementProps({ ref: forwardedRef, ...props, src, value, disabled: disabled || undefined, size, shape }), children);
 });
 
-export const EmptySwatch = React.forwardRef<HTMLElement, ElementProps & { onAdd?: () => void; disabled?: boolean; size?: SwatchPickerProps["size"]; shape?: SwatchPickerProps["shape"] }>(function EmptySwatch({ onAdd, disabled, size, shape, ...props }: ElementProps & { onAdd?: () => void; disabled?: boolean; size?: SwatchPickerProps["size"]; shape?: SwatchPickerProps["shape"] }, forwardedRef): React.ReactElement {
+export const EmptySwatch = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { onAdd?: () => void; disabled?: boolean; size?: SwatchPickerProps["size"]; shape?: SwatchPickerProps["shape"] }>(function EmptySwatch({ onAdd, disabled, size, shape, ...props }: ElementProps & { onAdd?: () => void; disabled?: boolean; size?: SwatchPickerProps["size"]; shape?: SwatchPickerProps["shape"] }, forwardedRef): React.ReactElement {
   const strings = React.useContext(UIContext).strings;
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -5427,7 +5427,7 @@ export const EmptySwatch = React.forwardRef<HTMLElement, ElementProps & { onAdd?
   return React.createElement("spui-empty-swatch", useCustomElementProps({ ...props, ref, "aria-label": props["aria-label"] ?? strings.colorAdd ?? "Add color", disabled: disabled || undefined, size, shape }));
 });
 
-export const SwatchPickerRow = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function SwatchPickerRow({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const SwatchPickerRow = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function SwatchPickerRow({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineNativeSwatchPicker);
   return React.createElement("spui-swatch-picker-row", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
@@ -5834,30 +5834,30 @@ export function useTableCompositeNavigation(): TableCompositeNavigation {
   }), [onTableKeyDown]);
 }
 
-export const Table = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; size?: TableSize; appearance?: TableAppearance; noNativeElements?: boolean; sortable?: boolean }>(function Table({ children, size = "medium", appearance = "dividers", noNativeElements = false, sortable = false, ...props }: ElementProps & { children?: React.ReactNode; size?: TableSize; appearance?: TableAppearance; noNativeElements?: boolean; sortable?: boolean }, forwardedRef): React.ReactElement {
+export const Table = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; size?: TableSize; appearance?: TableAppearance; noNativeElements?: boolean; sortable?: boolean }>(function Table({ children, size = "medium", appearance = "dividers", noNativeElements = false, sortable = false, ...props }: ElementProps & { children?: React.ReactNode; size?: TableSize; appearance?: TableAppearance; noNativeElements?: boolean; sortable?: boolean }, forwardedRef): React.ReactElement {
   ensureDefined(defineNativeTable);
   const tableContextValue = React.useMemo<TableContextValue>(() => ({ size, noNativeElements, sortable }), [size, noNativeElements, sortable]);
   return React.createElement(TableContext.Provider, { value: tableContextValue }, React.createElement("spui-table", useCustomElementProps({ ref: forwardedRef, ...props, size, appearance, "no-native-elements": noNativeElements || undefined }), children));
 });
 
-export const TableHeader = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function TableHeader({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const TableHeader = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function TableHeader({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineNativeTable);
   return React.createElement(TableHeaderContext.Provider, { value: "" }, React.createElement("spui-table-header", useCustomElementProps({ ...props, ref: forwardedRef }), children));
 });
 
-export const TableBody = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function TableBody({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const TableBody = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function TableBody({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineNativeTable);
   return React.createElement("spui-table-body", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
 
-export const TableRow = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; selected?: boolean; appearance?: "brand" | "neutral" | "none" }>(function TableRow({ children, selected = false, appearance, ...props }: ElementProps & { children?: React.ReactNode; selected?: boolean; appearance?: "brand" | "neutral" | "none" }, forwardedRef): React.ReactElement {
+export const TableRow = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; selected?: boolean; appearance?: "brand" | "neutral" | "none" }>(function TableRow({ children, selected = false, appearance, ...props }: ElementProps & { children?: React.ReactNode; selected?: boolean; appearance?: "brand" | "neutral" | "none" }, forwardedRef): React.ReactElement {
   ensureDefined(defineNativeTable);
   return React.createElement("spui-table-row", useCustomElementProps({ ref: forwardedRef, ...props, selected: selected || undefined, appearance }), children);
 });
 
 export type TableHeaderCellButtonSlot = React.ReactElement<any> | Omit<React.HTMLAttributes<HTMLElement>, "children">;
 
-export const TableHeaderCell = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; aside?: React.ReactNode; sortIcon?: React.ReactNode; button?: TableHeaderCellButtonSlot; sortable?: boolean; sortDirection?: TableSortDirection; columnId?: string | number; onSort?: (direction: TableSortDirection, columnId?: string) => void }>(function TableHeaderCell({ children, aside, sortIcon, button, sortable = false, sortDirection, columnId, onSort, ...props }: ElementProps & { children?: React.ReactNode; aside?: React.ReactNode; sortIcon?: React.ReactNode; button?: TableHeaderCellButtonSlot; sortable?: boolean; sortDirection?: TableSortDirection; columnId?: string | number; onSort?: (direction: TableSortDirection, columnId?: string) => void }, forwardedRef): React.ReactElement {
+export const TableHeaderCell = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; aside?: React.ReactNode; sortIcon?: React.ReactNode; button?: TableHeaderCellButtonSlot; sortable?: boolean; sortDirection?: TableSortDirection; columnId?: string | number; onSort?: (direction: TableSortDirection, columnId?: string) => void }>(function TableHeaderCell({ children, aside, sortIcon, button, sortable = false, sortDirection, columnId, onSort, ...props }: ElementProps & { children?: React.ReactNode; aside?: React.ReactNode; sortIcon?: React.ReactNode; button?: TableHeaderCellButtonSlot; sortable?: boolean; sortDirection?: TableSortDirection; columnId?: string | number; onSort?: (direction: TableSortDirection, columnId?: string) => void }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   ensureDefined(defineNativeTable);
@@ -5877,7 +5877,7 @@ export const TableHeaderCell = React.forwardRef<HTMLElement, ElementProps & { ch
   return React.createElement("spui-table-header-cell", useCustomElementProps({ ...props, ref, sortable: sortable || undefined, "sort-direction": sortDirection, "column-id": columnId }), buttonNode, buttonNode ? null : children, buttonNode ? null : sortIconNode, aside);
 });
 
-export const TableCell = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function TableCell({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const TableCell = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function TableCell({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineNativeTable);
   return React.createElement("spui-table-cell", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
@@ -5898,17 +5898,17 @@ function renderSpanSlot(value: SpanSlotProps | undefined, slot?: string): React.
   return React.createElement("span", slotProps, value as React.ReactNode);
 }
 
-export const TableCellLayout = React.forwardRef<HTMLElement, TableCellLayoutProps>(function TableCellLayout({ children, main, media, description, appearance, truncate = false, ...props }: TableCellLayoutProps, forwardedRef): React.ReactElement {
+export const TableCellLayout = /* @__PURE__ */ React.forwardRef<HTMLElement, TableCellLayoutProps>(function TableCellLayout({ children, main, media, description, appearance, truncate = false, ...props }: TableCellLayoutProps, forwardedRef): React.ReactElement {
   ensureDefined(defineNativeTable);
   return React.createElement("spui-table-cell-layout", useCustomElementProps({ ref: forwardedRef, ...props, appearance, truncate: truncate || undefined }), renderSpanSlot(media, "media"), renderSpanSlot(main ?? children, "main"), renderSpanSlot(description, "description"));
 });
 
-export const TableCellActions = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; visible?: boolean }>(function TableCellActions({ children, visible = false, ...props }: ElementProps & { children?: React.ReactNode; visible?: boolean }, forwardedRef): React.ReactElement {
+export const TableCellActions = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; visible?: boolean }>(function TableCellActions({ children, visible = false, ...props }: ElementProps & { children?: React.ReactNode; visible?: boolean }, forwardedRef): React.ReactElement {
   ensureDefined(defineNativeTable);
   return React.createElement("spui-table-cell-actions", useCustomElementProps({ ref: forwardedRef, ...props, visible: visible || undefined }), children);
 });
 
-export const TableSelectionCell = React.forwardRef<HTMLElement, ElementProps & { type?: "checkbox" | "radio"; checked?: boolean | "mixed"; subtle?: boolean; invisible?: boolean; hidden?: boolean; checkboxIndicator?: SelectionIndicatorSlot; radioIndicator?: SelectionIndicatorSlot; onSelectionChange?: (checked: boolean, type: "checkbox" | "radio") => void }>(function TableSelectionCell({ type = "checkbox", checked = false, subtle = false, invisible = false, hidden = false, checkboxIndicator, radioIndicator, onSelectionChange, ...props }: ElementProps & { type?: "checkbox" | "radio"; checked?: boolean | "mixed"; subtle?: boolean; invisible?: boolean; hidden?: boolean; checkboxIndicator?: SelectionIndicatorSlot; radioIndicator?: SelectionIndicatorSlot; onSelectionChange?: (checked: boolean, type: "checkbox" | "radio") => void }, forwardedRef): React.ReactElement {
+export const TableSelectionCell = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { type?: "checkbox" | "radio"; checked?: boolean | "mixed"; subtle?: boolean; invisible?: boolean; hidden?: boolean; checkboxIndicator?: SelectionIndicatorSlot; radioIndicator?: SelectionIndicatorSlot; onSelectionChange?: (checked: boolean, type: "checkbox" | "radio") => void }>(function TableSelectionCell({ type = "checkbox", checked = false, subtle = false, invisible = false, hidden = false, checkboxIndicator, radioIndicator, onSelectionChange, ...props }: ElementProps & { type?: "checkbox" | "radio"; checked?: boolean | "mixed"; subtle?: boolean; invisible?: boolean; hidden?: boolean; checkboxIndicator?: SelectionIndicatorSlot; radioIndicator?: SelectionIndicatorSlot; onSelectionChange?: (checked: boolean, type: "checkbox" | "radio") => void }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   ensureDefined(defineNativeTable);
@@ -5916,7 +5916,7 @@ export const TableSelectionCell = React.forwardRef<HTMLElement, ElementProps & {
   return React.createElement("spui-table-selection-cell", useCustomElementProps({ ...props, ref, type, checked: checked || undefined, subtle: subtle || undefined, invisible: invisible || undefined, hidden: hidden || undefined }), renderSelectionIndicator(checkboxIndicator, "checkbox-indicator", checked), renderSelectionIndicator(radioIndicator, "radio-indicator", checked));
 });
 
-export const TableResizeHandle = React.forwardRef<HTMLElement, ElementProps & { value?: number; min?: number; max?: number; step?: number; label?: string; onResize?: (delta: number, value: number, event?: Event) => void }>(function TableResizeHandle({ value, min, max, step = 8, label, onResize, ...props }: ElementProps & { value?: number; min?: number; max?: number; step?: number; label?: string; onResize?: (delta: number, value: number, event?: Event) => void }, forwardedRef): React.ReactElement {
+export const TableResizeHandle = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { value?: number; min?: number; max?: number; step?: number; label?: string; onResize?: (delta: number, value: number, event?: Event) => void }>(function TableResizeHandle({ value, min, max, step = 8, label, onResize, ...props }: ElementProps & { value?: number; min?: number; max?: number; step?: number; label?: string; onResize?: (delta: number, value: number, event?: Event) => void }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   ensureDefined(defineNativeTable);
@@ -5932,7 +5932,7 @@ export type TextAreaResize = "none" | "horizontal" | "vertical" | "both";
 export type TextAreaChangeData = { value: string };
 export type TextAreaProps = Omit<ElementProps, "onChange" | "defaultValue"> & { label?: string; value?: string | number | readonly string[]; defaultValue?: string | number | readonly string[]; textarea?: React.ReactElement<React.TextareaHTMLAttributes<HTMLTextAreaElement>> | React.TextareaHTMLAttributes<HTMLTextAreaElement>; rows?: number; cols?: number; autoComplete?: string; dirName?: string; form?: string; maxLength?: number; minLength?: number; name?: string; wrap?: "hard" | "soft" | "off"; placeholder?: string; disabled?: boolean; required?: boolean; readOnly?: boolean; appearance?: TextAreaAppearance; size?: TextAreaSize; resize?: TextAreaResize; onValueChange?: (value: string) => void; onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>, data: TextAreaChangeData) => void };
 
-export const TextArea = React.forwardRef<HTMLElement, TextAreaProps>(function TextArea(inputProps: TextAreaProps, forwardedRef): React.ReactElement {
+export const TextArea = /* @__PURE__ */ React.forwardRef<HTMLElement, TextAreaProps>(function TextArea(inputProps: TextAreaProps, forwardedRef): React.ReactElement {
   const { label, value, defaultValue, textarea, rows, placeholder, disabled, required, readOnly, appearance = "outline", size = "medium", resize = "none", onValueChange, onChange, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true, supportsSize: true });
   const ref = React.useRef<HTMLElement & { value: string; defaultValue: string }>(null);
   React.useImperativeHandle(forwardedRef, () => ref.current!, []);
@@ -5981,7 +5981,7 @@ function useToggle(define: () => void, props: ToggleHostProps, checked?: Checkbo
   return useHostProps(elementProps);
 }
 
-export const Checkbox = React.forwardRef<HTMLElement, CheckboxProps>(function Checkbox({ checked, defaultChecked, disabledFocusable, onCheckedChange, onChange, label, input, indicator, labelPosition = "after", shape = "square", size, ...props }: CheckboxProps, forwardedRef): React.ReactElement {
+export const Checkbox = /* @__PURE__ */ React.forwardRef<HTMLElement, CheckboxProps>(function Checkbox({ checked, defaultChecked, disabledFocusable, onCheckedChange, onChange, label, input, indicator, labelPosition = "after", shape = "square", size, ...props }: CheckboxProps, forwardedRef): React.ReactElement {
   const elementProps = useToggle(defineCheckbox, { ...props, shape, size, "label-position": labelPosition, "disabled-focusable": disabledFocusable || undefined }, checked, defaultChecked, onCheckedChange, onChange, forwardedRef);
   const inputSlot = input == null ? null : React.isValidElement(input)
     ? React.cloneElement(input as React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>>, { slot: "input" } as React.InputHTMLAttributes<HTMLInputElement> & { slot: string })
@@ -5997,7 +5997,7 @@ export const Checkbox = React.forwardRef<HTMLElement, CheckboxProps>(function Ch
 
 export type SwitchProps = Omit<ElementProps, "onChange"> & { label?: React.ReactNode; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; indicator?: React.ReactNode; checked?: boolean; defaultChecked?: boolean; disabled?: boolean; disabledFocusable?: boolean; required?: boolean; name?: string; form?: string; value?: string; size?: "small" | "medium"; labelPosition?: "before" | "after" | "above"; onCheckedChange?: (checked: boolean) => void; onChange?: (event: React.ChangeEvent<HTMLInputElement>, data: { checked: boolean }) => void };
 
-export const Switch = React.forwardRef<HTMLElement, SwitchProps>(function Switch({ checked, defaultChecked, disabledFocusable, onCheckedChange, onChange, label, children, input, indicator, size, labelPosition = "after", ...props }: SwitchProps, forwardedRef): React.ReactElement {
+export const Switch = /* @__PURE__ */ React.forwardRef<HTMLElement, SwitchProps>(function Switch({ checked, defaultChecked, disabledFocusable, onCheckedChange, onChange, label, children, input, indicator, size, labelPosition = "after", ...props }: SwitchProps, forwardedRef): React.ReactElement {
   const elementProps = useToggle(defineSwitch, { ...props, size, "label-position": labelPosition, "disabled-focusable": disabledFocusable || undefined }, checked, defaultChecked,
     onCheckedChange ? value => onCheckedChange(Boolean(value)) : undefined,
     onChange ? (event, data) => onChange(event, { checked: Boolean(data.checked) }) : undefined, forwardedRef);
@@ -6019,7 +6019,7 @@ const SpinnerContext = React.createContext<SpinnerContextValue | undefined>(unde
 export const SpinnerContextProvider = SpinnerContext.Provider;
 export function useSpinnerContext(): SpinnerContextValue { return React.useContext(SpinnerContext) ?? {}; }
 
-export const Spinner = React.forwardRef<HTMLElement, ElementProps & { label?: React.ReactNode; spinner?: React.ReactNode; spinnerTail?: React.ReactNode; size?: SpinnerSize; appearance?: SpinnerAppearance; labelPosition?: SpinnerLabelPosition; delay?: number; children?: React.ReactNode }>(function Spinner({ label, spinner, spinnerTail, size, appearance = "primary", labelPosition = "after", delay = 0, children, ...props }: ElementProps & { label?: React.ReactNode; spinner?: React.ReactNode; spinnerTail?: React.ReactNode; size?: SpinnerSize; appearance?: SpinnerAppearance; labelPosition?: SpinnerLabelPosition; delay?: number; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const Spinner = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { label?: React.ReactNode; spinner?: React.ReactNode; spinnerTail?: React.ReactNode; size?: SpinnerSize; appearance?: SpinnerAppearance; labelPosition?: SpinnerLabelPosition; delay?: number; children?: React.ReactNode }>(function Spinner({ label, spinner, spinnerTail, size, appearance = "primary", labelPosition = "after", delay = 0, children, ...props }: ElementProps & { label?: React.ReactNode; spinner?: React.ReactNode; spinnerTail?: React.ReactNode; size?: SpinnerSize; appearance?: SpinnerAppearance; labelPosition?: SpinnerLabelPosition; delay?: number; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   const context = React.useContext(UIContext);
   const spinnerContext = useSpinnerContext();
   ensureDefined(defineSpinner);
@@ -6031,7 +6031,7 @@ export const Spinner = React.forwardRef<HTMLElement, ElementProps & { label?: Re
   return React.createElement("spui-spinner", useCustomElementProps({ ...props, ref: forwardedRef, label: visibleLabel, size: resolvedSize, appearance, "label-position": labelPosition, delay: delay > 0 ? delay : undefined }), spinnerSlot, tailSlot, labelContent === undefined || labelContent === null ? null : React.createElement("span", { slot: "label" }, labelContent));
 });
 
-export const MessageBar = React.forwardRef<HTMLElement, ElementProps & { intent?: MessageBarIntent; politeness?: MessageBarPoliteness; shape?: MessageBarShape; layout?: MessageBarLayout; icon?: React.ReactNode; bottomReflowSpacer?: React.ReactNode; children?: React.ReactNode }>(function MessageBar({ intent = "info", politeness, shape = "rounded", layout = "auto", icon, bottomReflowSpacer, children, ...props }: ElementProps & { intent?: MessageBarIntent; politeness?: MessageBarPoliteness; shape?: MessageBarShape; layout?: MessageBarLayout; icon?: React.ReactNode; bottomReflowSpacer?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const MessageBar = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { intent?: MessageBarIntent; politeness?: MessageBarPoliteness; shape?: MessageBarShape; layout?: MessageBarLayout; icon?: React.ReactNode; bottomReflowSpacer?: React.ReactNode; children?: React.ReactNode }>(function MessageBar({ intent = "info", politeness, shape = "rounded", layout = "auto", icon, bottomReflowSpacer, children, ...props }: ElementProps & { intent?: MessageBarIntent; politeness?: MessageBarPoliteness; shape?: MessageBarShape; layout?: MessageBarLayout; icon?: React.ReactNode; bottomReflowSpacer?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineMessageBar);
   const iconSlot = icon == null ? null : React.isValidElement(icon)
     ? React.cloneElement(icon as React.ReactElement<{ slot?: string; "aria-hidden"?: boolean }>, { slot: "icon", "aria-hidden": icon.props["aria-hidden"] ?? true })
@@ -6042,27 +6042,27 @@ export const MessageBar = React.forwardRef<HTMLElement, ElementProps & { intent?
   return React.createElement("spui-message-bar", useCustomElementProps({ ...props, ref: forwardedRef, intent, politeness, shape, layout }), iconSlot, children, spacerSlot);
 });
 
-export const MessageBarActions = React.forwardRef<HTMLElement, ElementProps & { containerAction?: React.ReactNode; children?: React.ReactNode }>(function MessageBarActions({ containerAction, children, ...props }: ElementProps & { containerAction?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const MessageBarActions = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { containerAction?: React.ReactNode; children?: React.ReactNode }>(function MessageBarActions({ containerAction, children, ...props }: ElementProps & { containerAction?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineMessageBarActions);
   return React.createElement("spui-message-bar-actions", useCustomElementProps({ ...props, ref: forwardedRef }), children, containerAction == null ? null : React.createElement("span", { slot: "container-action" }, containerAction));
 });
 
-export const MessageBarBody = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function MessageBarBody({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const MessageBarBody = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function MessageBarBody({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineMessageBarBody);
   return React.createElement("spui-message-bar-body", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
 
-export const MessageBarTitle = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function MessageBarTitle({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const MessageBarTitle = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function MessageBarTitle({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineMessageBarTitle);
   return React.createElement("spui-message-bar-title", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
 
-export const MessageBarGroup = React.forwardRef<HTMLElement, ElementProps & { animate?: MessageBarGroupAnimation; children?: React.ReactNode }>(function MessageBarGroup({ animate = "exit-only", children, ...props }: ElementProps & { animate?: MessageBarGroupAnimation; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const MessageBarGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { animate?: MessageBarGroupAnimation; children?: React.ReactNode }>(function MessageBarGroup({ animate = "exit-only", children, ...props }: ElementProps & { animate?: MessageBarGroupAnimation; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineMessageBarGroup);
   return React.createElement("spui-message-bar-group", useCustomElementProps({ ...props, ref: forwardedRef, animate }), children);
 });
 
-export const Alert = React.forwardRef<HTMLElement, ElementProps & { intent?: "info" | "success" | "warning" | "error"; appearance?: "primary" | "inverted"; assertive?: boolean; dismissible?: boolean; dismissLabel?: string; onDismiss?: () => void; icon?: React.ReactNode; avatar?: React.ReactNode; action?: React.ReactNode; actions?: React.ReactNode }>(function Alert({ intent = "info", appearance = "primary", assertive, dismissible = false, dismissLabel, onDismiss, icon, avatar, action, actions, children, ...props }: ElementProps & { intent?: "info" | "success" | "warning" | "error"; appearance?: "primary" | "inverted"; assertive?: boolean; dismissible?: boolean; dismissLabel?: string; onDismiss?: () => void; icon?: React.ReactNode; avatar?: React.ReactNode; action?: React.ReactNode; actions?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const Alert = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { intent?: "info" | "success" | "warning" | "error"; appearance?: "primary" | "inverted"; assertive?: boolean; dismissible?: boolean; dismissLabel?: string; onDismiss?: () => void; icon?: React.ReactNode; avatar?: React.ReactNode; action?: React.ReactNode; actions?: React.ReactNode }>(function Alert({ intent = "info", appearance = "primary", assertive, dismissible = false, dismissLabel, onDismiss, icon, avatar, action, actions, children, ...props }: ElementProps & { intent?: "info" | "success" | "warning" | "error"; appearance?: "primary" | "inverted"; assertive?: boolean; dismissible?: boolean; dismissLabel?: string; onDismiss?: () => void; icon?: React.ReactNode; avatar?: React.ReactNode; action?: React.ReactNode; actions?: React.ReactNode }, forwardedRef): React.ReactElement {
   const context = React.useContext(UIContext);
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -6079,7 +6079,7 @@ export type ToastProps = Omit<ElementProps, "title"> & Omit<ToastDispatchOptions
 type ToastCompositionContextValue = { intent: ToastIntent; dismiss: (reason?: string) => void };
 const ToastCompositionContext = React.createContext<ToastCompositionContextValue | undefined>(undefined);
 
-export const ToastTitle = React.forwardRef<HTMLElement, ElementProps & { media?: React.ReactNode; action?: React.ReactNode; children?: React.ReactNode }>(function ToastTitle({ media, action, children, ...props }: ElementProps & { media?: React.ReactNode; action?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const ToastTitle = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { media?: React.ReactNode; action?: React.ReactNode; children?: React.ReactNode }>(function ToastTitle({ media, action, children, ...props }: ElementProps & { media?: React.ReactNode; action?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   const context = React.useContext(ToastCompositionContext);
   ensureDefined(defineToastTitle);
   return React.createElement("spui-toast-title", useCustomElementProps({ ref: forwardedRef, ...props, intent: context?.intent ?? "info" }),
@@ -6088,13 +6088,13 @@ export const ToastTitle = React.forwardRef<HTMLElement, ElementProps & { media?:
     action == null ? null : React.createElement("span", { slot: "action" }, action));
 });
 
-export const ToastBody = React.forwardRef<HTMLElement, ElementProps & { subtitle?: React.ReactNode; children?: React.ReactNode }>(function ToastBody({ subtitle, children, ...props }: ElementProps & { subtitle?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const ToastBody = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { subtitle?: React.ReactNode; children?: React.ReactNode }>(function ToastBody({ subtitle, children, ...props }: ElementProps & { subtitle?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineToastBody);
   return React.createElement("spui-toast-body", useCustomElementProps({ ...props, ref: forwardedRef }), children,
     subtitle == null ? null : React.createElement("span", { slot: "subtitle" }, subtitle));
 });
 
-export const ToastFooter = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function ToastFooter({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const ToastFooter = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function ToastFooter({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineToastFooter);
   return React.createElement("spui-toast-footer", useCustomElementProps({ ref: forwardedRef, ...props, slot: "action" }), children);
 });
@@ -6128,7 +6128,7 @@ export function ToastTrigger({ children, disableButtonEnhancement = false }: { c
   });
 }
 
-export const Toast = React.forwardRef<HTMLElement, ToastProps>(function Toast({ id, title, action, onAction, onDismiss, priority = 0, intent = "info", appearance, politeness, timeout = 3000, dismissLabel, pauseOnHover = false, pauseOnWindowBlur = false, children, ...props }: ToastProps, forwardedRef): React.ReactElement {
+export const Toast = /* @__PURE__ */ React.forwardRef<HTMLElement, ToastProps>(function Toast({ id, title, action, onAction, onDismiss, priority = 0, intent = "info", appearance, politeness, timeout = 3000, dismissLabel, pauseOnHover = false, pauseOnWindowBlur = false, children, ...props }: ToastProps, forwardedRef): React.ReactElement {
   const context = React.useContext(UIContext);
   const generatedId = React.useId();
   const toastId = id ?? generatedId;
@@ -6191,7 +6191,7 @@ function createTargetedToastController(toasterId: string): ToastControllerValue 
   };
 }
 
-export const Toaster = React.forwardRef<HTMLElement, ElementProps & { position?: ToastPosition; limit?: number; inline?: boolean; toasterId?: string; announce?: ToastAnnounce; children?: React.ReactNode }>(function Toaster({ position = "top-end", limit, inline = false, toasterId, announce, "aria-label": ariaLabel, children, ...props }: ElementProps & { position?: ToastPosition; limit?: number; inline?: boolean; toasterId?: string; announce?: ToastAnnounce; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const Toaster = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { position?: ToastPosition; limit?: number; inline?: boolean; toasterId?: string; announce?: ToastAnnounce; children?: React.ReactNode }>(function Toaster({ position = "top-end", limit, inline = false, toasterId, announce, "aria-label": ariaLabel, children, ...props }: ElementProps & { position?: ToastPosition; limit?: number; inline?: boolean; toasterId?: string; announce?: ToastAnnounce; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   const context = React.useContext(UIContext);
   const [records, setRecords] = React.useState<ToastRecord[]>([]);
   const ref = React.useRef<(HTMLElement & { announce?: ToastAnnounce }) | null>(null)
@@ -6298,23 +6298,23 @@ export function useToastController(toasterId?: string): ToastControllerValue {
   return controller;
 }
 
-export const Skeleton = React.forwardRef<HTMLElement, ElementProps & { shape?: SkeletonShape; width?: string; height?: string; animated?: boolean; animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; children?: React.ReactNode }>(function Skeleton({ shape = "text", width, height, animated = true, animation, appearance = "opaque", size, children, ...props }: ElementProps & { shape?: SkeletonShape; width?: string; height?: string; animated?: boolean; animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const Skeleton = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { shape?: SkeletonShape; width?: string; height?: string; animated?: boolean; animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; children?: React.ReactNode }>(function Skeleton({ shape = "text", width, height, animated = true, animation, appearance = "opaque", size, children, ...props }: ElementProps & { shape?: SkeletonShape; width?: string; height?: string; animated?: boolean; animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineSkeleton);
   return React.createElement("spui-skeleton", useCustomElementProps({ ...props, ref: forwardedRef, shape, width, height, animated, animation, appearance, size }), children);
 });
 
-export const SkeletonItem = React.forwardRef<HTMLElement, ElementProps & { animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; shape?: "rectangle" | "square" | "circle" }>(function SkeletonItem({ animation, appearance, size = 16, shape = "rectangle", ...props }: ElementProps & { animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; shape?: "rectangle" | "square" | "circle" }, forwardedRef): React.ReactElement {
+export const SkeletonItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; shape?: "rectangle" | "square" | "circle" }>(function SkeletonItem({ animation, appearance, size = 16, shape = "rectangle", ...props }: ElementProps & { animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; shape?: "rectangle" | "square" | "circle" }, forwardedRef): React.ReactElement {
   ensureDefined(defineSkeletonItem);
   return React.createElement("spui-skeleton-item", useCustomElementProps({ ...props, ref: forwardedRef, animation, appearance, size, shape }));
 });
 
 export type LinkProps = ElementProps & { href?: string; target?: string; rel?: string; download?: string | boolean; hrefLang?: string; hreflang?: string; media?: string; ping?: string; type?: string; referrerPolicy?: string; title?: string; appearance?: "default" | "subtle"; underline?: "always" | "hover" | "none"; disabled?: boolean; disabledFocusable?: boolean; inline?: boolean; as?: "a" | "button" | "span"; children?: React.ReactNode };
-export const Link = React.forwardRef<HTMLElement, LinkProps>(function Link({ href, target, rel, download, hrefLang, hreflang, media, ping, type, referrerPolicy, title, appearance = "default", underline = "hover", disabled = false, disabledFocusable = false, inline = false, as, children, ...props }: LinkProps, forwardedRef): React.ReactElement {
+export const Link = /* @__PURE__ */ React.forwardRef<HTMLElement, LinkProps>(function Link({ href, target, rel, download, hrefLang, hreflang, media, ping, type, referrerPolicy, title, appearance = "default", underline = "hover", disabled = false, disabledFocusable = false, inline = false, as, children, ...props }: LinkProps, forwardedRef): React.ReactElement {
   ensureDefined(defineLink);
   return React.createElement("spui-link", useCustomElementProps({ ...props, ref: forwardedRef, href, target, rel, download, hreflang: hrefLang ?? hreflang, media, ping, type, "referrerpolicy": referrerPolicy, title, appearance, underline, as, disabled: disabled || undefined, "disabled-focusable": disabledFocusable || undefined, inline: inline || undefined }), children);
 });
 
-export const Divider = React.forwardRef<HTMLElement, ElementProps & { orientation?: "horizontal" | "vertical"; vertical?: boolean; align?: "start" | "center" | "end"; alignContent?: "start" | "center" | "end"; appearance?: DividerAppearance; inset?: boolean; wrapper?: React.ReactNode; children?: React.ReactNode }>(function Divider({ orientation = "horizontal", vertical = false, align, alignContent, appearance = "default", inset = false, wrapper, children, ...props }: ElementProps & { orientation?: "horizontal" | "vertical"; vertical?: boolean; align?: "start" | "center" | "end"; alignContent?: "start" | "center" | "end"; appearance?: DividerAppearance; inset?: boolean; wrapper?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const Divider = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { orientation?: "horizontal" | "vertical"; vertical?: boolean; align?: "start" | "center" | "end"; alignContent?: "start" | "center" | "end"; appearance?: DividerAppearance; inset?: boolean; wrapper?: React.ReactNode; children?: React.ReactNode }>(function Divider({ orientation = "horizontal", vertical = false, align, alignContent, appearance = "default", inset = false, wrapper, children, ...props }: ElementProps & { orientation?: "horizontal" | "vertical"; vertical?: boolean; align?: "start" | "center" | "end"; alignContent?: "start" | "center" | "end"; appearance?: DividerAppearance; inset?: boolean; wrapper?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineDivider);
   const wrapperId = React.useId();
   const resolvedAlign = alignContent ?? align ?? "center";
@@ -6330,7 +6330,7 @@ export function AccordionProvider({ value, children }: { value: AccordionProvide
 }
 
 export type AccordionToggleEvent = React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>;
-export const Accordion = React.forwardRef<HTMLElement, ElementProps & { mode?: "single" | "multiple"; multiple?: boolean; collapsible?: boolean; navigation?: AccordionNavigation; openItems?: AccordionItemValue | readonly AccordionItemValue[]; defaultOpenItems?: AccordionItemValue | readonly AccordionItemValue[]; onToggle?: <TValue extends AccordionItemValue>(event: AccordionToggleEvent, data: { value: TValue; openItems: TValue[] }) => void; children?: React.ReactNode }>(function Accordion<TValue extends AccordionItemValue = AccordionItemValue>({ mode, multiple, collapsible, navigation, openItems, defaultOpenItems, onToggle, children, ...props }: ElementProps & { mode?: "single" | "multiple"; multiple?: boolean; collapsible?: boolean; navigation?: AccordionNavigation; openItems?: TValue | readonly TValue[]; defaultOpenItems?: TValue | readonly TValue[]; onToggle?: (event: AccordionToggleEvent, data: { value: TValue; openItems: TValue[] }) => void; children?: React.ReactNode }, forwardedRef: React.ForwardedRef<HTMLElement>): React.ReactElement {
+export const Accordion = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { mode?: "single" | "multiple"; multiple?: boolean; collapsible?: boolean; navigation?: AccordionNavigation; openItems?: AccordionItemValue | readonly AccordionItemValue[]; defaultOpenItems?: AccordionItemValue | readonly AccordionItemValue[]; onToggle?: <TValue extends AccordionItemValue>(event: AccordionToggleEvent, data: { value: TValue; openItems: TValue[] }) => void; children?: React.ReactNode }>(function Accordion<TValue extends AccordionItemValue = AccordionItemValue>({ mode, multiple, collapsible, navigation, openItems, defaultOpenItems, onToggle, children, ...props }: ElementProps & { mode?: "single" | "multiple"; multiple?: boolean; collapsible?: boolean; navigation?: AccordionNavigation; openItems?: TValue | readonly TValue[]; defaultOpenItems?: TValue | readonly TValue[]; onToggle?: (event: AccordionToggleEvent, data: { value: TValue; openItems: TValue[] }) => void; children?: React.ReactNode }, forwardedRef: React.ForwardedRef<HTMLElement>): React.ReactElement {
   const provider = React.useContext(AccordionContext);
   const ref = React.useRef<HTMLElement & { openItems?: readonly AccordionItemValue[] | AccordionItemValue; defaultOpenItems?: readonly AccordionItemValue[] | AccordionItemValue }>(null);
   useExposeHostRef(ref, forwardedRef);
@@ -6354,7 +6354,7 @@ export const Accordion = React.forwardRef<HTMLElement, ElementProps & { mode?: "
   return React.createElement("spui-accordion", useCustomElementProps({ ...props, ref, mode, multiple: isMultiple || undefined, collapsible: resolvedCollapsible || undefined, navigation: navigation ?? provider?.navigation }), children);
 }) as <TValue extends AccordionItemValue = AccordionItemValue>(props: ElementProps & { mode?: "single" | "multiple"; multiple?: boolean; collapsible?: boolean; navigation?: AccordionNavigation; openItems?: TValue | readonly TValue[]; defaultOpenItems?: TValue | readonly TValue[]; onToggle?: (event: AccordionToggleEvent, data: { value: TValue; openItems: TValue[] }) => void; children?: React.ReactNode } & React.RefAttributes<HTMLElement>) => React.ReactElement;
 
-export const AccordionItem = React.forwardRef<HTMLElement, ElementProps & { value: AccordionItemValue; heading?: string; open?: boolean; defaultOpen?: boolean; disabled?: boolean; onOpenChange?: (open: boolean) => void; children?: React.ReactNode }>(function AccordionItem({ value, heading, open, defaultOpen, disabled, onOpenChange, children, ...props }: ElementProps & { value: AccordionItemValue; heading?: string; open?: boolean; defaultOpen?: boolean; disabled?: boolean; onOpenChange?: (open: boolean) => void; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const AccordionItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { value: AccordionItemValue; heading?: string; open?: boolean; defaultOpen?: boolean; disabled?: boolean; onOpenChange?: (open: boolean) => void; children?: React.ReactNode }>(function AccordionItem({ value, heading, open, defaultOpen, disabled, onOpenChange, children, ...props }: ElementProps & { value: AccordionItemValue; heading?: string; open?: boolean; defaultOpen?: boolean; disabled?: boolean; onOpenChange?: (open: boolean) => void; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   const [motionOpen, setMotionOpen] = React.useState(open ?? defaultOpen ?? false);
@@ -6378,7 +6378,7 @@ export const AccordionItem = React.forwardRef<HTMLElement, ElementProps & { valu
   return React.createElement(AccordionItemOpenContext.Provider, { value: motionOpen }, React.createElement("spui-accordion-item", useCustomElementProps({ ...props, ref, value: String(value), heading, disabled, open: open ?? (defaultOpen || undefined) }), children));
 });
 
-export const AccordionHeader = React.forwardRef<HTMLElement, ElementProps & { expandIconPosition?: "start" | "end"; inline?: boolean; size?: "small" | "medium" | "large" | "extra-large"; icon?: React.ReactNode; expandIcon?: React.ReactNode; button?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; children?: React.ReactNode }>(function AccordionHeader({ expandIconPosition = "end", inline = false, size = "medium", icon, expandIcon, button, children, ...props }: ElementProps & { expandIconPosition?: "start" | "end"; inline?: boolean; size?: "small" | "medium" | "large" | "extra-large"; icon?: React.ReactNode; expandIcon?: React.ReactNode; button?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const AccordionHeader = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { expandIconPosition?: "start" | "end"; inline?: boolean; size?: "small" | "medium" | "large" | "extra-large"; icon?: React.ReactNode; expandIcon?: React.ReactNode; button?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; children?: React.ReactNode }>(function AccordionHeader({ expandIconPosition = "end", inline = false, size = "medium", icon, expandIcon, button, children, ...props }: ElementProps & { expandIconPosition?: "start" | "end"; inline?: boolean; size?: "small" | "medium" | "large" | "extra-large"; icon?: React.ReactNode; expandIcon?: React.ReactNode; button?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineAccordion);
   const ref = React.useRef<HTMLElement & { button?: React.ButtonHTMLAttributes<HTMLButtonElement> }>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -6395,7 +6395,7 @@ export const AccordionHeader = React.forwardRef<HTMLElement, ElementProps & { ex
     expandIcon == null ? null : React.createElement("span", { slot: "expand-icon" }, expandIcon));
 });
 
-export const AccordionPanel = React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; collapseMotion?: React.ComponentType<PresenceMotionSlotProps> }>(function AccordionPanel({ children, collapseMotion, ...props }: ElementProps & { children?: React.ReactNode; collapseMotion?: React.ComponentType<PresenceMotionSlotProps> }, forwardedRef): React.ReactElement {
+export const AccordionPanel = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; collapseMotion?: React.ComponentType<PresenceMotionSlotProps> }>(function AccordionPanel({ children, collapseMotion, ...props }: ElementProps & { children?: React.ReactNode; collapseMotion?: React.ComponentType<PresenceMotionSlotProps> }, forwardedRef): React.ReactElement {
   ensureDefined(defineAccordion);
   const open = React.useContext(AccordionItemOpenContext);
   return React.createElement("spui-accordion-panel", useCustomElementProps({ ref: forwardedRef, ...props, slot: "panel", motion: collapseMotion ? true : undefined }), collapseMotion ? React.createElement(collapseMotion, { visible: open, appear: true, unmountOnExit: true }, children) : children);

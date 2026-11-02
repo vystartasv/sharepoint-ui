@@ -4021,7 +4021,7 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Show a non-modal top-layer surface anchored to a trigger with dismissal and focus return."
+      "summary": "Show a non-modal top-layer surface anchored to a trigger with dismissal, focus return, and Fluent positioning fallbacks, boundaries, offsets, sizing, virtual targets, and update refs."
     },
     {
       "react": "PopoverProvider",
