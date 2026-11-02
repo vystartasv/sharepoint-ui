@@ -1,4 +1,4 @@
-import { base } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, type NativeFormControlDefaults } from "./shared.js";
 
 type CheckedState = boolean | "mixed";
 
@@ -12,6 +12,7 @@ function defineToggle(name: "spui-checkbox" | "spui-switch", type: "checkbox" | 
     private defaultCheckedValue?: CheckedState;
     private formDisabledValue = false;
     private boundInput?: HTMLInputElement;
+    private slotInputDefaults?: NativeFormControlDefaults;
     private generatedLabelInput?: HTMLInputElement;
     private generatedLabel = "";
 
@@ -31,7 +32,7 @@ function defineToggle(name: "spui-checkbox" | "spui-switch", type: "checkbox" | 
     constructor() { super(); this.internals = this.attachInternals(); }
     get checked(): CheckedState { const input = this.getInput(); return input ? (input.indeterminate ? "mixed" : input.checked) : this.checkedValue ?? this.initialChecked(); }
     set checked(value: CheckedState) { this.checkedValue = this.normalizeChecked(value); this.syncInput(); this.syncFormState(); }
-    get defaultChecked(): CheckedState { return this.defaultCheckedValue ?? this.initialChecked(); }
+    get defaultChecked(): CheckedState { return this.defaultCheckedValue ?? this.initialDefaultChecked(); }
     set defaultChecked(value: CheckedState) { this.defaultCheckedValue = this.normalizeChecked(value); if (this.checkedValue === undefined) this.syncInput(); this.syncFormState(); }
     get form(): HTMLFormElement | null { return this.internals.form; }
     get validity(): ValidityState { return this.internals.validity; }
@@ -67,6 +68,7 @@ function defineToggle(name: "spui-checkbox" | "spui-switch", type: "checkbox" | 
       const fallback = this.shadowRoot?.querySelector<HTMLInputElement>(".input-fallback");
       if (fallback) fallback.hidden = assigned;
       const input = this.getInput();
+      if (input && !input.classList.contains("input-fallback")) this.slotInputDefaults = rememberNativeFormControlDefaults(this.slotInputDefaults, input);
       if (input) this.bindInput(input);
       this.syncInput();
       this.syncFormState();
@@ -75,6 +77,12 @@ function defineToggle(name: "spui-checkbox" | "spui-switch", type: "checkbox" | 
     private isDisabledFocusable(): boolean { return this.isDisabled() && this.hasAttribute("disabled-focusable"); }
     private initialChecked(): CheckedState {
       const initial = this.getAttribute("checked") ?? this.getAttribute("default-checked");
+      if (initial === null && this.slotInputDefaults) return this.slotInputDefaults.checked;
+      return type === "checkbox" && initial === "mixed" ? "mixed" : initial !== null;
+    }
+    private initialDefaultChecked(): CheckedState {
+      const initial = this.getAttribute("checked") ?? this.getAttribute("default-checked");
+      if (initial === null && this.slotInputDefaults) return this.slotInputDefaults.defaultChecked;
       return type === "checkbox" && initial === "mixed" ? "mixed" : initial !== null;
     }
     private normalizeChecked(value: CheckedState): CheckedState { return type === "checkbox" && value === "mixed" ? "mixed" : Boolean(value); }
@@ -82,14 +90,16 @@ function defineToggle(name: "spui-checkbox" | "spui-switch", type: "checkbox" | 
     private syncInput(): void {
       const input = this.getInput();
       if (!input) return;
-      const checked = this.checkedValue ?? this.defaultChecked;
+      if (!input.classList.contains("input-fallback")) this.slotInputDefaults = rememberNativeFormControlDefaults(this.slotInputDefaults, input);
+      const defaults = input.classList.contains("input-fallback") ? undefined : this.slotInputDefaults;
+      const checked = this.checkedValue ?? this.defaultCheckedValue ?? this.initialChecked();
       input.checked = checked === true;
       input.indeterminate = checked === "mixed";
-      input.disabled = this.isDisabled() && !this.isDisabledFocusable();
+      input.disabled = (this.isDisabled() && !this.isDisabledFocusable()) || Boolean(defaults?.disabled);
       input.type = "checkbox";
       if (type === "switch") input.setAttribute("role", "switch");
-      input.required = this.hasAttribute("required");
-      input.value = this.getAttribute("value") ?? "on";
+      input.required = this.hasAttribute("required") || Boolean(defaults?.required);
+      input.value = this.getAttribute("value") ?? defaults?.value ?? "on";
       input.removeAttribute("name");
       for (const attr of ["aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid"]) {
         const value = this.getAttribute(attr);
@@ -160,9 +170,9 @@ function defineToggle(name: "spui-checkbox" | "spui-switch", type: "checkbox" | 
       if (!input) return;
       if ((name === "checked" || name === "default-checked") && this.checkedValue === undefined) this.syncInput();
       if (name === "disabled" || name === "disabled-focusable") this.syncInput();
-      if (name === "required") input.required = this.hasAttribute(name);
+      if (name === "required") input.required = this.hasAttribute(name) || Boolean(this.slotInputDefaults?.required);
       if (name === "name") input.removeAttribute("name");
-      if (name === "value") input.value = this.getAttribute(name) ?? "on";
+      if (name === "value") input.value = this.getAttribute(name) ?? this.slotInputDefaults?.value ?? "on";
       if (name === "aria-label" || name === "aria-labelledby" || name === "aria-description" || name === "aria-describedby" || name === "aria-invalid") { const value = this.getAttribute(name); value === null ? input.removeAttribute(name) : input.setAttribute(name, value); }
       this.syncFormState();
     }

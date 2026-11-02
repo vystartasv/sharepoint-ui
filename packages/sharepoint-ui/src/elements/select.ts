@@ -1,4 +1,4 @@
-import { base } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, type NativeFormControlDefaults } from "./shared.js";
 
 export type SelectAppearance = "outline" | "underline" | "filled-darker" | "filled-lighter";
 export type SelectSize = "small" | "medium" | "large";
@@ -13,6 +13,8 @@ export function defineSelect(): void {
     private observer: MutationObserver | undefined;
     private currentValue: string | undefined;
     private boundSelect: HTMLSelectElement | undefined;
+    private formDisabled = false;
+    private slotSelectDefaults?: NativeFormControlDefaults;
     private initialSelectedValues: Set<string> | undefined;
 
     get form(): HTMLFormElement | null { return this.internals?.form ?? null; }
@@ -43,7 +45,9 @@ export function defineSelect(): void {
 
     connectedCallback(): void {
       this.render();
-      this.observer = new MutationObserver(() => this.syncOptions());
+      this.observer = new MutationObserver(records => {
+        if (records.some(record => !this.boundSelect?.contains(record.target))) this.syncOptions();
+      });
       this.observer.observe(this, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["value", "label", "disabled", "selected"] });
     }
 
@@ -59,9 +63,9 @@ export function defineSelect(): void {
         const label = this.shadowRoot?.querySelector("label");
         if (label) label.textContent = value ?? "";
       }
-      if (name === "disabled") select.disabled = this.hasAttribute("disabled");
-      if (name === "required") select.required = this.hasAttribute("required");
-      if (name === "multiple") select.multiple = this.hasAttribute("multiple");
+      if (name === "disabled") select.disabled = this.formDisabled || this.hasAttribute("disabled") || Boolean(this.slotSelectDefaults?.disabled);
+      if (name === "required") select.required = this.hasAttribute("required") || Boolean(this.slotSelectDefaults?.required);
+      if (name === "multiple") select.multiple = this.hasAttribute("multiple") || Boolean(this.slotSelectDefaults?.multiple);
       if (name === "form") value === null ? select.removeAttribute("form") : select.setAttribute("form", value);
       if (name === "auto-complete") value === null ? select.removeAttribute("autocomplete") : select.setAttribute("autocomplete", value);
       if (name === "aria-label" || name === "aria-labelledby" || name === "aria-description" || name === "aria-describedby" || name === "aria-invalid") value === null ? select.removeAttribute(name) : select.setAttribute(name, value);
@@ -81,8 +85,8 @@ export function defineSelect(): void {
     set defaultValue(value: string) { this.setAttribute("default-value", value); }
 
     formDisabledCallback(disabled: boolean): void {
-      const select = this.getSelect();
-      if (select) select.disabled = disabled || this.hasAttribute("disabled");
+      this.formDisabled = disabled;
+      this.syncOptions();
     }
 
     formResetCallback(): void {
@@ -109,6 +113,8 @@ export function defineSelect(): void {
     private syncOptions(): void {
       const select = this.getSelect();
       if (!select) return;
+      if (!select.classList.contains("select-fallback")) this.slotSelectDefaults = rememberNativeFormControlDefaults(this.slotSelectDefaults, select);
+      const defaults = select.classList.contains("select-fallback") ? undefined : this.slotSelectDefaults;
       if (select.classList.contains("select-fallback")) {
         const priorValue = this.currentValue ?? select.value;
         const sourceOptions = [...this.querySelectorAll("option")];
@@ -116,7 +122,7 @@ export function defineSelect(): void {
         if (!this.initialSelectedValues && sourceOptions.length > 0) this.initialSelectedValues = sourceSelectedValues;
         const priorValues = select.multiple ? new Set([...select.selectedOptions].map(option => option.value)) : undefined;
         select.replaceChildren(...this.cloneOptionContent());
-        select.disabled = this.hasAttribute("disabled");
+        select.disabled = this.formDisabled || this.hasAttribute("disabled");
         select.required = this.hasAttribute("required");
         select.multiple = this.hasAttribute("multiple");
         if (this.hasAttribute("form")) select.setAttribute("form", this.getAttribute("form")!); else select.removeAttribute("form");
@@ -135,9 +141,9 @@ export function defineSelect(): void {
           select.value = priorValue;
         }
       } else {
-        select.disabled = this.hasAttribute("disabled") || select.disabled;
-        select.required = this.hasAttribute("required") || select.required;
-        select.multiple = this.hasAttribute("multiple") || select.multiple;
+        select.disabled = this.formDisabled || this.hasAttribute("disabled") || Boolean(defaults?.disabled);
+        select.required = this.hasAttribute("required") || Boolean(defaults?.required);
+        select.multiple = this.hasAttribute("multiple") || Boolean(defaults?.multiple);
         if (this.hasAttribute("auto-complete") && !select.hasAttribute("autocomplete")) select.setAttribute("autocomplete", this.getAttribute("auto-complete")!);
         if (this.hasAttribute("name")) select.removeAttribute("name");
         for (const name of ["aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid"]) {

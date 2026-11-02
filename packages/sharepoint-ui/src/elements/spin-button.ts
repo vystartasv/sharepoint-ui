@@ -1,4 +1,4 @@
-import { base } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, type NativeFormControlDefaults } from "./shared.js";
 
 export type SpinButtonAppearance = "outline" | "underline" | "filled-darker" | "filled-lighter";
 export type SpinButtonSize = "small" | "medium";
@@ -11,9 +11,11 @@ export function defineSpinButton(): void {
     static observedAttributes = ["label", "value", "default-value", "display-value", "min", "max", "step", "step-page", "precision", "size", "appearance", "disabled", "required", "read-only", "name", "aria-label", "aria-description", "aria-describedby", "aria-invalid", "aria-valuetext", "increment-label", "decrement-label"];
     private internals: ElementInternals | undefined;
     private currentValue: string | undefined;
+    private formDisabled = false;
     private draft: string | undefined;
     private previousDraft: string | undefined;
     private boundInput?: HTMLInputElement;
+    private slotInputDefaults?: NativeFormControlDefaults;
     private boundDecrement?: HTMLButtonElement;
     private boundIncrement?: HTMLButtonElement;
 
@@ -51,9 +53,9 @@ export function defineSpinButton(): void {
       } else if (name === "step-page" || name === "precision" || name === "size" || name === "appearance") {
         this.render();
         return;
-      } else if (name === "disabled") input.disabled = this.hasAttribute("disabled");
-      else if (name === "required") input.required = this.hasAttribute("required");
-      else if (name === "read-only") input.readOnly = this.hasAttribute("read-only");
+      } else if (name === "disabled") input.disabled = this.formDisabled || this.hasAttribute("disabled") || Boolean(this.slotInputDefaults?.disabled);
+      else if (name === "required") input.required = this.hasAttribute("required") || Boolean(this.slotInputDefaults?.required);
+      else if (name === "read-only") input.readOnly = this.hasAttribute("read-only") || Boolean(this.slotInputDefaults?.readOnly);
       else if (name === "name") { /* The form-associated host owns the submitted name. */ }
       else if (name === "aria-label" || name === "aria-description" || name === "aria-describedby" || name === "aria-invalid" || name === "aria-valuetext") value === null ? input.removeAttribute(name) : input.setAttribute(name, value);
       this.syncAria(input);
@@ -71,7 +73,7 @@ export function defineSpinButton(): void {
     get defaultValue(): number | null { const value = this.getAttribute("default-value"); return value === null || value === "" ? null : Number(value); }
     set defaultValue(value: number | null) { if (value === null) this.removeAttribute("default-value"); else this.setAttribute("default-value", String(value)); }
 
-    formDisabledCallback(disabled: boolean): void { const input = this.getInput(); if (input) { input.disabled = disabled || this.hasAttribute("disabled"); this.updateButtons(input); } }
+    formDisabledCallback(disabled: boolean): void { this.formDisabled = disabled; this.syncSlots(); }
     formResetCallback(): void { this.currentValue = this.getAttribute("value") ?? this.getAttribute("default-value") ?? "0"; this.draft = undefined; this.previousDraft = undefined; const input = this.getInput(); if (input) { input.value = this.getAttribute("display-value") ?? this.currentValue; this.syncAria(input); this.syncFormState(input); this.updateButtons(input); } }
     formStateRestoreCallback(state: string | File | FormData | null): void { if (typeof state === "string") this.value = state; }
 
@@ -173,6 +175,8 @@ export function defineSpinButton(): void {
       const input = this.getInput();
       if (input) {
         const fallback = this.shadowRoot?.querySelector<HTMLInputElement>(".input-fallback");
+        if (input !== fallback) this.slotInputDefaults = rememberNativeFormControlDefaults(this.slotInputDefaults, input);
+        const defaults = input === fallback ? undefined : this.slotInputDefaults;
         if (fallback) { const assigned = input !== fallback; fallback.hidden = assigned; fallback.setAttribute("aria-hidden", String(assigned)); fallback.removeAttribute("name"); }
         if (this.boundInput !== input) {
           this.boundInput?.removeEventListener("input", this.handleInput);
@@ -194,9 +198,9 @@ export function defineSpinButton(): void {
           if (input.hasAttribute(name)) continue;
           const value = this.getAttribute(name); if (value !== null) input.setAttribute(name, value);
         }
-        input.disabled = this.hasAttribute("disabled") || input.disabled;
-        input.required = this.hasAttribute("required") || input.required;
-        input.readOnly = this.hasAttribute("read-only") || input.readOnly;
+        input.disabled = this.formDisabled || this.hasAttribute("disabled") || Boolean(defaults?.disabled);
+        input.required = this.hasAttribute("required") || Boolean(defaults?.required);
+        input.readOnly = this.hasAttribute("read-only") || Boolean(defaults?.readOnly);
         input.removeAttribute("name");
         if (this.draft === undefined) input.value = this.getAttribute("display-value") ?? this.currentValue ?? "";
         this.syncAria(input); this.syncFormState(input); this.updateButtons(input);
@@ -263,7 +267,7 @@ export function defineSpinButton(): void {
       input.inputMode = "decimal";
       input.autocomplete = "off";
       input.setAttribute("role", "spinbutton");
-      const initial = this.currentValue ?? this.getAttribute("value") ?? this.getAttribute("default-value") ?? "0";
+      const initial = this.currentValue ?? this.getAttribute("value") ?? this.getAttribute("default-value") ?? this.querySelector<HTMLInputElement>('input[slot="input"]')?.value ?? "0";
       this.currentValue = initial;
       input.value = this.getAttribute("display-value") ?? initial;
       for (const name of ["min", "max", "aria-label", "aria-description", "aria-describedby", "aria-invalid"]) { const value = this.getAttribute(name); if (value !== null) input.setAttribute(name, value); }

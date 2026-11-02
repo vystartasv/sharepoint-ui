@@ -1,4 +1,4 @@
-import { base } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, type NativeFormControlDefaults } from "./shared.js";
 
 export function defineCombobox(): void {
   if (customElements.get("spui-combobox")) return;
@@ -21,6 +21,8 @@ export function defineCombobox(): void {
     private inputSlot?: HTMLSlotElement;
     private fallbackInput?: HTMLInputElement;
     private boundInput?: HTMLInputElement;
+    private formDisabled = false;
+    private slotInputDefaults?: NativeFormControlDefaults;
     private readonly handleInput = (event: Event): void => { const input = this.getInput(); if (!input) return; const changed = !this.open; this.currentValue = input.value; this.dirty = true; this.activeIndex = -1; this.open = true; this.updateOptions(); this.syncFormState(); this.notifyOpenChange(true, event, changed); this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: input.value }, bubbles: true, composed: true })); };
     private readonly handleInputClick = (event: Event): void => { if (!this.open) this.openList(0, event); };
     private readonly handleInputKeyDown = (event: KeyboardEvent): void => this.onKeyDown(event);
@@ -42,7 +44,7 @@ export function defineCombobox(): void {
     }
 
     connectedCallback(): void {
-      this.currentValue = this.getAttribute("value") ?? "";
+      this.currentValue = this.getAttribute("value") ?? this.querySelector<HTMLInputElement>('input[slot="input"]')?.value ?? "";
       this.selectedValueState = this.getAttribute("selected-value") ?? "";
       this.selectedOptionsState = this.readSelectedOptions(this.getAttribute("selected-options") ?? this.getAttribute("default-selected-options"));
       this.render();
@@ -68,6 +70,8 @@ export function defineCombobox(): void {
     private bindInput(): void {
       const input = this.getInput();
       if (!input) return;
+      if (input !== this.fallbackInput) this.slotInputDefaults = rememberNativeFormControlDefaults(this.slotInputDefaults, input);
+      const defaults = input === this.fallbackInput ? undefined : this.slotInputDefaults;
       if (this.boundInput !== input) {
         this.boundInput?.removeEventListener("input", this.handleInput); this.boundInput?.removeEventListener("click", this.handleInputClick); this.boundInput?.removeEventListener("keydown", this.handleInputKeyDown); this.boundInput?.removeEventListener("blur", this.handleInputBlur);
         input.addEventListener("input", this.handleInput); input.addEventListener("click", this.handleInputClick); input.addEventListener("keydown", this.handleInputKeyDown); input.addEventListener("blur", this.handleInputBlur); this.boundInput = input;
@@ -76,7 +80,7 @@ export function defineCombobox(): void {
       if (!input.id) input.id = `combo-${this.instanceId}-input`;
       if (!input.type) input.type = "text";
       input.role = "combobox"; input.autocomplete ||= "off"; input.setAttribute("aria-autocomplete", "list"); input.setAttribute("aria-haspopup", "listbox");
-      input.value = this.currentValue; input.placeholder = this.getAttribute("placeholder") ?? ""; input.readOnly = this.hasAttribute("read-only"); input.disabled = this.hasAttribute("disabled"); input.required = this.hasAttribute("required"); input.hidden = this.hasAttribute("button-trigger"); input.part.add("control");
+      input.value = this.currentValue; input.placeholder = this.getAttribute("placeholder") ?? ""; input.readOnly = this.hasAttribute("read-only") || Boolean(defaults?.readOnly); input.disabled = this.formDisabled || this.hasAttribute("disabled") || Boolean(defaults?.disabled); input.required = this.hasAttribute("required") || Boolean(defaults?.required); input.hidden = this.hasAttribute("button-trigger"); input.part.add("control");
       for (const name of ["aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid"]) { const value = this.getAttribute(name); if (value === null) input.removeAttribute(name); else input.setAttribute(name, value); }
     }
 
@@ -103,8 +107,8 @@ export function defineCombobox(): void {
       } else if (name === "default-selected-options" && !this.selectionsDirty && !this.hasAttribute("selected-options")) {
         this.selectedOptionsState = this.readSelectedOptions(value);
         this.updateOptions();
-      } else if (name === "disabled") input.disabled = this.hasAttribute("disabled");
-      else if (name === "read-only") { input.readOnly = this.hasAttribute("read-only"); this.syncExpandIcon(); }
+      } else if (name === "disabled") input.disabled = this.formDisabled || this.hasAttribute("disabled") || Boolean(this.slotInputDefaults?.disabled);
+      else if (name === "read-only") { input.readOnly = this.hasAttribute("read-only") || Boolean(this.slotInputDefaults?.readOnly); this.syncExpandIcon(); }
       else if (name === "button-trigger") {
         const active = this.hasAttribute("button-trigger"); input.hidden = active;
         if (this.buttonTriggerSlot) {
@@ -122,7 +126,7 @@ export function defineCombobox(): void {
         if (this.hasAttribute("open") || this.hasAttribute("default-open")) this.openList();
         else this.closeList();
       }
-      else if (name === "required") input.required = this.hasAttribute("required");
+      else if (name === "required") input.required = this.hasAttribute("required") || Boolean(this.slotInputDefaults?.required);
       else if (name === "placeholder") input.placeholder = value ?? "";
       else if (name === "aria-label" || name === "aria-labelledby" || name === "aria-description" || name === "aria-describedby" || name === "aria-invalid") value === null ? input.removeAttribute(name) : input.setAttribute(name, value);
       else if (name === "allow-freeform" || name === "no-results" || name === "remove-selected-label" || name === "multiselect") this.updateOptions();
@@ -159,7 +163,7 @@ export function defineCombobox(): void {
       catch { return []; }
     }
 
-    formDisabledCallback(disabled: boolean): void { const input = this.getInput(); if (input) input.disabled = disabled || this.hasAttribute("disabled"); }
+    formDisabledCallback(disabled: boolean): void { this.formDisabled = disabled; this.bindInput(); this.syncFormState(); }
     formResetCallback(): void {
       this.selectedOptionsState = this.readSelectedOptions(this.getAttribute("default-selected-options"));
       this.selectionsDirty = false;

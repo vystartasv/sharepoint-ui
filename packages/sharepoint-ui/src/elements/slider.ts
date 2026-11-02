@@ -1,4 +1,4 @@
-import { base } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, type NativeFormControlDefaults } from "./shared.js";
 
 export function defineSlider(): void {
   if (customElements.get("spui-slider")) return;
@@ -8,7 +8,9 @@ export function defineSlider(): void {
     private internals: ElementInternals | undefined;
     private currentValue: string | undefined;
     private currentDefaultValue: string | undefined;
+    private formDisabled = false;
     private boundInput?: HTMLInputElement;
+    private slotInputDefaults?: NativeFormControlDefaults;
     private defaultAriaOrientation?: { input: HTMLInputElement; value: string };
 
     get form(): HTMLFormElement | null { return this.internals?.form ?? null; }
@@ -44,7 +46,7 @@ export function defineSlider(): void {
           if (this.hasAttribute("vertical")) input.setAttribute("orient", "vertical");
           else input.removeAttribute("orient");
         }
-      } else if (name === "disabled") input.disabled = this.hasAttribute("disabled");
+      } else if (name === "disabled") input.disabled = this.formDisabled || this.hasAttribute("disabled") || Boolean(this.slotInputDefaults?.disabled);
       else if (name === "aria-label" || name === "aria-description" || name === "aria-describedby" || name === "aria-invalid" || name === "aria-orientation" || name === "aria-required" || name === "aria-valuetext") {
         if (name === "aria-orientation") this.defaultAriaOrientation = undefined;
         value === null ? input.removeAttribute(name) : input.setAttribute(name, value);
@@ -66,7 +68,7 @@ export function defineSlider(): void {
       this.setAttribute("default-value", this.currentDefaultValue);
     }
 
-    formDisabledCallback(disabled: boolean): void { const input = this.getInput(); if (input) input.disabled = disabled || this.hasAttribute("disabled"); }
+    formDisabledCallback(disabled: boolean): void { this.formDisabled = disabled; this.syncSlots(); }
     formResetCallback(): void { const input = this.getInput(); if (input) { input.value = this.getAttribute("value") ?? this.getAttribute("default-value") ?? "0"; this.currentValue = input.value; this.syncFormValue(input); this.syncVisual(input); } }
     formStateRestoreCallback(state: string | File | FormData | null): void { if (typeof state === "string") this.value = Number(state); }
 
@@ -94,13 +96,14 @@ export function defineSlider(): void {
     }
     private syncSlots(): void {
       const input = this.getInput(); if (!input) return;
+      const fallback = this.shadowRoot?.querySelector<HTMLInputElement>(".input-fallback");
+      if (input !== fallback) this.slotInputDefaults = rememberNativeFormControlDefaults(this.slotInputDefaults, input);
       if (this.boundInput !== input) {
         this.boundInput?.removeEventListener("input", this.handleInput);
         input.addEventListener("input", this.handleInput);
         this.boundInput = input;
         input.value = this.currentValue ?? this.getAttribute("value") ?? this.currentDefaultValue ?? this.getAttribute("default-value") ?? input.value ?? "0";
       }
-      const fallback = this.shadowRoot?.querySelector<HTMLInputElement>(".input-fallback");
       if (fallback) { const assigned = input !== fallback; fallback.hidden = assigned; fallback.setAttribute("aria-hidden", String(assigned)); }
       input.type = "range"; input.removeAttribute("name");
       if (!input.id) input.id = this.shadowRoot?.querySelector("label")?.htmlFor ?? `slider-${crypto.randomUUID()}`;
@@ -115,7 +118,7 @@ export function defineSlider(): void {
         input.setAttribute("aria-orientation", orientation);
         this.defaultAriaOrientation = { input, value: orientation };
       } else this.defaultAriaOrientation = undefined;
-      input.disabled = this.hasAttribute("disabled") || input.disabled;
+      input.disabled = this.formDisabled || this.hasAttribute("disabled") || Boolean(input === fallback ? false : this.slotInputDefaults?.disabled);
       this.syncFormValue(input); this.syncVisual(input);
     }
     private handleInput = (event: Event): void => {
