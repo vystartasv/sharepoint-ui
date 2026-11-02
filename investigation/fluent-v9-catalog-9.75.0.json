@@ -258,7 +258,7 @@
       ],
       "localStatus": "partial",
       "purpose": "Accept short free-form text such as a query or value.",
-      "coverageNote": "A local implementation exists, but family-level behavior, accessibility, theme, composition, documentation, and performance parity are not yet complete."
+      "coverageNote": "Input exposes React and custom-element paths with native input types, controlled/default value and checked state, native form attributes, prefix/suffix slots, size/appearance, validation, reset, and focus/selection refs. Replaceable input slots retain their own disabled, required, and read-only state while host props and disabled fieldsets are applied. Chromium measures size/focus contrast and mount/input-event latency, and covers callback shape, forms, reduced motion, forced colors, and slot state. Full theme/state and assistive-technology review, browser/tenant parity, and performance comparison against Fluent remain open."
     },
     {
       "family": "label",
@@ -463,7 +463,7 @@
       ],
       "localStatus": "partial",
       "purpose": "Choose a numeric value within a range.",
-      "coverageNote": "A local implementation exists, but family-level behavior, accessibility, theme, composition, documentation, and performance parity are not yet complete."
+      "coverageNote": "React Slider and the custom element provide controlled/default numeric values, size, vertical orientation, replaceable native input/rail/thumb slots, form submission/reset, and Fluent-shaped onChange data. The native range input now exposes horizontal orientation by default, updates its orientation when vertical mode changes, and preserves an explicitly supplied input-slot orientation. Chromium verifies callbacks, sizing, orientation, slot values, form behavior, and zero page errors. Remaining: broader keyboard/input behavior, theme and contrast matrices, assistive-technology and cross-browser review, authenticated tenant behavior, and performance comparison."
     },
     {
       "family": "spinbutton",
@@ -645,7 +645,7 @@
       ],
       "localStatus": "partial",
       "purpose": "Enter or edit multi-line text.",
-      "coverageNote": "A local implementation exists, but family-level behavior, accessibility, theme, composition, documentation, and performance parity are not yet complete."
+      "coverageNote": "React TextArea and the custom element support controlled/default values, Fluent onChange data, the replaceable native textarea slot, small/medium/large sizing, appearance and resize modes, labels and ARIA naming, native attributes, form ownership/submission/reset/required validation, and focus/selection refs. Replaceable textareas retain their own disabled, required, and read-only state while host props and disabled fieldsets are applied; filled-shadow appearance reaches the replacement slot. Chromium covers both adapters, slot replacement, callback event shape, form lifecycle, and style inheritance. Remaining: full Fluent theme/state and forced-color matrices, assistive-technology review, cross-browser and tenant behavior, and family performance comparison."
     },
     {
       "family": "toast",

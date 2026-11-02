@@ -16,6 +16,7 @@ export function defineInput(): void {
     private formDisabled = false;
     private customError = "";
     private boundInput?: HTMLInputElement;
+    private slotInputDefaults?: { input: HTMLInputElement; disabled: boolean; required: boolean; readOnly: boolean };
 
     private handleInput = (event: Event): void => {
       const input = this.input();
@@ -73,9 +74,6 @@ export function defineInput(): void {
       if (!input) return;
       if (name === "value") { if (!this.dirty && input.type !== "file") { this.currentValue = value ?? ""; input.value = this.currentValue; this.syncForm(input); } return; }
       if (name === "size" || name === "appearance") this.shadowRoot.querySelector<HTMLElement>(".control")!.dataset[name] = value || (name === "size" ? "medium" : "outline");
-      else if (name === "disabled") input.disabled = value !== null || this.formDisabled;
-      else if (name === "required") input.required = value !== null;
-      else if (name === "read-only") input.readOnly = value !== null;
       else if (name === "type") { try { input.type = value || "text"; } catch { input.type = "text"; } }
       else if (name === "checked") input.checked = value !== null;
       else if (name === "default-checked") { input.defaultChecked = value !== null; if (!this.dirty) input.checked = value !== null; }
@@ -90,7 +88,7 @@ export function defineInput(): void {
       this.syncInputSlot();
     }
 
-    formDisabledCallback(disabled: boolean): void { this.formDisabled = disabled; const input = this.input(); if (input) { input.disabled = disabled || this.disabled; this.syncForm(input); } }
+    formDisabledCallback(disabled: boolean): void { this.formDisabled = disabled; this.syncInputSlot(); }
     formResetCallback(): void { this.dirty = false; const input = this.input(); this.currentValue = input?.type === "file" ? "" : this.defaultValue; if (input) { input.value = this.currentValue; input.checked = input.defaultChecked; this.syncForm(input); } }
     formStateRestoreCallback(state: string | File | FormData | null): void { if (typeof state === "string") this.value = state; }
     focus(options?: FocusOptions): void { this.input()?.focus(options); }
@@ -109,6 +107,9 @@ export function defineInput(): void {
       if (!input) return;
       const fallback = this.shadowRoot?.querySelector<HTMLInputElement>(".input-fallback");
       if (fallback) fallback.hidden = input !== fallback;
+      if (input !== fallback && this.slotInputDefaults?.input !== input) {
+        this.slotInputDefaults = { input, disabled: input.disabled, required: input.required, readOnly: input.readOnly };
+      }
       if (this.boundInput !== input) {
         this.boundInput?.removeEventListener("input", this.handleInput);
         this.boundInput?.removeEventListener("change", this.handleChange);
@@ -122,9 +123,10 @@ export function defineInput(): void {
         const value = this.getAttribute(name);
         if (value !== null) input.setAttribute(name, value);
       }
-      input.disabled = this.disabled || this.formDisabled || input.disabled;
-      input.required = this.required || input.required;
-      input.readOnly = this.readOnly || input.readOnly;
+      const defaults = input === fallback ? undefined : this.slotInputDefaults;
+      input.disabled = this.disabled || this.formDisabled || Boolean(defaults?.disabled);
+      input.required = this.required || Boolean(defaults?.required);
+      input.readOnly = this.readOnly || Boolean(defaults?.readOnly);
       input.defaultChecked = this.hasAttribute("default-checked");
       if (this.hasAttribute("checked")) input.checked = true;
       if (!this.dirty && input.type !== "file" && (this.hasAttribute("value") || this.defaultValue)) input.value = this.currentValue || this.defaultValue;

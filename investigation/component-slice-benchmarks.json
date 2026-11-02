@@ -3072,20 +3072,20 @@
     }
   },
   "inputParityLocal": {
-    "measuredOn": "2026-11-01",
+    "measuredOn": "2026-11-02",
     "viewport": "700x900",
     "componentSlices": {
       "customElement": {
-        "raw": 9180,
-        "gzip": 2828,
-        "brotli": 2442,
+        "raw": 12628,
+        "gzip": 3516,
+        "brotli": 3062,
         "modules": 3
       },
       "reactAdapter": {
-        "raw": 27759,
-        "gzip": 6974,
-        "brotli": 6029,
-        "modules": 5
+        "raw": 43851,
+        "gzip": 11184,
+        "brotli": 9836,
+        "modules": 6
       }
     },
     "checks": {
@@ -3096,6 +3096,8 @@
       "fluentSizeHeights": true,
       "emptyStringFormData": true,
       "requiredFormBehavior": true,
+      "assignedNativeSlotStateRetention": true,
+      "assignedSlotDisabledFieldset": true,
       "disabledFieldset": true,
       "formReset": true,
       "pageErrors": 0,
@@ -3108,17 +3110,17 @@
         "1": {
           "samples": 10,
           "p50Ms": 0,
-          "p95Ms": 0.1
+          "p95Ms": 0.2
         },
         "20": {
           "samples": 10,
-          "p50Ms": 0.3,
-          "p95Ms": 0.4
+          "p50Ms": 0.5,
+          "p95Ms": 0.7
         },
         "100": {
           "samples": 10,
-          "p50Ms": 1.3,
-          "p95Ms": 1.8
+          "p50Ms": 2.1,
+          "p95Ms": 2.5
         }
       },
       "inputEventMs": {
@@ -3128,12 +3130,12 @@
         "observed": 50
       }
     },
-    "caveat": "Local Chromium only. Mount samples measure custom-element construction, connected render, and one forced layout in detached fixtures; synchronous input-event samples exclude paint and SharePoint host latency. Single-run local microbenchmark, not a p95 production guarantee. Component slices exclude CSS, React runtime, and SharePoint host. This change has not been packaged for SharePoint; the deployed catalog remains .138 with the existing site instance Initialized (9).",
+    "caveat": "Local Chromium only. Mount samples measure custom-element construction, connected render, and one forced layout in detached fixtures; synchronous input-event samples exclude paint and SharePoint host latency. Single-run local microbenchmark, not a p95 production guarantee. Component slices exclude CSS, React runtime, and SharePoint host. The SPFx 1.24 artifact was built locally but not uploaded to a tenant in this checkpoint.",
     "spfxPackage": {
-      "solutionVersion": "1.0.0.139",
-      "featureVersion": "1.0.0.75",
-      "sppkgBytes": 122710,
-      "demoBundleBytes": 507390,
+      "solutionVersion": "1.0.0.160",
+      "featureVersion": "1.0.0.96",
+      "sppkgBytes": 250242,
+      "demoBundleBytes": 1073415,
       "builtLocally": true,
       "uploadedToTenant": false
     }
@@ -5909,13 +5911,17 @@
     "caveat": "Local Chromium and tree-shaken JavaScript only; React runtime, CSS assets, and SharePoint host cost are excluded."
   },
   "sliderParityLocal": {
-    "measuredOn": "2026-11-01",
+    "measuredOn": "2026-11-02",
     "reference": "@fluentui/react-slider within @fluentui/react-components@9.75.0",
     "verifier": "scripts/verify-slider-parity.mjs",
     "checks": {
       "reactAndCustomElement": true,
       "controlledAndDefaultValue": true,
       "smallAndVertical": true,
+      "horizontalOrientationDefault": true,
+      "verticalOrientationUpdates": true,
+      "explicitInputOrientationPreserved": true,
+      "hostAriaOrientationOverride": true,
       "fluentOnChangeEventAndData": true,
       "legacyOnValueChange": true,
       "nativeFormSubmissionAndReset": true,
@@ -5923,15 +5929,15 @@
     },
     "componentSlices": {
       "customElement": {
-        "raw": 4708,
-        "gzip": 1664,
-        "brotli": 1374,
+        "raw": 11241,
+        "gzip": 3050,
+        "brotli": 2630,
         "includedModules": 3
       },
       "reactAdapter": {
-        "raw": 28801,
-        "gzip": 7165,
-        "brotli": 6190,
+        "raw": 42026,
+        "gzip": 10644,
+        "brotli": 9337,
         "includedModules": 6,
         "reactExternalized": true
       }
@@ -6134,7 +6140,7 @@
     "limitations": "The DataGrid slice comparison shows the provider-level token-resolution refactor reduced this emitted slice by 744 gzip bytes; it does not isolate the cost of brand/density props. SPFx bundle figures include all current worktree changes, and exclude SharePoint runtime costs. Contrast was checked for selected hex samples, not a full palette or component matrix."
   },
   "textareaFluentParityLocal": {
-    "measuredOn": "2026-11-01",
+    "measuredOn": "2026-11-02",
     "reference": "@fluentui/react-textarea within @fluentui/react-components@9.75.0",
     "verifier": "scripts/verify-textarea-parity.mjs",
     "checks": {
@@ -6143,6 +6149,10 @@
       "onChangeEventAndData": true,
       "legacyOnValueChange": true,
       "appearanceVariants": true,
+      "slotDisabledRequiredReadOnly": true,
+      "assignedSlotDisabledFieldset": true,
+      "replacementTextareaSlot": true,
+      "replacementSlotShadowAppearance": true,
       "sizeVariants": true,
       "resizeDirections": true,
       "customElementPropertyAndAttributeUpdates": true,
@@ -6151,27 +6161,27 @@
     },
     "componentSlices": {
       "customElement": {
-        "raw": 7235,
-        "gzip": 2251,
-        "brotli": 1897,
+        "raw": 10585,
+        "gzip": 2800,
+        "brotli": 2396,
         "includedModules": 3
       },
       "reactAdapter": {
-        "raw": 28653,
-        "gzip": 7147,
-        "brotli": 6167,
-        "includedModules": 5,
+        "raw": 41513,
+        "gzip": 10383,
+        "brotli": 9098,
+        "includedModules": 6,
         "reactExternalized": true
       }
     },
     "spfx124Build": {
-      "componentVersion": "0.0.41",
-      "solutionVersion": "1.0.0.159",
-      "featureVersion": "1.0.0.95",
-      "sppkgBytes": 191965,
-      "demoBundleRawBytes": 819875,
-      "demoBundleGzipBytes": 186868,
-      "demoBundleBrotliBytes": 141609,
+      "componentVersion": "0.0.42",
+      "solutionVersion": "1.0.0.160",
+      "featureVersion": "1.0.0.96",
+      "sppkgBytes": 250242,
+      "demoBundleRawBytes": 1073415,
+      "demoBundleGzipBytes": 245527,
+      "demoBundleBrotliBytes": 184977,
       "jestSuites": 0
     },
     "remainingGap": "Full assistive-technology and authenticated SharePoint validation remain open.",

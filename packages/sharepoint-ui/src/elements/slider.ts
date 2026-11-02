@@ -4,11 +4,12 @@ export function defineSlider(): void {
   if (customElements.get("spui-slider")) return;
   class SpuiSlider extends HTMLElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "value", "default-value", "min", "max", "step", "size", "vertical", "disabled", "name", "aria-label", "aria-description", "aria-describedby", "aria-invalid", "aria-required", "aria-valuetext"];
+    static observedAttributes = ["label", "value", "default-value", "min", "max", "step", "size", "vertical", "disabled", "name", "aria-label", "aria-description", "aria-describedby", "aria-invalid", "aria-orientation", "aria-required", "aria-valuetext"];
     private internals: ElementInternals | undefined;
     private currentValue: string | undefined;
     private currentDefaultValue: string | undefined;
     private boundInput?: HTMLInputElement;
+    private defaultAriaOrientation?: { input: HTMLInputElement; value: string };
 
     get form(): HTMLFormElement | null { return this.internals?.form ?? null; }
 
@@ -40,11 +41,14 @@ export function defineSlider(): void {
       } else if (name === "size" || name === "vertical") {
         if (value === null || value === "false") this.removeAttribute(name);
         if (name === "vertical") {
-          if (this.hasAttribute("vertical")) { input.setAttribute("orient", "vertical"); input.setAttribute("aria-orientation", "vertical"); }
-          else { input.removeAttribute("orient"); input.removeAttribute("aria-orientation"); }
+          if (this.hasAttribute("vertical")) input.setAttribute("orient", "vertical");
+          else input.removeAttribute("orient");
         }
       } else if (name === "disabled") input.disabled = this.hasAttribute("disabled");
-      else if (name === "aria-label" || name === "aria-description" || name === "aria-describedby" || name === "aria-invalid" || name === "aria-required" || name === "aria-valuetext") value === null ? input.removeAttribute(name) : input.setAttribute(name, value);
+      else if (name === "aria-label" || name === "aria-description" || name === "aria-describedby" || name === "aria-invalid" || name === "aria-orientation" || name === "aria-required" || name === "aria-valuetext") {
+        if (name === "aria-orientation") this.defaultAriaOrientation = undefined;
+        value === null ? input.removeAttribute(name) : input.setAttribute(name, value);
+      }
       this.syncFormValue(input);
       this.syncSlots();
     }
@@ -100,10 +104,17 @@ export function defineSlider(): void {
       if (fallback) { const assigned = input !== fallback; fallback.hidden = assigned; fallback.setAttribute("aria-hidden", String(assigned)); }
       input.type = "range"; input.removeAttribute("name");
       if (!input.id) input.id = this.shadowRoot?.querySelector("label")?.htmlFor ?? `slider-${crypto.randomUUID()}`;
-      if (this.hasAttribute("vertical")) { input.setAttribute("orient", "vertical"); input.setAttribute("aria-orientation", "vertical"); }
-      else { input.removeAttribute("orient"); input.removeAttribute("aria-orientation"); }
+      if (this.hasAttribute("vertical")) input.setAttribute("orient", "vertical");
+      else input.removeAttribute("orient");
       if (!input.hasAttribute("aria-label") && !input.hasAttribute("aria-labelledby")) { const label = this.getAttribute("label"); if (label) input.setAttribute("aria-label", label); }
-      for (const name of ["min", "max", "step", "aria-description", "aria-describedby", "aria-invalid", "aria-required", "aria-valuetext"]) if (!input.hasAttribute(name)) { const value = this.getAttribute(name); if (value !== null) input.setAttribute(name, value); }
+      for (const name of ["min", "max", "step", "aria-description", "aria-describedby", "aria-invalid", "aria-orientation", "aria-required", "aria-valuetext"]) if (!input.hasAttribute(name)) { const value = this.getAttribute(name); if (value !== null) input.setAttribute(name, value); }
+      const orientation = this.hasAttribute("vertical") ? "vertical" : "horizontal";
+      const previousDefault = this.defaultAriaOrientation;
+      const orientationWasDefaulted = previousDefault?.input === input && input.getAttribute("aria-orientation") === previousDefault.value;
+      if (orientationWasDefaulted || !input.hasAttribute("aria-orientation")) {
+        input.setAttribute("aria-orientation", orientation);
+        this.defaultAriaOrientation = { input, value: orientation };
+      } else this.defaultAriaOrientation = undefined;
       input.disabled = this.hasAttribute("disabled") || input.disabled;
       this.syncFormValue(input); this.syncVisual(input);
     }
@@ -125,7 +136,7 @@ export function defineSlider(): void {
       input.className = "input-fallback";
       input.id = id;
       input.type = "range";
-      if (this.hasAttribute("vertical")) { input.setAttribute("orient", "vertical"); input.setAttribute("aria-orientation", "vertical"); }
+      if (this.hasAttribute("vertical")) input.setAttribute("orient", "vertical");
       input.value = this.currentValue ?? this.getAttribute("value") ?? this.currentDefaultValue ?? this.getAttribute("default-value") ?? "0";
       for (const name of ["min", "max", "step", "aria-label", "aria-description", "aria-describedby", "aria-invalid", "aria-required", "aria-valuetext"]) { const value = this.getAttribute(name); if (value !== null) input.setAttribute(name, value); }
       input.disabled = this.hasAttribute("disabled");
