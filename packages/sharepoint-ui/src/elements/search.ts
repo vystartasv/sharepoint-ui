@@ -81,8 +81,11 @@ export function defineSearchBox(): void {
       if (!this.#internals) return;
       const input = this.shadowRoot?.querySelector("input");
       this.#internals.setFormValue(this.#value, this.#value);
-      if (input && this.hasAttribute("required") && !this.#value) {
-        this.#internals.setValidity({ valueMissing: true }, input.validationMessage || "Please enter a search term.", input);
+      if (input && !input.validity.valid) {
+        const invalidFlags = ["badInput", "customError", "patternMismatch", "rangeOverflow", "rangeUnderflow", "stepMismatch", "tooLong", "tooShort", "typeMismatch", "valueMissing"] as const;
+        const flags: Partial<Record<(typeof invalidFlags)[number], boolean>> = {};
+        for (const flag of invalidFlags) if (input.validity[flag]) flags[flag] = true;
+        this.#internals.setValidity(flags, input.validationMessage, input);
       } else this.#internals.setValidity({});
     }
 

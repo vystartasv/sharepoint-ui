@@ -45,6 +45,14 @@ try {
   await page.waitForFunction(() => document.querySelector('[data-testid="controlled"]').value === "Budget");
   assert.deepEqual(await page.evaluate(() => window.changes), [["input","INPUT","INPUT","Budget"]]);
   assert.deepEqual(await page.evaluate(() => window.values), ["Budget"]);
+  await input("controlled").fill("1");
+  assert.equal(await host("controlled").evaluate(node => node.matches(":invalid")), true, "minLength validity reaches the form-associated host");
+  assert.equal(await host("controlled").evaluate(node => node.form.checkValidity()), false, "the enclosing form rejects a too-short search value");
+  await input("controlled").fill("12");
+  assert.equal(await host("controlled").evaluate(node => node.matches(":invalid")), true, "pattern validity reaches the form-associated host");
+  assert.equal(await host("controlled").evaluate(node => node.form.checkValidity()), false, "the enclosing form rejects a pattern mismatch");
+  await input("controlled").fill("Budget");
+  assert.equal(await host("controlled").evaluate(node => node.matches(":valid")), true, "the host returns to valid after the input constraints are satisfied");
   await host("controlled").getByRole("button", { name: "Clear report search" }).click();
   await page.waitForFunction(() => document.querySelector('[data-testid="controlled"]').value === "");
   assert.deepEqual((await page.evaluate(() => window.changes)).at(-1), ["click","SPAN","SPAN",""]);

@@ -1,5 +1,9 @@
 # Fluent UI React v9 parity plan
 
+### SearchBox native constraint validation — Fluent 9.75.0 input behavior and local Chromium, 2026-11-03
+
+The SearchBox custom element forwarded native constraints such as `minlength` and `pattern` to its shadow input but only reflected `required` through `ElementInternals`. The enclosing form therefore missed native `tooShort` and `patternMismatch` states. It now maps the shadow input's `ValidityState` flags and validation message to the form-associated host. `verify:search-box-parity` confirms short and pattern-mismatched values fail the associated form and valid text restores `:valid`; the full `parity:check` also passes. Cross-browser, assistive-technology, tenant, and SearchBox-wide visual/performance parity remain open.
+
 ### ComboBox prefix activation and stale-selection clearing — Fluent 9.75.0 declarations/runtime and local Chromium, 2026-11-03
 
 The input handler previously reset active-option state on every edit and retained a selected value when typed text no longer matched any enabled option. It now activates the first enabled prefix match, emits the active-option change, and clears a stale single selection on empty/unmatched input while preserving the typed text and emitting the selection callback. `verify:combobox-compounds`, `verify:combobox-slots`, and `verify:combobox-multiselect` pass; `parity:check` passes with 243 catalog entries, all 51 Fluent named-API families represented, and no candidate own-prop, slot, literal, or callback-shape gaps. This focused improvement does not establish full ComboBox family, cross-browser, assistive-technology, theme, tenant, or performance parity.

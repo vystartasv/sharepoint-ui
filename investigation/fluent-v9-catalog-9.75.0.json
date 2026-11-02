@@ -432,7 +432,7 @@
       ],
       "localStatus": "partial",
       "purpose": "Find matching content from a query.",
-      "coverageNote": "SearchBox is available through native and React entry points with theme-aware outline/underline/filled appearances, form value and reset support, clear action, RTL-safe layout, Enter submission, and Fluent contentBefore/contentAfter/dismiss composition. Chromium verifies slot order and native slot use. Full visual/forced-color, assistive-technology, and tenant parity remain open."
+      "coverageNote": "SearchBox is available through native and React entry points with theme-aware outline/underline/filled appearances, form value and reset support, clear action, RTL-safe layout, Enter submission, and Fluent contentBefore/contentAfter/dismiss composition. Native input validity for required, minLength, maxLength, and pattern is bridged through ElementInternals so the associated host participates in form validation. Chromium verifies slot order, native slot use, minLength/pattern rejection and recovery, and zero page errors. Full visual/forced-color, assistive-technology, and tenant parity remain open."
     },
     {
       "family": "select",
