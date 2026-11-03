@@ -187,6 +187,21 @@ export function getSharePointLookupOptionsUrl(field: SharePointFieldMetadata, lo
   return url.toString();
 }
 
+/** Resolve a SharePoint OData next link and reject links that would send host credentials to another origin. */
+export function getSharePointNextPageUrl(webUrl: string, nextLink?: string | null): string | null {
+  if (nextLink == null) return null;
+  if (typeof nextLink !== "string") throw new TypeError("nextLink must be a URL string or null.");
+  if (nextLink.trim() === "") return null;
+  const base = new URL(webUrl);
+  if (!/^https?:$/.test(base.protocol) || base.username || base.password) throw new TypeError("webUrl must be an HTTP(S) SharePoint web URL.");
+  const next = new URL(nextLink, base);
+  if (!/^https?:$/.test(next.protocol) || next.origin !== base.origin || next.username || next.password) {
+    throw new TypeError("SharePoint next links must resolve to the same HTTP(S) origin as webUrl.");
+  }
+  next.hash = "";
+  return next.toString();
+}
+
 /** Serialize selected SharePoint lookup/person IDs for an item create or update body. */
 export function serializeSharePointLookupValue(field: SharePointFieldMetadata, value: SharePointLookupValue): SharePointLookupUpdate {
   const adapter = getSharePointFieldAdapter(field);

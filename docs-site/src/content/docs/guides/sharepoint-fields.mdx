@@ -37,7 +37,7 @@ SharePoint identifies lookup values by the source list's item ID. The field meta
 
 ```ts
 import { SPHttpClient } from "@microsoft/sp-http";
-import { getSharePointFieldAdapter, getSharePointLookupOptionsUrl } from "@spfx-fast/sharepoint-ui/sharepoint-fields";
+import { getSharePointFieldAdapter, getSharePointLookupOptionsUrl, getSharePointNextPageUrl } from "@spfx-fast/sharepoint-ui/sharepoint-fields";
 
 const adapter = getSharePointFieldAdapter(column);
 const source = adapter.lookupSource;
@@ -45,14 +45,21 @@ if (!source) throw new Error("SharePoint did not provide a lookup source for thi
 const optionsUrl = getSharePointLookupOptionsUrl(column, lookupWebUrl, 100);
 const response = await context.spHttpClient.get(optionsUrl, SPHttpClient.configurations.v1);
 if (!response.ok) throw new Error(`Lookup request failed: ${response.status}`);
-const result = await response.json() as { value?: Array<Record<string, unknown> & { Id: number }> };
-const options = (result.value ?? []).map(item => ({
+const result = await response.json() as {
+  value?: Array<Record<string, unknown> & { Id: number }>;
+  "@odata.nextLink"?: string;
+  "odata.nextLink"?: string;
+  d?: { results?: Array<Record<string, unknown> & { Id: number }>; __next?: string };
+};
+const items = result.value ?? result.d?.results ?? [];
+const options = items.map(item => ({
   value: String(item.Id),
   label: String(item[source.displayField] ?? "")
 }));
+const nextPageUrl = getSharePointNextPageUrl(lookupWebUrl, result["@odata.nextLink"] ?? result["odata.nextLink"] ?? result.d?.__next);
 ```
 
-Use `options` as the values for the library's `ComboBox`, and follow SharePoint's `odata.nextLink` when the list has more results. The URL requests only `Id` and the configured display field. For a cross-web lookup, pass the source web URL, which can differ from the current list's web.
+Use `options` as the values for the library's `ComboBox`. If `nextPageUrl` is non-null, request it and repeat; the helper accepts absolute or relative OData links and rejects a different origin before the host sends credentials. The URL requests only `Id` and the configured display field. For a cross-web lookup, pass the source web URL, which can differ from the current list's web.
 
 Use the IDs returned by the options or people picker to create an item update body. The helper handles single/multiple fields and clearing a selection:
 
