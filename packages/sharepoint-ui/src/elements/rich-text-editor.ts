@@ -142,6 +142,8 @@ export function defineRichTextEditor(): void {
     private pendingValue: string | undefined;
     private customError = "";
     private savedRange?: Range;
+    private probingSelection = false;
+    private probedSelection?: Range;
     /** Uploads to a durable asset store and returns the image URL to persist in editor HTML. */
     private imageUploader?: (file: File) => Promise<string>;
     get uploadImage(): ((file: File) => Promise<string>) | undefined { return this.imageUploader; }
@@ -392,13 +394,22 @@ export function defineRichTextEditor(): void {
     }
     private selection(): Selection | null {
       const root = this.editor.getRootNode();
-      return root instanceof ShadowRoot ? (root as ShadowRoot & { getSelection?: () => Selection | null }).getSelection?.() ?? document.getSelection() : document.getSelection();
+      return root instanceof ShadowRoot ? (root as ShadowRoot & { getSelection?: () => Selection | null }).getSelection?.() ?? this.editor.ownerDocument.getSelection() : this.editor.ownerDocument.getSelection();
     }
     private onSelectionChange = (): void => {
       const selection = this.selection();
-      if (!selection?.rangeCount) return;
-      const range = selection.getRangeAt(0);
-      if (!this.editor.contains(range.commonAncestorContainer)) return;
+      let range = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
+      if (!range || !this.editor.contains(range.commonAncestorContainer)) {
+        const InputEventConstructor = this.editor.ownerDocument.defaultView?.InputEvent;
+        if (this.editor.matches(":focus") && typeof InputEventConstructor?.prototype.getTargetRanges === "function" && !this.probingSelection) {
+          this.probedSelection = undefined;
+          this.probingSelection = true;
+          try { this.editor.ownerDocument.execCommand("indent"); }
+          finally { this.probingSelection = false; }
+          range = this.probedSelection;
+        }
+      }
+      if (!range || !this.editor.contains(range.commonAncestorContainer)) return;
       this.savedRange = range.cloneRange();
       const node = range.startContainer;
       const element = node instanceof Element ? node : node.parentElement;
@@ -422,7 +433,8 @@ export function defineRichTextEditor(): void {
           format.value = [...format.options].some(option => option.value === block) ? block : "P";
         } catch { format.value = "P"; }
       }
-      const node = this.selection()?.anchorNode;
+      const selection = this.selection();
+      const node = selection?.anchorNode && this.editor.contains(selection.anchorNode) ? selection.anchorNode : this.savedRange?.startContainer;
       const element = node instanceof Element ? node : node?.parentElement;
       if (element && this.editor.contains(element)) {
         const computed = this.editor.ownerDocument.defaultView?.getComputedStyle(element);
@@ -451,8 +463,10 @@ export function defineRichTextEditor(): void {
       });
     }
     private restoreSelection(): void {
-      this.editor.focus();
       const selection = this.selection();
+      const liveRange = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
+      if ((!liveRange || !this.editor.contains(liveRange.commonAncestorContainer)) && this.editor.matches(":focus")) return;
+      this.editor.focus();
       if (!selection || !this.savedRange || !this.editor.contains(this.savedRange.commonAncestorContainer)) return;
       selection.removeAllRanges();
       selection.addRange(this.savedRange);
@@ -460,9 +474,9 @@ export function defineRichTextEditor(): void {
     private applyInlineStyle(property: "color" | "background-color" | "font-family" | "font-size", value: string): void {
       this.restoreSelection();
       const selection = this.selection();
-      if (!selection?.rangeCount) return;
-      const range = selection.getRangeAt(0);
-      if (range.collapsed || !this.editor.contains(range.commonAncestorContainer)) return;
+      const liveRange = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
+      const range = liveRange && this.editor.contains(liveRange.commonAncestorContainer) ? liveRange : this.savedRange;
+      if (!range || range.collapsed || !this.editor.contains(range.commonAncestorContainer)) return;
       const command = property === "color" ? "foreColor" : property === "background-color" ? "hiliteColor" : property === "font-family" ? "fontName" : "fontSize";
       const document = this.editor.ownerDocument;
       document.execCommand("styleWithCSS", false, "true");
@@ -774,11 +788,22 @@ export function defineRichTextEditor(): void {
       });
       this.editor = document.createElement("div"); this.editor.setAttribute("role", "textbox"); this.editor.setAttribute("aria-multiline", "true"); this.syncEditorLabel(); const invalid = this.getAttribute("aria-invalid"); if (invalid !== null) this.editor.setAttribute("aria-invalid", invalid); this.editor.contentEditable = this.hasAttribute("disabled") || this.hasAttribute("read-only") ? "false" : this.contentMode === "plain" ? "plaintext-only" : "true"; this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only"))); this.editor.setAttribute("aria-disabled", String(this.hasAttribute("disabled"))); this.editor.setAttribute("aria-required", String(this.hasAttribute("required"))); this.editor.dataset.placeholder = this.getAttribute("placeholder") ?? "Write something…"; this.editor.part.add("editor");
       this.editor.addEventListener("keydown", event => { const key = (event as KeyboardEvent).key.toLowerCase(); const shortcut = (event as KeyboardEvent).metaKey || (event as KeyboardEvent).ctrlKey; if (!shortcut) return; if (key === "z") { event.preventDefault(); this.command((event as KeyboardEvent).shiftKey ? "redo" : "undo"); } else if (key === "y") { event.preventDefault(); this.command("redo"); } });
+      this.editor.addEventListener("beforeinput", event => {
+        if (!this.probingSelection) return;
+        const targetRange = (event as InputEvent & { getTargetRanges?: () => StaticRange[] }).getTargetRanges?.()[0];
+        if (targetRange && this.editor.contains(targetRange.startContainer) && this.editor.contains(targetRange.endContainer)) {
+          const range = this.editor.ownerDocument.createRange();
+          range.setStart(targetRange.startContainer, targetRange.startOffset);
+          range.setEnd(targetRange.endContainer, targetRange.endOffset);
+          this.probedSelection = range;
+        }
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }, true);
       this.editor.addEventListener("input", () => this.commitEditorValue());
       this.editor.addEventListener("mouseup", this.onSelectionChange);
       this.editor.addEventListener("keyup", this.onSelectionChange);
       this.editor.addEventListener("click", this.onEditorClick);
-      shadow.addEventListener("selectionchange", this.onSelectionChange, { signal: this.events?.signal });
       this.editor.addEventListener("paste", event => {
         event.preventDefault();
         const clipboard = (event as ClipboardEvent).clipboardData;
