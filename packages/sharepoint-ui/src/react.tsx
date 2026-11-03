@@ -4491,9 +4491,12 @@ function VirtualDataGrid<T>({ items, dataSource, onDataLoadError, onDataSourceGr
     const rowForSelection = (event.target as HTMLElement).closest<HTMLElement>("[role=row][data-row-index]");
     if (event.key === " " && rowForSelection && selectionMode !== "none" && !(event.target as HTMLElement).closest("button,input,select,textarea,a,[contenteditable=true]")) { event.preventDefault(); toggleRowSelection(rowForSelection.dataset.rowKey || ""); return; }
     if (focusMode === "none") return;
+    const rtl = getComputedStyle(viewport.current!).direction === "rtl";
+    const inlineStartKey = rtl ? "ArrowRight" : "ArrowLeft";
+    const inlineEndKey = rtl ? "ArrowLeft" : "ArrowRight";
     const rowElement = (event.target as HTMLElement).closest<HTMLElement>("[role=row][data-row-index]");
     if (rowElement && (focusMode === "row_unstable" || focusMode === "composite") && event.target === rowElement) {
-      if (focusMode === "composite" && event.key === "ArrowRight") {
+      if (focusMode === "composite" && event.key === inlineEndKey) {
         const target = rowElement.querySelector<HTMLElement>('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),a[href],[tabindex="0"][role="gridcell"]');
         if (target) { event.preventDefault(); target.focus(); }
         return;
@@ -4516,7 +4519,7 @@ function VirtualDataGrid<T>({ items, dataSource, onDataLoadError, onDataSourceGr
     if (!cell) return;
     let row = Number(cell.dataset.rowIndex), column = Number(cell.dataset.columnIndex);
     if (focusMode === "composite") {
-      if (event.key === "ArrowLeft") { const rowNode = cell.closest<HTMLElement>("[role=row][data-row-index]"); if (rowNode) { event.preventDefault(); rowNode.focus(); } }
+      if (event.key === inlineStartKey) { const rowNode = cell.closest<HTMLElement>("[role=row][data-row-index]"); if (rowNode) { event.preventDefault(); rowNode.focus(); } }
       else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
         const direction = event.key === "ArrowDown" ? 1 : -1;
         let next = row + direction;
@@ -4540,8 +4543,8 @@ function VirtualDataGrid<T>({ items, dataSource, onDataLoadError, onDataSourceGr
     }
     if (event.key === "ArrowDown") { let next = row + 1; while (!dataSource && next < displayRows.length && displayRows[next]?.kind !== "item") next++; if (next < displayRows.length) row = next; }
     else if (event.key === "ArrowUp") { let next = row - 1; while (!dataSource && next >= 0 && displayRows[next]?.kind !== "item") next--; if (next >= 0) row = next; }
-    else if (event.key === "ArrowRight") column++;
-    else if (event.key === "ArrowLeft") column--;
+    else if (event.key === inlineEndKey) column++;
+    else if (event.key === inlineStartKey) column--;
     else if (event.key === "Home") column = 0;
     else if (event.key === "End") column = columns.length - 1;
     else return;

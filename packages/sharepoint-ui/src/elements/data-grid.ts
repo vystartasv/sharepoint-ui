@@ -986,9 +986,12 @@ export function defineDataGrid(): void {
       if (event.key === " " && selectionRow && this.selectionMode() !== "none" && !(event.target as HTMLElement).closest("button,input,select,textarea,a,[contenteditable=true]")) { event.preventDefault(); this.toggleRowSelection(selectionRow.dataset.rowKey || ""); return; }
       const focusMode = this.focusMode;
       if (focusMode === "none") return;
+      const rtl = getComputedStyle(this).direction === "rtl";
+      const inlineStartKey = rtl ? "ArrowRight" : "ArrowLeft";
+      const inlineEndKey = rtl ? "ArrowLeft" : "ArrowRight";
       const rowElement = (event.target as HTMLElement).closest<HTMLElement>("[role=row][data-row-index]");
       if (rowElement && (focusMode === "row_unstable" || focusMode === "composite") && event.target === rowElement) {
-        if (focusMode === "composite" && event.key === "ArrowRight") {
+        if (focusMode === "composite" && event.key === inlineEndKey) {
           const firstFocusable = rowElement.querySelector<HTMLElement>('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),a[href],[tabindex="0"][role="gridcell"]');
           if (firstFocusable) { event.preventDefault(); firstFocusable.focus(); }
           return;
@@ -1003,7 +1006,7 @@ export function defineDataGrid(): void {
       const cell = (event.target as HTMLElement).closest<HTMLElement>("[role=gridcell][data-col-index]");
       if (!cell || !this.viewport) return;
       if (focusMode === "composite") {
-        if (event.key === "ArrowLeft") { const row = cell.closest<HTMLElement>("[role=row][data-row-index]"); if (row) { event.preventDefault(); row.focus(); } }
+        if (event.key === inlineStartKey) { const row = cell.closest<HTMLElement>("[role=row][data-row-index]"); if (row) { event.preventDefault(); row.focus(); } }
         else if (event.key === "ArrowDown" || event.key === "ArrowUp") { const row = Number(cell.closest<HTMLElement>("[data-row-index]")?.dataset.rowIndex); const rows = this.displayRows(); let next = row + (event.key === "ArrowDown" ? 1 : -1); while (!this.source && next >= 0 && next < rows.length && rows[next]?.kind !== "item") next += event.key === "ArrowDown" ? 1 : -1; if (next >= 0 && next < rows.length) { event.preventDefault(); this.activeCell = { ...this.activeCell, row: next }; this.viewport.scrollTo({ top: this.indexRowSizes(rows, this.positiveNumber(this.getAttribute("row-height"), 40)).offset(next), behavior: "auto" }); this.paint(); requestAnimationFrame(() => this.rows.get(next)?.focus()); } }
         return;
       }
@@ -1014,8 +1017,8 @@ export function defineDataGrid(): void {
       const displayRows = this.displayRows();
       if (event.key === "ArrowDown") { let next = nextRow + 1; while (!this.source && next < displayRows.length && displayRows[next]?.kind !== "item") next++; if (next < displayRows.length) nextRow = next; }
       else if (event.key === "ArrowUp") { let next = nextRow - 1; while (!this.source && next >= 0 && displayRows[next]?.kind !== "item") next--; if (next >= 0) nextRow = next; }
-      else if (event.key === "ArrowRight") nextColumn++;
-      else if (event.key === "ArrowLeft") nextColumn--;
+      else if (event.key === inlineEndKey) nextColumn++;
+      else if (event.key === inlineStartKey) nextColumn--;
       else if (event.key === "Home") nextColumn = 0;
       else if (event.key === "End") nextColumn = this.definitions.length - 1;
       else return;
