@@ -143,6 +143,7 @@ export function defineRichTextEditor(): void {
     private customError = "";
     private savedRange?: Range;
     private preserveToolbarSelection = false;
+    private touchSelectionGesture?: { pointerId: number; x: number; y: number; timer: number };
     private probingSelection = false;
     private probedSelection?: Range;
     /** Uploads to a durable asset store and returns the image URL to persist in editor HTML. */
@@ -180,7 +181,7 @@ export function defineRichTextEditor(): void {
       else if (this.hasAttribute("value")) this.value = this.getAttribute("value") ?? "";
       this.syncForm();
     }
-    disconnectedCallback(): void { this.events?.abort(); }
+    disconnectedCallback(): void { this.events?.abort(); this.clearTouchSelectionGesture(); }
     attributeChangedCallback(name: string): void {
       if (!this.isConnected) return;
       if (name === "value") this.value = this.getAttribute("value") ?? "";
@@ -470,17 +471,66 @@ export function defineRichTextEditor(): void {
       const selection = this.selection();
       const liveRange = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
       if ((!liveRange || !this.editor.contains(liveRange.commonAncestorContainer)) && this.editor.matches(":focus")) return;
-      this.editor.focus();
+      const keepUnfocusedSelection = Boolean(this.savedRange && !this.savedRange.collapsed && !this.editor.matches(":focus"));
+      if (!keepUnfocusedSelection) this.editor.focus();
       if (!selection || !this.savedRange || !this.editor.contains(this.savedRange.commonAncestorContainer)) return;
       selection.removeAllRanges();
       selection.addRange(this.savedRange);
     }
+    private clearTouchSelectionGesture(): void {
+      if (this.touchSelectionGesture) clearTimeout(this.touchSelectionGesture.timer);
+      this.touchSelectionGesture = undefined;
+    }
+    private wrapUnfocusedSelection(range: Range, createWrapper: () => HTMLElement): boolean {
+      const walker = this.editor.ownerDocument.createTreeWalker(this.editor, NodeFilter.SHOW_TEXT);
+      const nodes: Text[] = [];
+      while (walker.nextNode()) {
+        const node = walker.currentNode as Text;
+        if (range.intersectsNode(node)) nodes.push(node);
+      }
+      const wrappers: HTMLElement[] = [];
+      for (const node of nodes.reverse()) {
+        const start = node === range.startContainer ? range.startOffset : 0;
+        const end = node === range.endContainer ? range.endOffset : node.length;
+        if (end <= start) continue;
+        const part = this.editor.ownerDocument.createRange();
+        part.setStart(node, start);
+        part.setEnd(node, end);
+        const wrapper = createWrapper();
+        wrapper.append(part.extractContents());
+        part.insertNode(wrapper);
+        wrappers.push(wrapper);
+      }
+      if (!wrappers.length) return false;
+      wrappers.reverse();
+      const selected = this.editor.ownerDocument.createRange();
+      selected.setStartBefore(wrappers[0]);
+      selected.setEndAfter(wrappers[wrappers.length - 1]);
+      const selection = this.selection();
+      selection?.removeAllRanges();
+      selection?.addRange(selected);
+      this.savedRange = selected.cloneRange();
+      return true;
+    }
+    private applyStyleToUnfocusedSelection(range: Range, property: "color" | "background-color" | "font-family" | "font-size", value: string): boolean {
+      return this.wrapUnfocusedSelection(range, () => {
+        const span = this.editor.ownerDocument.createElement("span");
+        span.style.setProperty(property, value);
+        return span;
+      });
+    }
     private applyInlineStyle(property: "color" | "background-color" | "font-family" | "font-size", value: string): void {
-      this.restoreSelection();
+      const editorFocused = this.editor.matches(":focus");
+      if (editorFocused) this.restoreSelection();
       const selection = this.selection();
       const liveRange = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
       const range = liveRange && this.editor.contains(liveRange.commonAncestorContainer) ? liveRange : this.savedRange;
       if (!range || range.collapsed || !this.editor.contains(range.commonAncestorContainer)) return;
+      if (!editorFocused) {
+        const cssValue = property === "font-size" ? FONT_SIZE_PX[value] ?? value : value;
+        if (this.applyStyleToUnfocusedSelection(range, property, cssValue)) this.commitEditorValue();
+        return;
+      }
       const command = property === "color" ? "foreColor" : property === "background-color" ? "hiliteColor" : property === "font-family" ? "fontName" : "fontSize";
       const document = this.editor.ownerDocument;
       document.execCommand("styleWithCSS", false, "true");
@@ -545,9 +595,13 @@ export function defineRichTextEditor(): void {
       if (command === "insertImage") { this.imageInput?.click(); return; }
       if (["insertRowAbove", "insertRowBelow", "insertColumnBefore", "insertColumnAfter", "deleteRow", "deleteColumn", "deleteTable"].includes(command)) { this.editTable(command); return; }
       if (command === "createLink") { this.openLinkEditor(); return; }
+      const editorFocused = this.editor.matches(":focus");
       this.restoreSelection();
       if (command === "insertTable") value = '<table><caption><br></caption><thead><tr><th scope="col"><br></th><th scope="col"><br></th></tr></thead><tbody><tr><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td></tr></tbody></table><p><br></p>';
-      const applied = this.editor.ownerDocument.execCommand(command === "insertTable" ? "insertHTML" : command, false, command === "formatBlock" ? `<${value?.toLowerCase() ?? "p"}>` : value);
+      const document = this.editor.ownerDocument;
+      const applied = document.execCommand(command === "insertTable" ? "insertHTML" : command, false, command === "formatBlock" ? `<${value?.toLowerCase() ?? "p"}>` : value);
+      const tag = ({ bold: "strong", italic: "em", underline: "u", strikeThrough: "s" } as Record<string, string>)[command];
+      if (!editorFocused && !applied && tag && this.savedRange && !this.savedRange.collapsed && this.wrapUnfocusedSelection(this.savedRange, () => document.createElement(tag))) { this.commitEditorValue(); return; }
       if (command === "hiliteColor" && !applied) this.editor.ownerDocument.execCommand("backColor", false, value);
       this.commitEditorValue();
     }
@@ -810,7 +864,24 @@ export function defineRichTextEditor(): void {
         event.stopImmediatePropagation();
       }, true);
       this.editor.addEventListener("input", () => this.commitEditorValue());
-      this.editor.addEventListener("pointerdown", () => { this.preserveToolbarSelection = false; });
+      this.editor.addEventListener("pointerdown", event => {
+        this.preserveToolbarSelection = false;
+        this.clearTouchSelectionGesture();
+        if (event.pointerType !== "touch" || !this.editor.matches(":focus")) return;
+        const gesture = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, timer: 0 };
+        gesture.timer = window.setTimeout(() => {
+          if (this.touchSelectionGesture !== gesture) return;
+          this.touchSelectionGesture = undefined;
+          this.editor.blur();
+        }, 350);
+        this.touchSelectionGesture = gesture;
+      });
+      this.editor.addEventListener("pointermove", event => {
+        const gesture = this.touchSelectionGesture;
+        if (gesture?.pointerId === event.pointerId && Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y) > 10) this.clearTouchSelectionGesture();
+      });
+      this.editor.addEventListener("pointerup", event => { if (this.touchSelectionGesture?.pointerId === event.pointerId) this.clearTouchSelectionGesture(); });
+      this.editor.addEventListener("pointercancel", event => { if (this.touchSelectionGesture?.pointerId === event.pointerId) this.clearTouchSelectionGesture(); });
       this.editor.addEventListener("mouseup", this.onSelectionChange);
       this.editor.addEventListener("keyup", this.onSelectionChange);
       this.editor.addEventListener("click", this.onEditorClick);
