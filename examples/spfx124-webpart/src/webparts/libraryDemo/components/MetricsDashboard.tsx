@@ -350,13 +350,24 @@ export function MetricsDashboard({ startedAt, theme, fluentTokens, spHttpClient,
       if (field && (field.RestrictedMode || !field.SchemaXml?.includes('RichTextMode="FullHtml"'))) throw new Error("BodyHtml must be a full HTML SharePoint Note field; recreate it with FullHtml rich text mode.");
       const safeHtml = (document.querySelector("spui-rich-text-editor") as HTMLElement & { value?: string })?.value ?? richHtml;
       const itemsUrl = `${listUrl}/items`;
-      const request = { headers: { Accept: "application/json;odata=nometadata", "Content-Type": "application/json;odata=nometadata" }, body: JSON.stringify({ Title: `Editor demo ${new Date().toISOString()}`, BodyHtml: safeHtml }) };
+      const itemTitle = `Editor demo ${new Date().toISOString()} ${Math.random().toString(36).slice(2)}`;
+      const request = { headers: { Accept: "application/json;odata=nometadata", "Content-Type": "application/json;odata=nometadata" }, body: JSON.stringify({ Title: itemTitle, BodyHtml: safeHtml }) };
       const response = richItemId
         ? await spHttpClient.post(`${itemsUrl}(${richItemId})`, SPHttpClient.configurations.v1, { ...request, headers: { ...request.headers, "X-HTTP-Method": "MERGE", "IF-MATCH": "*" } })
         : await spHttpClient.post(itemsUrl, SPHttpClient.configurations.v1, request);
       if (!response.ok) throw new Error(`Save failed (${response.status}): ${(await response.text()).slice(0, 500)}`);
       let savedId = richItemId;
-      if (!savedId) { const verify = await spHttpClient.get(`${itemsUrl}?$select=Id&$orderby=Id desc&$top=1`, SPHttpClient.configurations.v1, { headers: { Accept: "application/json;odata=nometadata" } }); const saved = await verify.json() as { value?: Array<{ Id: number }> }; savedId = saved.value?.[0]?.Id ?? null; }
+      if (!savedId) {
+        const created = await response.json().catch(() => undefined) as { Id?: number; d?: { Id?: number } } | undefined;
+        savedId = created?.Id ?? created?.d?.Id ?? null;
+        if (!savedId) {
+          const query = new URLSearchParams({ $select: "Id", $filter: `Title eq '${itemTitle.replace(/'/g, "''")}'`, $orderby: "Created desc", $top: "1" });
+          const verify = await spHttpClient.get(`${itemsUrl}?${query}`, SPHttpClient.configurations.v1, { headers: { Accept: "application/json;odata=nometadata" } });
+          if (!verify.ok) throw new Error(`Created item lookup failed (${verify.status})`);
+          const saved = await verify.json() as { value?: Array<{ Id: number }> };
+          savedId = saved.value?.[0]?.Id ?? null;
+        }
+      }
       if (!savedId) throw new Error("SharePoint returned no item ID after saving.");
       const check = await spHttpClient.get(`${itemsUrl}(${savedId})?$select=Id,BodyHtml`, SPHttpClient.configurations.v1, { headers: { Accept: "application/json;odata=nometadata" } });
       if (!check.ok) throw new Error(`Readback failed (${check.status})`);
