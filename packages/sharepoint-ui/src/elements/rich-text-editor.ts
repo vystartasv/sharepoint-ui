@@ -601,7 +601,7 @@ export function defineRichTextEditor(): void {
       this.commitEditorValue();
     }
     private command(command: string, value?: string): void {
-      if ((this.contentMode === "plain" && !["undo", "redo"].includes(command)) || (this.contentMode === "restricted" && ["insertTable", "insertImage", "insertRowAbove", "insertRowBelow", "insertColumnBefore", "insertColumnAfter", "deleteRow", "deleteColumn", "deleteTable", "foreColor", "hiliteColor", "fontFamily", "fontSize"].includes(command)) || (command === "createLink" && !this.allowHyperlinks)) return;
+      if ((this.contentMode === "plain" && !["undo", "redo"].includes(command)) || (this.contentMode === "restricted" && ["insertTable", "insertImage", "insertRowAbove", "insertRowBelow", "insertColumnBefore", "insertColumnAfter", "deleteRow", "deleteColumn", "deleteTable", "foreColor", "hiliteColor", "fontFamily", "fontSize"].includes(command)) || (this.contentMode !== "html" && ["subscript", "superscript", "justifyLeft", "justifyCenter", "justifyRight", "justifyFull"].includes(command)) || (command === "createLink" && !this.allowHyperlinks)) return;
       if (command === "formatBlock" && !["P", "H1", "H2", "H3", "BLOCKQUOTE", "PRE"].includes(value?.toUpperCase() ?? "")) return;
       if (command === "insertImage") { this.imageInput?.click(); return; }
       if (["insertRowAbove", "insertRowBelow", "insertColumnBefore", "insertColumnAfter", "deleteRow", "deleteColumn", "deleteTable"].includes(command)) { this.editTable(command); return; }
