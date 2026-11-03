@@ -16,6 +16,32 @@ const dialogParts = [
   ["spui-dialog-trigger", "trigger"],
 ] as const;
 
+type DocumentScrollLock = { count: number; htmlOverflowY: string; bodyOverflowY: string; scrollbarGutter: string };
+const documentScrollLocks = new WeakMap<Document, DocumentScrollLock>();
+
+function acquireDocumentScrollLock(doc: Document): boolean {
+  const active = documentScrollLocks.get(doc);
+  if (active) { active.count++; return true; }
+  const body = doc.body;
+  const view = doc.defaultView;
+  if (!body || !view || Math.floor(body.getBoundingClientRect().height) <= view.innerHeight) return false;
+  const lock = { count: 1, htmlOverflowY: doc.documentElement.style.overflowY, bodyOverflowY: body.style.overflowY, scrollbarGutter: doc.documentElement.style.scrollbarGutter };
+  documentScrollLocks.set(doc, lock);
+  doc.documentElement.style.overflowY = "clip";
+  doc.documentElement.style.scrollbarGutter = "stable";
+  body.style.overflowY = "hidden";
+  return true;
+}
+
+function releaseDocumentScrollLock(doc: Document): void {
+  const lock = documentScrollLocks.get(doc);
+  if (!lock || --lock.count > 0) return;
+  if (doc.documentElement.style.overflowY === "clip") doc.documentElement.style.overflowY = lock.htmlOverflowY;
+  if (doc.documentElement.style.scrollbarGutter === "stable") doc.documentElement.style.scrollbarGutter = lock.scrollbarGutter;
+  if (doc.body?.style.overflowY === "hidden") doc.body.style.overflowY = lock.bodyOverflowY;
+  documentScrollLocks.delete(doc);
+}
+
 function defineDialogPart(tag: typeof dialogParts[number][0], styles: string, namedSlots: string[] = []): void {
   if (customElements.get(tag)) return;
   class SpuiDialogPart extends HTMLElement {
@@ -64,6 +90,7 @@ export function defineDialog(): void {
     private previousFocus?: HTMLElement;
     private fallbackTrapActive = false;
     private refocusing = false;
+    private bodyScrollLockHeld = false;
     private focusGuard?: (event: FocusEvent) => void;
     get open(): boolean { return this.hasAttribute("open"); }
     set open(value: boolean) { this.toggleAttribute("open", Boolean(value)); }
@@ -75,7 +102,7 @@ export function defineDialog(): void {
       this.syncOpen();
     }
 
-    disconnectedCallback(): void { this.titleObserver?.disconnect(); }
+    disconnectedCallback(): void { this.titleObserver?.disconnect(); this.releaseBodyScrollLock(); }
 
     attributeChangedCallback(): void { if (this.isConnected) this.syncOpen(); }
 
@@ -84,6 +111,7 @@ export function defineDialog(): void {
       if (!dialog) return;
       const motionExiting = this.hasAttribute("motion") && this.getAttribute("motion-visible") === "false" && !this.hasAttribute("motion-exit-complete");
       const shouldOpen = this.open || motionExiting;
+      this.syncBodyScrollLock(shouldOpen);
       if (shouldOpen && !dialog.open) {
         this.previousFocus ??= document.activeElement instanceof HTMLElement ? document.activeElement : undefined;
         const modalType = this.getAttribute("modal-type");
@@ -184,6 +212,23 @@ export function defineDialog(): void {
       this.emitOpenChange({ open: false, type, event, trigger } as DialogOpenChangeData);
     }
 
+    private isDismissible(): boolean { return !(this.hasAttribute("dismissible") && this.getAttribute("dismissible") === "false"); }
+    private isModal(): boolean {
+      const modalType = this.getAttribute("modal-type");
+      return modalType === "modal" || (modalType == null && this.getAttribute("modal") !== "false");
+    }
+    private syncBodyScrollLock(shouldOpen: boolean): void {
+      const modalType = this.getAttribute("modal-type");
+      const shouldLock = shouldOpen && modalType !== "non-modal" && (modalType != null || this.getAttribute("modal") !== "false");
+      if (shouldLock && !this.bodyScrollLockHeld) this.bodyScrollLockHeld = acquireDocumentScrollLock(this.ownerDocument);
+      else if (!shouldLock) this.releaseBodyScrollLock();
+    }
+    private releaseBodyScrollLock(): void {
+      if (!this.bodyScrollLockHeld) return;
+      this.bodyScrollLockHeld = false;
+      releaseDocumentScrollLock(this.ownerDocument);
+    }
+
     private render(): void {
       const shadow = this.attachShadow({ mode: "open" });
       const dialog = document.createElement("dialog");
@@ -213,14 +258,15 @@ export function defineDialog(): void {
       });
       this.titleObserver = new MutationObserver(() => this.syncAccessibleName(dialog));
       dialog.insertBefore(surface, body);
-      dialog.addEventListener("cancel", event => {
-        if (this.getAttribute("modal-type") === "alert" || (this.hasAttribute("dismissible") && this.getAttribute("dismissible") === "false")) { event.preventDefault(); return; }
-        event.preventDefault(); this.closeDialog("escapeKeyDown", event as KeyboardEvent);
-      });
+      dialog.addEventListener("cancel", event => event.preventDefault());
       dialog.addEventListener("keydown", event => {
         if (event.key === "Escape") {
-          event.preventDefault();
-          if (this.getAttribute("modal-type") !== "alert" && !(this.hasAttribute("dismissible") && this.getAttribute("dismissible") === "false")) this.closeDialog("escapeKeyDown", event);
+          if (event.defaultPrevented) return;
+          window.setTimeout(() => {
+            if (event.defaultPrevented || !this.open) return;
+            event.preventDefault();
+            if (this.isDismissible()) this.closeDialog("escapeKeyDown", event);
+          }, 0);
           return;
         }
         if (!this.fallbackTrapActive) return;
@@ -233,7 +279,7 @@ export function defineDialog(): void {
         else if (!event.shiftKey && index === controls.length - 1) { event.preventDefault(); controls[0]?.focus(); }
       });
       dialog.addEventListener("click", event => {
-        if (event.target !== dialog || this.getAttribute("modal-type") === "alert" || (this.hasAttribute("dismissible") && this.getAttribute("dismissible") === "false")) return;
+        if (event.target !== dialog || !this.isModal() || !this.isDismissible()) return;
         const rect = dialog.getBoundingClientRect();
         if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) this.closeDialog("backdropClick", event);
       });
@@ -243,7 +289,7 @@ export function defineDialog(): void {
       overlayStyle.textContent = ".modal-backdrop{position:fixed;inset:0;z-index:2147483000;background:color-mix(in srgb,var(--spui-ui-text,#242424) 42%,transparent);backdrop-filter:blur(2px)}.modal-backdrop[hidden]{display:none}.modal-backdrop slot{position:absolute;inset:0}:host([data-has-custom-backdrop]) .modal-backdrop{background:transparent;backdrop-filter:none}:host([backdrop-appearance=transparent]) .modal-backdrop{background:transparent;backdrop-filter:none}::slotted([slot=backdrop]){position:absolute;inset:0;display:block;background:color-mix(in srgb,var(--spui-ui-text,#242424) 42%,transparent)}::slotted([slot=backdrop][data-appearance=transparent]){background:transparent}";
       const backdrop = document.createElement("div"); backdrop.className = "modal-backdrop"; backdrop.part.add("backdrop"); backdrop.hidden = true; backdrop.setAttribute("aria-hidden", "true");
       const backdropSlot = document.createElement("slot"); backdropSlot.name = "backdrop"; backdrop.append(backdropSlot);
-      backdrop.addEventListener("click", event => { if (this.getAttribute("modal-type") !== "alert" && !(this.hasAttribute("dismissible") && this.getAttribute("dismissible") === "false")) this.closeDialog("backdropClick", event); });
+      backdrop.addEventListener("click", event => { if (this.isModal() && this.isDismissible()) this.closeDialog("backdropClick", event); });
       const triggerSlot = document.createElement("slot"); triggerSlot.name = "trigger";
       triggerSlot.addEventListener("slotchange", () => {
         for (const trigger of triggerSlot.assignedElements()) {

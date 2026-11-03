@@ -2435,7 +2435,7 @@
       "module": "dialog",
       "category": "overlays",
       "api": {
-        "reactSignature": "{ children, backdrop, backdropMotion, style, ...props }: DialogSurfaceProps",
+        "reactSignature": "{ children, backdrop, backdropMotion, style, tabIndex = -1, ...props }: DialogSurfaceProps",
         "callbackProps": [],
         "slots": [
           "default",

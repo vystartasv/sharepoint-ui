@@ -1112,11 +1112,11 @@ export type DialogBackdropSlotProps = React.ReactElement | (React.HTMLAttributes
 
 export type DialogSurfaceProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & { children?: React.ReactNode; backdrop?: DialogBackdropSlotProps; backdropMotion?: React.ComponentType<PresenceMotionSlotProps> };
 
-export const DialogSurface = /* @__PURE__ */ React.forwardRef<HTMLDivElement, DialogSurfaceProps>(function DialogSurface({ children, backdrop, backdropMotion, style, ...props }: DialogSurfaceProps, forwardedRef): React.ReactElement {
+export const DialogSurface = /* @__PURE__ */ React.forwardRef<HTMLDivElement, DialogSurfaceProps>(function DialogSurface({ children, backdrop, backdropMotion, style, tabIndex = -1, ...props }: DialogSurfaceProps, forwardedRef): React.ReactElement {
   const motion = React.useContext(DialogMotionContext);
   ensureDefined(defineDialogSurface);
   const surfaceChildren = React.createElement(DialogSurfaceContext.Provider, { value: true }, children);
-  const surface = React.createElement("div", { ...props, ref: forwardedRef, slot: "surface", style: { display: "block", minWidth: 0, color: "inherit", background: "inherit", ...style } }, surfaceChildren);
+  const surface = React.createElement("div", { ...props, tabIndex, ref: forwardedRef, slot: "surface", style: { display: "block", minWidth: 0, color: "inherit", background: "inherit", ...style } }, surfaceChildren);
   const surfaceContent = motion.surfaceMotion
     ? React.createElement(motion.surfaceMotion, { visible: motion.visible, appear: motion.unmountOnClose, unmountOnExit: motion.unmountOnClose, slot: "surface" }, surface)
     : React.cloneElement(surface, { slot: "surface" });
@@ -1183,10 +1183,26 @@ export const DialogTrigger = /* @__PURE__ */ React.forwardRef<HTMLElement, Dialo
   const resolvedAction = action ?? (insideSurface ? "close" : "open");
   const childProps: DialogTriggerChildProps = { ...props, ...(insideSurface ? {} : { slot: "trigger" }), ...(!disableButtonEnhancement && resolvedAction === "open" ? { "aria-haspopup": "dialog" } : {}), className: triggerClassName, style: triggerStyle };
   const child = typeof children === "function" ? children(childProps) : children;
-  if (!React.isValidElement(child) || child.type === React.Fragment) return null;
+  if (child == null) return null;
+  if (!React.isValidElement(child) || child.type === React.Fragment) throw new Error("A DialogTrigger child must be a single element; React Fragments are not supported.");
   const originalProps = child.props as Record<string, unknown>;
   const childRef = (originalProps.ref ?? (child as React.ReactElement & { ref?: React.Ref<HTMLElement> }).ref) as React.Ref<HTMLElement> | undefined;
+  const disabled = Boolean(originalProps.disabled);
+  const disabledFocusable = Boolean(originalProps.disabledFocusable);
+  const ariaDisabled = originalProps["aria-disabled"];
+  const normalizedAriaDisabled = typeof ariaDisabled === "string" ? ariaDisabled === "true" : Boolean(ariaDisabled);
+  const isDisabled = disabled || disabledFocusable || normalizedAriaDisabled;
+  const tag = typeof child.type === "string" ? child.type : "div";
+  const nativeButton = tag === "button";
+  const nativeAnchor = tag === "a";
+  const href = originalProps.href;
+  const isLink = nativeAnchor && Boolean(href);
   const onClick = (event: React.MouseEvent<HTMLElement>): void => {
+    if (!disableButtonEnhancement && isDisabled) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
     (originalProps.onClick as React.MouseEventHandler<HTMLElement> | undefined)?.(event);
     triggerOnClick?.(event);
     if (!event.isDefaultPrevented()) {
@@ -1194,18 +1210,11 @@ export const DialogTrigger = /* @__PURE__ */ React.forwardRef<HTMLElement, Dialo
       trigger.dispatchEvent(new CustomEvent("spui-dialog-trigger", { bubbles: true, composed: true, detail: { action: resolvedAction, trigger, originalEvent: event.nativeEvent } }));
     }
   };
-  const tag = typeof child.type === "string" ? child.type : "div";
-  const nativeButton = tag === "button";
-  const nativeAnchor = tag === "a";
-  const href = originalProps.href;
-  const disabled = Boolean(originalProps.disabled || originalProps["aria-disabled"] === true || originalProps["aria-disabled"] === "true");
-  const disabledFocusable = Boolean(originalProps.disabledFocusable);
-  const isLink = nativeAnchor && Boolean(href);
   const onKeyDown = (event: React.KeyboardEvent<HTMLElement>): void => {
     (originalProps.onKeyDown as React.KeyboardEventHandler<HTMLElement> | undefined)?.(event);
     triggerOnKeyDown?.(event);
     if (event.isDefaultPrevented()) return;
-    if (disabled && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); event.stopPropagation(); return; }
+    if (isDisabled && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); event.stopPropagation(); return; }
     if (!nativeButton && event.key === " ") event.preventDefault();
     else if (!nativeButton && event.key === "Enter") { event.preventDefault(); event.currentTarget.click(); }
   };
@@ -1213,7 +1222,7 @@ export const DialogTrigger = /* @__PURE__ */ React.forwardRef<HTMLElement, Dialo
     (originalProps.onKeyUp as React.KeyboardEventHandler<HTMLElement> | undefined)?.(event);
     triggerOnKeyUp?.(event);
     if (event.isDefaultPrevented()) return;
-    if (disabled && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); event.stopPropagation(); return; }
+    if (isDisabled && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); event.stopPropagation(); return; }
     if (!nativeButton && event.key === " ") { event.preventDefault(); event.currentTarget.click(); }
   };
   const triggerProps: Record<string, unknown> = {
@@ -1222,26 +1231,27 @@ export const DialogTrigger = /* @__PURE__ */ React.forwardRef<HTMLElement, Dialo
     className: [triggerClassName, originalProps.className as string | undefined].filter(Boolean).join(" ") || undefined,
     style: { ...(triggerStyle as React.CSSProperties | undefined), ...(originalProps.style as React.CSSProperties | undefined) },
     ref: (node: HTMLElement | null) => { setDialogTriggerRef(childRef, node); setDialogTriggerRef(forwardedRef, node); },
-    onClick: disabledFocusable ? undefined : onClick,
-    onKeyDown: !nativeButton && !isLink ? onKeyDown : triggerOnKeyDown || originalProps.onKeyDown ? onKeyDown : undefined,
-    onKeyUp: !nativeButton && !isLink ? onKeyUp : triggerOnKeyUp || originalProps.onKeyUp ? onKeyUp : undefined,
+    onClick,
+    onKeyDown: !nativeButton ? onKeyDown : triggerOnKeyDown || originalProps.onKeyDown ? onKeyDown : undefined,
+    onKeyUp: !nativeButton ? onKeyUp : triggerOnKeyUp || originalProps.onKeyUp ? onKeyUp : undefined,
   };
+  delete triggerProps.disabledFocusable;
   if (!disableButtonEnhancement) {
     triggerProps["aria-haspopup"] = "dialog";
     if (nativeButton) {
       triggerProps.type = "button";
       triggerProps.disabled = disabled && !disabledFocusable;
-      triggerProps["aria-disabled"] = disabledFocusable ? true : originalProps["aria-disabled"];
+      triggerProps["aria-disabled"] = disabledFocusable ? true : normalizedAriaDisabled;
       if (disabledFocusable) triggerProps.onClick = undefined;
       if (!originalProps.onKeyDown && !triggerOnKeyDown) triggerProps.onKeyDown = undefined;
       if (!originalProps.onKeyUp && !triggerOnKeyUp) triggerProps.onKeyUp = undefined;
     } else {
-      triggerProps.role = isLink && !disabled ? originalProps.role : "button";
-      triggerProps.tabIndex = disabledFocusable || (!isLink && !disabled) ? 0 : originalProps.tabIndex;
-      triggerProps["aria-disabled"] = disabled || undefined;
+      triggerProps.role = originalProps.role ?? (isLink ? (isDisabled ? "link" : undefined) : "button");
+      triggerProps.tabIndex = originalProps.tabIndex ?? (disabledFocusable || (!isLink && !disabled) ? 0 : undefined);
+      triggerProps["aria-disabled"] = isDisabled;
       triggerProps.onKeyDown = onKeyDown;
       triggerProps.onKeyUp = onKeyUp;
-      if (nativeAnchor && disabled) triggerProps.href = undefined;
+      if (nativeAnchor && isDisabled) triggerProps.href = undefined;
     }
   }
   return React.cloneElement(child as React.ReactElement<Record<string, unknown>>, triggerProps);

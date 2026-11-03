@@ -26,6 +26,7 @@ const bundle = await build({
       import { defineDialog } from "${resolve("packages/sharepoint-ui/src/elements/dialog.ts")}";
       defineDialog();
       function Motion({ visible, slot, unmountOnExit, children }) { return !visible && unmountOnExit ? null : <div slot={slot} data-motion={slot} data-visible={String(visible)}>{children}</div>; }
+      class CaptureError extends React.Component { state = { error: null }; static getDerivedStateFromError(error) { return { error }; } render() { return this.state.error ? <output data-testid="trigger-contract-error">{this.state.error.message}</output> : this.props.children; } }
       function App() {
         const [open, setOpen] = React.useState(false);
         const [fallbackOpen, setFallbackOpen] = React.useState(false);
@@ -45,16 +46,18 @@ const bundle = await build({
         window.keyboardTriggerRef = keyboardTriggerRef;
         return <>
           <button data-testid="outside">Outside control</button>
-          <Dialog data-testid="alert" defaultOpen modalType="alert"><DialogSurface><DialogTitle>Important update</DialogTitle><DialogActions data-testid="alert-actions" position="start" fluid><DialogTrigger action="close"><button data-testid="alert-action">Acknowledge</button></DialogTrigger></DialogActions></DialogSurface></Dialog>
-          <Dialog data-testid="composed" open={open} closeLabel="Dismiss composed dialog" surfaceMotion={Motion} onOpenChange={(event,data) => { window.dialogOpenChanges.push({open:data.open,type:data.type,eventType:event.type,sameEvent:event===data.event,currentTarget:event.currentTarget.tagName,nativeEventType:event.nativeEvent.type}); setOpen(data.open); setChanges(current => [...current, data.open]); }}><DialogTrigger><button data-testid="trigger">Open composed dialog</button></DialogTrigger><DialogTrigger disableButtonEnhancement><button data-testid="plain-trigger">Open without enhancement</button></DialogTrigger><DialogSurface id="composed-surface" className="surface-root" ref={surfaceRef} onClick={event => window.surfaceClicks.push([event.currentTarget.tagName,event.target.tagName])} backdrop={{ appearance: "dimmed" }} backdropMotion={Motion}><DialogContent id="content-root" ref={contentRef} onClick={event => window.contentClicks.push([event.currentTarget.tagName,event.target.tagName])}><DialogTitle id="composed-title" ref={titleRef} onClick={event => window.titleClicks.push([event.currentTarget.tagName,event.target.tagName])} action={<button data-testid="dialog-title-action">Help</button>}>Composed dialog title</DialogTitle><DialogBody id="body-root" ref={bodyRef} onClick={event => window.bodyClicks.push([event.currentTarget.tagName,event.target.tagName])}><p data-testid="body-copy">Composed dialog body</p></DialogBody><DialogActions id="actions-root" ref={actionsRef} onClick={event => window.actionsClicks.push([event.currentTarget.tagName,event.target.tagName])}><button data-testid="action">Save</button></DialogActions></DialogContent></DialogSurface></Dialog>
+          <Dialog data-testid="alert" defaultOpen modalType="alert" onOpenChange={(event,data) => window.alertOpenChanges.push({open:data.open,type:data.type,currentTarget:event.currentTarget.tagName})}><DialogTrigger><button data-testid="alert-reopen">Reopen alert</button></DialogTrigger><DialogSurface><DialogTitle>Important update</DialogTitle><DialogActions data-testid="alert-actions" position="start" fluid><DialogTrigger action="close"><button data-testid="alert-action">Acknowledge</button></DialogTrigger></DialogActions></DialogSurface></Dialog>
+          <Dialog data-testid="non-modal" modalType="non-modal" onOpenChange={(event,data) => window.nonModalOpenChanges.push({open:data.open,type:data.type})}><DialogTrigger><button data-testid="non-modal-trigger">Open non-modal</button></DialogTrigger><DialogSurface backdrop={{ appearance: "dimmed" }}><DialogTitle>Non-modal dialog</DialogTitle><DialogBody>Non-modal content</DialogBody></DialogSurface></Dialog>
+          <Dialog data-testid="composed" open={open} closeLabel="Dismiss composed dialog" surfaceMotion={Motion} onOpenChange={(event,data) => { window.dialogOpenChanges.push({open:data.open,type:data.type,eventType:event.type,sameEvent:event===data.event,currentTarget:event.currentTarget.tagName,nativeEventType:event.nativeEvent.type}); setOpen(data.open); setChanges(current => [...current, data.open]); }}><DialogTrigger><button data-testid="trigger">Open composed dialog</button></DialogTrigger><DialogTrigger disableButtonEnhancement><button data-testid="plain-trigger">Open without enhancement</button></DialogTrigger><DialogSurface id="composed-surface" className="surface-root" ref={surfaceRef} onClick={event => window.surfaceClicks.push([event.currentTarget.tagName,event.target.tagName])} onKeyDown={event => { if (event.key === "Escape") { if (window.preventDialogEscape) event.preventDefault(); window.surfaceEscapeEvents.push({ target: event.target.tagName, currentTarget: event.currentTarget.tagName, prevented: event.defaultPrevented, nativePrevented: event.nativeEvent.defaultPrevented }); } }} backdrop={{ appearance: "dimmed" }} backdropMotion={Motion}><DialogContent id="content-root" ref={contentRef} onClick={event => window.contentClicks.push([event.currentTarget.tagName,event.target.tagName])}><DialogTitle id="composed-title" ref={titleRef} onClick={event => window.titleClicks.push([event.currentTarget.tagName,event.target.tagName])} action={<button data-testid="dialog-title-action">Help</button>}>Composed dialog title</DialogTitle><DialogBody id="body-root" ref={bodyRef} onClick={event => window.bodyClicks.push([event.currentTarget.tagName,event.target.tagName])}><p data-testid="body-copy">Composed dialog body</p></DialogBody><DialogActions id="actions-root" ref={actionsRef} onClick={event => window.actionsClicks.push([event.currentTarget.tagName,event.target.tagName])}><button data-testid="action">Save</button></DialogActions></DialogContent></DialogSurface></Dialog>
           <output data-testid="changes">{changes.join(",")}</output>
-          <Dialog data-testid="trigger-accessibility" open={enhancedOpen} onOpenChange={(event,data) => { window.enhancedTriggerChanges.push({open:data.open,type:data.type,currentTarget:event.currentTarget.tagName}); setEnhancedOpen(data.open); }}><DialogTrigger><button data-testid="cancel-trigger" onClick={event => { window.cancelTriggerClicks++; event.preventDefault(); }}>Cancel open</button></DialogTrigger><DialogTrigger ref={keyboardTriggerRef}><div data-testid="keyboard-trigger">Open with keyboard</div></DialogTrigger><DialogSurface><DialogTitle>Keyboard trigger dialog</DialogTitle><DialogBody>Keyboard trigger content</DialogBody></DialogSurface></Dialog>
+          <CaptureError><DialogTrigger><><button>Fragment trigger</button></></DialogTrigger></CaptureError>
+          <Dialog data-testid="trigger-accessibility" open={enhancedOpen} onOpenChange={(event,data) => { window.enhancedTriggerChanges.push({open:data.open,type:data.type,currentTarget:event.currentTarget.tagName}); setEnhancedOpen(data.open); }}><DialogTrigger><button data-testid="cancel-trigger" onClick={event => { window.cancelTriggerClicks++; event.preventDefault(); }}>Cancel open</button></DialogTrigger><DialogTrigger ref={keyboardTriggerRef}><div data-testid="keyboard-trigger">Open with keyboard</div></DialogTrigger><DialogTrigger><button aria-disabled="true" data-testid="aria-disabled-button" onClick={() => window.disabledTriggerClicks++}>Disabled button</button></DialogTrigger><DialogTrigger><a href="#disabled-trigger" aria-disabled="true" disabledFocusable data-testid="disabled-link">Disabled link</a></DialogTrigger><DialogTrigger><div role="menuitem" tabIndex={-1} data-testid="custom-tab-trigger">Preserve explicit role and tab order</div></DialogTrigger><DialogTrigger><a href="#anchor-trigger" data-testid="anchor-trigger">Anchor trigger</a></DialogTrigger><DialogTrigger disableButtonEnhancement><button aria-disabled="true" data-testid="unenhanced-disabled-trigger" onClick={() => window.unenhancedDisabledClicks++}>Unenhanced aria-disabled trigger</button></DialogTrigger><DialogSurface><DialogTitle>Keyboard trigger dialog</DialogTitle><DialogBody>Keyboard trigger content</DialogBody></DialogSurface></Dialog>
           <Dialog data-testid="legacy" inertTrapFocus unmountOnClose={false} title="Legacy title" actions={<button data-testid="legacy-action">Done</button>}><p data-testid="legacy-copy">Legacy body</p></Dialog>
           <button data-testid="fallback-trigger" onClick={() => setFallbackOpen(true)}>Open contained-focus dialog</button><Dialog data-testid="fallback" open={fallbackOpen} onOpenChange={(event,data) => {window.fallbackOpenChanges.push({open:data.open,type:data.type,eventType:event.type,sameEvent:event===data.event});setFallbackOpen(data.open)}} inertTrapFocus={false}><DialogSurface><DialogTitle>Contained focus</DialogTitle><DialogBody><button data-testid="fallback-one">First</button><Input data-testid="fallback-input" aria-label="Fallback dialog field"/><button data-testid="fallback-two">Last</button></DialogBody></DialogSurface></Dialog>
           <div hidden><DialogContent as="section" data-testid="polymorphic-content">Content root</DialogContent><DialogBody as="article" data-testid="polymorphic-body">Body root</DialogBody></div>
         </>;
       }
-      createRoot(document.querySelector("#root")).render(<App/>);window.dialogOpenChanges=[];window.fallbackOpenChanges=[];window.enhancedTriggerChanges=[];window.cancelTriggerClicks=0;window.surfaceClicks=[];window.titleClicks=[];window.contentClicks=[];window.bodyClicks=[];window.actionsClicks=[];`,
+      createRoot(document.querySelector("#root")).render(<App/>);window.dialogOpenChanges=[];window.alertOpenChanges=[];window.nonModalOpenChanges=[];window.fallbackOpenChanges=[];window.enhancedTriggerChanges=[];window.cancelTriggerClicks=0;window.disabledTriggerClicks=0;window.unenhancedDisabledClicks=0;window.preventDialogEscape=false;window.surfaceClicks=[];window.surfaceEscapeEvents=[];window.titleClicks=[];window.contentClicks=[];window.bodyClicks=[];window.actionsClicks=[];`,
     resolveDir: process.cwd(), sourcefile: "dialog-parity.tsx", loader: "tsx",
   },
   bundle: true, format: "iife", platform: "browser", target: ["es2020"], write: false,
@@ -63,7 +66,7 @@ const bundle = await build({
 });
 const server = createServer((request, response) => request.url === "/bundle.js"
   ? response.writeHead(200, { "content-type": "text/javascript" }).end(bundle.outputFiles[0].contents)
-  : response.writeHead(200, { "content-type": "text/html" }).end("<!doctype html><html><body><div id='root'></div><script src='/bundle.js'></script></body></html>"));
+  : response.writeHead(200, { "content-type": "text/html" }).end("<!doctype html><html><head><style>html,body{min-height:200vh}</style></head><body><div id='root'></div><script src='/bundle.js'></script></body></html>"));
 await new Promise(done => server.listen(0, "127.0.0.1", done));
 const require = createRequire(import.meta.url);
 const { chromium } = require("/Users/vilius/.t3/projects/spfx-research/node_modules/playwright");
@@ -72,23 +75,59 @@ try {
   browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
   const errors = [];
-  page.on("pageerror", error => errors.push(error.message));
+  const expectedTriggerErrors = [];
+  page.on("pageerror", error => (error.message === "A DialogTrigger child must be a single element; React Fragments are not supported." ? expectedTriggerErrors : errors).push(error.message));
   await page.goto(`http://127.0.0.1:${server.address().port}`);
   await page.addScriptTag({ path: require.resolve("axe-core") });
+  assert.deepEqual(await page.evaluate(() => [getComputedStyle(document.documentElement).overflowY, getComputedStyle(document.documentElement).scrollbarGutter, getComputedStyle(document.body).overflowY]), ["clip", "stable", "hidden"], "open modal and alert dialogs lock document scrolling with stable scrollbar geometry");
   assert.deepEqual(await page.evaluate(() => [document.querySelector('[data-testid="polymorphic-content"]')?.localName, document.querySelector('[data-testid="polymorphic-body"]')?.localName]), ["section", "article"], "DialogContent and DialogBody honor the Fluent polymorphic as prop");
 
   const alert = page.getByTestId("alert");
   await page.waitForFunction(() => document.querySelector("[data-testid=alert]")?.shadowRoot?.querySelector("dialog")?.open);
   assert.equal(await page.getByRole("alertdialog", { name: "Important update" }).count(), 1, "alert mode provides alertdialog semantics and an accessible name");
   assert.equal(await alert.evaluate(host => host.shadowRoot.querySelector(".close").hidden), true, "alert mode requires an explicit action");
-  await page.keyboard.press("Escape");
-  assert.equal(await alert.evaluate(host => host.shadowRoot.querySelector("dialog").open), true, "alert mode ignores Escape");
   assert.equal(await page.getByTestId("alert-actions").evaluate(root => getComputedStyle(root).justifyContent), "flex-start", "DialogActions position=start aligns its native root");
   assert.equal(await page.getByTestId("alert-actions").locator("button").evaluate(trigger => getComputedStyle(trigger).flex), "1 1 0%", "DialogActions fluid expands action slots");
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(() => !document.querySelector("[data-testid=alert]")?.shadowRoot?.querySelector("dialog")?.open);
+  assert.deepEqual(await page.evaluate(() => window.alertOpenChanges), [{ open: false, type: "escapeKeyDown", currentTarget: "DIALOG" }], "Fluent alert dialogs close on Escape and report the Escape reason");
+  assert.deepEqual(await page.evaluate(() => [getComputedStyle(document.documentElement).overflowY, getComputedStyle(document.documentElement).scrollbarGutter, getComputedStyle(document.body).overflowY]), ["visible", "auto", "visible"], "closing the last modal restores the prior document scroll styles");
+  const scrollLockStates = await page.evaluate(() => {
+    document.documentElement.style.overflowY = "scroll";
+    document.documentElement.style.scrollbarGutter = "auto";
+    document.body.style.overflowY = "auto";
+    const first = document.createElement("spui-dialog");
+    const second = document.createElement("spui-dialog");
+    first.setAttribute("open", "");
+    second.setAttribute("open", "");
+    document.body.append(first, second);
+    const locked = [getComputedStyle(document.documentElement).overflowY, getComputedStyle(document.documentElement).scrollbarGutter, getComputedStyle(document.body).overflowY];
+    first.remove();
+    const afterFirstCloses = [getComputedStyle(document.documentElement).overflowY, getComputedStyle(document.body).overflowY];
+    second.remove();
+    const restored = [getComputedStyle(document.documentElement).overflowY, getComputedStyle(document.documentElement).scrollbarGutter, getComputedStyle(document.body).overflowY];
+    document.documentElement.style.overflowY = "";
+    document.documentElement.style.scrollbarGutter = "";
+    document.body.style.overflowY = "";
+    return { locked, afterFirstCloses, restored };
+  });
+  assert.deepEqual(scrollLockStates, { locked: ["clip", "stable", "hidden"], afterFirstCloses: ["clip", "hidden"], restored: ["scroll", "auto", "auto"] }, "overlapping modal locks keep scrolling disabled until the last dialog closes, then restore consumer styles");
+  await page.getByTestId("alert-reopen").click();
+  await page.waitForFunction(() => document.querySelector("[data-testid=alert]")?.shadowRoot?.querySelector("dialog")?.open);
   await page.getByTestId("alert-action").click();
   await page.waitForFunction(() => !document.querySelector("[data-testid=alert]")?.shadowRoot?.querySelector("dialog")?.open);
   await page.waitForFunction(() => !document.querySelector("[data-testid=alert]")?.querySelector("[data-spui-dialog-title]"));
   assert.equal(await alert.evaluate(host => host.querySelector('[slot="surface"]')?.querySelector("[data-spui-dialog-title]")), null, "unmountOnClose removes composed content while retaining its surface and trigger");
+  await page.getByTestId("non-modal-trigger").click();
+  const nonModal = page.getByTestId("non-modal");
+  await page.waitForFunction(() => document.querySelector("[data-testid=non-modal]")?.shadowRoot?.querySelector("dialog")?.open);
+  assert.equal(await nonModal.evaluate(host => host.shadowRoot.querySelector("dialog").matches(":modal")), false, "modalType=non-modal opens without entering the browser modal layer");
+  assert.deepEqual(await page.evaluate(() => [getComputedStyle(document.documentElement).overflowY, getComputedStyle(document.body).overflowY]), ["visible", "visible"], "non-modal dialogs do not lock document scrolling");
+  await nonModal.evaluate(host => host.shadowRoot.querySelector(".modal-backdrop").dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true })));
+  assert.equal(await nonModal.evaluate(host => host.shadowRoot.querySelector("dialog").open), true, "backdrop clicks do not dismiss non-modal dialogs");
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(() => !document.querySelector("[data-testid=non-modal]")?.shadowRoot?.querySelector("dialog")?.open);
+  assert.deepEqual(await page.evaluate(() => window.nonModalOpenChanges), [{ open: true, type: "triggerClick" }, { open: false, type: "escapeKeyDown" }], "non-modal dialogs still honor Escape dismissal");
 
   const composed = page.getByTestId("composed");
   const trigger = page.getByTestId("trigger");
@@ -98,6 +137,7 @@ try {
   assert.equal(await trigger.getAttribute("type"), "button", "enhanced submit-capable child is normalized to type=button");
   await trigger.click();
   await page.waitForFunction(() => document.querySelector("[data-testid=composed]")?.shadowRoot?.querySelector("dialog")?.open);
+  assert.deepEqual(await page.evaluate(() => [getComputedStyle(document.documentElement).overflowY, getComputedStyle(document.documentElement).scrollbarGutter, getComputedStyle(document.body).overflowY]), ["clip", "stable", "hidden"], "opening a modal locks scrolling after previously closed dialogs released their locks");
   assert.equal(await page.getByRole("button", { name: "Dismiss composed dialog" }).count(), 1, "React closeLabel customizes the close button accessible name");
   assert.deepEqual(await page.evaluate(() => window.dialogOpenChanges), [{ open: true, type: "triggerClick", eventType: "click", sameEvent: true, currentTarget: "BUTTON", nativeEventType: "click" }], "Dialog callback exposes a React-shaped event with the Fluent trigger root currentTarget and native source event");
   await page.waitForFunction(() => document.querySelector("[data-testid=composed]")?.querySelector("[data-spui-dialog-title]"));
@@ -120,6 +160,7 @@ try {
   assert.equal(relations.hiddenFallback, true, "legacy chrome is hidden for the composed surface");
   assert.equal(relations.surfaceAssigned, 1);
   assert.deepEqual(await page.evaluate(() => ({ tag: window.surfaceRef.current?.tagName, id: window.surfaceRef.current?.id, className: window.surfaceRef.current?.className })), { tag: "DIV", id: "composed-surface", className: "surface-root" }, "DialogSurface props and ref target its native Fluent div root");
+  assert.equal(await composed.locator("#composed-surface").getAttribute("tabindex"), "-1", "DialogSurface is programmatically focusable by default like Fluent's div root");
   assert.equal(await composed.locator("[data-motion=surface]").getAttribute("data-visible"), "true", "surfaceMotion receives the current open state");
   assert.equal(await composed.locator("[data-motion=backdrop]").getAttribute("data-visible"), "true", "backdropMotion receives the current open state");
   assert.equal(await composed.getAttribute("data-has-custom-backdrop"), "true", "custom backdrop switches to the managed modal overlay path");
@@ -155,13 +196,24 @@ try {
   assert.deepEqual(await page.evaluate(() => window.actionsClicks), [["DIV", "BUTTON"]], "DialogActions events use its native div root");
   assert.deepEqual(await page.evaluate(() => window.surfaceClicks), [["DIV", "H2"], ["DIV", "P"], ["DIV", "BUTTON"]], "DialogSurface React events use native root target and currentTarget");
   assert.equal(await composed.evaluate(host => host.hasAttribute("open")), true, "interior action does not dismiss the dialog");
+  await page.locator("#composed-surface").focus();
+  assert.equal(await page.locator("#composed-surface").evaluate(element => element.matches(":focus")), true, "DialogSurface receives focus for its root keyboard contract");
+  await page.evaluate(() => { window.preventDialogEscape = true; });
+  await page.keyboard.press("Escape");
+  assert.deepEqual(await page.evaluate(() => window.surfaceEscapeEvents), [{ target: "DIV", currentTarget: "DIV", prevented: true, nativePrevented: true }], "DialogSurface receives and prevents the Escape keydown");
+  assert.equal(await composed.evaluate(host => host.shadowRoot.querySelector("dialog").open), true, "DialogSurface preventDefault cancels Escape dismissal");
+  assert.equal(await page.evaluate(() => window.dialogOpenChanges.length), 1, `canceled Escape does not emit an open-change callback: ${JSON.stringify(await page.evaluate(() => window.dialogOpenChanges))}`);
+  await page.evaluate(() => { window.preventDialogEscape = false; });
   await page.keyboard.press("Escape");
   await page.waitForFunction(() => !document.querySelector("[data-testid=composed]")?.shadowRoot?.querySelector("dialog")?.open);
+  assert.deepEqual(await page.evaluate(() => [getComputedStyle(document.documentElement).overflowY, getComputedStyle(document.documentElement).scrollbarGutter, getComputedStyle(document.body).overflowY]), ["visible", "auto", "visible"], "closing the modal restores document scrolling");
   assert.deepEqual(await page.evaluate(() => window.dialogOpenChanges.at(-1)), { open: false, type: "escapeKeyDown", eventType: "keydown", sameEvent: true, currentTarget: "DIALOG", nativeEventType: "keydown" }, "Dialog close callback includes the Fluent Escape reason and source event");
   await page.waitForFunction(() => document.querySelector("[data-testid=changes]")?.textContent === "true,false");
   assert.equal(await page.getByTestId("changes").textContent(), "true,false", "controlled open state reports both transitions");
 
   const triggerAccessibility = page.getByTestId("trigger-accessibility");
+  assert.equal(await page.getByTestId("trigger-contract-error").textContent(), "A DialogTrigger child must be a single element; React Fragments are not supported.", "DialogTrigger rejects a Fragment child instead of silently omitting its trigger");
+  assert.ok(expectedTriggerErrors.length > 0, "the invalid Fragment contract error is observable and handled by its React boundary");
   await page.getByTestId("cancel-trigger").click();
   assert.equal(await page.evaluate(() => window.cancelTriggerClicks), 1, "the child click handler runs before trigger activation");
   assert.equal(await triggerAccessibility.evaluate(host => host.shadowRoot.querySelector("dialog").open), false, "a canceled child click does not open the dialog");
@@ -179,6 +231,24 @@ try {
   await page.keyboard.press("Escape");
   await page.waitForFunction(() => !document.querySelector("[data-testid=trigger-accessibility]")?.shadowRoot?.querySelector("dialog")?.open);
   assert.deepEqual(await page.evaluate(() => window.enhancedTriggerChanges), [{ open: true, type: "triggerClick", currentTarget: "DIV" }, { open: false, type: "escapeKeyDown", currentTarget: "DIALOG" }, { open: true, type: "triggerClick", currentTarget: "DIV" }, { open: false, type: "escapeKeyDown", currentTarget: "DIALOG" }], "custom element triggers open through Enter and Space and preserve callback reasons");
+  await page.getByTestId("unenhanced-disabled-trigger").evaluate(element => element.click());
+  await page.waitForFunction(() => document.querySelector("[data-testid=trigger-accessibility]")?.shadowRoot?.querySelector("dialog")?.open);
+  assert.equal(await page.evaluate(() => window.unenhancedDisabledClicks), 1, "disableButtonEnhancement retains native aria-disabled click behavior");
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(() => !document.querySelector("[data-testid=trigger-accessibility]")?.shadowRoot?.querySelector("dialog")?.open);
+  await page.getByTestId("aria-disabled-button").evaluate(element => element.click());
+  await page.getByTestId("disabled-link").evaluate(element => element.click());
+  assert.equal(await page.evaluate(() => window.disabledTriggerClicks), 0, "aria-disabled trigger clicks are canceled before child activation");
+  assert.equal(await triggerAccessibility.evaluate(host => host.shadowRoot.querySelector("dialog").open), false, "aria-disabled triggers do not open the dialog");
+  assert.deepEqual(await page.getByTestId("disabled-link").evaluate(element => ({ role: element.getAttribute("role"), href: element.getAttribute("href"), tabIndex: element.tabIndex, ariaDisabled: element.getAttribute("aria-disabled") })), { role: "link", href: null, tabIndex: 0, ariaDisabled: "true" }, "disabled focusable links keep link semantics, lose navigation, and remain focusable");
+  assert.deepEqual(await page.getByTestId("custom-tab-trigger").evaluate(element => ({ role: element.getAttribute("role"), tabIndex: element.tabIndex, ariaDisabled: element.getAttribute("aria-disabled") })), { role: "menuitem", tabIndex: -1, ariaDisabled: "false" }, "explicit child role and tab order are preserved");
+  assert.deepEqual(await page.getByTestId("anchor-trigger").evaluate(element => ({ role: element.getAttribute("role"), tabIndex: element.tabIndex, ariaDisabled: element.getAttribute("aria-disabled"), href: element.getAttribute("href") })), { role: null, tabIndex: 0, ariaDisabled: "false", href: "#anchor-trigger" }, "enabled anchors retain native link semantics while receiving button keyboard behavior");
+  await page.getByTestId("anchor-trigger").focus();
+  await page.keyboard.press("Space");
+  await page.waitForFunction(() => document.querySelector("[data-testid=trigger-accessibility]")?.shadowRoot?.querySelector("dialog")?.open);
+  assert.deepEqual(await page.evaluate(() => window.enhancedTriggerChanges.at(-1)), { open: true, type: "triggerClick", currentTarget: "A" }, "anchor Space activation dispatches the same trigger transition");
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(() => !document.querySelector("[data-testid=trigger-accessibility]")?.shadowRoot?.querySelector("dialog")?.open);
 
   const legacy = page.getByTestId("legacy");
   await legacy.evaluate(host => { host.open = true; });
