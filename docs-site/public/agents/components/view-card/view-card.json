@@ -22,8 +22,11 @@
         "default",
         "leading",
         "eyebrow",
+        "title",
+        "subtitle",
+        "description",
         "status",
-        "footer"
+        "actions"
       ],
       "styling": [
         "SharePointUIProvider tokens",
