@@ -11,12 +11,13 @@ import { createRoot } from "react-dom/client";
 import { RichTextEditor, SharePointUIProvider } from "${resolve("packages/sharepoint-ui/src/react.tsx")}";
 import { defineRichTextEditor } from "${resolve("packages/sharepoint-ui/src/elements/rich-text-editor.ts")}";
 window.mount = () => {
+  window.richTextEvents = [];
   defineRichTextEditor();
   const native = document.createElement("spui-rich-text-editor"); native.setAttribute("label", "Native editor"); native.setAttribute("name", "body"); native.setAttribute("required", ""); native.setAttribute("value", "<p>Initial body</p>"); native.id = "native";
   native.value = "<table><thead><tr><th scope=\\\"col\\\">Head A</th><th scope=\\\"col\\\">Head B</th></tr></thead><tbody><tr><td>Cell A</td><td>Cell B</td></tr><tr><td>Cell C</td><td>Cell D</td></tr></tbody></table><script>alert(1)<\\/script>";
   const nativeForm = document.createElement("form"); nativeForm.id = "native-form"; nativeForm.append(native); const disabledFieldset = document.createElement("fieldset"); disabledFieldset.id = "native-editor-fieldset"; disabledFieldset.disabled = true; const disabledEditor = document.createElement("spui-rich-text-editor"); disabledEditor.name = "disabledBody"; disabledEditor.setAttribute("required", ""); disabledFieldset.append(disabledEditor); nativeForm.append(disabledFieldset); document.querySelector("#native-root").append(nativeForm);
   native.value = "<table><thead><tr><th scope=\\\"col\\\">Head A</th><th scope=\\\"col\\\">Head B</th></tr></thead><tbody><tr><td>Cell A</td><td>Cell B</td></tr><tr><td>Cell C</td><td>Cell D</td></tr></tbody></table><script>alert(1)<\\/script>";
-  function App() { return <SharePointUIProvider lang="ar" dir="rtl" strings={{ richTextChooseImage: "اختر صورة", richTextRequired: "أدخل نصًا.", richTextInsertImage: "إدراج صورة", richTextInsertRowBelow: "إدراج صف أسفل", richTextInsertColumnAfter: "إدراج عمود بعد", richTextDeleteRow: "حذف الصف", richTextDeleteColumn: "حذف العمود", richTextDeleteTable: "حذف الجدول" }}><><form id="react-form"><RichTextEditor label="محرر أصلي" data-testid="react" name="body" required defaultValue={native.value} onImageUpload={async file => "https://contoso.sharepoint.com/ReactAssets/" + encodeURIComponent(file.name)}></RichTextEditor></form><form id="external-rich-form"></form><RichTextEditor label="External editor" data-testid="react-external" name="externalBody" form="external-rich-form" required defaultValue="<p>External body</p>" /><RichTextEditor label="Required editor" data-testid="react-required" required /><RichTextEditor label="Read-only required editor" data-testid="react-readonly" readOnly required /><RichTextEditor label="Controlled editor" data-testid="react-controlled" value="Controlled" /></></SharePointUIProvider>; }
+  function App() { return <SharePointUIProvider lang="ar" dir="rtl" strings={{ richTextChooseImage: "اختر صورة", richTextRequired: "أدخل نصًا.", richTextInsertImage: "إدراج صورة", richTextInsertRowBelow: "إدراج صف أسفل", richTextInsertColumnAfter: "إدراج عمود بعد", richTextDeleteRow: "حذف الصف", richTextDeleteColumn: "حذف العمود", richTextDeleteTable: "حذف الجدول" }}><><form id="react-form"><RichTextEditor label="محرر أصلي" data-testid="react" name="body" required defaultValue={native.value} onInput={event => window.richTextEvents.push({source: "input", type: event.type, nativeType: event.nativeEvent.type, currentTarget: event.currentTarget.getAttribute("role")} )} onChange={event => window.richTextEvents.push({source: "change", type: event.type, nativeType: event.nativeEvent.type, currentTarget: event.currentTarget.getAttribute("role")} )} onBeforeInput={event => window.richTextEvents.push({source: "beforeinput", type: event.type, nativeType: event.nativeEvent.type, currentTarget: event.currentTarget.getAttribute("role")} )} onPasteCapture={event => window.richTextEvents.push({source: "paste-capture", type: event.type, nativeType: event.nativeEvent.type, currentTarget: event.currentTarget.getAttribute("role"), clipboardText: event.clipboardData?.getData("text/plain")} )} onImageUpload={async file => "https://contoso.sharepoint.com/ReactAssets/" + encodeURIComponent(file.name)}></RichTextEditor></form><form id="external-rich-form"></form><RichTextEditor label="External editor" data-testid="react-external" name="externalBody" form="external-rich-form" required defaultValue="<p>External body</p>" /><RichTextEditor label="Required editor" data-testid="react-required" required /><RichTextEditor label="Read-only required editor" data-testid="react-readonly" readOnly required /><RichTextEditor label="Controlled editor" data-testid="react-controlled" value="Controlled" /></></SharePointUIProvider>; }
   createRoot(document.querySelector("#react-root")).render(<App />);
 };`,
     resolveDir: process.cwd(),
@@ -162,6 +163,16 @@ try {
     assert.match(pasted, /<table>/);
     assert.doesNotMatch(pasted, /onclick|style=|javascript:|<script/i);
   }
+  await reactEditor.evaluate(node => {
+    const editable = node.shadowRoot.querySelector('[role="textbox"]');
+    editable.dispatchEvent(new InputEvent("beforeinput", { bubbles: true, composed: true, data: "x", inputType: "insertText" }));
+    editable.dispatchEvent(new InputEvent("input", { bubbles: true, composed: true, data: "x", inputType: "insertText" }));
+  });
+  const reactEventRows = await page.evaluate(() => window.richTextEvents);
+  assert.ok(reactEventRows.some(event => event.source === "input" && event.type === "input" && event.nativeType === "input" && event.currentTarget === "textbox"), "React onInput targets the native contenteditable editor");
+  assert.ok(reactEventRows.some(event => event.source === "change" && event.type === "change" && event.nativeType === "input" && event.currentTarget === "textbox"), "React onChange receives input-driven change semantics on the native editor");
+  assert.ok(reactEventRows.some(event => event.source === "beforeinput" && event.type === "beforeinput" && event.nativeType === "beforeinput" && event.currentTarget === "textbox"), "React onBeforeInput targets the native contenteditable editor");
+  assert.ok(reactEventRows.some(event => event.source === "paste-capture" && event.type === "paste" && event.nativeType === "paste" && event.currentTarget === "textbox" && event.clipboardText === "fallback text"), "React clipboard capture preserves clipboard data on the native editor");
   for (const editor of [native, reactEditor]) {
     const plainPasted = await editor.evaluate((node, text) => {
       node.value = "<p>Start</p>";
@@ -223,7 +234,7 @@ try {
   assert.equal(await nativeLabel, "Native editor");
   assert.equal(await reactLabel, "محرر أصلي");
   assert.deepEqual(errors, [], JSON.stringify(errors));
-  console.log(JSON.stringify({ assertions: "passed", nativeTableEditing: true, reactTableEditing: true, richPasteStructureAndSanitization: true, plainTextPastePreservesLineBreaks: true, plainTextMarkupRemainsInert: true, nativeAndReactUndoRedo: true, nativeAndReactDefaultValueReset: true, controlledReactValue: true, formParticipationAndValidity: true, disabledFieldsetDisablesAndReenables: true, pastedImageUpload: true, rtlLabels: true, rtlToolbarRovingFocus: true, tabNavigationBetweenToolbarAndEditor: true, mergedCellGuard: true, sanitizedContent: true, nativeAndReactDurableImageUpload: true, pageErrors: errors }));
+  console.log(JSON.stringify({ assertions: "passed", nativeReactEventBridge: true, nativeTableEditing: true, reactTableEditing: true, richPasteStructureAndSanitization: true, plainTextPastePreservesLineBreaks: true, plainTextMarkupRemainsInert: true, nativeAndReactUndoRedo: true, nativeAndReactDefaultValueReset: true, controlledReactValue: true, formParticipationAndValidity: true, disabledFieldsetDisablesAndReenables: true, pastedImageUpload: true, rtlLabels: true, rtlToolbarRovingFocus: true, tabNavigationBetweenToolbarAndEditor: true, mergedCellGuard: true, sanitizedContent: true, nativeAndReactDurableImageUpload: true, pageErrors: errors }));
 } finally {
   await browser?.close();
   await new Promise(done => server.close(done));

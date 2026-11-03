@@ -24,7 +24,7 @@ function visit(node) {
 visit(file);
 const gaps = roots.filter(({ props }) => !props
   || !ts.isCallExpression(props)
-  || !["useCustomElementProps", "customElementProps"].includes(props.expression.getText(file)));
+  || !["useCustomElementProps", "customElementProps", "nativeControlHostProps"].includes(props.expression.getText(file)));
 
 if (gaps.length) {
   throw new Error(`React custom-element roots must normalize className to class:\n${gaps.map(({ tag, line }) => `  ${tag} at line ${line}`).join("\n")}`);
