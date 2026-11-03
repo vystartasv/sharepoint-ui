@@ -3457,9 +3457,12 @@
       "module": "tag-picker",
       "category": "form",
       "api": {
-        "reactSignature": "{ children, label, selectedLabel, selectedValues, defaultSelectedValues, inputValue, open, defaultOpen, inline = false, noPopover = false, onOpenChange, onOptionSelect, onInputValueChange, onChange, ...props }: TagPickerProps",
+        "reactSignature": "{ children, label, selectedLabel, selectedOptions, defaultSelectedOptions, selectedValues, defaultSelectedValues, inputValue, open, defaultOpen, positioning, disableAutoFocus = false, inline = false, noPopover = false, disabled, onOpenChange, onOptionSelect, onInputValueChange, onChange, ...props }: TagPickerProps",
         "relatedReactApis": [
-          { "name": "TagPickerProps.selectedLabel", "description": "Names the selected-options group; defaults to SharePointUIProvider.strings.selectedOptionsLabel." }
+          { "name": "TagPickerProps.selectedLabel", "description": "Names the selected-options group; defaults to SharePointUIProvider.strings.selectedOptionsLabel." },
+          { "name": "TagPickerProps.selectedOptions", "description": "Controls the selected option values; use defaultSelectedOptions for an uncontrolled initial selection." },
+          { "name": "TagPickerProps.positioning", "description": "Positions the options surface relative to the control; supports placement shorthands, alignment, fallbacks, and offsets." },
+          { "name": "TagPickerProps.disableAutoFocus", "description": "Keeps the first matching option inactive until keyboard navigation selects one." }
         ],
         "callbackProps": [
           "onOpenChange",
@@ -3492,7 +3495,7 @@
       "reactOnly": true,
       "category": "form-trigger",
       "api": {
-        "reactSignature": "{ children, appearance = \"secondary\", size = \"medium\", disabled = false, ...props }: ElementProps & { children?: React.ReactNode; appearance?: ButtonAppearance; size?: ButtonSize; disabled?: boolean }",
+        "reactSignature": "{ children, appearance = \"outline\", size = \"medium\", disabled = false, ...props }: ElementProps & { children?: React.ReactNode; appearance?: \"filled-darker\" | \"filled-lighter\" | \"outline\" | \"underline\"; size?: \"small\" | \"medium\" | \"large\"; disabled?: boolean }",
         "callbackProps": [],
         "slots": [
           "button"
@@ -3555,7 +3558,7 @@
       "module": "tag-picker",
       "category": "form-option",
       "api": {
-        "reactSignature": "{ value, placeholder, disabled = false, clearable = false, appearance, onValueChange, ...props }: Omit<ElementProps, \"children\"> & { value?: string; placeholder?: string; disabled?: boolean; clearable?: boolean; appearance?: \"filled-darker\" | \"filled-lighter\" | \"outline\"; onValueChange?: (value: string) => void }",
+        "reactSignature": "{ value, placeholder, disabled = false, clearable = false, appearance, onValueChange, ...props }: Omit<ElementProps, \"children\"> & { value?: string; placeholder?: string; disabled?: boolean; clearable?: boolean; appearance?: \"filled-darker\" | \"filled-lighter\" | \"outline\" | \"underline\"; onValueChange?: (value: string) => void }",
         "callbackProps": [
           "onValueChange"
         ],
@@ -3578,7 +3581,7 @@
       "module": "tag-picker",
       "category": "form-option",
       "api": {
-        "reactSignature": "{ children }: ElementProps & { children?: React.ReactNode; disableAutoFocus?: boolean }",
+        "reactSignature": "{ children }: ElementProps & { children?: React.ReactNode }",
         "callbackProps": [],
         "slots": [
           "children"

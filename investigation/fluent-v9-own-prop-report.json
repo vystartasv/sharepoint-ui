@@ -1,20 +1,20 @@
 {
   "baseline": "@fluentui/react-components@9.75.0",
   "fluentPackages": 51,
-  "scope": "Named own props, public slot props declared through Fluent ComponentProps<Slots>, and resolvable string/number/boolean literal-union values versus local exported adapter props; local aliases, union/intersection branches, Pick/Omit key filtering, overloads, and Parameters<typeof Component>[0] are resolved. Value comparison reports only when both sides resolve to literal sets. SearchBox and DataGrid resolve from their actual Fluent subpackages. Non-component utilities are classified separately; absent reference packages are reported as unavailable rather than counted as prop gaps. Inherited React/DOM props and runtime semantics are excluded.",
+  "scope": "Declared component props including explicitly imported/picked inherited component contracts, public slot props declared through Fluent ComponentProps<Slots>, and resolvable string/number/boolean literal-union values versus local exported adapter props; local aliases, union/intersection branches, Pick/Omit key filtering, overloads, and Parameters<typeof Component>[0] are resolved. Value comparison reports only when both sides resolve to literal sets. SearchBox and DataGrid resolve from their actual Fluent subpackages. Non-component utilities are classified separately; absent reference packages are reported as unavailable rather than counted as prop gaps. Generic inherited React/DOM props and runtime semantics are excluded.",
   "summary": {
     "comparedComponents": 231,
     "missingLocalComponentExports": 0,
-    "componentsWithPropNameGaps": 0,
-    "componentsWithSlotPropGaps": 0,
-    "componentsWithPropValueGaps": 0,
+    "componentsWithPropNameGaps": 9,
+    "componentsWithSlotPropGaps": 2,
+    "componentsWithPropValueGaps": 1,
     "manualReviewComponents": 0,
     "unavailableBaselineComponents": 0,
     "nonComponentContracts": 10,
-    "missingOwnPropCount": 0,
-    "declaredSlotPropCount": 240,
-    "missingSlotPropCount": 0,
-    "missingLiteralValueCount": 0
+    "missingOwnPropCount": 45,
+    "declaredSlotPropCount": 242,
+    "missingSlotPropCount": 2,
+    "missingLiteralValueCount": 1
   },
   "components": [
     {
@@ -516,6 +516,8 @@
       "status": "own-prop-names-covered",
       "fluentOwnProps": [
         "current",
+        "disabled",
+        "disabledFocusable",
         "size"
       ],
       "fluentSlotProps": [
@@ -537,8 +539,6 @@
       "missingSlotProps": [],
       "localAdditions": [
         "children",
-        "disabled",
-        "disabledFocusable",
         "href",
         "icon",
         "rel",
@@ -1018,9 +1018,18 @@
       "family": "carousel",
       "component": "CarouselAutoplayButton",
       "localComponent": "CarouselAutoplayButton",
-      "status": "own-prop-names-covered",
+      "status": "review-prop-gaps",
       "fluentOwnProps": [
-        "onCheckedChange"
+        "appearance",
+        "checked",
+        "defaultChecked",
+        "disabled",
+        "disabledFocusable",
+        "iconPosition",
+        "isAccessible",
+        "onCheckedChange",
+        "shape",
+        "size"
       ],
       "fluentSlotProps": [
         "icon"
@@ -1032,7 +1041,17 @@
         "playLabel",
         "slot"
       ],
-      "missingLocally": [],
+      "missingLocally": [
+        "appearance",
+        "checked",
+        "defaultChecked",
+        "disabled",
+        "disabledFocusable",
+        "iconPosition",
+        "isAccessible",
+        "shape",
+        "size"
+      ],
       "missingSlotProps": [],
       "localAdditions": [
         "icon",
@@ -1541,6 +1560,7 @@
         "placeholder",
         "positioning",
         "required",
+        "selectedLabel",
         "selectedOptions",
         "selectedValue",
         "size",
@@ -1562,6 +1582,7 @@
         "onSelectedOptionsChange",
         "onValueChange",
         "required",
+        "selectedLabel",
         "selectedValue"
       ],
       "missingLiteralValues": []
@@ -1755,6 +1776,7 @@
         "children",
         "closeLabel",
         "defaultOpen",
+        "dialogLabel",
         "dismissible",
         "inertTrapFocus",
         "modal",
@@ -1770,6 +1792,7 @@
       "localAdditions": [
         "actions",
         "closeLabel",
+        "dialogLabel",
         "dismissible",
         "modal",
         "surfaceMotion",
@@ -2131,9 +2154,12 @@
       "family": "drawer",
       "component": "OverlayDrawer",
       "localComponent": "OverlayDrawer",
-      "status": "own-prop-names-covered",
+      "status": "review-prop-gaps",
       "fluentOwnProps": [
         "defaultOpen",
+        "inertTrapFocus",
+        "modalType",
+        "onOpenChange",
         "open",
         "position",
         "size",
@@ -2166,7 +2192,9 @@
         "title",
         "unmountOnClose"
       ],
-      "missingLocally": [],
+      "missingLocally": [
+        "inertTrapFocus"
+      ],
       "missingSlotProps": [],
       "localAdditions": [
         "actions",
@@ -2177,16 +2205,30 @@
         "expandLabel",
         "expandable",
         "expanded",
-        "modalType",
         "onDismiss",
         "onExpandedChange",
-        "onOpenChange",
         "restoreLabel",
         "separator",
         "surfaceMotion",
         "title"
       ],
-      "missingLiteralValues": []
+      "missingLiteralValues": [
+        {
+          "prop": "modalType",
+          "expected": [
+            "alert",
+            "modal",
+            "non-modal"
+          ],
+          "actual": [
+            "modal",
+            "non-modal"
+          ],
+          "missing": [
+            "alert"
+          ]
+        }
+      ]
     },
     {
       "family": "field",
@@ -2514,9 +2556,15 @@
       "family": "input",
       "component": "SearchBox",
       "localComponent": "SearchBox",
-      "status": "own-prop-names-covered",
+      "status": "review-prop-gaps",
       "fluentOwnProps": [
-        "onChange"
+        "appearance",
+        "children",
+        "defaultValue",
+        "onChange",
+        "size",
+        "type",
+        "value"
       ],
       "fluentSlotProps": [
         "contentAfter",
@@ -2565,12 +2613,14 @@
         "value",
         "width"
       ],
-      "missingLocally": [],
+      "missingLocally": [
+        "children",
+        "type"
+      ],
       "missingSlotProps": [],
       "localAdditions": [
         "accept",
         "alt",
-        "appearance",
         "autoComplete",
         "capture",
         "checked",
@@ -2578,7 +2628,6 @@
         "contentAfter",
         "contentBefore",
         "defaultChecked",
-        "defaultValue",
         "disabled",
         "dismiss",
         "form",
@@ -2602,10 +2651,8 @@
         "placeholder",
         "readOnly",
         "required",
-        "size",
         "src",
         "step",
-        "value",
         "width"
       ],
       "missingLiteralValues": []
@@ -3469,8 +3516,15 @@
       "family": "nav",
       "component": "Hamburger",
       "localComponent": "Hamburger",
-      "status": "own-prop-names-covered",
-      "fluentOwnProps": [],
+      "status": "review-prop-gaps",
+      "fluentOwnProps": [
+        "appearance",
+        "disabled",
+        "disabledFocusable",
+        "iconPosition",
+        "shape",
+        "size"
+      ],
       "fluentSlotProps": [
         "icon"
       ],
@@ -3482,11 +3536,16 @@
         "onClick",
         "open"
       ],
-      "missingLocally": [],
+      "missingLocally": [
+        "appearance",
+        "disabledFocusable",
+        "iconPosition",
+        "shape",
+        "size"
+      ],
       "missingSlotProps": [],
       "localAdditions": [
         "children",
-        "disabled",
         "icon",
         "label",
         "onClick",
@@ -3613,15 +3672,25 @@
       "family": "nav",
       "component": "NavDivider",
       "localComponent": "NavDivider",
-      "status": "own-prop-names-covered",
-      "fluentOwnProps": [],
+      "status": "review-prop-gaps",
+      "fluentOwnProps": [
+        "alignContent",
+        "appearance",
+        "inset",
+        "vertical"
+      ],
       "fluentSlotProps": [
         "wrapper"
       ],
       "localOwnProps": [
         "wrapper"
       ],
-      "missingLocally": [],
+      "missingLocally": [
+        "alignContent",
+        "appearance",
+        "inset",
+        "vertical"
+      ],
       "missingSlotProps": [],
       "localAdditions": [
         "wrapper"
@@ -3634,6 +3703,7 @@
       "localComponent": "NavDrawer",
       "status": "own-prop-names-covered",
       "fluentOwnProps": [
+        "defaultOpen",
         "defaultOpenCategories",
         "defaultSelectedCategoryValue",
         "defaultSelectedValue",
@@ -3644,7 +3714,9 @@
         "openCategories",
         "selectedCategoryValue",
         "selectedValue",
-        "tabbable"
+        "separator",
+        "tabbable",
+        "type"
       ],
       "fluentSlotProps": [],
       "localOwnProps": [
@@ -3692,7 +3764,6 @@
         "collapsed",
         "collapsible",
         "defaultCollapsed",
-        "defaultOpen",
         "dismissible",
         "expandable",
         "expanded",
@@ -3707,9 +3778,7 @@
         "open",
         "openLabel",
         "position",
-        "separator",
         "size",
-        "type",
         "unmountOnClose"
       ],
       "missingLiteralValues": []
@@ -4475,9 +4544,15 @@
       "family": "search",
       "component": "SearchBox",
       "localComponent": "SearchBox",
-      "status": "own-prop-names-covered",
+      "status": "review-prop-gaps",
       "fluentOwnProps": [
-        "onChange"
+        "appearance",
+        "children",
+        "defaultValue",
+        "onChange",
+        "size",
+        "type",
+        "value"
       ],
       "fluentSlotProps": [
         "contentAfter",
@@ -4526,12 +4601,14 @@
         "value",
         "width"
       ],
-      "missingLocally": [],
+      "missingLocally": [
+        "children",
+        "type"
+      ],
       "missingSlotProps": [],
       "localAdditions": [
         "accept",
         "alt",
-        "appearance",
         "autoComplete",
         "capture",
         "checked",
@@ -4539,7 +4616,6 @@
         "contentAfter",
         "contentBefore",
         "defaultChecked",
-        "defaultValue",
         "disabled",
         "dismiss",
         "form",
@@ -4563,10 +4639,8 @@
         "placeholder",
         "readOnly",
         "required",
-        "size",
         "src",
         "step",
-        "value",
         "width"
       ],
       "missingLiteralValues": []
@@ -5745,16 +5819,25 @@
       "status": "own-prop-names-covered",
       "fluentOwnProps": [
         "children",
+        "defaultOpen",
+        "defaultSelectedOptions",
+        "disableAutoFocus",
         "inline",
         "noPopover",
         "onOpenChange",
-        "onOptionSelect"
+        "onOptionSelect",
+        "open",
+        "positioning",
+        "selectedOptions"
       ],
       "fluentSlotProps": [],
       "localOwnProps": [
         "children",
         "defaultOpen",
+        "defaultSelectedOptions",
         "defaultSelectedValues",
+        "disableAutoFocus",
+        "disabled",
         "form",
         "inline",
         "inputValue",
@@ -5765,19 +5848,22 @@
         "onOpenChange",
         "onOptionSelect",
         "open",
+        "positioning",
+        "selectedLabel",
+        "selectedOptions",
         "selectedValues"
       ],
       "missingLocally": [],
       "missingSlotProps": [],
       "localAdditions": [
-        "defaultOpen",
         "defaultSelectedValues",
+        "disabled",
         "form",
         "inputValue",
         "label",
         "onChange",
         "onInputValueChange",
-        "open",
+        "selectedLabel",
         "selectedValues"
       ],
       "missingLiteralValues": []
@@ -5788,7 +5874,9 @@
       "localComponent": "TagPickerButton",
       "status": "own-prop-names-covered",
       "fluentOwnProps": [
-        "disabled"
+        "appearance",
+        "disabled",
+        "size"
       ],
       "fluentSlotProps": [],
       "localOwnProps": [
@@ -5800,9 +5888,7 @@
       "missingLocally": [],
       "missingSlotProps": [],
       "localAdditions": [
-        "appearance",
-        "children",
-        "size"
+        "children"
       ],
       "missingLiteralValues": []
     },
@@ -5855,6 +5941,8 @@
       "localComponent": "TagPickerInput",
       "status": "own-prop-names-covered",
       "fluentOwnProps": [
+        "appearance",
+        "clearable",
         "disabled",
         "value"
       ],
@@ -5870,8 +5958,6 @@
       "missingLocally": [],
       "missingSlotProps": [],
       "localAdditions": [
-        "appearance",
-        "clearable",
         "onValueChange",
         "placeholder"
       ],
@@ -6141,9 +6227,30 @@
       "family": "teaching-popover",
       "component": "TeachingPopover",
       "localComponent": "TeachingPopover",
-      "status": "own-prop-names-covered",
-      "fluentOwnProps": [],
-      "fluentSlotProps": [],
+      "status": "review-prop-gaps",
+      "fluentOwnProps": [
+        "appearance",
+        "children",
+        "closeOnIframeFocus",
+        "closeOnScroll",
+        "defaultOpen",
+        "inertTrapFocus",
+        "inline",
+        "legacyTrapFocus",
+        "mouseLeaveDelay",
+        "onOpenChange",
+        "open",
+        "openOnContext",
+        "openOnHover",
+        "positioning",
+        "size",
+        "trapFocus",
+        "unstable_disableAutoFocus",
+        "withArrow"
+      ],
+      "fluentSlotProps": [
+        "surfaceMotion"
+      ],
       "localOwnProps": [
         "children",
         "label",
@@ -6152,13 +6259,28 @@
         "placement",
         "trigger"
       ],
-      "missingLocally": [],
-      "missingSlotProps": [],
+      "missingLocally": [
+        "appearance",
+        "closeOnIframeFocus",
+        "closeOnScroll",
+        "defaultOpen",
+        "inertTrapFocus",
+        "inline",
+        "legacyTrapFocus",
+        "mouseLeaveDelay",
+        "openOnContext",
+        "openOnHover",
+        "positioning",
+        "size",
+        "trapFocus",
+        "unstable_disableAutoFocus",
+        "withArrow"
+      ],
+      "missingSlotProps": [
+        "surfaceMotion"
+      ],
       "localAdditions": [
-        "children",
         "label",
-        "onOpenChange",
-        "open",
         "placement",
         "trigger"
       ],
@@ -6273,20 +6395,37 @@
       "family": "teaching-popover",
       "component": "TeachingPopoverCarouselFooterButton",
       "localComponent": "TeachingPopoverCarouselFooterButton",
-      "status": "own-prop-names-covered",
+      "status": "review-prop-gaps",
       "fluentOwnProps": [
         "altText",
-        "navType"
+        "appearance",
+        "disabled",
+        "disabledFocusable",
+        "iconPosition",
+        "navType",
+        "shape",
+        "size"
       ],
-      "fluentSlotProps": [],
+      "fluentSlotProps": [
+        "icon"
+      ],
       "localOwnProps": [
         "altText",
         "children",
         "navType",
         "onClick"
       ],
-      "missingLocally": [],
-      "missingSlotProps": [],
+      "missingLocally": [
+        "appearance",
+        "disabled",
+        "disabledFocusable",
+        "iconPosition",
+        "shape",
+        "size"
+      ],
+      "missingSlotProps": [
+        "icon"
+      ],
       "localAdditions": [
         "children",
         "onClick"
@@ -6443,13 +6582,17 @@
       "family": "teaching-popover",
       "component": "TeachingPopoverTrigger",
       "localComponent": "TeachingPopoverTrigger",
-      "status": "own-prop-names-covered",
-      "fluentOwnProps": [],
+      "status": "review-prop-gaps",
+      "fluentOwnProps": [
+        "disableButtonEnhancement"
+      ],
       "fluentSlotProps": [],
       "localOwnProps": [
         "children"
       ],
-      "missingLocally": [],
+      "missingLocally": [
+        "disableButtonEnhancement"
+      ],
       "missingSlotProps": [],
       "localAdditions": [
         "children"

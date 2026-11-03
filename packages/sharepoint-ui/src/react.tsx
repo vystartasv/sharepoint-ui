@@ -1559,10 +1559,12 @@ type TagPickerReactOptionSelectData = { value: string; selectedOptions: string[]
   | { type: "click"; event: React.MouseEvent<HTMLDivElement> }
   | { type: "keydown"; event: React.KeyboardEvent<HTMLDivElement> }
 );
-export type TagPickerProps = Omit<ElementProps, "onChange"> & { children?: React.ReactNode; label?: string; selectedLabel?: string; form?: string; selectedValues?: string[]; defaultSelectedValues?: string[]; inputValue?: string; open?: boolean; defaultOpen?: boolean; inline?: boolean; noPopover?: boolean; onOpenChange?: (event: SharePointUIEvent, data: TagPickerReactOpenChangeData) => void; onOptionSelect?: (event: SharePointUIEvent, data: TagPickerReactOptionSelectData) => void; onInputValueChange?: (value: string) => void; onChange?: (values: string[]) => void };
-export const TagPicker = /* @__PURE__ */ React.forwardRef<HTMLElement, TagPickerProps>(function TagPicker({ children, label, selectedLabel, selectedValues, defaultSelectedValues, inputValue, open, defaultOpen, inline = false, noPopover = false, onOpenChange, onOptionSelect, onInputValueChange, onChange, ...props }: TagPickerProps, forwardedRef): React.ReactElement {
+export type TagPickerProps = Omit<ElementProps, "onChange"> & { children?: React.ReactNode; label?: string; selectedLabel?: string; form?: string; disabled?: boolean; selectedOptions?: readonly string[]; defaultSelectedOptions?: readonly string[]; selectedValues?: readonly string[]; defaultSelectedValues?: readonly string[]; inputValue?: string; open?: boolean; defaultOpen?: boolean; positioning?: TooltipPositioning; disableAutoFocus?: boolean; inline?: boolean; noPopover?: boolean; onOpenChange?: (event: SharePointUIEvent, data: TagPickerReactOpenChangeData) => void; onOptionSelect?: (event: SharePointUIEvent, data: TagPickerReactOptionSelectData) => void; onInputValueChange?: (value: string) => void; onChange?: (values: string[]) => void };
+export const TagPicker = /* @__PURE__ */ React.forwardRef<HTMLElement, TagPickerProps>(function TagPicker({ children, label, selectedLabel, selectedOptions, defaultSelectedOptions, selectedValues, defaultSelectedValues, inputValue, open, defaultOpen, positioning, disableAutoFocus = false, inline = false, noPopover = false, disabled, onOpenChange, onOptionSelect, onInputValueChange, onChange, ...props }: TagPickerProps, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
+  const selected = selectedOptions ?? selectedValues;
+  const defaultSelected = defaultSelectedOptions ?? defaultSelectedValues;
   const strings = React.useContext(UIContext).strings;
   ensureDefined(defineTagPicker);
   useSpuiEvent(ref, "spui-change", detail => onChange?.(detail.values ?? detail.selectedValues ?? []));
@@ -1586,12 +1588,13 @@ export const TagPicker = /* @__PURE__ */ React.forwardRef<HTMLElement, TagPicker
   });
   React.useLayoutEffect(() => {
     const element = ref.current as (HTMLElement & { value?: string[] }) | null;
-    if (element && selectedValues !== undefined) element.value = selectedValues;
+    if (element && selected !== undefined) element.value = [...selected];
     if (element && inputValue !== undefined) (element as HTMLElement & { inputValue: string }).inputValue = inputValue;
     if (element && open !== undefined) (element as HTMLElement & { open: boolean }).open = open;
     else if (element && defaultOpen !== undefined) (element as HTMLElement & { defaultOpen: boolean }).defaultOpen = defaultOpen;
-  }, [selectedValues, inputValue, open, defaultOpen]);
-  return React.createElement("spui-tag-picker", useCustomElementProps({ ...props, ref, label, "selected-label": selectedLabel ?? strings.selectedOptionsLabel, "selected-values": defaultSelectedValues === undefined ? undefined : JSON.stringify(defaultSelectedValues), "input-value": inputValue, inline: inline || undefined, "no-popover": noPopover || undefined, "no-results": strings.noResults, "remove-label": strings.remove }), children);
+  }, [selected, inputValue, open, defaultOpen]);
+  React.useLayoutEffect(() => { const element = ref.current as (HTMLElement & { positioning?: TooltipPositioning }) | null; if (element) element.positioning = positioning; }, [positioning]);
+  return React.createElement("spui-tag-picker", useCustomElementProps({ ...props, ref, label, disabled, "disable-auto-focus": disableAutoFocus || undefined, "selected-label": selectedLabel ?? strings.selectedOptionsLabel, "default-selected-options": defaultSelected === undefined ? undefined : JSON.stringify(defaultSelected), "input-value": inputValue, inline: inline || undefined, "no-popover": noPopover || undefined, "no-results": strings.noResults, "remove-label": strings.remove }), children);
 });
 
 export function TagPickerControl({ children, secondaryAction, expandIcon }: ElementProps & { children?: React.ReactNode; secondaryAction?: React.ReactNode; expandIcon?: React.ReactNode }): React.ReactElement {
@@ -1604,7 +1607,7 @@ export const TagPickerGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, Elem
   return React.createElement("spui-tag-picker-group", useCustomElementProps({ ref: forwardedRef, ...props, slot: "selected-group", role: "group", "aria-label": props["aria-label"] ?? label }), children);
 });
 
-export const TagPickerInput = /* @__PURE__ */ React.forwardRef<HTMLElement, Omit<ElementProps, "children"> & { value?: string; placeholder?: string; disabled?: boolean; clearable?: boolean; appearance?: "filled-darker" | "filled-lighter" | "outline"; onValueChange?: (value: string) => void }>(function TagPickerInput({ value, placeholder, disabled = false, clearable = false, appearance, onValueChange, ...props }: Omit<ElementProps, "children"> & { value?: string; placeholder?: string; disabled?: boolean; clearable?: boolean; appearance?: "filled-darker" | "filled-lighter" | "outline"; onValueChange?: (value: string) => void }, forwardedRef): React.ReactElement {
+export const TagPickerInput = /* @__PURE__ */ React.forwardRef<HTMLElement, Omit<ElementProps, "children"> & { value?: string; placeholder?: string; disabled?: boolean; clearable?: boolean; appearance?: "filled-darker" | "filled-lighter" | "outline" | "underline"; onValueChange?: (value: string) => void }>(function TagPickerInput({ value, placeholder, disabled = false, clearable = false, appearance, onValueChange, ...props }: Omit<ElementProps, "children"> & { value?: string; placeholder?: string; disabled?: boolean; clearable?: boolean; appearance?: "filled-darker" | "filled-lighter" | "outline" | "underline"; onValueChange?: (value: string) => void }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   React.useEffect(() => {
@@ -1617,12 +1620,12 @@ export const TagPickerInput = /* @__PURE__ */ React.forwardRef<HTMLElement, Omit
   return React.createElement("spui-tag-picker-input", useCustomElementProps({ ...props, ref, value, placeholder, disabled: disabled || undefined, clearable: clearable || undefined, appearance }));
 });
 
-export function TagPickerList({ children }: ElementProps & { children?: React.ReactNode; disableAutoFocus?: boolean }): React.ReactElement {
+export function TagPickerList({ children }: ElementProps & { children?: React.ReactNode }): React.ReactElement {
   return React.createElement(React.Fragment, null, children);
 }
 
-export function TagPickerButton({ children, appearance = "secondary", size = "medium", disabled = false, ...props }: ElementProps & { children?: React.ReactNode; appearance?: ButtonAppearance; size?: ButtonSize; disabled?: boolean }): React.ReactElement {
-  return React.createElement(Button, { ...props, slot: "button", type: "button", appearance, size, disabled: disabled || undefined }, children);
+export function TagPickerButton({ children, appearance = "outline", size = "medium", disabled = false, ...props }: ElementProps & { children?: React.ReactNode; appearance?: "filled-darker" | "filled-lighter" | "outline" | "underline"; size?: "small" | "medium" | "large"; disabled?: boolean }): React.ReactElement {
+  return React.createElement("button", useCustomElementProps({ ...props, slot: "button", type: "button", "data-appearance": appearance, "data-size": size, disabled: disabled || undefined }), children);
 }
 
 export const TagPickerOption = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { value: string; text?: string; label?: string; group?: string; media?: React.ReactNode; secondaryContent?: React.ReactNode; disabled?: boolean; children?: React.ReactNode }>(function TagPickerOption({ value, text, label, group, media, secondaryContent, disabled = false, children, ...props }: ElementProps & { value: string; text?: string; label?: string; group?: string; media?: React.ReactNode; secondaryContent?: React.ReactNode; disabled?: boolean; children?: React.ReactNode }, forwardedRef): React.ReactElement {

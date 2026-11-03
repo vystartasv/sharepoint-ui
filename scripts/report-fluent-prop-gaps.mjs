@@ -79,6 +79,7 @@ function buildFluentAliases(sourceFile, fluentFiles, seen = new Set()) {
     const dependency = fluentFiles.find(([packageName]) => packageName === statement.moduleSpecifier.text)?.[2];
     if (!dependency) continue;
     const dependencyAliases = buildFluentAliases(dependency, fluentFiles, nextSeen);
+    for (const [dependencyName, dependencyType] of dependencyAliases) if (!aliases.has(dependencyName)) aliases.set(dependencyName, dependencyType);
     for (const element of statement.importClause.namedBindings.elements) {
       const importedName = element.propertyName?.text ?? element.name.text;
       const localName = element.name.text;
@@ -232,9 +233,9 @@ function literalPropsFromType(type, aliases) {
 }
 function walk(node, callback) { callback(node); ts.forEachChild(node, child => walk(child, callback)); }
 
-function getFluentOwnProps(source, componentName) {
+function getFluentOwnProps(source, componentName, fluentFiles) {
   if (!source) return undefined;
-  const aliases = buildAliases(source);
+  const aliases = buildFluentAliases(source, fluentFiles);
   const publicNames = new Map();
   walk(source, node => {
     if (!ts.isExportDeclaration(node) || !node.exportClause || !ts.isNamedExports(node.exportClause)) return;
@@ -367,7 +368,7 @@ for (const family of baseline.families) {
     const localComponent = [localName, ...supplementalLocals].join(" + ");
     const sourcePackage = fluentPackageOverridesByComponent.get(contractKey) ?? defaultPackageName;
     const sourceForComponent = fluentFiles.find(([packageName]) => packageName === sourcePackage)?.[2];
-    const fluentContract = getFluentOwnProps(sourceForComponent, name);
+    const fluentContract = getFluentOwnProps(sourceForComponent, name, fluentFiles);
     if (!fluentContract || !localProps) {
       const missingPackage = !sourceForComponent;
       results.push({ family: family.family, component: name, localComponent, status: missingPackage ? "unavailable-baseline" : "manual-review", referencePackage: sourcePackage, reason: missingPackage ? `The reference package ${sourcePackage} is not installed in this SPFx dependency tree, so its declaration cannot be audited here.` : !fluentContract ? "Fluent component prop type was not resolved from the installed declaration" : "Local prop type is indirect or not a direct exported function" });
@@ -406,7 +407,7 @@ for (const [family, component, expectedSlots] of knownSlotContracts) {
 const report = {
   baseline: `${baseline.reference}@${baseline.version}`,
   fluentPackages: fluentFiles.filter(([, , file]) => file).length,
-  scope: "Named own props, public slot props declared through Fluent ComponentProps<Slots>, and resolvable string/number/boolean literal-union values versus local exported adapter props; local aliases, union/intersection branches, Pick/Omit key filtering, overloads, and Parameters<typeof Component>[0] are resolved. Value comparison reports only when both sides resolve to literal sets. SearchBox and DataGrid resolve from their actual Fluent subpackages. Non-component utilities are classified separately; absent reference packages are reported as unavailable rather than counted as prop gaps. Inherited React/DOM props and runtime semantics are excluded.",
+  scope: "Declared component props including explicitly imported/picked inherited component contracts, public slot props declared through Fluent ComponentProps<Slots>, and resolvable string/number/boolean literal-union values versus local exported adapter props; local aliases, union/intersection branches, Pick/Omit key filtering, overloads, and Parameters<typeof Component>[0] are resolved. Value comparison reports only when both sides resolve to literal sets. SearchBox and DataGrid resolve from their actual Fluent subpackages. Non-component utilities are classified separately; absent reference packages are reported as unavailable rather than counted as prop gaps. Generic inherited React/DOM props and runtime semantics are excluded.",
   summary: {
     comparedComponents: results.filter(result => !["manual-review", "unavailable-baseline", "non-component-contract"].includes(result.status)).length,
     missingLocalComponentExports: results.filter(result => result.status === "missing-local-export").length,

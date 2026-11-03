@@ -1,5 +1,6 @@
 import { base } from "./shared.js";
-import { getFloatingPosition } from "./floating-position.js";
+import { getFloatingPosition, type FloatingAlign, type FloatingPlacement } from "./floating-position.js";
+import type { TooltipPositioning, TooltipPositioningOptions } from "./tooltip.js";
 
 type PickerOption = { value: string; label: string; group: string; disabled: boolean; selected: boolean; element: Element };
 export type TagPickerOpenChangeType = "click" | "keydown" | "input" | "focus" | "focusout" | "blur" | "pointerdown" | "programmatic";
@@ -19,7 +20,7 @@ export function defineTagPicker(): void {
   if (customElements.get("spui-tag-picker")) return;
   class SpuiTagPicker extends HTMLElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "placeholder", "selected-values", "input-value", "input-appearance", "input-disabled", "input-aria-label", "input-aria-describedby", "clearable", "selected-label", "inline", "no-popover", "disabled", "required", "name", "no-results", "remove-label", "open", "default-open", "aria-label", "aria-describedby"];
+    static observedAttributes = ["label", "placeholder", "selected-values", "selected-options", "default-selected-options", "input-value", "input-appearance", "input-disabled", "input-aria-label", "input-aria-describedby", "clearable", "selected-label", "inline", "no-popover", "disabled", "required", "name", "no-results", "remove-label", "open", "default-open", "positioning", "disable-auto-focus", "aria-label", "aria-describedby"];
     private internals?: ElementInternals;
     private observer?: MutationObserver;
     private resizeObserver?: ResizeObserver;
@@ -33,6 +34,7 @@ export function defineTagPicker(): void {
     private openControlled = false;
     private formDisabled = false;
     private initialValues: string[] = [];
+    private positioningValue?: TooltipPositioning;
 
     get form(): HTMLFormElement | null { return this.internals?.form ?? null; }
 
@@ -74,7 +76,7 @@ export function defineTagPicker(): void {
 
     attributeChangedCallback(name: string, _oldValue: string | null, value: string | null): void {
       if (!this.isConnected) return;
-      if (name === "selected-values") {
+      if (name === "selected-values" || name === "selected-options" || name === "default-selected-options") {
         this.initialValues = this.readSelectedValues();
         this.selected = new Set(this.initialValues);
         this.renderOptions();
@@ -95,6 +97,8 @@ export function defineTagPicker(): void {
       } else if (name === "aria-label" || name === "aria-describedby") {
         const input = this.input();
         if (input) this.getAttribute(name) === null ? input.removeAttribute(name) : input.setAttribute(name, this.getAttribute(name)!);
+      } else if (name === "positioning") {
+        this.positionList();
       } else if (name === "open") {
         this.openControlled = this.hasAttribute("open");
         if (this.openControlled) this.openState = this.getAttribute("open") !== "false";
@@ -113,10 +117,16 @@ export function defineTagPicker(): void {
     set inputValue(value: string) { this.query = String(value ?? ""); const input = this.input(); if (input) input.value = this.query; this.renderOptions(); }
     get selectedValues(): string[] { return this.value; }
     set selectedValues(values: string[]) { this.value = values; }
+    get selectedOptions(): string[] { return this.value; }
+    set selectedOptions(values: string[]) { this.value = values; }
+    get defaultSelectedOptions(): string[] { return this.readSelectedValues(); }
+    set defaultSelectedOptions(values: string[]) { this.setAttribute("default-selected-options", JSON.stringify(values)); }
     get open(): boolean { return this.openState; }
     set open(value: boolean) { this.openControlled = true; this.openState = Boolean(value); this.syncAria(); }
     get defaultOpen(): boolean { return this.openState; }
     set defaultOpen(value: boolean) { if (!this.openControlled) { this.openState = Boolean(value); this.syncAria(); } }
+    get positioning(): TooltipPositioning | undefined { return this.positioningValue; }
+    set positioning(value: TooltipPositioning | undefined) { this.positioningValue = value; this.positionList(); }
 
     private isDisabled(): boolean { return this.formDisabled || this.hasAttribute("disabled"); }
     private setOpen(value: boolean, reason: string, event?: Event): void {
@@ -144,7 +154,7 @@ export function defineTagPicker(): void {
       if (!trigger || !event.composedPath().includes(trigger)) return;
       if (this.isDisabled()) { event.preventDefault(); return; }
       if (this.open) this.closeList("pointer", event);
-      else { this.setOpen(true, "pointer", event); this.activeIndex = this.filteredOptions().findIndex(option => !option.disabled); this.syncAria(); }
+      else { this.setOpen(true, "pointer", event); this.activeIndex = this.hasAttribute("disable-auto-focus") ? -1 : this.filteredOptions().findIndex(option => !option.disabled); this.syncAria(); }
     };
     private readonly onButtonKeyDown = (event: KeyboardEvent): void => {
       const trigger = this.buttonTrigger();
@@ -185,9 +195,21 @@ export function defineTagPicker(): void {
       const width = Math.min(rect.width, window.innerWidth - 8);
       popup.style.width = `${width}px`;
       const direction = getComputedStyle(this).direction === "rtl" ? "rtl" : "ltr";
-      const position = getFloatingPosition(rect, { width: popup.offsetWidth, height: popup.offsetHeight }, "bottom", direction, 4);
+      const config = this.positioningValue;
+      const raw = typeof config === "string" ? config : config?.position ?? "below";
+      const [side = "below", suffix] = raw.split("-");
+      const placementMap: Record<string, FloatingPlacement> = { above: "top", below: "bottom", before: "start", after: "end", top: "top", bottom: "bottom", left: "left", right: "right", start: "start", end: "end" };
+      const placement = placementMap[side] ?? "bottom";
+      const align = (typeof config === "object" && config ? config.align : undefined) ?? (suffix === "start" || suffix === "end" || suffix === "top" || suffix === "bottom" ? suffix as FloatingAlign : "start");
+      const options = typeof config === "object" && config ? config as TooltipPositioningOptions : undefined;
+      const offset = typeof options?.offset === "number" ? options.offset : typeof options?.offset === "object" ? options.offset.mainAxis : 4;
+      const fallback = (options?.fallbackPositions ?? []).map(value => {
+        const [fallbackSide, fallbackAlign] = value.split("-");
+        return { placement: placementMap[fallbackSide] ?? "bottom", align: fallbackAlign as FloatingAlign | undefined };
+      });
+      const position = getFloatingPosition(rect, { width: popup.offsetWidth, height: popup.offsetHeight }, placement, direction, offset, undefined, align, fallback, options?.pinned, undefined, undefined, { coverTarget: options?.coverTarget });
       popup.dataset.placement = position.placement;
-      popup.style.left = `${Math.max(4, Math.min(direction === "rtl" ? rect.right - popup.offsetWidth : rect.left, window.innerWidth - popup.offsetWidth - 4))}px`;
+      popup.style.left = `${position.left}px`;
       popup.style.top = `${position.top}px`;
     };
     private syncButtonSlot(): void { this.toggleAttribute("data-button-trigger", this.buttonTrigger() !== null); this.syncAria(); }
@@ -217,7 +239,7 @@ export function defineTagPicker(): void {
       })).filter(option => option.value && option.label);
     }
     private readSelectedValues(): string[] {
-      const serialized = this.getAttribute("selected-values");
+      const serialized = this.getAttribute("selected-options") ?? this.getAttribute("selected-values") ?? this.getAttribute("default-selected-options");
       if (serialized !== null) { try { const values: unknown = JSON.parse(serialized); return Array.isArray(values) ? values.filter((value): value is string => typeof value === "string") : []; } catch { return []; } }
       return this.options().filter(option => option.selected).map(option => option.value);
     }
@@ -387,7 +409,7 @@ export function defineTagPicker(): void {
       const popup = document.createElement("div"); popup.className = "popup"; popup.setAttribute("popover", "manual"); popup.hidden = true; popup.part.add("popup");
       const list = document.createElement("ul"); list.id = `${this.instanceId}-listbox`; list.setAttribute("role", "listbox"); list.setAttribute("aria-multiselectable", "true"); list.part.add("listbox");
       const empty = document.createElement("div"); empty.className = "empty"; empty.setAttribute("role", "status"); empty.hidden = true;
-      input.addEventListener("input", event => { this.query = input.value; this.setOpen(true, "input", event); this.activeIndex = this.filteredOptions().findIndex(option => !option.disabled); this.renderOptions(); this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.query }, bubbles: true, composed: true })); });
+      input.addEventListener("input", event => { this.query = input.value; this.setOpen(true, "input", event); this.activeIndex = this.hasAttribute("disable-auto-focus") ? -1 : this.filteredOptions().findIndex(option => !option.disabled); this.renderOptions(); this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.query }, bubbles: true, composed: true })); });
       input.addEventListener("focus", event => { this.setOpen(true, "focus", event); this.renderOptions(); });
       input.addEventListener("keydown", event => this.onKeyDown(event));
       input.addEventListener("blur", event => window.setTimeout(() => { if (!this.matches(":focus-within")) this.closeList("blur", event); }, 0));
@@ -396,8 +418,8 @@ export function defineTagPicker(): void {
       const style = document.createElement("style");
       style.textContent = `${base}:host{display:grid;gap:var(--spui-control-gap,6px);min-width:0}label{font-size:14px;font-weight:600;color:var(--spui-ui-muted,var(--spui-semantic-body-text,inherit))}.control{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:4px;box-sizing:border-box;min-height:var(--spui-control-height,36px);padding:4px 8px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,var(--spui-semantic-input-border,#8a8886)));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,var(--spui-semantic-input-background,#fff)));color:var(--spui-ui-text,inherit)}.control:focus-within{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#0078d4));outline-offset:1px}.selected{display:contents}.chip{display:inline-flex;align-items:center;gap:4px;max-width:100%;padding:2px 5px 2px 8px;border:1px solid var(--spui-base-stroke,var(--spui-ui-stroke,#d1d1d1));border-radius:999px;background:color-mix(in srgb,var(--spui-base-accent,var(--spui-ui-accent,#0078d4)) 12%,var(--spui-base-surface,var(--spui-ui-surface,#fff)));font-size:12px}.chip>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.remove{display:grid;place-items:center;flex:none;width:20px;height:20px;padding:0;border:0;border-radius:50%;background:transparent;color:inherit;font:inherit;font-size:16px;cursor:pointer}.remove:hover{background:color-mix(in srgb,currentColor 12%,transparent)}.remove:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#0078d4))}.remove:disabled{opacity:.5;cursor:not-allowed}input{flex:1 1 100px;min-width:72px;width:auto;min-height:28px;padding:2px 4px;border:0;outline:none;background:transparent;color:inherit;font:inherit}input::placeholder{color:var(--spui-ui-muted,#616161)}input:disabled{cursor:not-allowed}ul{position:absolute;z-index:var(--spui-layer-dropdown,20);top:calc(100% + 4px);inset-inline:0;box-sizing:border-box;max-height:240px;overflow:auto;margin:0;padding:4px;list-style:none;border:1px solid var(--spui-ui-stroke,#d1d1d1);border-radius:var(--spui-card-radius,8px);background:var(--spui-ui-surface,#fff);box-shadow:var(--spui-card-shadow,0 4px 14px #0002)}ul[hidden]{display:none}.group-heading{padding:7px 10px 3px;color:var(--spui-ui-muted,inherit);font-size:11px;font-weight:600}li[role=option]{padding:8px 10px;border-radius:var(--spui-control-radius,4px);color:var(--spui-ui-text,inherit);cursor:pointer}li[role=option][data-active=true],li[role=option][aria-selected=true]{background:var(--spui-ui-surface-hover,var(--spui-ui-canvas,#f5f5f5))}li[role=option][aria-disabled=true]{opacity:.5;cursor:not-allowed}.empty{position:absolute;z-index:calc(var(--spui-layer-dropdown,20) + 1);top:calc(100% + 4px);inset-inline:0;box-sizing:border-box;padding:12px;border:1px solid var(--spui-ui-stroke,#d1d1d1);border-radius:var(--spui-card-radius,8px);background:var(--spui-ui-surface,#fff);box-shadow:var(--spui-card-shadow,0 4px 14px #0002);color:var(--spui-ui-muted,inherit)}.empty[hidden]{display:none}:host([disabled]) .control{opacity:.55}@media(forced-colors:active){.control,ul,.empty{border-color:CanvasText}.chip{border-color:CanvasText}li[role=option][data-active=true]{outline:1px solid Highlight}}`;
       style.textContent += `.option-group{list-style:none;margin:0;padding:0}.option-media{display:inline-flex;align-items:center;justify-content:center;flex:none}.option-media img,.option-media svg{width:24px;height:24px;object-fit:cover}.chip .option-media img,.chip .option-media svg{width:20px;height:20px;border-radius:50%}li[role=option],[role=group] [role=option]{display:flex;align-items:center;gap:8px}.option-group-options [role=option]{padding:8px 10px;border-radius:var(--spui-control-radius,4px);color:var(--spui-ui-text,inherit);cursor:pointer}.option-group-options [role=option][data-active=true],.option-group-options [role=option][aria-selected=true]{background:var(--spui-ui-surface-hover,var(--spui-ui-canvas,#f5f5f5))}.option-group-options [role=option][aria-disabled=true]{opacity:.5;cursor:not-allowed}.option-label{min-width:0;overflow:hidden;text-overflow:ellipsis}.option-secondary{margin-inline-start:auto;color:var(--spui-ui-muted,inherit);font-size:12px;white-space:nowrap}`;
-      style.textContent += `:host([data-button-trigger]) input{display:none}::slotted(button[slot=button]){align-self:center;display:inline-flex;align-items:center;min-width:32px;min-height:28px;padding:4px 8px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#8a8886));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit;cursor:pointer}::slotted(button[slot=button]:focus-visible){outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#0078d4));outline-offset:1px}:host([disabled])::slotted(button[slot=button]){opacity:.55;cursor:not-allowed}`;
-      style.textContent += `::slotted(spui-tag-picker-group){display:contents}:host([input-appearance=filled-darker]) .control{background:var(--spui-ui-surface-sunken,var(--spui-ui-canvas,#f5f5f5))}:host([input-appearance=filled-lighter]) .control{background:var(--spui-ui-surface,var(--spui-semantic-input-background,#fff))}`;
+      style.textContent += `:host([data-button-trigger]) input{display:none}::slotted(button[slot=button]){align-self:center;display:inline-flex;align-items:center;min-width:32px;min-height:28px;padding:4px 8px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#8a8886));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit;cursor:pointer}::slotted(button[slot=button][data-appearance=filled-darker]){background:var(--spui-ui-surface-sunken,var(--spui-ui-canvas,#f5f5f5))}::slotted(button[slot=button][data-appearance=filled-lighter]){background:var(--spui-ui-surface,var(--spui-semantic-input-background,#fff))}::slotted(button[slot=button][data-appearance=underline]){border:0;border-bottom:1px solid currentColor;border-radius:0;background:transparent}::slotted(button[slot=button][data-size=small]){min-height:24px;padding:2px 6px;font-size:12px}::slotted(button[slot=button][data-size=large]){min-height:40px;padding:6px 12px;font-size:16px}::slotted(button[slot=button]:focus-visible){outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#0078d4));outline-offset:1px}:host([disabled])::slotted(button[slot=button]){opacity:.55;cursor:not-allowed}`;
+      style.textContent += `::slotted(spui-tag-picker-group){display:contents}:host([input-appearance=filled-darker]) .control{background:var(--spui-ui-surface-sunken,var(--spui-ui-canvas,#f5f5f5))}:host([input-appearance=filled-lighter]) .control{background:var(--spui-ui-surface,var(--spui-semantic-input-background,#fff))}:host([input-appearance=underline]) .control{border:0;border-bottom:1px solid var(--spui-control-border,var(--spui-ui-stroke,#8a8886));border-radius:0;background:transparent}`;
       style.textContent += `::slotted([slot=secondary-action]){display:inline-flex;align-items:center;flex:none}::slotted([slot=expand-icon]){display:inline-flex;align-items:center;justify-content:center;flex:none}:host([inline]) .popup,:host([no-popover]) .popup{position:absolute;inset-inline:0;top:calc(100% + 4px);left:auto;width:100%!important;max-height:min(240px,calc(100dvh - 8px));z-index:var(--spui-layer-dropdown,20)}`;
       style.textContent += `.popup{position:fixed;inset:auto;z-index:var(--spui-layer-popover,10000);box-sizing:border-box;max-width:calc(100vw - 8px);max-height:min(240px,calc(100dvh - 8px));overflow:auto;margin:0;padding:4px;border:1px solid var(--spui-ui-stroke,#d1d1d1);border-radius:var(--spui-card-radius,8px);background:var(--spui-ui-surface,#fff);color:var(--spui-ui-text,inherit);box-shadow:var(--spui-card-shadow,0 4px 14px #0002)}.popup[hidden]{display:none}.popup ul{position:static;inset:auto;z-index:auto;max-height:none;overflow:visible;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}.popup .empty{position:static;inset:auto;z-index:auto;margin:0;padding:12px;border:0;border-radius:0;background:transparent;box-shadow:none}`;
       const slot = document.createElement("slot"); slot.hidden = true;
