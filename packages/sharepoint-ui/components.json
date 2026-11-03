@@ -2247,6 +2247,10 @@
           {
             "name": "RichTextEditorProps.editorLabel",
             "description": "Accessible name used when no aria-label or visible label is supplied; defaults to SharePointUIProvider.strings.richTextEditorLabel."
+          },
+          {
+            "name": "RichTextEditorProps.onValueChange",
+            "description": "Receives sanitized HTML after edits. With a controlled value prop, update that prop from this callback; the editor preserves its live selection while React applies the committed value."
           }
         ],
         "callbackProps": [

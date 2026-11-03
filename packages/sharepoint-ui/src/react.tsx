@@ -1965,7 +1965,6 @@ export const RichTextEditor = /* @__PURE__ */ React.forwardRef<HTMLElement, Rich
   React.useEffect(() => { const element = ref.current as (HTMLElement & { uploadImage?: (file: File) => Promise<string> }) | null; if (element) element.uploadImage = onImageUpload; return () => { if (element) delete element.uploadImage; }; }, [onImageUpload]);
   useSpuiEvent(ref, "spui-input", value !== undefined || onValueChange ? detail => {
     onValueChange?.(String(detail.value ?? ""));
-    if (value !== undefined && ref.current) (ref.current as HTMLElement & { value: string }).value = value;
   } : undefined);
   React.useLayoutEffect(() => {
     const element = ref.current as (HTMLElement & { value?: string }) | null;
