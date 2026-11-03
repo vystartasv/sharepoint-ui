@@ -2,6 +2,8 @@
 
 Use this page as the short route from a SharePoint task to a working component. The library is designed for SPFx 1.24 and React 18, but its custom elements can be used without React.
 
+For the predictable cross-component pattern and copy-ready Tooltip/Persona composition, start with [`QUICKSTART.md`](./QUICKSTART.md). Component pages and their linked JSON slices supply the exact component-specific props, slots, and callback signatures.
+
 ## Pick the smallest entry point
 
 - In an SPFx React web part, import the React adapter from `@spfx-fast/sharepoint-ui/react` and import only the components used.

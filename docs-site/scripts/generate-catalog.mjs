@@ -237,7 +237,7 @@ for (const [module, entries] of familyIndex) {
     const customExample = entry.tag?.startsWith("spui-") && markup ? `\n<details>\n<summary>${example.related ? "Composed custom element example" : "Custom element markup"}</summary>\n\n\`\`\`html\n${markup}\n\`\`\`\n\n</details>` : "";
     const relatedPreview = !entry.tag?.startsWith("spui-") && markup ? `\n<details>\n<summary>Related live preview markup</summary>\n\n\`\`\`html\n${markup}\n\`\`\`\n\n</details>` : "";
     const agentSlice = `/sharepoint-ui/agents/components/${slugFor(module)}/${slug}.json`;
-    const agentPath = `\n> **Building with an agent?** Use the [quickstart](/sharepoint-ui/agents/QUICKSTART.md) and this component’s [API slice](${agentSlice}). The same integration pattern applies across components.\n`;
+    const agentPath = `\n> **Building with an agent?** Follow the [component conventions](/sharepoint-ui/guides/component-patterns/), then use the [quickstart](/sharepoint-ui/agents/QUICKSTART.md) and this component’s [API slice](${agentSlice}).\n`;
     const page = `---\ntitle: ${quote(name)}\ndescription: ${quote(entry.summary ?? firstSummary)}\n---\n\nimport ComponentPreviewRuntime from "../../../../components/ComponentPreviewRuntime.astro";\n\n<ComponentPreviewRuntime />\n\n${entry.summary ?? ""}\n${agentPath}\n${preview}\n${properties}\n${slotTable}\n<div class="api-entry">\n  <p class="api-meta"><span>${react}</span><span>${reactRoot}</span><span>${customElement}</span></p>\n  <p><strong>Callbacks:</strong> ${callbacks}</p>\n  <p><strong>Styling:</strong> ${styling}</p>\n  ${signature}\n  ${relatedApis}\n</div>\n${customExample}${relatedPreview}\n`;
     await writeFile(join(familyDir, `${slug}.mdx`), page);
     items.push(`- [${name}](${pagePath})`);

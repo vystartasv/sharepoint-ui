@@ -39,7 +39,9 @@ const sourceAgentGuide = await readFile(resolve(packageRoot, "AGENTS.md"), "utf8
 const agentGuide = sourceAgentGuide.replace("](../../investigation/FLUENT-V9-PARITY-PLAN.md)", "](https://github.com/vystartasv/sharepoint-ui/blob/main/investigation/FLUENT-V9-PARITY-PLAN.md)");
 await writeFile(join(output, "AGENTS.md"), agentGuide);
 const sourceSkill = await readFile(resolve(skillRoot, "SKILL.md"), "utf8");
-const publishedSkill = sourceSkill.replace("`../../components.json`", "[`components.json`](https://vystartasv.github.io/sharepoint-ui/agents/components.json)");
+const publishedSkill = sourceSkill
+  .replace("`../../components.json`", "[`components.json`](https://vystartasv.github.io/sharepoint-ui/agents/components.json)")
+  .replace("](../../QUICKSTART.md)", "](https://vystartasv.github.io/sharepoint-ui/agents/QUICKSTART.md)");
 await writeFile(join(output, "SKILL.md"), publishedSkill);
 await mkdir(join(output, "references"), { recursive: true });
 for (const name of ["choosing-components.md", "sharepoint-patterns.md"]) {

@@ -34,6 +34,39 @@ export function RequestList({
 
 In the web part, pass `this.context.pageContext.cultureInfo.currentUICultureName` as `locale`. For a single control, import its React export from `/react`; import only what the view uses.
 
+## The shared component pattern
+
+- Every React adapter is a named export from `@spfx-fast/sharepoint-ui/react`. React imports register the element automatically; do not call `defineX()` in React.
+- Put `SharePointUIProvider` once around the view. Theme, font, locale, direction, and provider strings flow to descendants.
+- Compose components with children. Use a named slot or a component-specific prop only when its page documents one; the `Slots` table shows the exact names.
+- When an API has controlled state, pass its state prop and update it in the documented callback. `defaultX` supplies initial state where supported. State names and callback arguments are component-specific; copy them from that component’s page rather than guessing.
+- Styling and host attributes belong on the component host. Use inherited theme tokens, documented CSS custom properties or `::part` hooks; do not target shadow-DOM internals.
+- Keep labels, accessible names, and app behavior in the host view. The component handles its documented interaction and reports changes; the web part handles SharePoint data and persistence.
+
+Use composition like this:
+
+```tsx
+import { Avatar, Button, Persona, Tooltip } from "@spfx-fast/sharepoint-ui/react";
+
+export function RequestActions({ openRequest, photoUrl }: { openRequest: () => void; photoUrl: string }) {
+  return (
+    <>
+      <Tooltip content="Opens the request details">
+        <Button onClick={openRequest}>Open request</Button>
+      </Tooltip>
+      <Persona
+        name="Ada Lovelace"
+        primaryText="Ada Lovelace"
+        secondaryText="Engineering"
+        avatar={<Avatar name="Ada Lovelace" image={photoUrl} decorative />}
+      />
+    </>
+  );
+}
+```
+
+`Tooltip` uses its children as the trigger and its `content` as the tooltip. `Persona` accepts identity text directly and an optional composed `Avatar`. Other components follow the same import, provider, children, and host-styling rules; use their own page for their specific props, slots, and callback signatures. For Tooltip controlled visibility, use `open` with `onOpenChange`; `visible` and `onVisibleChange` remain compatibility aliases.
+
 ## Another framework or plain HTML
 
 Import only the component’s leaf factory, register it once, then use its documented custom-element tag and events:
@@ -54,4 +87,4 @@ defineButton();
 2. Use the matching component JSON slice linked from that page for exact types and callbacks.
 3. Keep app state and persistence in the host; connect documented callbacks to it.
 
-The same pattern applies across components. Add `SharePointUIProvider` once at the view root for React; custom elements inherit theme and direction from their host context. Use the human component page for a rendered example and this package’s `components.json` for machine-readable API data.
+The same pattern applies across components. Add `SharePointUIProvider` once at the view root for React; custom elements inherit theme and direction from their host context. Use the [component conventions guide](https://vystartasv.github.io/sharepoint-ui/guides/component-patterns/) for human-readable composition examples and the component page plus its JSON slice for exact APIs.

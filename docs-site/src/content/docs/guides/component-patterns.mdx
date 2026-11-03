@@ -1,0 +1,50 @@
+---
+title: How components fit together
+description: Learn the shared component pattern, then apply a component page’s exact API to any view.
+---
+
+Most components use the same integration shape: import a named React export, put the page under one provider, compose with children, and connect documented callbacks to your app. The component page supplies the exact props and slots for each control.
+
+## Compose familiar pieces
+
+`Tooltip` wraps its trigger as children. `Persona` uses identity props and can accept a composed `Avatar`:
+
+```tsx
+import { Avatar, Button, Persona, Tooltip } from "@spfx-fast/sharepoint-ui/react";
+
+export function RequestActions({ openRequest, photoUrl }: { openRequest: () => void; photoUrl: string }) {
+  return (
+    <>
+      <Tooltip content="Opens the request details">
+        <Button onClick={openRequest}>Open request</Button>
+      </Tooltip>
+      <Persona
+        name="Ada Lovelace"
+        primaryText="Ada Lovelace"
+        secondaryText="Engineering"
+        avatar={<Avatar name="Ada Lovelace" image={photoUrl} decorative />}
+      />
+    </>
+  );
+}
+```
+
+The React adapter registers the elements it uses. In React, import from `/react`; do not also call a custom-element factory. Put `SharePointUIProvider` around the whole view to inherit SharePoint theme tokens, font, language, direction, and localized strings.
+
+## What carries across components
+
+| Pattern | Shared behavior |
+| --- | --- |
+| Composition | Children compose by default. Named slots and component props such as `Persona.avatar` are listed on that component’s page. |
+| State | When controlled state is supported, the app passes the state prop and updates it from the matching callback. A `defaultX` prop is an initial value only when that component provides one. |
+| Styling | Theme tokens inherit from the provider. Put `className`, `style`, and `data-testid` on the host; use documented CSS variables and `::part` hooks for customization. |
+| Application behavior | Components report interaction; the web part owns SharePoint reads, writes, validation rules, and persistence. |
+| Direction | Set the content language on the provider. Direction follows the language unless an explicit region override is needed. |
+
+## Read the component-specific contract
+
+The API varies where the behavior varies. Do not assume every value prop is named `value`, every callback is `onChange`, or every callback has the same arguments. Copy the exact state prop, callback, slot name, and signature from the component page. For example, `Tooltip` uses `open` and `onOpenChange` for controlled visibility; its `visible` and `onVisibleChange` names remain compatibility aliases.
+
+For non-React apps, import only the component’s documented leaf factory and use its custom-element tag. HTML attributes handle simple values; assign objects and callbacks as DOM properties. Custom event names and `detail` payloads are component-specific, so use the documented event for that element rather than guessing it from a React callback name.
+
+Start with [Get started](/sharepoint-ui/getting-started/) for SPFx setup, or use the [agent quickstart](/sharepoint-ui/agents/QUICKSTART.md) for a compact machine-oriented version of these rules. Every component page links its matching machine-readable API slice.
