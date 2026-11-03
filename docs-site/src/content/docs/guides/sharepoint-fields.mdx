@@ -82,6 +82,22 @@ serializeSharePointChoiceValue(categoryField, ["Finance", "Operations"]);
 
 Pass `null` to clear a single field or a MultiChoice field. Unknown values throw when the field disallows fill-in choices; duplicate multi-values are removed while preserving their order.
 
+## Serialize the other common field types
+
+Use `serializeSharePointFieldValue()` for text, Note, Boolean, integer, number, currency, date/time, URL, Choice, MultiChoice, lookup, and person values. It routes the specialized choice and ID fields through the same validation as their focused helpers:
+
+```ts
+import { serializeSharePointFieldValue } from "@spfx-fast/sharepoint-ui/sharepoint-fields";
+
+serializeSharePointFieldValue(titleField, "Quarterly access review"); // { Title: "Quarterly access review" }
+serializeSharePointFieldValue(approvedField, true);                    // { Approved: true }
+serializeSharePointFieldValue(amountField, "125.50");                  // { Amount: 125.5 }
+serializeSharePointFieldValue(dueDateField, new Date());               // ISO date string
+serializeSharePointFieldValue(linkField, { url: "/sites/ops/guide", description: "Open guide" });
+```
+
+Use `null` to clear nullable values. Read-only fields are rejected. Numeric strings are parsed as whole values; non-finite numbers and unsafe integers are rejected. URL fields accept absolute HTTP(S) or server-relative URLs and serialize to SharePoint's [`SP.FieldUrlValue`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.sharepoint.client.fieldurlvalue?view=sharepoint-csom) shape. Date-only ISO strings are preserved, date-time strings with a timezone keep that offset, and local date-time strings or `Date` objects become ISO UTC strings. The helper does not send the request or replace SharePoint-side validation.
+
 ## Render with existing controls
 
 The recipe uses the same component names and prop concepts used elsewhere in the library. A choice field can be rendered as a Select without inventing app-specific naming:
@@ -109,4 +125,4 @@ import { RichTextEditor } from "@spfx-fast/sharepoint-ui/react";
 <RichTextEditor label={field.label} name={field.name} required={field.required} field={column} />
 ```
 
-The adapter describes the editor and provides helpers for lookup option URLs and lookup/person ID payloads. Your app still owns authorized fetching, people search, field-specific validation, general value serialization, and persistence. It never treats unknown field types as text or claims a save succeeded before SharePoint confirms it.
+The adapter describes the editor and provides helpers for lookup option URLs and field-value payloads. Your app still owns authorized fetching, people search, permissions, persistence, and handling SharePoint's response. Unknown field types remain explicit instead of being coerced to text.

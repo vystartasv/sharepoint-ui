@@ -91,6 +91,10 @@ export type SharePointLookupValue = SharePointLookupId | readonly SharePointLook
 export type SharePointLookupUpdate = Record<string, number | null | { results: number[] }>;
 export type SharePointChoiceValue = string | readonly string[] | null;
 export type SharePointChoiceUpdate = Record<string, string | null | { results: string[] }>;
+export type SharePointUrlValue = { url: string; description?: string };
+export type SharePointFieldValue = string | number | boolean | Date | SharePointUrlValue | readonly string[] | readonly SharePointLookupId[] | null;
+export type SharePointFieldUpdateValue = string | number | boolean | null | { results: Array<string | number> } | { __metadata: { type: "SP.FieldUrlValue" }; Url: string; Description: string };
+export type SharePointFieldUpdate = Record<string, SharePointFieldUpdateValue>;
 
 const booleanValue = (value: SharePointBoolean | undefined): boolean => value === true || (typeof value === "string" && value.trim().toLowerCase() === "true");
 
@@ -227,12 +231,95 @@ export function serializeSharePointChoiceValue(field: SharePointFieldMetadata, v
   return { [adapter.name]: value == null || value === "" ? null : validateChoice(value) };
 }
 
+/** Serialize a common SharePoint list-field value into a REST item create/update body. */
+export function serializeSharePointFieldValue(field: SharePointFieldMetadata, value: SharePointFieldValue): SharePointFieldUpdate {
+  const adapter = getSharePointFieldAdapter(field);
+  const type = adapter.fieldType.replace(/^SP\.Field/, "").toLowerCase();
+  if (!adapter.name) throw new TypeError("The SharePoint field must include InternalName.");
+  if (adapter.readOnly) throw new TypeError(`${adapter.label} is read-only and cannot be serialized for an item update.`);
+
+  if (["lookup", "lookupmulti", "user", "usermulti"].includes(type)) {
+    return serializeSharePointLookupValue(field, value as SharePointLookupValue);
+  }
+  if (["choice", "outcomechoice", "multichoice"].includes(type)) {
+    return serializeSharePointChoiceValue(field, value as SharePointChoiceValue);
+  }
+  if (["text", "note"].includes(type)) {
+    if (value != null && typeof value !== "string") throw new TypeError(`${adapter.label} requires a string value or null.`);
+    return { [adapter.name]: value as string | null };
+  }
+  if (type === "boolean") {
+    if (value != null && typeof value !== "boolean") throw new TypeError(`${adapter.label} requires a boolean value or null.`);
+    return { [adapter.name]: value as boolean | null };
+  }
+  if (["integer", "number", "currency"].includes(type)) {
+    if (value == null || value === "") return { [adapter.name]: null };
+    const numeric = typeof value === "number" ? value : typeof value === "string" && value.trim() !== "" && /^[-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?$/i.test(value.trim()) ? Number(value) : NaN;
+    if (!Number.isFinite(numeric) || (type === "integer" && !Number.isSafeInteger(numeric))) {
+      throw new TypeError(`${adapter.label} requires a ${type === "integer" ? "safe integer" : "finite number"}, numeric string, or null.`);
+    }
+    return { [adapter.name]: numeric };
+  }
+  if (type === "datetime") {
+    if (value == null || value === "") return { [adapter.name]: null };
+    if (value instanceof Date) {
+      if (!Number.isFinite(value.getTime())) throw new TypeError(`${adapter.label} requires a valid date, ISO date string, or null.`);
+      return { [adapter.name]: value.toISOString() };
+    }
+    if (typeof value !== "string") throw new TypeError(`${adapter.label} requires a valid date, ISO date string, or null.`);
+    const iso = serializeSharePointDateValue(value);
+    if (!iso) throw new TypeError(`${adapter.label} requires a valid ISO date or date-time string.`);
+    return { [adapter.name]: iso };
+  }
+  if (type === "url") {
+    if (value == null || value === "") return { [adapter.name]: null };
+    const link = typeof value === "string" ? { url: value, description: value.trim() } : isSharePointUrlValue(value) ? value : undefined;
+    if (!link) throw new TypeError(`${adapter.label} requires a URL string, URL value, or null.`);
+    const url = link.url.trim();
+    if (url.length > 255) throw new RangeError(`${adapter.label} URL cannot exceed 255 characters.`);
+    if (url && !isSharePointFieldUrl(url)) throw new TypeError(`${adapter.label} must be an HTTP(S) or server-relative URL.`);
+    const description = link.description ?? url;
+    if (typeof description !== "string") throw new TypeError(`${adapter.label} URL description must be a string.`);
+    if (description.length > 255) throw new RangeError(`${adapter.label} URL description cannot exceed 255 characters.`);
+    return { [adapter.name]: { __metadata: { type: "SP.FieldUrlValue" }, Url: url, Description: description } };
+  }
+
+  throw new TypeError(adapter.unsupportedReason ?? `${adapter.fieldType} fields cannot be serialized by this helper.`);
+}
+
 function isLookupIdArray(value: SharePointLookupValue): value is readonly SharePointLookupId[] {
   return Array.isArray(value);
 }
 
 function isChoiceValueArray(value: SharePointChoiceValue): value is readonly string[] {
   return Array.isArray(value);
+}
+
+function isSharePointFieldUrl(value: string): boolean {
+  if (value.startsWith("/") && !value.startsWith("//")) return true;
+  try {
+    const url = new URL(value);
+    return (url.protocol === "http:" || url.protocol === "https:") && !url.username && !url.password;
+  } catch {
+    return false;
+  }
+}
+
+function isSharePointUrlValue(value: SharePointFieldValue): value is SharePointUrlValue {
+  return typeof value === "object" && value !== null && !Array.isArray(value) && !(value instanceof Date) && typeof (value as SharePointUrlValue).url === "string";
+}
+
+function serializeSharePointDateValue(value: string): string | undefined {
+  const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  const dateTime = /^(\d{4})-(\d{2})-(\d{2})T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(Z|[+-]\d{2}:\d{2})?$/.exec(value);
+  const match = dateOnly ?? dateTime;
+  if (!match) return undefined;
+  const day = new Date(`${match[1]}-${match[2]}-${match[3]}T00:00:00.000Z`);
+  if (!Number.isFinite(day.getTime()) || day.toISOString().slice(0, 10) !== `${match[1]}-${match[2]}-${match[3]}`) return undefined;
+  const parsed = new Date(value);
+  if (!Number.isFinite(parsed.getTime())) return undefined;
+  if (dateOnly || dateTime?.[4]) return value;
+  return parsed.toISOString();
 }
 
 function parseLookupId(value: SharePointLookupId): number {

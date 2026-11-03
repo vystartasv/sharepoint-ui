@@ -106,7 +106,7 @@ defineButton();
 
 For a Copilot surface that reads SharePoint data, updates the visible-state context, and saves through `SPHttpClient`, use the [SPFx CLI template](https://github.com/vystartasv/sharepoint-ui/tree/main/templates/spfx-fast-copilot-access-review) or the [complete tenant-connected example](https://github.com/vystartasv/sharepoint-ui/tree/main/examples/spfx124-copilot-ux). Both are framework-free and import only the custom elements they use.
 
-For forms backed by SharePoint list columns, `getSharePointFieldAdapter(field)` maps metadata to a control recipe. `getSharePointLookupOptionsUrl(field, sourceWebUrl)` builds the related-list options request; `serializeSharePointLookupValue(field, ids)` creates the ID-based REST body for lookup and people fields; `serializeSharePointChoiceValue(field, values)` validates Choice/MultiChoice values and creates the REST body. The app supplies authorized fetches, people search, and persistence.
+For forms backed by SharePoint list columns, `getSharePointFieldAdapter(field)` maps metadata to a control recipe. `getSharePointLookupOptionsUrl(field, sourceWebUrl)` builds the related-list options request; `serializeSharePointFieldValue(field, value)` creates update payloads for common scalar, URL, choice, lookup, and person fields. It validates and serializes values; the app supplies authorized fetches, people search, permissions, and persistence.
 
 ## Build from a component page
 
