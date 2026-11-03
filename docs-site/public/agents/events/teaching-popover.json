@@ -1,0 +1,56 @@
+{
+  "module": "teaching-popover",
+  "scope": "Events are listed by source module because a module can define a parent and its child tags. Check event.target when a module composes multiple tags; detailProperties lists statically declared top-level keys and may be incomplete when detailPropertiesComplete is false.",
+  "events": [
+    {
+      "name": "spui-announcement",
+      "detailProperties": [
+        "currentPage",
+        "message",
+        "totalPages",
+        "value"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    },
+    {
+      "name": "spui-carousel-change",
+      "detailProperties": [],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    },
+    {
+      "name": "spui-finish",
+      "detailProperties": [
+        "event",
+        "type",
+        "value"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    },
+    {
+      "name": "spui-popover-request-close",
+      "detailProperties": [
+        "sourceEvent"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    },
+    {
+      "name": "spui-value-change",
+      "detailProperties": [
+        "event",
+        "type",
+        "value"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    }
+  ]
+}

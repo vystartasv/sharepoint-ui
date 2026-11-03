@@ -5845,11 +5845,16 @@
     }
   ],
   "agentContract": {
+    "composition": "Import named components from @spfx-fast/sharepoint-ui/react. Put one SharePointUIProvider around the view. Compose with children by default; use only the slots and component props listed for that component.",
     "reactProps": "Each component entry exposes its React parameter signature; callback props describe emitted value/state changes.",
+    "state": "State props, initial default props, callback names, and callback arguments vary by component. Follow that component's signature and callbackProps; update controlled state in its callback.",
     "slots": "Use the listed slots for content. Prefer ViewCard over custom markup for common SharePoint records.",
+    "customElements": "Import the component's define function from @spfx-fast/sharepoint-ui/elements/{module} and register it once. Set objects and callbacks as DOM properties. For event names and statically visible detail keys, use the source module's event inventory at https://vystartasv.github.io/sharepoint-ui/agents/events/{module}.json; it is module-scoped, so check event.target when composed tags emit events.",
+    "styling": "Theme, typography, locale, and direction inherit from SharePointUIProvider. Style the host with tokens, documented CSS variables, or ::part hooks; do not target shadow-DOM internals.",
     "localization": "Set lang and dir from the host language. SPFx uses pageContext.cultureInfo.currentUICultureName and isRightToLeft. Supply SharePointUIProvider strings for built-in control labels.",
     "theme": "Call applySharePointTheme at the SPFx web-part boundary; it forwards SharePoint palette, semantic colors, effects, spacing, font ramps, and default font styles as --spui-* variables. React can use SharePointUIProvider appearance and density (compact, comfortable, touch), theme.brandColor for derived accent/state roles, fluentTokens for raw Fluent variables, theme for typed semantic/design roles, and tokens for direct --spui-* overrides. Nested providers merge semantic groups and inherit density. Explicit theme roles override generated brand roles; direct tokens and element inline styles override these. Hex brand colors derive an AA-aware black-or-white on-accent foreground; set colors.accentForeground for other CSS color formats. CSS custom properties and ::part hooks remain public styling surfaces.",
     "persistence": "Keep SharePoint reads and writes in the web part or its service; controls expose values and do not persist data.",
     "accessibility": "Use visible labels, preserve native keyboard behavior, test visible focus, disabled/invalid states, forced colors, and RTL for the target surface."
-  }
+  },
+  "elementEventScope": "Events are listed by source module because a module can define a parent and its child tags. Check event.target when a module composes multiple tags; detailProperties lists statically declared top-level keys and may be incomplete when detailPropertiesComplete is false."
 }

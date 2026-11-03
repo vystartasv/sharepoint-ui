@@ -1,6 +1,10 @@
 {
   "package": "@spfx-fast/sharepoint-ui",
   "module": "progress-bar",
+  "elementEventInventory": {
+    "url": "https://vystartasv.github.io/sharepoint-ui/agents/events/progress-bar.json",
+    "scope": "source module; composed child tags may also emit listed events"
+  },
   "components": [
     {
       "react": "ProgressBar",

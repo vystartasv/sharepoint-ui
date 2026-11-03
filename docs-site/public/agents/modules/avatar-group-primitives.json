@@ -1,6 +1,10 @@
 {
   "package": "@spfx-fast/sharepoint-ui",
   "module": "avatar-group-primitives",
+  "elementEventInventory": {
+    "url": "https://vystartasv.github.io/sharepoint-ui/agents/events/avatar-group-primitives.json",
+    "scope": "source module; composed child tags may also emit listed events"
+  },
   "components": [
     {
       "react": "AvatarGroupItem",

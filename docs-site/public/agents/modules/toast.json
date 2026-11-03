@@ -1,6 +1,10 @@
 {
   "package": "@spfx-fast/sharepoint-ui",
   "module": "toast",
+  "elementEventInventory": {
+    "url": "https://vystartasv.github.io/sharepoint-ui/agents/events/toast.json",
+    "scope": "source module; composed child tags may also emit listed events"
+  },
   "components": [
     {
       "react": "Toast",

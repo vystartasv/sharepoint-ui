@@ -1,0 +1,52 @@
+{
+  "module": "nav",
+  "scope": "Events are listed by source module because a module can define a parent and its child tags. Check event.target when a module composes multiple tags; detailProperties lists statically declared top-level keys and may be incomplete when detailPropertiesComplete is false.",
+  "events": [
+    {
+      "name": "spui-nav-category-toggle",
+      "detailProperties": [
+        "categoryValue",
+        "event",
+        "open",
+        "openCategories",
+        "type",
+        "value"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    },
+    {
+      "name": "spui-nav-collapsed-change",
+      "detailProperties": [
+        "collapsed"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    },
+    {
+      "name": "spui-nav-item-select",
+      "detailProperties": [
+        "categoryValue",
+        "event",
+        "href",
+        "label",
+        "type",
+        "value"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    },
+    {
+      "name": "spui-nav-open-change",
+      "detailProperties": [
+        "open"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    }
+  ]
+}

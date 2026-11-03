@@ -189,6 +189,7 @@
 
 .preview-actions {
   flex-wrap: wrap;
+  align-items: flex-start;
   margin-top: 1.5rem;
 }
 
@@ -425,7 +426,7 @@
   display: flex;
   min-height: 7rem;
   gap: var(--spui-control-gap, 0.5rem);
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
   overflow-x: auto;
   padding: clamp(1rem, 3vw, 2rem);

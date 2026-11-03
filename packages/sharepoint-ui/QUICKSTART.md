@@ -69,7 +69,7 @@ export function RequestActions({ openRequest, photoUrl }: { openRequest: () => v
 
 ## Another framework or plain HTML
 
-Import only the component’s leaf factory, register it once, then use its documented custom-element tag and events:
+Import only the component’s leaf factory, register it once, then use its documented custom-element tag:
 
 ```ts
 import { defineButton } from "@spfx-fast/sharepoint-ui/elements/button";
@@ -85,6 +85,7 @@ defineButton();
 
 1. Copy the React export or custom-element tag and its property/slot table.
 2. Use the matching component JSON slice linked from that page for exact types and callbacks.
-3. Keep app state and persistence in the host; connect documented callbacks to it.
+3. Use the shared `agentContract` included in every component JSON slice, then follow that component’s exact state props, callbacks, and slots.
+4. Keep app state and persistence in the host; connect documented callbacks to it.
 
-The same pattern applies across components. Add `SharePointUIProvider` once at the view root for React; custom elements inherit theme and direction from their host context. Use the [component conventions guide](https://vystartasv.github.io/sharepoint-ui/guides/component-patterns/) for human-readable composition examples and the component page plus its JSON slice for exact APIs.
+The same pattern applies across components. Add `SharePointUIProvider` once at the view root for React; custom elements inherit theme and direction from their host context. Each component slice links to its module event inventory. `detailPropertiesComplete` tells whether the listed event detail keys are exhaustive. Events are module-scoped: when several tags share a module, check the event target before handling them. Use the [component conventions guide](https://vystartasv.github.io/sharepoint-ui/guides/component-patterns/) for human-readable composition examples and the component page plus its JSON slice for exact APIs.

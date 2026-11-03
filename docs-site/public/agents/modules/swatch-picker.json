@@ -1,6 +1,10 @@
 {
   "package": "@spfx-fast/sharepoint-ui",
   "module": "swatch-picker",
+  "elementEventInventory": {
+    "url": "https://vystartasv.github.io/sharepoint-ui/agents/events/swatch-picker.json",
+    "scope": "source module; composed child tags may also emit listed events"
+  },
   "components": [
     {
       "module": "swatch-picker",

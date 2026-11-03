@@ -1,0 +1,37 @@
+{
+  "module": "table",
+  "scope": "Events are listed by source module because a module can define a parent and its child tags. Check event.target when a module composes multiple tags; detailProperties lists statically declared top-level keys and may be incomplete when detailPropertiesComplete is false.",
+  "events": [
+    {
+      "name": "spui-table-resize",
+      "detailProperties": [
+        "delta",
+        "sourceEvent",
+        "value"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    },
+    {
+      "name": "spui-table-selection-change",
+      "detailProperties": [
+        "checked",
+        "type"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    },
+    {
+      "name": "spui-table-sort",
+      "detailProperties": [
+        "columnId",
+        "direction"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    }
+  ]
+}

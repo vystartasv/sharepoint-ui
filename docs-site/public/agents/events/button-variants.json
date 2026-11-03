@@ -1,0 +1,26 @@
+{
+  "module": "button-variants",
+  "scope": "Events are listed by source module because a module can define a parent and its child tags. Check event.target when a module composes multiple tags; detailProperties lists statically declared top-level keys and may be incomplete when detailPropertiesComplete is false.",
+  "events": [
+    {
+      "name": "spui-checked-change",
+      "detailProperties": [
+        "checked",
+        "currentTarget",
+        "sourceEvent"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    },
+    {
+      "name": "spui-pressed-change",
+      "detailProperties": [
+        "pressed"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+import ts from "typescript";
 
 const siteRoot = resolve(import.meta.dirname, "..");
 const projectRoot = resolve(siteRoot, "..");
@@ -17,19 +18,74 @@ await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
 const catalog = JSON.parse(await readFile(catalogPath, "utf8"));
 const slug = value => value.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+function elementEventsFor(source, fileName) {
+  const root = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  const events = new Map();
+  const readName = node => node && (ts.isIdentifier(node) || ts.isStringLiteral(node) || ts.isNumericLiteral(node)) ? node.text : undefined;
+  const readFlag = (options, key) => {
+    if (!options) return false;
+    if (!ts.isObjectLiteralExpression(options)) return "unknown";
+    const property = options.properties.find(item => ts.isPropertyAssignment(item) && readName(item.name) === key);
+    if (!property) return false;
+    return property.initializer.kind === ts.SyntaxKind.TrueKeyword ? true : property.initializer.kind === ts.SyntaxKind.FalseKeyword ? false : "unknown";
+  };
+  const visit = node => {
+    if (ts.isNewExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === "CustomEvent") {
+      const name = node.arguments?.[0];
+      if (name && (ts.isStringLiteral(name) || ts.isNoSubstitutionTemplateLiteral(name))) {
+        const options = node.arguments?.[1];
+        const detailProperty = options && ts.isObjectLiteralExpression(options)
+          ? options.properties.find(item => ts.isPropertyAssignment(item) && readName(item.name) === "detail")
+          : undefined;
+        const detail = detailProperty?.initializer;
+        const complete = !detailProperty || Boolean(detail && ts.isObjectLiteralExpression(detail) && detail.properties.every(item => !ts.isSpreadAssignment(item) && readName(item.name) !== undefined));
+        const detailProperties = complete && detail && ts.isObjectLiteralExpression(detail)
+          ? detail.properties.map(item => readName(item.name)).filter(Boolean)
+          : [];
+        const item = events.get(name.text) ?? { name: name.text, detailProperties: new Set(), complete: true, bubbles: new Set(), composed: new Set() };
+        detailProperties.forEach(key => item.detailProperties.add(key));
+        item.complete &&= complete;
+        item.bubbles.add(readFlag(options, "bubbles"));
+        item.composed.add(readFlag(options, "composed"));
+        events.set(name.text, item);
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(root);
+  const delivery = values => values.size === 1 ? values.values().next().value === true ? "always" : values.values().next().value === false ? "never" : "unknown" : "varies";
+  return [...events.values()].map(item => ({
+    name: item.name,
+    detailProperties: [...item.detailProperties].sort(),
+    detailPropertiesComplete: item.complete,
+    bubbles: delivery(item.bubbles),
+    composed: delivery(item.composed),
+  })).sort((a, b) => a.name.localeCompare(b.name));
+}
 const modules = new Map();
 for (const component of catalog.components) modules.set(component.module, [...(modules.get(component.module) ?? []), component]);
 
+const elementModuleEvents = {};
+for (const module of modules.keys()) {
+  const sourcePath = resolve(packageRoot, "src/elements", `${module}.ts`);
+  const source = await readFile(sourcePath, "utf8").catch(() => "");
+  elementModuleEvents[module] = elementEventsFor(source, sourcePath);
+}
+catalog.elementEventScope = "Events are listed by source module because a module can define a parent and its child tags. Check event.target when a module composes multiple tags; detailProperties lists statically declared top-level keys and may be incomplete when detailPropertiesComplete is false.";
+const sliceContract = Object.fromEntries(["composition", "state", "customElements"].map(key => [key, catalog.agentContract[key]]));
 await writeFile(join(output, "components.json"), `${JSON.stringify(catalog, null, 2)}\n`);
 await mkdir(join(output, "modules"), { recursive: true });
 await mkdir(join(output, "components"), { recursive: true });
+await mkdir(join(output, "events"), { recursive: true });
 for (const [module, components] of modules) {
-  await writeFile(join(output, "modules", `${slug(module)}.json`), `${JSON.stringify({ package: catalog.package, module, components }, null, 2)}\n`);
+  const eventInventory = { url: `https://vystartasv.github.io/sharepoint-ui/agents/events/${slug(module)}.json`, scope: "source module; composed child tags may also emit listed events" };
+  await writeFile(join(output, "modules", `${slug(module)}.json`), `${JSON.stringify({ package: catalog.package, module, elementEventInventory: eventInventory, components }, null, 2)}\n`);
+  await writeFile(join(output, "events", `${slug(module)}.json`), `${JSON.stringify({ module, scope: catalog.elementEventScope, events: elementModuleEvents[module] }, null, 2)}\n`);
   for (const component of components) {
     const componentSlug = slug(component.react ?? component.tag ?? component.module);
     const componentPath = join(output, "components", slug(module), `${componentSlug}.json`);
     await mkdir(dirname(componentPath), { recursive: true });
-    await writeFile(componentPath, `${JSON.stringify({ package: catalog.package, component }, null, 2)}\n`);
+    await writeFile(componentPath, `${JSON.stringify({ package: catalog.package, agentContract: sliceContract, elementEventInventory: eventInventory, component }, null, 2)}\n`);
   }
 }
 

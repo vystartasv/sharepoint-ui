@@ -1,0 +1,60 @@
+{
+  "module": "carousel",
+  "scope": "Events are listed by source module because a module can define a parent and its child tags. Check event.target when a module composes multiple tags; detailProperties lists statically declared top-level keys and may be incomplete when detailPropertiesComplete is false.",
+  "events": [
+    {
+      "name": "spui-carousel-autoplay-toggle",
+      "detailProperties": [
+        "checked",
+        "event",
+        "type"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    },
+    {
+      "name": "spui-carousel-button-activate",
+      "detailProperties": [
+        "event",
+        "navType"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    },
+    {
+      "name": "spui-carousel-card-focus",
+      "detailProperties": [
+        "event",
+        "index"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    },
+    {
+      "name": "spui-carousel-change",
+      "detailProperties": [
+        "event",
+        "eventType",
+        "index",
+        "type",
+        "value"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    },
+    {
+      "name": "spui-carousel-nav-select",
+      "detailProperties": [
+        "event",
+        "index"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    }
+  ]
+}
