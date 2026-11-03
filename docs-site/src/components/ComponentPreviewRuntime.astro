@@ -10,7 +10,12 @@
     const status = demo.querySelector(".component-demo__status");
 
     const applyTokens = () => {
-      const tokens = getSharePointUIStyleTokens(appearance?.value ?? "ios", { "--spui-ui-accent": accent?.value ?? "#78716c" });
+      const selectedAppearance = appearance?.value ?? "ios";
+      const baseAppearance = selectedAppearance === "glass" ? "ios" : "fluent";
+      demo.dataset.spuiAppearance = selectedAppearance;
+      demo.dataset.spuiBaseAppearance = baseAppearance;
+      if (stage) stage.dataset.spuiAppearance = selectedAppearance;
+      const tokens = getSharePointUIStyleTokens(selectedAppearance, { "--spui-ui-accent": accent?.value ?? "#78716c" }, baseAppearance);
       for (const [name, value] of Object.entries(tokens)) demo.style.setProperty(name, value);
     };
 

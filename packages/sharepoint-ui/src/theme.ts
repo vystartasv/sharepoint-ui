@@ -201,6 +201,16 @@ export function applySharePointTheme(target: HTMLElement, theme?: SharePointThem
     style.setProperty("--spui-is-inverted", theme.isInverted ? "1" : "0");
     names.add("--spui-is-inverted");
   }
+  // Older SPFx themes expose their brand only in palette.themePrimary. The
+  // appearance presets consume the semantic role, so bridge that value when
+  // neither semantic colors nor Fluent v9 already provide a brand token.
+  const semanticAccent = theme?.semanticColors?.primaryButtonBackground;
+  const fluentAccent = fluentTokens?.colorBrandBackground;
+  const paletteAccent = theme?.palette?.themePrimary;
+  if (!semanticAccent && !fluentAccent && paletteAccent) {
+    style.setProperty("--spui-semantic-primary-button-background", paletteAccent);
+    names.add("--spui-semantic-primary-button-background");
+  }
   for (const [name, value] of Object.entries(fluentTokens ?? {})) {
     if (typeof value !== "string" && typeof value !== "number") continue;
     const property = name.startsWith("--") ? name : `--${name}`;

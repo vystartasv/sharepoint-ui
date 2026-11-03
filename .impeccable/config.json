@@ -11,6 +11,15 @@
         ],
         "createdAt": "2026-10-31T15:18:24.793Z",
         "reason": "Agent: Tree styling uses a full focus-visible outline around the row, not a one-sided accent border; the finding is a regex false positive on the keyboard focus indicator."
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "docs-site/scripts/generate-catalog.mjs"
+        ],
+        "createdAt": "2026-11-03T08:37:04.182Z",
+        "reason": "Agent: the generator emits the Image preview with a verified src and alt from exampleFor; the dynamic template preserves those attributes."
       }
     ]
   }

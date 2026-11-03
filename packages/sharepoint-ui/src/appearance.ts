@@ -204,7 +204,7 @@ export function getSharePointUIStyleTokens(appearance: SharePointUIAppearance = 
     "--spui-control-height": scalePresetLength(tokens["--spui-base-control-height"], 1.04),
     "--spui-card-padding": scalePresetLength(tokens["--spui-base-card-padding"], 1.12),
     "--spui-control-gap": scalePresetLength(tokens["--spui-base-control-gap"], 1.12),
-    "--spui-color-scheme": "light"
+    "--spui-color-scheme": tokens["--spui-color-scheme"] ?? "light"
   });
   if (appearance === "glass") {
     // Directly specified finished values win; base values still flow through

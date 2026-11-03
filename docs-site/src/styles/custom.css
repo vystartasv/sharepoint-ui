@@ -271,6 +271,7 @@
 .component-demo__stage {
   display: flex;
   min-height: 7rem;
+  gap: var(--spui-control-gap, 0.5rem);
   align-items: center;
   justify-content: center;
   overflow-x: auto;
@@ -279,6 +280,10 @@
   border-radius: 0.75rem;
   background: var(--spui-ui-surface, var(--sl-color-bg));
   color: var(--spui-ui-text, var(--sl-color-text));
+}
+
+.component-demo__stage[data-spui-appearance="glass"] {
+  background: color-mix(in srgb, var(--spui-base-accent, #78716c) 18%, var(--sl-color-bg));
 }
 
 .component-demo__stage > * {

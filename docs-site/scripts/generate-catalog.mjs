@@ -58,6 +58,7 @@ function exampleFor(component) {
 function markupFor(example) {
   if (!example?.tag) return "";
   const attrs = example.attrs ? ` ${example.attrs}` : "";
+  if (example.tag === "spui-button") return `<spui-button appearance="secondary">View details</spui-button><spui-button${attrs}>${escapeHtml(example.content)}</spui-button>`;
   if (example.tag === "img") return `<img${attrs} />`;
   return `<${example.tag}${attrs}>${escapeHtml(example.content)}</${example.tag}>`;
 }
