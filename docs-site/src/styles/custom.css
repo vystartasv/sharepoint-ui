@@ -43,6 +43,10 @@
   text-align: start;
 }
 
+.hero .copy {
+  align-items: flex-start;
+}
+
 .hero h1 {
   max-width: 13ch;
   margin-inline: 0;
