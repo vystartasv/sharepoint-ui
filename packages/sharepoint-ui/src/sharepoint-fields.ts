@@ -77,6 +77,7 @@ export type SharePointFieldAdapter = {
   hidden: boolean;
   multiple?: boolean;
   inputType?: "text" | "number" | "url" | "datetime-local";
+  urlFormat?: "hyperlink" | "picture";
   step?: number | "any";
   dateMode?: "date" | "date-time";
   choices?: readonly string[];
@@ -124,6 +125,10 @@ export function getSharePointFieldAdapter(field: SharePointFieldMetadata): Share
   if (["text", "integer", "number", "currency", "url"].includes(normalized)) {
     const control = finish("input");
     control.inputType = normalized === "url" ? "url" : ["integer", "number", "currency"].includes(normalized) ? "number" : "text";
+    if (normalized === "url") {
+      const displayFormat = String(field.DisplayFormat ?? field.displayFormat ?? "0").trim().toLowerCase();
+      control.urlFormat = displayFormat === "1" || displayFormat === "image" || displayFormat === "picture" ? "picture" : "hyperlink";
+    }
     if (control.inputType === "number") {
       const decimalPlaces = getConfiguredDecimalPlaces(field);
       control.step = normalized === "integer" || decimalPlaces === 0 ? 1 : decimalPlaces == null ? "any" : 10 ** -decimalPlaces;

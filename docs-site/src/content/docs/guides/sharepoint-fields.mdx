@@ -18,7 +18,7 @@ const adapter = getSharePointFieldAdapter(field);
 | --- | --- | --- |
 | Text | `input`, type `text` | Uses the display name, internal name, description, and required flag. |
 | Integer, Number, Currency | `input`, type `number` | Integer uses step `1`; decimal fields use the configured precision or `any`. |
-| URL | `input`, type `url` | The app supplies its value and save handling. |
+| URL | `input`, type `url` | `urlFormat` preserves SharePoint's hyperlink or picture display setting for record views. |
 | Note without rich text | `textarea` | SharePoint's plain-text field stays plain text. |
 | Note with rich text | `rich-text-editor` | Includes the existing `richText` options; explicit SharePoint restrictions win. |
 | Choice | `select` or `radio-group` | Reads `Choices` and `EditFormat` in the order SharePoint provides. |
@@ -139,7 +139,7 @@ Use `null` to clear nullable values. Read-only fields and empty values for requi
 
 ## Render with existing controls
 
-The recipe uses the same component names and prop concepts used elsewhere in the library. A choice field can be rendered as a Select without inventing app-specific naming:
+The recipe uses the same component names and prop concepts used elsewhere in the library. For a URL field, use `urlFormat` to render the saved URL as a `Link` or `Image` in a record view; use the `input` recipe when editing. A choice field can be rendered as a Select without inventing app-specific naming:
 
 ```tsx
 import { Select } from "@spfx-fast/sharepoint-ui/react";
