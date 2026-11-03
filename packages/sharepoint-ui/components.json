@@ -2209,6 +2209,9 @@
       "note": "SharePoint-specific extra; not a Fluent v9 parity component.",
       "api": {
         "reactSignature": "inputProps: RichTextEditorProps",
+        "relatedReactApis": [
+          { "name": "RichTextEditorProps.editorLabel", "description": "Accessible name used when no aria-label or visible label is supplied; defaults to SharePointUIProvider.strings.richTextEditorLabel." }
+        ],
         "callbackProps": [
           "onValueChange",
           "onImageUpload"
