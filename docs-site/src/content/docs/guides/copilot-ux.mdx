@@ -142,7 +142,7 @@ await this.requestDisplayModeAsync("fullscreen");
 
 ## Keep Copilot aware of the visible view
 
-Copilot does not read the component's DOM. After filters or decisions change, send a concise, authorized summary of the current view through the SPFx bridge. The next user message can then refer to the same selected and visible records:
+Copilot does not read the component's DOM. Send a concise, authorized summary through the SPFx bridge after the initial data load and whenever filters or decisions change. Keep it comfortably below the 10 KB limit so the next user message can refer to the same visible records:
 
 ```ts
 import { createCopilotTextContent } from "@microsoft/sp-copilot-component";

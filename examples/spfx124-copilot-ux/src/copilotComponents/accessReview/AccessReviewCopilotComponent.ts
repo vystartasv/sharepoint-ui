@@ -15,6 +15,7 @@ type ListResponse = { value?: ReviewItem[] };
 
 const STATUS_FIELD = 'Status';
 const MAX_ITEMS = 25;
+const MAX_COPILOT_CONTEXT_BYTES = 8 * 1024;
 const LIST_ID_PATTERN = /^[\da-f]{8}-(?:[\da-f]{4}-){3}[\da-f]{12}$/i;
 
 export default class AccessReviewCopilotComponent extends BaseCopilotComponent<IAccessReviewCopilotComponentProperties> {
@@ -40,21 +41,22 @@ export default class AccessReviewCopilotComponent extends BaseCopilotComponent<I
 
     if (!LIST_ID_PATTERN.test(this.properties.listId)) {
       this.loadError = 'The agent supplied an invalid SharePoint list ID.';
-      return;
+    } else {
+      try {
+        const url = `${this.context.pageContext.web.absoluteUrl}/_api/web/lists(guid'${this.properties.listId}')/items?$select=Id,Title,${STATUS_FIELD}&$orderby=Modified desc&$top=${MAX_ITEMS}`;
+        const response = await this.context.spHttpClient.get(url, SPHttpClient.configurations.v1, {
+          headers: { Accept: 'application/json;odata=nometadata' }
+        });
+        if (!response.ok) throw new Error(`SharePoint returned ${response.status}.`);
+
+        const result = await response.json() as ListResponse;
+        this.items = Array.isArray(result.value) ? result.value.filter(item => Number.isSafeInteger(item.Id) && item.Id > 0) : [];
+      } catch (error) {
+        this.loadError = error instanceof Error ? error.message : 'The review list could not be loaded.';
+      }
     }
 
-    try {
-      const url = `${this.context.pageContext.web.absoluteUrl}/_api/web/lists(guid'${this.properties.listId}')/items?$select=Id,Title,${STATUS_FIELD}&$orderby=Modified desc&$top=${MAX_ITEMS}`;
-      const response = await this.context.spHttpClient.get(url, SPHttpClient.configurations.v1, {
-        headers: { Accept: 'application/json;odata=nometadata' }
-      });
-      if (!response.ok) throw new Error(`SharePoint returned ${response.status}.`);
-
-      const result = await response.json() as ListResponse;
-      this.items = Array.isArray(result.value) ? result.value.filter(item => Number.isSafeInteger(item.Id) && item.Id > 0) : [];
-    } catch (error) {
-      this.loadError = error instanceof Error ? error.message : 'The review list could not be loaded.';
-    }
+    this.updateCopilotContext().catch(() => undefined);
   }
 
   protected render(): void {
@@ -197,11 +199,25 @@ export default class AccessReviewCopilotComponent extends BaseCopilotComponent<I
   }
 
   private async updateCopilotContext(): Promise<void> {
-    const locale = this.context.pageContext.cultureInfo.currentUICultureName;
-    const query = this.query.toLocaleLowerCase(locale);
-    const visible = this.items.filter(item => `${item.Title} ${item.Status ?? ''}`.toLocaleLowerCase(locale).includes(query));
-    const pending = visible.filter(item => item.Status?.toLocaleLowerCase(locale) !== 'approved');
-    const summary = `SharePoint access reviews: ${visible.length} visible of the latest ${this.items.length} loaded; ${pending.length} still need review. Filter: ${this.query || 'all'}. ${visible.slice(0, 15).map(item => `${item.Title}: ${item.Status || 'Needs review'}`).join('; ')}`;
+    let summary: string;
+    if (this.loadError) {
+      summary = 'The access-review component could not load the requested SharePoint list. The visible view contains an error and no review results.';
+    } else {
+      const locale = this.context.pageContext.cultureInfo.currentUICultureName;
+      const query = this.query.toLocaleLowerCase(locale);
+      const visible = this.items.filter(item => `${item.Title} ${item.Status ?? ''}`.toLocaleLowerCase(locale).includes(query));
+      const pending = visible.filter(item => item.Status?.toLocaleLowerCase(locale) !== 'approved');
+      summary = `SharePoint access reviews: ${visible.length} visible of the latest ${this.items.length} loaded; ${pending.length} still need review. Filter: ${this.query || 'all'}.`;
+      for (const item of visible.slice(0, 15)) {
+        const detail = `${item.Title}: ${item.Status || 'Needs review'}`;
+        const candidate = `${summary} ${detail}`;
+        if (new TextEncoder().encode(candidate).byteLength > MAX_COPILOT_CONTEXT_BYTES) {
+          summary += ' Additional visible review details are omitted to keep the Copilot context within its size limit.';
+          break;
+        }
+        summary = candidate;
+      }
+    }
     try {
       await this.context.copilotBridge.updateModelContextAsync({ content: [createCopilotTextContent(summary)] });
     } catch {
