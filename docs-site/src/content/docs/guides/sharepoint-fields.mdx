@@ -1,0 +1,61 @@
+---
+title: SharePoint field adapters
+description: Turn SharePoint list field metadata into a predictable, typed control recipe without importing control implementations.
+---
+
+`getSharePointFieldAdapter()` maps a SharePoint REST or CSOM field definition to a small control recipe. It has no SPFx or React dependency, so a data layer can choose the UI without loading the library's components.
+
+```ts
+import { getSharePointFieldAdapter } from "@spfx-fast/sharepoint-ui/sharepoint-fields";
+
+const adapter = getSharePointFieldAdapter(field);
+// adapter.control, adapter.label, adapter.name, adapter.required, adapter.readOnly
+```
+
+## Mappings
+
+| SharePoint field | Recipe | Notes |
+| --- | --- | --- |
+| Text | `input`, type `text` | Uses the display name, internal name, description, and required flag. |
+| Integer, Number, Currency | `input`, type `number` | Integer uses step `1`; decimal fields use the configured precision or `any`. |
+| URL | `input`, type `url` | The app supplies its value and save handling. |
+| Note without rich text | `textarea` | SharePoint's plain-text field stays plain text. |
+| Note with rich text | `rich-text-editor` | Includes the existing `richText` options; explicit SharePoint restrictions win. |
+| Choice | `select` or `radio-group` | Reads `Choices` and `EditFormat` in the order SharePoint provides. |
+| MultiChoice | `multi-choice` | Includes the choices and fill-in setting; render as a checkbox list. |
+| Boolean | `checkbox` | Uses the library Checkbox. |
+| DateTime | `date-picker` | `dateMode` is `date` or `date-time`; use a date-time input when time entry is enabled. |
+| Lookup, User | `combobox` | The app must load authorized options from the related list or people source. `multiple` follows field metadata. |
+| Counter, Computed, Calculated | `read-only` | SharePoint calculates or manages these values. |
+| Other types | `unsupported` | Includes the source `fieldType` and a reason; use a specialized renderer. |
+
+Both SharePoint's PascalCase fields (`TypeAsString`, `InternalName`) and camelCase equivalents are accepted. `FieldTypeKind` numeric values are supported when `TypeAsString` is absent. Hidden, required, read-only, description, choice, and multi-value metadata are retained on the recipe.
+
+## Render with existing controls
+
+The recipe uses the same component names and prop concepts used elsewhere in the library. A choice field can be rendered as a Select without inventing app-specific naming:
+
+```tsx
+import { Select } from "@spfx-fast/sharepoint-ui/react";
+import { getSharePointFieldAdapter } from "@spfx-fast/sharepoint-ui/sharepoint-fields";
+
+const field = getSharePointFieldAdapter(column);
+
+if (field.hidden || field.control !== "select") return null;
+
+return (
+  <Select label={field.label} name={field.name} required={field.required} disabled={field.readOnly}>
+    {field.choices?.map(choice => <option key={choice} value={choice}>{choice}</option>)}
+  </Select>
+);
+```
+
+For a SharePoint Note field, pass the original field metadata to `RichTextEditor`; it uses the same rules as `getRichTextEditorFieldOptions()`:
+
+```tsx
+import { RichTextEditor } from "@spfx-fast/sharepoint-ui/react";
+
+<RichTextEditor label={field.label} name={field.name} required={field.required} field={column} />
+```
+
+The adapter only describes the editor. Your app still owns loading and saving values, SharePoint permissions, lookup/people option queries, field-specific validation, and the REST/Graph serialization format. It never treats unknown field types as text or claims a save succeeded before SharePoint confirms it.

@@ -48,6 +48,7 @@ export { defineAlert, type AlertAppearance } from "./elements/alert.js";
 export { defineSkeleton, defineSkeletonItem, type SkeletonAnimation, type SkeletonAppearance, type SkeletonItemSize, type SkeletonShape } from "./elements/skeleton.js";
 export { DEFAULT_ACCENT, getSharePointUIStyleTokens, type SharePointUIAppearance, type SharePointUIBaseAppearance, type SharePointUIDensity, type SharePointUIStyleTokens } from "./appearance.js";
 export { applySharePointTheme, composeSharePointUIDesignThemes, getSharePointUIDesignTokens, getSharePointThemeColorPresets, type SharePointThemeColorPreset, type SharePointTheme, type FluentThemeTokens, type SharePointUIDesignTheme, type SharePointUIThemeOptions } from "./theme.js";
+export { getSharePointFieldAdapter, type SharePointFieldAdapter, type SharePointFieldControl, type SharePointFieldMetadata } from "./sharepoint-fields.js";
 
 export { defineLink } from "./elements/link.js";
 export { defineDivider, type DividerAppearance } from "./elements/divider.js";

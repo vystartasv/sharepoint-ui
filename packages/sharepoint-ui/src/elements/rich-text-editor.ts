@@ -1,23 +1,9 @@
 import { base, syncHostAccessibleName } from "./shared.js";
+import { getRichTextEditorFieldOptions, type SharePointMultiLineField } from "../sharepoint-fields.js";
+export { getRichTextEditorFieldOptions, type SharePointMultiLineField } from "../sharepoint-fields.js";
 
 export type RichTextEditorLink = { href: string; text?: string; title?: string; openInNewTab?: boolean };
 export type RichTextEditorLinkPicker = (currentLink: RichTextEditorLink | null) => Promise<RichTextEditorLink | null>;
-type SharePointBoolean = boolean | string;
-export type SharePointMultiLineField = { richText?: SharePointBoolean; restrictedMode?: SharePointBoolean; richTextMode?: string; allowHyperlink?: SharePointBoolean; RichText?: SharePointBoolean; RestrictedMode?: SharePointBoolean; RichTextMode?: string; AllowHyperlink?: SharePointBoolean };
-export function getRichTextEditorFieldOptions(field: SharePointMultiLineField): { contentMode: "plain" | "restricted" | "rich" | "html"; allowHyperlink: boolean } {
-  const asBoolean = (value: SharePointBoolean | undefined): boolean | undefined => value === undefined ? undefined : value === true || (typeof value === "string" && value.trim().toLowerCase() === "true");
-  const richText = asBoolean(field.RichText ?? field.richText);
-  const restricted = asBoolean(field.RestrictedMode ?? field.restrictedMode) ?? false;
-  const richTextMode = field.RichTextMode ?? field.richTextMode;
-  const mode = richTextMode?.trim().toLowerCase();
-  const contentMode = richText === false ? "plain" : restricted ? "restricted" : mode === "fullhtml" ? "html" : mode === "compatible" || richText === true ? "rich" : "html";
-  const fieldAllowsHyperlinks = asBoolean(field.AllowHyperlink ?? field.allowHyperlink);
-  // Respect an explicit SharePoint restriction in every rich mode. If the
-  // host omitted this setting, keep links available and let sanitization decide
-  // which URL schemes and markup can be saved.
-  const allowHyperlink = contentMode !== "plain" && contentMode !== "restricted" && fieldAllowsHyperlinks !== false;
-  return { contentMode, allowHyperlink };
-}
 
 export interface SharePointRichTextEditorElement extends HTMLElement {
   value: string;

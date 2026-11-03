@@ -51,6 +51,10 @@
       "types": "./dist/theme.d.ts",
       "import": "./dist/theme.js"
     },
+    "./sharepoint-fields": {
+      "types": "./dist/sharepoint-fields.d.ts",
+      "import": "./dist/sharepoint-fields.js"
+    },
     "./tokens": "./tokens.json"
   },
   "files": [
