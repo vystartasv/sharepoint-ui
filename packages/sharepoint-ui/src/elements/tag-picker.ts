@@ -20,7 +20,7 @@ export function defineTagPicker(): void {
   if (customElements.get("spui-tag-picker")) return;
   class SpuiTagPicker extends HTMLElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "placeholder", "selected-values", "selected-options", "default-selected-options", "input-value", "input-appearance", "input-disabled", "input-aria-label", "input-aria-describedby", "clearable", "selected-label", "inline", "no-popover", "disabled", "required", "name", "no-results", "remove-label", "open", "default-open", "positioning", "disable-auto-focus", "aria-label", "aria-labelledby", "aria-description", "aria-describedby"];
+    static observedAttributes = ["label", "placeholder", "selected-values", "selected-options", "default-selected-options", "input-value", "input-appearance", "input-disabled", "input-aria-label", "input-aria-describedby", "clearable", "selected-label", "required-message", "inline", "no-popover", "disabled", "required", "name", "no-results", "remove-label", "open", "default-open", "positioning", "disable-auto-focus", "aria-label", "aria-labelledby", "aria-description", "aria-describedby"];
     private internals?: ElementInternals;
     private observer?: MutationObserver;
     private resizeObserver?: ResizeObserver;
@@ -288,7 +288,7 @@ export function defineTagPicker(): void {
       if (name) values.forEach(value => formData.append(name, value));
       this.internals?.setFormValue(values.length && name ? formData : null, JSON.stringify(values));
       const missing = this.hasAttribute("required") && values.length === 0;
-      try { this.internals?.setValidity(missing ? { valueMissing: true } : {}, missing ? "Choose at least one option." : "", (this.buttonTrigger() ?? input) ?? undefined); } catch { /* The input itself retains required semantics as a fallback. */ }
+      try { this.internals?.setValidity(missing ? { valueMissing: true } : {}, missing ? this.getAttribute("required-message") || "Choose at least one option." : "", (this.buttonTrigger() ?? input) ?? undefined); } catch { /* The input itself retains required semantics as a fallback. */ }
     }
     private syncAria(): void {
       const input = this.input();

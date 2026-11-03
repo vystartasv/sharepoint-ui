@@ -3505,8 +3505,12 @@
       "module": "tag-picker",
       "category": "form",
       "api": {
-        "reactSignature": "{ children, label, selectedLabel, selectedOptions, defaultSelectedOptions, selectedValues, defaultSelectedValues, inputValue, open, defaultOpen, positioning, disableAutoFocus = false, inline = false, noPopover = false, disabled, onOpenChange, onOptionSelect, onInputValueChange, onChange, ...props }: TagPickerProps",
+        "reactSignature": "{ children, label, selectedLabel, requiredMessage, selectedOptions, defaultSelectedOptions, selectedValues, defaultSelectedValues, inputValue, open, defaultOpen, positioning, disableAutoFocus = false, inline = false, noPopover = false, disabled, onOpenChange, onOptionSelect, onInputValueChange, onChange, ...props }: TagPickerProps",
         "relatedReactApis": [
+          {
+            "name": "TagPickerProps.requiredMessage",
+            "description": "Sets the native form validation message; defaults to SharePointUIProvider.strings.required."
+          },
           {
             "name": "TagPickerProps.selectedLabel",
             "description": "Names the selected-options group; defaults to SharePointUIProvider.strings.selectedOptionsLabel."
