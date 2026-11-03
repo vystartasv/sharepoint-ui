@@ -106,6 +106,8 @@ defineButton();
 
 For a Copilot surface that reads SharePoint data, updates the visible-state context, and saves through `SPHttpClient`, use the [SPFx CLI template](https://github.com/vystartasv/sharepoint-ui/tree/main/templates/spfx-fast-copilot-access-review) or the [complete tenant-connected example](https://github.com/vystartasv/sharepoint-ui/tree/main/examples/spfx124-copilot-ux). Both are framework-free and import only the custom elements they use.
 
+For forms backed by SharePoint list columns, `getSharePointFieldAdapter(field)` maps metadata to a control recipe. `getSharePointLookupOptionsUrl(field, sourceWebUrl)` builds the related-list options request; `serializeSharePointLookupValue(field, ids)` creates the ID-based REST body for single/multiple lookup and people fields. The app supplies authorized fetches, people search, and persistence.
+
 ## Build from a component page
 
 1. Copy the React export or custom-element tag and its property/slot table.

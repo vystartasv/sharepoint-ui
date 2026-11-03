@@ -25,11 +25,47 @@ const adapter = getSharePointFieldAdapter(field);
 | MultiChoice | `multi-choice` | Includes the choices and fill-in setting; render as a checkbox list. |
 | Boolean | `checkbox` | Uses the library Checkbox. |
 | DateTime | `date-picker` | `dateMode` is `date` or `date-time`; use a date-time input when time entry is enabled. |
-| Lookup, User | `combobox` | The app must load authorized options from the related list or people source. `multiple` follows field metadata. |
+| Lookup, User | `combobox` | `multiple` follows field metadata. Lookup fields can expose `lookupSource` when SharePoint supplied its source-list metadata. |
 | Counter, Computed, Calculated | `read-only` | SharePoint calculates or manages these values. |
 | Other types | `unsupported` | Includes the source `fieldType` and a reason; use a specialized renderer. |
 
 Both SharePoint's PascalCase fields (`TypeAsString`, `InternalName`) and camelCase equivalents are accepted. `FieldTypeKind` numeric values are supported when `TypeAsString` is absent. Hidden, required, read-only, description, choice, and multi-value metadata are retained on the recipe.
+
+## Load and save lookup selections
+
+SharePoint identifies lookup values by the source list's item ID. The field metadata supplies its `LookupList` and `LookupField`; pass the source list's web URL to create a bounded options request:
+
+```ts
+import { SPHttpClient } from "@microsoft/sp-http";
+import { getSharePointFieldAdapter, getSharePointLookupOptionsUrl } from "@spfx-fast/sharepoint-ui/sharepoint-fields";
+
+const adapter = getSharePointFieldAdapter(column);
+const source = adapter.lookupSource;
+if (!source) throw new Error("SharePoint did not provide a lookup source for this field.");
+const optionsUrl = getSharePointLookupOptionsUrl(column, lookupWebUrl, 100);
+const response = await context.spHttpClient.get(optionsUrl, SPHttpClient.configurations.v1);
+if (!response.ok) throw new Error(`Lookup request failed: ${response.status}`);
+const result = await response.json() as { value?: Array<Record<string, unknown> & { Id: number }> };
+const options = (result.value ?? []).map(item => ({
+  value: String(item.Id),
+  label: String(item[source.displayField] ?? "")
+}));
+```
+
+Use `options` as the values for the library's `ComboBox`, and follow SharePoint's `odata.nextLink` when the list has more results. The URL requests only `Id` and the configured display field. For a cross-web lookup, pass the source web URL, which can differ from the current list's web.
+
+Use the IDs returned by the options or people picker to create an item update body. The helper handles single/multiple fields and clearing a selection:
+
+```ts
+import { serializeSharePointLookupValue } from "@spfx-fast/sharepoint-ui/sharepoint-fields";
+
+const patch = serializeSharePointLookupValue(column, selectedIds);
+// Single: { ProjectId: 42 }
+// Multi:  { ReviewersId: { results: [17, 21] } }
+await saveItem({ ...otherChanges, ...patch });
+```
+
+Pass numeric IDs or digit strings; malformed and non-positive IDs throw instead of becoming a display-name write. For people fields, this serializes selected user/group IDs but does not search the tenant directory. Use an SPFx people-picker service appropriate to your tenant and permissions; a site's existing users are not a substitute for directory search. SharePoint REST requires lookup values to be selected/expanded explicitly and returns related values through `$select`/`$expand`; see Microsoft's [OData query guidance](https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/use-odata-query-operations-in-sharepoint-rest-requests) and the [`LookupList`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.sharepoint.client.fieldlookup.lookuplist?view=sharepoint-csom) / [`LookupField`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.sharepoint.client.fieldlookup.lookupfield?view=sharepoint-csom) metadata.
 
 ## Render with existing controls
 
@@ -58,4 +94,4 @@ import { RichTextEditor } from "@spfx-fast/sharepoint-ui/react";
 <RichTextEditor label={field.label} name={field.name} required={field.required} field={column} />
 ```
 
-The adapter only describes the editor. Your app still owns loading and saving values, SharePoint permissions, lookup/people option queries, field-specific validation, and the REST/Graph serialization format. It never treats unknown field types as text or claims a save succeeded before SharePoint confirms it.
+The adapter describes the editor and provides helpers for lookup option URLs and lookup/person ID payloads. Your app still owns authorized fetching, people search, field-specific validation, general value serialization, and persistence. It never treats unknown field types as text or claims a save succeeded before SharePoint confirms it.

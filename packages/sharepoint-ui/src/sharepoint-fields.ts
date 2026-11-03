@@ -56,6 +56,12 @@ export type SharePointFieldMetadata = SharePointMultiLineField & {
   displayFormat?: string | number;
   Decimals?: string | number;
   decimals?: string | number;
+  LookupList?: string;
+  lookupList?: string;
+  LookupField?: string;
+  lookupField?: string;
+  LookupWebId?: string;
+  lookupWebId?: string;
 };
 
 export type SharePointFieldControl = "input" | "textarea" | "rich-text-editor" | "select" | "radio-group" | "checkbox" | "multi-choice" | "date-picker" | "combobox" | "read-only" | "unsupported";
@@ -76,8 +82,13 @@ export type SharePointFieldAdapter = {
   choices?: readonly string[];
   allowFillIn?: boolean;
   richText?: ReturnType<typeof getRichTextEditorFieldOptions>;
+  lookupSource?: { listId: string; displayField: string; webId?: string };
   unsupportedReason?: string;
 };
+
+export type SharePointLookupId = number | string;
+export type SharePointLookupValue = SharePointLookupId | readonly SharePointLookupId[] | null;
+export type SharePointLookupUpdate = Record<string, number | null | { results: number[] }>;
 
 const booleanValue = (value: SharePointBoolean | undefined): boolean => value === true || (typeof value === "string" && value.trim().toLowerCase() === "true");
 
@@ -135,9 +146,66 @@ export function getSharePointFieldAdapter(field: SharePointFieldMetadata): Share
     return { ...finish("date-picker"), dateMode: displayFormat === 1 || String(displayFormat).toLowerCase() === "1" || String(displayFormat).toLowerCase() === "datetime" ? "date-time" : "date" };
   }
   if (["lookup", "lookupmulti", "user", "usermulti"].includes(normalized)) {
-    return { ...finish("combobox"), multiple: normalized.endsWith("multi") || booleanValue(field.AllowMultipleValues ?? field.allowMultipleValues) };
+    const lookupList = field.LookupList ?? field.lookupList;
+    const lookupField = field.LookupField ?? field.lookupField;
+    const lookupSource = normalized.startsWith("lookup") && lookupList && lookupField
+      ? { listId: lookupList, displayField: lookupField, webId: field.LookupWebId ?? field.lookupWebId }
+      : undefined;
+    return { ...finish("combobox"), multiple: normalized.endsWith("multi") || booleanValue(field.AllowMultipleValues ?? field.allowMultipleValues), lookupSource };
   }
   if (["counter", "computed", "calculated"].includes(normalized)) return { ...finish("read-only"), readOnly: true };
 
   return { ...adapter, unsupportedReason: "This SharePoint field type needs a specialized data source or renderer." };
+}
+
+/** Build a paged REST URL for options in a lookup field's source list. Pass that list's web URL. */
+export function getSharePointLookupOptionsUrl(field: SharePointFieldMetadata, lookupWebUrl: string, pageSize = 100): string {
+  const adapter = getSharePointFieldAdapter(field);
+  const source = adapter.lookupSource;
+  if (adapter.control !== "combobox" || !source) throw new TypeError("This field does not include SharePoint lookup-list metadata.");
+  if (!Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 500) throw new RangeError("pageSize must be an integer from 1 to 500.");
+
+  const listId = source.listId.replace(/[{}]/g, "");
+  if (!/^[\da-f]{8}-(?:[\da-f]{4}-){3}[\da-f]{12}$/i.test(listId)) throw new TypeError("LookupList must contain a SharePoint list GUID.");
+  if (!/^[A-Za-z_][A-Za-z\d_]*$/.test(source.displayField)) throw new TypeError("LookupField must be a SharePoint internal field name.");
+
+  const url = new URL(lookupWebUrl);
+  if (!/^https?:$/.test(url.protocol) || url.username || url.password) throw new TypeError("lookupWebUrl must be an HTTP(S) SharePoint web URL.");
+  url.pathname = `${url.pathname.replace(/\/+$/, "")}/_api/web/lists(guid'${listId}')/items`;
+  url.search = new URLSearchParams({
+    "$select": `Id,${source.displayField}`,
+    "$orderby": `${source.displayField} asc`,
+    "$top": String(pageSize)
+  }).toString();
+  url.hash = "";
+  return url.toString();
+}
+
+/** Serialize selected SharePoint lookup/person IDs for an item create or update body. */
+export function serializeSharePointLookupValue(field: SharePointFieldMetadata, value: SharePointLookupValue): SharePointLookupUpdate {
+  const adapter = getSharePointFieldAdapter(field);
+  const type = adapter.fieldType.replace(/^SP\.Field/, "").toLowerCase();
+  if (adapter.control !== "combobox" || !["lookup", "lookupmulti", "user", "usermulti"].includes(type)) {
+    throw new TypeError("Only SharePoint Lookup and User fields can be serialized as ID selections.");
+  }
+  if (!adapter.name) throw new TypeError("The SharePoint field must include InternalName.");
+  const key = `${adapter.name}Id`;
+
+  if (adapter.multiple) {
+    if (value == null) return { [key]: { results: [] } };
+    if (!isLookupIdArray(value)) throw new TypeError("A multi-value field requires an array of selected IDs.");
+    return { [key]: { results: [...new Set(value.map(parseLookupId))] } };
+  }
+  if (isLookupIdArray(value)) throw new TypeError("A single-value field accepts one selected ID or null.");
+  return { [key]: value == null || value === "" ? null : parseLookupId(value) };
+}
+
+function isLookupIdArray(value: SharePointLookupValue): value is readonly SharePointLookupId[] {
+  return Array.isArray(value);
+}
+
+function parseLookupId(value: SharePointLookupId): number {
+  const id = typeof value === "string" && /^\d+$/.test(value.trim()) ? Number(value.trim()) : value;
+  if (typeof id !== "number" || !Number.isSafeInteger(id) || id < 1) throw new RangeError("SharePoint lookup IDs must be positive safe integers.");
+  return id;
 }
