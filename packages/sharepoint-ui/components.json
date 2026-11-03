@@ -2290,7 +2290,7 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Keep a persistent inline status or error message with an intent-derived icon and custom icon or multiline spacer slots."
+      "summary": "Present an accessible named status group, announce body and action changes at polite or assertive urgency, and adapt automatically between singleline and multiline layouts."
     },
     {
       "react": "MessageBarActions",

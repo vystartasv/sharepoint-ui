@@ -326,7 +326,7 @@
       ],
       "localStatus": "partial",
       "purpose": "Show a persistent inline status, warning, or error near related work.",
-      "coverageNote": "A local implementation exists, but family-level behavior, accessibility, theme, composition, documentation, and performance parity are not yet complete."
+      "coverageNote": "MessageBar/Actions/Body/Title/Group composition supports Fluent intents, custom icons/spacers, RTL, shape, explicit singleline/multiline layouts, and auto layout that measures available width and reflows between singleline and multiline. MessageBars expose the Fluent group role and title-linked name, with an internal polite/assertive announcement region for body and action changes; explicit author labels are preserved. MessageBarGroup retains removed bars for a 250ms inert/aria-hidden exit fade and supports the optional entry fade; both honor reduced motion. Side-by-side Chromium checks compare reflow and group/title semantics with Fluent 9.75.0, and forced-colors, theme, motion, and native composition checks pass. Actual assistive-technology announcements, exact visual parity across all themes, cross-browser, tenant, docs examples, and family performance parity remain open."
     },
     {
       "family": "nav",
