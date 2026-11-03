@@ -19,29 +19,34 @@
       <spui-badge appearance="tint" color="success">Ready for review</spui-badge>
       <span>Updated just now</span>
     </div>
-    <output id="preview-message" class="preview-message" aria-live="polite"></output>
+    <output id="preview-message" class="preview-message" aria-live="polite">iOS appearance · stone accent</output>
   </div>
 </section>
 
 <script>
   import { defineBadge, defineButton, defineInput, defineTag } from "@spfx-fast/sharepoint-ui/elements";
+  import { getSharePointUIStyleTokens } from "@spfx-fast/sharepoint-ui/appearance";
 
   defineBadge();
   defineButton();
   defineInput();
   defineTag();
 
+  const preview = document.querySelector<HTMLElement>("#preview-surface");
+  const accents = ["#78716c", "#0078d4", "#138a58", "#c23b8d"];
+  let accentIndex = 0;
+  if (preview) Object.entries(getSharePointUIStyleTokens("ios", { "--spui-ui-accent": accents[accentIndex] })).forEach(([name, value]) => preview.style.setProperty(name, value));
+
   const previewMessage = document.querySelector<HTMLOutputElement>("#preview-message");
   document.querySelector("#preview-save")?.addEventListener("click", () => {
     if (previewMessage) previewMessage.textContent = "Your update is ready to save.";
   });
   document.querySelector("#preview-theme")?.addEventListener("click", () => {
-    const preview = document.querySelector<HTMLElement>("#preview-surface");
-    const next = preview?.dataset.theme === "blue" ? "stone" : "blue";
     if (preview) {
-      preview.dataset.theme = next;
-      preview.style.setProperty("--spui-ui-accent", next === "blue" ? "#0078d4" : "#78716c");
-      preview.style.setProperty("--spui-focus-ring", next === "blue" ? "#0078d4" : "#78716c");
+      accentIndex = (accentIndex + 1) % accents.length;
+      const tokens = getSharePointUIStyleTokens("ios", { "--spui-ui-accent": accents[accentIndex] });
+      Object.entries(tokens).forEach(([name, value]) => preview.style.setProperty(name, value));
+      if (previewMessage) previewMessage.textContent = `iOS appearance · accent ${accents[accentIndex]}`;
     }
   });
 </script>

@@ -136,7 +136,7 @@ spfx create \
   --local-source ./templates
 ```
 
-The generated app depends on `@spfx-fast/sharepoint-ui@^0.4.0`. Public npm publication is being prepared; after the initial release, install the package from npm before building a generated project.
+The generated app depends on `@spfx-fast/sharepoint-ui@^0.4.2`.
 
 ## Theme contract
 
@@ -257,3 +257,7 @@ The SPFx lab stores normalized HTML in the `Body` rich-text field of a dedicated
 
 - [SPFx Agent Workflow](products/spfx-agent-workflow/README.md)
 - [SharePoint Deployment Field Guide](products/sharepoint-deployment-field-guide/README.md)
+
+## Contributing
+
+The repository is currently private. See [CONTRIBUTING.md](CONTRIBUTING.md) for access and contribution guidance.

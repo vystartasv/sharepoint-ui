@@ -1,0 +1,30 @@
+<script>
+  import { defineSharePointUIElements, getSharePointUIStyleTokens } from "@spfx-fast/sharepoint-ui";
+
+  defineSharePointUIElements();
+
+  document.querySelectorAll("[data-component-demo]").forEach((demo) => {
+    const appearance = demo.querySelector("[data-preview-appearance]");
+    const accent = demo.querySelector("[data-preview-accent]");
+    const stage = demo.querySelector(".component-demo__stage");
+    const status = demo.querySelector(".component-demo__status");
+
+    const applyTokens = () => {
+      const tokens = getSharePointUIStyleTokens(appearance?.value ?? "ios", { "--spui-ui-accent": accent?.value ?? "#78716c" });
+      for (const [name, value] of Object.entries(tokens)) demo.style.setProperty(name, value);
+    };
+
+    appearance?.addEventListener("change", applyTokens);
+    accent?.addEventListener("input", applyTokens);
+    applyTokens();
+
+    for (const type of ["click", "input", "change"]) {
+      stage?.addEventListener(type, (event) => {
+        const target = event.target;
+        const label = demo.dataset.label ?? "Component";
+        const value = target?.value ?? target?.checked;
+        if (status) status.textContent = value === undefined ? `${label} ${type === "click" ? "activated" : "updated"}.` : `${label} value: ${value}`;
+      });
+    }
+  });
+</script>
