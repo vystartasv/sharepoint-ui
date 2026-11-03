@@ -7192,7 +7192,7 @@ export const AccordionPanel = /* @__PURE__ */ React.forwardRef<HTMLElement, Elem
 });
 
 export type SharePointFieldOption = { value: string | number; label: string; disabled?: boolean };
-export type SharePointFieldProps = {
+export type SharePointFieldProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children" | "defaultValue" | "onChange"> & {
   field: SharePointFieldMetadata;
   value?: SharePointFieldValue;
   defaultValue?: SharePointFieldValue;
@@ -7204,12 +7204,10 @@ export type SharePointFieldProps = {
   renderUnsupported?: (field: SharePointFieldMetadata, reason: string) => React.ReactNode;
   addChoiceLabel?: string;
   emptyOptionLabel?: string;
-  className?: string;
-  style?: React.CSSProperties;
 };
 
 /** Render a SharePoint field recipe using the library's matching form control. */
-export function SharePointField({ field, value, defaultValue, options: providedOptions, onValueChange, disabled = false, hint, validationMessage, renderUnsupported, addChoiceLabel = "Add another choice", emptyOptionLabel = "Select an option", className, style }: SharePointFieldProps): React.ReactElement | null {
+export function SharePointField({ field, value, defaultValue, options: providedOptions, onValueChange, disabled = false, hint, validationMessage, renderUnsupported, addChoiceLabel = "Add another choice", emptyOptionLabel = "Select an option", className, style, ...hostProps }: SharePointFieldProps): React.ReactElement | null {
   const adapter = getSharePointFieldAdapter(field);
   const [internalValue, setInternalValue] = React.useState<SharePointFieldValue | undefined>(defaultValue);
   const [fillInValue, setFillInValue] = React.useState("");
@@ -7309,11 +7307,11 @@ export function SharePointField({ field, value, defaultValue, options: providedO
   }
 
   if (adapter.control === "multi-choice") {
-    return <Field hint={hint ?? adapter.description} validationMessage={validationMessage} disabled={disabled} className={className} style={style}>
+    return <Field {...hostProps} hint={hint ?? adapter.description} validationMessage={validationMessage} disabled={disabled} className={className} style={style}>
       <SharePointMultiChoiceGroup label={label} required={adapter.required} disabled={disabled}>{control}</SharePointMultiChoiceGroup>
     </Field>;
   }
-  return <Field label={label} hint={hint ?? adapter.description} validationMessage={validationMessage} required={adapter.required} disabled={disabled} className={className} style={style}>{control}</Field>;
+  return <Field {...hostProps} label={label} hint={hint ?? adapter.description} validationMessage={validationMessage} required={adapter.required} disabled={disabled} className={className} style={style}>{control}</Field>;
 }
 
 function toSharePointControlString(value: SharePointFieldValue | undefined): string {
