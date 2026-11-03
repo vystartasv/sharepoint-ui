@@ -489,6 +489,43 @@
   width: min(100%, 32rem);
 }
 
+.component-demo__stage .preview-field {
+  display: grid;
+  width: min(100%, 24rem);
+  gap: 0.4rem;
+}
+
+.component-demo__stage .preview-field label,
+.component-demo__stage .preview-info-label label {
+  color: var(--spui-ui-text, var(--sl-color-text));
+  font-weight: 600;
+}
+
+.component-demo__stage .preview-field input,
+.component-demo__stage > input,
+.component-demo__stage .preview-info-label + input {
+  min-height: 2.5rem;
+  padding-inline: 0.75rem;
+  border: 1px solid var(--spui-ui-stroke, var(--sl-color-hairline));
+  border-radius: 0.4rem;
+  background: var(--spui-ui-surface, var(--sl-color-bg));
+  color: var(--spui-ui-text, var(--sl-color-text));
+  font: inherit;
+}
+
+.component-demo__stage .preview-field input:focus-visible,
+.component-demo__stage > input:focus-visible,
+.component-demo__stage .preview-info-label + input:focus-visible {
+  outline: 2px solid var(--spui-ui-accent, #007780);
+  outline-offset: 2px;
+}
+
+.component-demo__stage .preview-info-label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
 .component-demo__stage > spui-virtual-list {
   display: block;
   width: 100%;

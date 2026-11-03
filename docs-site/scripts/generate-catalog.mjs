@@ -149,6 +149,7 @@ function slotsTableFor(slots) {
 
 function exampleFor(component) {
   const compositions = {
+    label: { tag: "div", markup: '<div class="preview-field"><label for="preview-project-code">Project code <span aria-hidden="true">*</span></label><input id="preview-project-code" required value="OPS-204" /></div>' },
     accordion: { tag: "spui-accordion", attrs: 'value="access"', markup: '<spui-accordion value="access"><spui-accordion-item value="access" open><spui-accordion-header>Access policy</spui-accordion-header><spui-accordion-panel>Review who can open this workspace.</spui-accordion-panel></spui-accordion-item></spui-accordion>' },
     carousel: { tag: "spui-carousel", attrs: 'aria-label="Project updates" default-selected-index="0"', markup: '<spui-carousel aria-label="Project updates" default-selected-index="0"><spui-carousel-card>Workspace launch</spui-carousel-card><spui-carousel-card>Quarterly review</spui-carousel-card><spui-carousel-card>Team updates</spui-carousel-card></spui-carousel>' },
     dialog: { tag: "spui-dialog", attrs: 'aria-label="Save changes"', markup: '<spui-dialog aria-label="Save changes"><spui-dialog-trigger slot="trigger"><spui-button appearance="secondary">Open dialog</spui-button></spui-dialog-trigger><spui-dialog-title>Save changes</spui-dialog-title><spui-dialog-body>Your edits are ready to share with the team.</spui-dialog-body><spui-dialog-actions><spui-button appearance="secondary">Cancel</spui-button><spui-button appearance="primary">Save</spui-button></spui-dialog-actions></spui-dialog>' },
@@ -159,6 +160,8 @@ function exampleFor(component) {
     tabs: { tag: "spui-tabs", attrs: 'value="overview"', markup: '<spui-tabs value="overview"><spui-tab-list><spui-tab value="overview">Overview</spui-tab><spui-tab value="activity">Activity</spui-tab></spui-tab-list><spui-tab-panel value="overview">Workspace overview and key details.</spui-tab-panel></spui-tabs>' },
     "avatar-group-primitives": { tag: "spui-avatar-group-popover", attrs: 'count="2" label="Other reviewers" trigger-label="View {count} more reviewers"', markup: '<spui-avatar-group-popover count="2" label="Other reviewers" trigger-label="View {count} more reviewers"><li>Maria Chen</li><li>Daniel Morgan</li></spui-avatar-group-popover>' },
   };
+  if (component.react === "Field") return { tag: "spui-field", attrs: 'label="Project code" required value="OPS-204"', content: "", related: false };
+  if (component.react === "InfoLabel") return { tag: "div", markup: '<div class="preview-info-label"><label for="preview-owner">Project owner</label><spui-info-button label="About project owner" info="The person responsible for keeping this project current." placement="right"></spui-info-button></div><input id="preview-owner" value="Maria Chen" />', related: true };
   if (component.tag === "spui-data-grid" || component.module.startsWith("data-grid")) {
     return { tag: "spui-data-grid", attrs: 'aria-label="Project work items"', content: "", related: true };
   }
