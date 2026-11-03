@@ -29,7 +29,7 @@ Theme packs compose left to right; later packs override earlier values. Host-der
 
 ## Use the current UI culture for RTL
 
-Set the provider `lang` from the SPFx page culture. Arabic and other RTL locales resolve to right-to-left direction, and components use logical start/end placement. If the host gives a language value without direction information, set `dir="rtl"` on the owning app region. Keep the content's actual `lang` accurate for assistive technology.
+Set the provider `lang` from the SPFx page culture. The provider derives `dir` from the language tag, so Arabic and other RTL languages flow right-to-left while English and other LTR languages flow left-to-right. An explicit `dir` always takes precedence. Direct custom elements also follow inherited language direction unless they have their own `dir` attribute. Keep the content's actual `lang` accurate for assistive technology.
 
 ```tsx
 <SharePointUIProvider lang={this.context.pageContext.cultureInfo.currentUICultureName}>

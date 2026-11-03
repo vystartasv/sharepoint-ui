@@ -2,7 +2,7 @@
 
 ## Theme and layout
 
-Wrap a React surface in `SharePointUIProvider` and pass the SharePoint `ThemeProvider` values through `applySharePointTheme()` at the web-part boundary. Set `lang` and `dir` on the provider. Use tokens and CSS parts to customize; avoid copying a component's internal markup. Glass derives its values from the selected SharePoint/base appearance.
+Wrap a React surface in `SharePointUIProvider` and pass the SharePoint `ThemeProvider` values through `applySharePointTheme()` at the web-part boundary. Set the provider `lang`; it derives `dir` from the BCP 47 language tag. Set `dir` explicitly only to override that direction. Use tokens and CSS parts to customize; avoid copying a component's internal markup. Glass derives its values from the selected SharePoint/base appearance.
 
 ## Forms and events
 
