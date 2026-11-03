@@ -142,6 +142,7 @@ export function defineRichTextEditor(): void {
     private pendingValue: string | undefined;
     private customError = "";
     private savedRange?: Range;
+    private preserveToolbarSelection = false;
     private probingSelection = false;
     private probedSelection?: Range;
     /** Uploads to a durable asset store and returns the image URL to persist in editor HTML. */
@@ -411,8 +412,8 @@ export function defineRichTextEditor(): void {
         }
       }
       if (!range || !this.editor.contains(range.commonAncestorContainer)) return;
-      const toolbar = this.shadowRoot?.querySelector<HTMLElement>('[role="toolbar"]');
-      if (range.collapsed && !this.editor.matches(":focus") && this.savedRange && !this.savedRange.collapsed && toolbar?.contains(this.shadowRoot?.activeElement ?? null)) return;
+      if (range.collapsed && this.preserveToolbarSelection && this.savedRange && !this.savedRange.collapsed) return;
+      if (!range.collapsed) this.preserveToolbarSelection = false;
       this.savedRange = range.cloneRange();
       const node = range.startContainer;
       const element = node instanceof Element ? node : node.parentElement;
@@ -698,7 +699,7 @@ export function defineRichTextEditor(): void {
       toolbar.addEventListener("pointerdown", () => {
         const selection = this.selection();
         const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
-        if (range && !range.collapsed && this.editor.contains(range.commonAncestorContainer)) this.savedRange = range.cloneRange();
+        if (range && !range.collapsed && this.editor.contains(range.commonAncestorContainer)) { this.savedRange = range.cloneRange(); this.preserveToolbarSelection = true; }
       }, true);
       const format = document.createElement("select"); format.className = "toolbar-format"; format.dataset.command = "formatBlock"; format.dataset.labelAttribute = "format-block-label"; format.setAttribute("aria-label", this.getAttribute("format-block-label") ?? "Text style");
       for (const [value, attribute, fallback] of [["P", "paragraph-label", "Paragraph"], ["H1", "heading-1-label", "Heading 1"], ["H2", "heading-2-label", "Heading 2"], ["H3", "heading-3-label", "Heading 3"], ["BLOCKQUOTE", "blockquote-label", "Quote"], ["PRE", "preformatted-label", "Preformatted"]]) {
@@ -809,6 +810,7 @@ export function defineRichTextEditor(): void {
         event.stopImmediatePropagation();
       }, true);
       this.editor.addEventListener("input", () => this.commitEditorValue());
+      this.editor.addEventListener("pointerdown", () => { this.preserveToolbarSelection = false; });
       this.editor.addEventListener("mouseup", this.onSelectionChange);
       this.editor.addEventListener("keyup", this.onSelectionChange);
       this.editor.addEventListener("click", this.onEditorClick);
