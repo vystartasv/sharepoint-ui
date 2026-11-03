@@ -36,7 +36,28 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Present a modal or non-modal task surface with optional full-screen expansion."
+      "summary": "Present a modal or non-modal task surface with optional full-screen expansion.",
+      "customElementAttributes": [
+        "aria-label",
+        "close-label",
+        "data-has-custom-backdrop",
+        "dismissible",
+        "expand-label",
+        "expandable",
+        "expanded",
+        "inert-trap-focus",
+        "modal",
+        "modal-type",
+        "motion",
+        "motion-exit-complete",
+        "motion-visible",
+        "open",
+        "position",
+        "restore-label",
+        "size",
+        "title",
+        "type"
+      ]
     },
     {
       "react": "InlineDrawer",
@@ -63,7 +84,16 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Show a non-modal drawer in the page layout with optional separator, title, navigation, and actions."
+      "summary": "Show a non-modal drawer in the page layout with optional separator, title, navigation, and actions.",
+      "customElementAttributes": [
+        "aria-label",
+        "motion",
+        "open",
+        "position",
+        "separator",
+        "size",
+        "title"
+      ]
     },
     {
       "react": "OverlayDrawer",
@@ -89,7 +119,28 @@
           "host className/style"
         ]
       },
-      "summary": "Use the modal or non-modal overlay drawer with Fluent overlay defaults."
+      "summary": "Use the modal or non-modal overlay drawer with Fluent overlay defaults.",
+      "customElementAttributes": [
+        "aria-label",
+        "close-label",
+        "data-has-custom-backdrop",
+        "dismissible",
+        "expand-label",
+        "expandable",
+        "expanded",
+        "inert-trap-focus",
+        "modal",
+        "modal-type",
+        "motion",
+        "motion-exit-complete",
+        "motion-visible",
+        "open",
+        "position",
+        "restore-label",
+        "size",
+        "title",
+        "type"
+      ]
     },
     {
       "react": "DrawerFooter",

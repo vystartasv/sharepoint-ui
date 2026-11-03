@@ -33,7 +33,17 @@
           "named ::part hooks"
         ]
       },
-      "summary": "Browse nested folders or navigation nodes with hierarchy semantics and RTL-aware keys."
+      "summary": "Browse nested folders or navigation nodes with hierarchy semantics and RTL-aware keys.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-label",
+        "empty-label",
+        "label",
+        "navigation-mode",
+        "selection-mode",
+        "size",
+        "toggle-label"
+      ]
     },
     {
       "react": "TreeItemLayout",

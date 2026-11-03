@@ -32,7 +32,31 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Search or filter content with a clear action, native form value, and Enter-to-submit behavior."
+      "summary": "Search or filter content with a clear action, native form value, and Enter-to-submit behavior.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "aria-required",
+        "autocomplete",
+        "clear-label",
+        "disabled",
+        "inputmode",
+        "label",
+        "maxlength",
+        "minlength",
+        "name",
+        "pattern",
+        "placeholder",
+        "read-only",
+        "required",
+        "size",
+        "type",
+        "value"
+      ]
     }
   ]
 }

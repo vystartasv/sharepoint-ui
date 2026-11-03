@@ -30,7 +30,16 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Group related content in a themed surface with filled, outline, subtle, and alternative appearances plus compact, medium, large, and horizontal layouts. Selectable cards provide a themed, keyboard-operable checkbox with controlled or default selection. Nonselectable cards support off, no-tab, tab-exit, and tab-only focus modes. SharePointCard remains available as an alias."
+      "summary": "Group related content in a themed surface with filled, outline, subtle, and alternative appearances plus compact, medium, large, and horizontal layouts. Selectable cards provide a themed, keyboard-operable checkbox with controlled or default selection. Nonselectable cards support off, no-tab, tab-exit, and tab-only focus modes. SharePointCard remains available as an alias.",
+      "customElementAttributes": [
+        "aria-label",
+        "default-selected",
+        "disabled",
+        "focus-mode",
+        "selectable",
+        "selected",
+        "selection-label"
+      ]
     }
   ]
 }

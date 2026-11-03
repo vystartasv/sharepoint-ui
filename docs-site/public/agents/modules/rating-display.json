@@ -28,7 +28,17 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Display an accessible, theme-aware whole or fractional rating with compact and count modes."
+      "summary": "Display an accessible, theme-aware whole or fractional rating with compact and count modes.",
+      "customElementAttributes": [
+        "aria-label",
+        "color",
+        "compact",
+        "count",
+        "lang",
+        "max",
+        "size",
+        "value"
+      ]
     },
     {
       "react": "RatingItem",
@@ -51,7 +61,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Compose a reusable filled or outlined rating item inside RatingDisplay."
+      "summary": "Compose a reusable filled or outlined rating item inside RatingDisplay.",
+      "customElementAttributes": [
+        "color",
+        "max",
+        "rating",
+        "size",
+        "value"
+      ]
     }
   ]
 }

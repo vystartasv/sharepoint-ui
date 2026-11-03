@@ -26,7 +26,15 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Navigate with an anchor or render an accessible button or span action when needed."
+      "summary": "Navigate with an anchor or render an accessible button or span action when needed.",
+      "customElementAttributes": [
+        "appearance",
+        "as",
+        "disabled",
+        "disabled-focusable",
+        "inline",
+        "underline"
+      ]
     }
   ]
 }

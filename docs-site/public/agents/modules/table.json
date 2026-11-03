@@ -48,7 +48,12 @@
           "useTableCompositeNavigation"
         ]
       },
-      "summary": "Render a responsive, theme-aware table surface with small, medium, and large density plus an optional flex-based non-native layout."
+      "summary": "Render a responsive, theme-aware table surface with small, medium, and large density plus an optional flex-based non-native layout.",
+      "customElementAttributes": [
+        "appearance",
+        "no-native-elements",
+        "size"
+      ]
     },
     {
       "module": "table",

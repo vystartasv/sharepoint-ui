@@ -38,7 +38,33 @@
           "resize: none | horizontal | vertical | both"
         ]
       },
-      "summary": "Edit multi-line text with controlled or default values, Fluent appearances and sizes, native resize control, and change callbacks."
+      "summary": "Edit multi-line text with controlled or default values, Fluent appearances and sizes, native resize control, and change callbacks.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "autocomplete",
+        "cols",
+        "default-value",
+        "dirname",
+        "disabled",
+        "form",
+        "label",
+        "maxlength",
+        "minlength",
+        "name",
+        "placeholder",
+        "read-only",
+        "required",
+        "resize",
+        "rows",
+        "size",
+        "value",
+        "wrap"
+      ]
     }
   ]
 }

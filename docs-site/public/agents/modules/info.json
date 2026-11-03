@@ -52,7 +52,20 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Open a keyboard-operable, theme-aware information popover with support for links and other focusable guidance."
+      "summary": "Open a keyboard-operable, theme-aware information popover with support for links and other focusable guidance.",
+      "customElementAttributes": [
+        "disabled",
+        "info",
+        "inline",
+        "label",
+        "open",
+        "placement",
+        "popover-arrow",
+        "popover-label",
+        "popover-placement",
+        "popover-trap-focus",
+        "size"
+      ]
     }
   ]
 }

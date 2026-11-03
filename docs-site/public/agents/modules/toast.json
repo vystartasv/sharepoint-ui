@@ -31,7 +31,16 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Announce brief, dismissible feedback with intent-based live politeness, priority scheduling, and a three-second timeout that continues while hovered or the window is unfocused."
+      "summary": "Announce brief, dismissible feedback with intent-based live politeness, priority scheduling, and a three-second timeout that continues while hovered or the window is unfocused.",
+      "customElementAttributes": [
+        "appearance",
+        "dismiss-label",
+        "intent",
+        "politeness",
+        "priority",
+        "timeout",
+        "toast-id"
+      ]
     },
     {
       "react": "ToastBody",
@@ -100,7 +109,10 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Compose a toast title with intent media and a trailing title action."
+      "summary": "Compose a toast title with intent media and a trailing title action.",
+      "customElementAttributes": [
+        "intent"
+      ]
     },
     {
       "react": "ToastTrigger",

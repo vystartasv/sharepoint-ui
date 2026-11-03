@@ -3,7 +3,7 @@
   "agentContract": {
     "composition": "Import named components from @spfx-fast/sharepoint-ui/react. Put one SharePointUIProvider around the view. Compose with children by default; use only the slots and component props listed for that component.",
     "state": "State props, initial default props, callback names, and callback arguments vary by component. Follow that component's signature and callbackProps; update controlled state in its callback.",
-    "customElements": "Import the component's define function from @spfx-fast/sharepoint-ui/elements/{module} and register it once. Set objects and callbacks as DOM properties. For event names and statically visible detail keys, use the source module's event inventory at https://vystartasv.github.io/sharepoint-ui/agents/events/{module}.json; it is module-scoped, so check event.target when composed tags emit events."
+    "customElements": "Import the component's define function from @spfx-fast/sharepoint-ui/elements/{module} and register it once. Set objects and callbacks as DOM properties. For event names and statically visible detail keys, use the source module's event inventory at https://vystartasv.github.io/sharepoint-ui/agents/events/{module}.json; it is module-scoped, so check event.target when composed tags emit events. Where present, a component JSON slice reports its tag's statically declared observed attributes as customElementAttributes; set non-attribute objects and callbacks as DOM properties."
   },
   "elementEventInventory": {
     "url": "https://vystartasv.github.io/sharepoint-ui/agents/events/combobox.json",

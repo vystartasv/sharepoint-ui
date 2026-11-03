@@ -27,7 +27,28 @@
         "reactRefType": "HTMLElement"
       },
       "summary": "Select localized dates using a keyboard-accessible calendar with RTL navigation, min/max constraints, and native form participation.",
-      "note": "SharePoint addition; Fluent UI v9 DatePicker remains in a separate compatibility package."
+      "note": "SharePoint addition; Fluent UI v9 DatePicker remains in a separate compatibility package.",
+      "customElementAttributes": [
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "calendar-label",
+        "disabled",
+        "invalid-date-message",
+        "label",
+        "max",
+        "min",
+        "name",
+        "next-month-label",
+        "placeholder",
+        "previous-month-label",
+        "read-only",
+        "required",
+        "required-message",
+        "value"
+      ]
     }
   ]
 }

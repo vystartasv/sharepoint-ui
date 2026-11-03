@@ -33,7 +33,13 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Present a document, person, task, approval, or list item with replaceable fields and actions."
+      "summary": "Present a document, person, task, approval, or list item with replaceable fields and actions.",
+      "customElementAttributes": [
+        "description",
+        "kind",
+        "subtitle",
+        "title"
+      ]
     }
   ]
 }

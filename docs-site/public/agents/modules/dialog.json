@@ -38,7 +38,22 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Present a focused modal or non-modal task surface with title, actions, and dismissal controls."
+      "summary": "Present a focused modal or non-modal task surface with title, actions, and dismissal controls.",
+      "customElementAttributes": [
+        "aria-label",
+        "close-label",
+        "default-open",
+        "dialog-label",
+        "dismissible",
+        "inert-trap-focus",
+        "modal",
+        "modal-type",
+        "motion",
+        "motion-exit-complete",
+        "motion-visible",
+        "open",
+        "title"
+      ]
     },
     {
       "react": "DialogSurface",

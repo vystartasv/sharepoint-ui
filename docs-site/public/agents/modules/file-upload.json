@@ -27,7 +27,28 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Select files by browsing or drag and drop, enforce type/count/size constraints, expose accessible removal and events, and contribute selected files to native forms. The consumer owns upload transport and SharePoint persistence."
+      "summary": "Select files by browsing or drag and drop, enforce type/count/size constraints, expose accessible removal and events, and contribute selected files to native forms. The consumer owns upload transport and SharePoint persistence.",
+      "customElementAttributes": [
+        "accept",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "browse-label",
+        "disabled",
+        "drop-label",
+        "invalid-message",
+        "label",
+        "max-file-size",
+        "max-files",
+        "multiple",
+        "name",
+        "remove-label",
+        "required",
+        "required-message",
+        "selected-label"
+      ]
     }
   ]
 }

@@ -31,7 +31,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Announce by intent with polite or assertive live-region behavior, and compose icon, avatar, action, or dismissal slots."
+      "summary": "Announce by intent with polite or assertive live-region behavior, and compose icon, avatar, action, or dismissal slots.",
+      "customElementAttributes": [
+        "appearance",
+        "assertive",
+        "dismiss-label",
+        "dismissible",
+        "intent"
+      ]
     }
   ]
 }

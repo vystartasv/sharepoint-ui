@@ -32,7 +32,7 @@ let nextGridId = 0;
 export function defineDataGrid(): void {
   if (customElements.get("spui-data-grid")) return;
   class SpuiDataGrid extends HTMLElement implements SharePointDataGridElement {
-    static observedAttributes = ["aria-label", "label", "focus-mode", "selection-mode", "selection-appearance", "subtle-selection", "auto-fit-columns", "container-width-offset", "row-height", "overscan", "virtualize-columns", "select-label", "select-all-label", "empty-label", "no-results-label", "filterable", "filter-label", "sort-priority-label", "resizable-columns", "resize-label", "reorderable-columns", "reorder-label", "group-by", "empty-group-label", "expand-group-label", "collapse-group-label", "row-label", "edit-hint"];
+    static observedAttributes = ["aria-label", "label", "focus-mode", "selection-mode", "selection-appearance", "subtle-selection", "auto-fit-columns", "container-width-offset", "row-height", "overscan", "virtualize-columns", "select-label", "select-all-label", "empty-label", "no-results-label", "loading-label", "filterable", "filter-label", "sort-priority-label", "resizable-columns", "resize-label", "reorderable-columns", "reorder-label", "group-by", "empty-group-label", "expand-group-label", "collapse-group-label", "row-label", "edit-hint"];
     private data: unknown[] = [];
     private source?: DataGridDataSource;
     private sourceUnsubscribe?: () => void;

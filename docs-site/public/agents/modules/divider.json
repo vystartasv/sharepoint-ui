@@ -27,7 +27,15 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Separate adjacent content groups without creating an extra layout container."
+      "summary": "Separate adjacent content groups without creating an extra layout container.",
+      "customElementAttributes": [
+        "align",
+        "align-content",
+        "appearance",
+        "inset",
+        "orientation",
+        "vertical"
+      ]
     }
   ]
 }

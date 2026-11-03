@@ -30,7 +30,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Identify one panel by value; compose an accessible AccordionHeader and AccordionPanel, or use the heading/default-content compatibility form."
+      "summary": "Identify one panel by value; compose an accessible AccordionHeader and AccordionPanel, or use the heading/default-content compatibility form.",
+      "customElementAttributes": [
+        "disabled",
+        "disabled-focusable",
+        "heading",
+        "open",
+        "value"
+      ]
     },
     {
       "react": "AccordionHeader",
@@ -54,7 +61,12 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Compose the labelled, keyboard-operable heading for an AccordionItem with optional leading and expandable icon slots."
+      "summary": "Compose the labelled, keyboard-operable heading for an AccordionItem with optional leading and expandable icon slots.",
+      "customElementAttributes": [
+        "expand-icon-position",
+        "inline",
+        "size"
+      ]
     },
     {
       "react": "AccordionPanel",
@@ -102,7 +114,13 @@
         "reactRefType": "HTMLElement",
         "forwardRefParameterType": "React.ForwardedRef<HTMLElement>"
       },
-      "summary": "Group composed sections with controlled or default values, single/multiple and collapsible behavior, change details, and optional linear/circular keyboard navigation."
+      "summary": "Group composed sections with controlled or default values, single/multiple and collapsible behavior, change details, and optional linear/circular keyboard navigation.",
+      "customElementAttributes": [
+        "collapsible",
+        "mode",
+        "multiple",
+        "navigation"
+      ]
     },
     {
       "react": "AccordionProvider",

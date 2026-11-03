@@ -26,7 +26,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Show a compact status or category label alongside its related content."
+      "summary": "Show a compact status or category label alongside its related content.",
+      "customElementAttributes": [
+        "appearance",
+        "color",
+        "icon-position",
+        "shape",
+        "size"
+      ]
     },
     {
       "react": "CounterBadge",
@@ -48,7 +55,18 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Display an accessible count or dot badge with an optional overflow limit."
+      "summary": "Display an accessible count or dot badge with an optional overflow limit.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-label",
+        "color",
+        "count",
+        "dot",
+        "overflow-count",
+        "shape",
+        "show-zero",
+        "size"
+      ]
     },
     {
       "react": "PresenceBadge",
@@ -70,7 +88,13 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Show a compact, accessible presence status with an optional out-of-office marker."
+      "summary": "Show a compact, accessible presence status with an optional out-of-office marker.",
+      "customElementAttributes": [
+        "aria-label",
+        "out-of-office",
+        "size",
+        "status"
+      ]
     }
   ]
 }

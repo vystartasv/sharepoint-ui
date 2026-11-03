@@ -28,7 +28,16 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Stack people avatars compactly and reveal the remaining members with a localized, keyboard-operable overflow control."
+      "summary": "Stack people avatars compactly and reveal the remaining members with a localized, keyboard-operable overflow control.",
+      "customElementAttributes": [
+        "expanded",
+        "label",
+        "layout",
+        "max-visible",
+        "show-less-label",
+        "show-more-label",
+        "size"
+      ]
     }
   ]
 }

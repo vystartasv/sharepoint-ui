@@ -30,7 +30,23 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "A themed menu trigger that composes with Menu for open state, keyboard focus, and dismissal."
+      "summary": "A themed menu trigger that composes with Menu for open state, keyboard focus, and dismissal.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-controls",
+        "aria-describedby",
+        "aria-expanded",
+        "aria-haspopup",
+        "aria-label",
+        "aria-labelledby",
+        "disabled",
+        "disabled-focusable",
+        "shape",
+        "size",
+        "tabindex",
+        "title",
+        "type"
+      ]
     },
     {
       "react": "CompoundButton",
@@ -55,7 +71,15 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Present a primary action with a descriptive second line and optional decorative icon."
+      "summary": "Present a primary action with a descriptive second line and optional decorative icon.",
+      "customElementAttributes": [
+        "appearance",
+        "disabled",
+        "disabled-focusable",
+        "icon-position",
+        "shape",
+        "size"
+      ]
     },
     {
       "react": "ToggleButton",
@@ -81,7 +105,25 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "A button with an accessible pressed state, controlled or uncontrolled operation, and theme-derived selected styling."
+      "summary": "A button with an accessible pressed state, controlled or uncontrolled operation, and theme-derived selected styling.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-describedby",
+        "aria-label",
+        "checked",
+        "controlled",
+        "default-checked",
+        "default-pressed",
+        "disabled",
+        "disabled-focusable",
+        "icon-position",
+        "is-accessible",
+        "pressed",
+        "shape",
+        "size",
+        "tabindex",
+        "title"
+      ]
     },
     {
       "react": "SplitButton",
@@ -106,7 +148,10 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Pair a primary action with a localized menu trigger; replace either button slot with a React element or partial prop object while retaining composed Menu behavior."
+      "summary": "Pair a primary action with a localized menu trigger; replace either button slot with a React element or partial prop object while retaining composed Menu behavior.",
+      "customElementAttributes": [
+        "aria-label"
+      ]
     },
     {
       "react": "ToolbarToggleButton",
@@ -129,7 +174,25 @@
           "host className/style"
         ]
       },
-      "summary": "Toggle toolbar command with the library ToggleButton pressed state and subtle appearance by default."
+      "summary": "Toggle toolbar command with the library ToggleButton pressed state and subtle appearance by default.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-describedby",
+        "aria-label",
+        "checked",
+        "controlled",
+        "default-checked",
+        "default-pressed",
+        "disabled",
+        "disabled-focusable",
+        "icon-position",
+        "is-accessible",
+        "pressed",
+        "shape",
+        "size",
+        "tabindex",
+        "title"
+      ]
     }
   ]
 }

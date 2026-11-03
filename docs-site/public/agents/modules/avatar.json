@@ -27,7 +27,17 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Identify a person or entity with initials, an image, or composed icon and badge slots."
+      "summary": "Identify a person or entity with initials, an image, or composed icon and badge slots.",
+      "customElementAttributes": [
+        "color",
+        "decorative",
+        "id-for-color",
+        "image",
+        "initials",
+        "name",
+        "shape",
+        "size"
+      ]
     },
     {
       "react": "AvatarGroupProvider",

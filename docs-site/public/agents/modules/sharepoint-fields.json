@@ -35,7 +35,16 @@
         "customElementEvents": [
           "spui-field-value-change"
         ]
-      }
+      },
+      "customElementAttributes": [
+        "add-choice-label",
+        "disabled",
+        "empty-option-label",
+        "field",
+        "hint",
+        "validation-message",
+        "value"
+      ]
     }
   ]
 }

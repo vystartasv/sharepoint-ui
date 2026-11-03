@@ -37,7 +37,36 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Compose direct or grouped CarouselCard slides with localized navigation, optional autoplay, numeric or responsive page groups, drag interaction, and theme-aware motion."
+      "summary": "Compose direct or grouped CarouselCard slides with localized navigation, optional autoplay, numeric or responsive page groups, drag interaction, and theme-aware motion.",
+      "customElementAttributes": [
+        "active-index",
+        "align",
+        "appearance",
+        "aria-label",
+        "aria-roledescription",
+        "autoplay",
+        "autoplay-interval",
+        "circular",
+        "controlled",
+        "default-active-index",
+        "default-selected-index",
+        "draggable",
+        "group-size",
+        "motion",
+        "motion-duration",
+        "motion-physics-duration",
+        "navigation-label",
+        "next-label",
+        "pause-label",
+        "play-label",
+        "previous-label",
+        "selected-index",
+        "slide-group-label",
+        "slide-label",
+        "slide-width",
+        "whitespace",
+        "wrap"
+      ]
     },
     {
       "module": "carousel",
@@ -63,7 +92,10 @@
       "slots": [
         "content"
       ],
-      "summary": "Represent one accessible carousel slide, with optional intrinsic sizing for content-driven galleries."
+      "summary": "Represent one accessible carousel slide, with optional intrinsic sizing for content-driven galleries.",
+      "customElementAttributes": [
+        "auto-size"
+      ]
     },
     {
       "module": "carousel",
@@ -164,7 +196,12 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Add a previous or next action to a composed Carousel control strip; the Carousel owns bounds, wrapping, and disabled state."
+      "summary": "Add a previous or next action to a composed Carousel control strip; the Carousel owns bounds, wrapping, and disabled state.",
+      "customElementAttributes": [
+        "disabled",
+        "label",
+        "nav-type"
+      ]
     },
     {
       "react": "CarouselAutoplayButton",
@@ -201,7 +238,26 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Expose a localized, accessible play/pause control synchronized with its parent Carousel autoplay state."
+      "summary": "Expose a localized, accessible play/pause control synchronized with its parent Carousel autoplay state.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-describedby",
+        "aria-label",
+        "checked",
+        "controlled",
+        "default-checked",
+        "disabled",
+        "disabled-focusable",
+        "icon-position",
+        "is-accessible",
+        "pause-label",
+        "play-label",
+        "selected",
+        "shape",
+        "size",
+        "tabindex",
+        "title"
+      ]
     },
     {
       "react": "CarouselNavContainer",
@@ -229,7 +285,10 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Arrange Carousel navigation, previous/next, and autoplay controls in inline or overlay layouts."
+      "summary": "Arrange Carousel navigation, previous/next, and autoplay controls in inline or overlay layouts.",
+      "customElementAttributes": [
+        "layout"
+      ]
     },
     {
       "react": "CarouselSlider",
@@ -250,7 +309,10 @@
           "host className/style"
         ],
         "reactRefType": "HTMLElement"
-      }
+      },
+      "customElementAttributes": [
+        "card-focus"
+      ]
     },
     {
       "react": "CarouselViewport",

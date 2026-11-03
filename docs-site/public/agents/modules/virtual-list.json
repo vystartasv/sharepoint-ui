@@ -29,7 +29,16 @@
           "named ::part hooks"
         ]
       },
-      "summary": "Render large local or asynchronously range-loaded collections with bounded horizontal or vertical viewport rendering, fixed or measured item sizes, and accessible list position metadata."
+      "summary": "Render large local or asynchronously range-loaded collections with bounded horizontal or vertical viewport rendering, fixed or measured item sizes, and accessible list position metadata.",
+      "customElementAttributes": [
+        "aria-label",
+        "axis",
+        "item-size",
+        "label",
+        "measure-items",
+        "overscan",
+        "row-height"
+      ]
     },
     {
       "module": "virtual-list",

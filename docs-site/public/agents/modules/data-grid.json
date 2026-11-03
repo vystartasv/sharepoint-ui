@@ -70,6 +70,37 @@
       "highValueAdditions": [
         "Bring async range-backed composition to the existing composable rendering and selection model for large SharePoint lists.",
         "Add broad assistive-technology and layout performance checks to each composed DataGrid interaction."
+      ],
+      "customElementAttributes": [
+        "aria-label",
+        "auto-fit-columns",
+        "collapse-group-label",
+        "container-width-offset",
+        "edit-hint",
+        "empty-group-label",
+        "empty-label",
+        "expand-group-label",
+        "filter-label",
+        "filterable",
+        "focus-mode",
+        "group-by",
+        "label",
+        "loading-label",
+        "no-results-label",
+        "overscan",
+        "reorder-label",
+        "reorderable-columns",
+        "resizable-columns",
+        "resize-label",
+        "row-height",
+        "row-label",
+        "select-all-label",
+        "select-label",
+        "selection-appearance",
+        "selection-mode",
+        "sort-priority-label",
+        "subtle-selection",
+        "virtualize-columns"
       ]
     },
     {

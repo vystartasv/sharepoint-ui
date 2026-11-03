@@ -32,7 +32,44 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Choose a color with controlled HSV or HEX values, interactive saturation/brightness and hue controls, opacity, HEX/RGB entry, and theme-derived swatches."
+      "summary": "Choose a color with controlled HSV or HEX values, interactive saturation/brightness and hue controls, opacity, HEX/RGB entry, and theme-derived swatches.",
+      "customElementAttributes": [
+        "alpha",
+        "alpha-label",
+        "area-label",
+        "area-value-text",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "blue-label",
+        "color-format",
+        "color-input-label",
+        "colors",
+        "default-alpha",
+        "default-color",
+        "default-value",
+        "disabled",
+        "format-label",
+        "green-label",
+        "hex-input-label",
+        "hue-label",
+        "invalid-message",
+        "label",
+        "name",
+        "read-only",
+        "red-label",
+        "required",
+        "rgb-label",
+        "saturation-label",
+        "shape",
+        "size",
+        "swatch-label",
+        "swatches-label",
+        "value",
+        "value-label"
+      ]
     },
     {
       "react": "ColorArea",
@@ -60,7 +97,14 @@
           "named ::part hooks"
         ],
         "reactRefType": "HTMLElement"
-      }
+      },
+      "customElementAttributes": [
+        "aria-label",
+        "color",
+        "default-color",
+        "disabled",
+        "shape"
+      ]
     },
     {
       "react": "ColorSlider",

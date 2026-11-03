@@ -31,7 +31,30 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Show a non-modal top-layer surface anchored to a trigger, with optional mountNode portal targeting, dismissal, focus return, and Fluent positioning fallbacks, boundaries, offsets, sizing, virtual targets, and update refs."
+      "summary": "Show a non-modal top-layer surface anchored to a trigger, with optional mountNode portal targeting, dismissal, focus return, and Fluent positioning fallbacks, boundaries, offsets, sizing, virtual targets, and update refs.",
+      "customElementAttributes": [
+        "align",
+        "appearance",
+        "arrow",
+        "close-on-iframe-focus",
+        "close-on-scroll",
+        "default-open",
+        "inert-trap-focus",
+        "inline",
+        "label",
+        "legacy-trap-focus",
+        "motion",
+        "mouse-leave-delay",
+        "offset",
+        "open",
+        "open-on-context",
+        "open-on-hover",
+        "placement",
+        "positioning",
+        "size",
+        "trap-focus",
+        "unstable-disable-auto-focus"
+      ]
     },
     {
       "react": "PopoverProvider",

@@ -28,7 +28,13 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Present an accessible named status group, announce body and action changes at polite or assertive urgency, and adapt automatically between singleline and multiline layouts."
+      "summary": "Present an accessible named status group, announce body and action changes at polite or assertive urgency, and adapt automatically between singleline and multiline layouts.",
+      "customElementAttributes": [
+        "intent",
+        "layout",
+        "politeness",
+        "shape"
+      ]
     },
     {
       "react": "MessageBarActions",

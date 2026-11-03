@@ -26,7 +26,21 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Edit a single-line value with an accessible label and controlled change events."
+      "summary": "Edit a single-line value with an accessible label and controlled change events.",
+      "customElementAttributes": [
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "disabled",
+        "label",
+        "placeholder",
+        "read-only",
+        "required",
+        "type",
+        "value"
+      ]
     }
   ]
 }

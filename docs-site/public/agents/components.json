@@ -372,7 +372,21 @@
       "tag": "spui-swatch-picker",
       "define": "defineSwatchPicker",
       "summary": "Render accessible color and image swatches as a keyboard-operable single- or multi-selection grid or row.",
-      "highValueAdditions": []
+      "highValueAdditions": [],
+      "customElementAttributes": [
+        "aria-label",
+        "columns",
+        "default-selected-value",
+        "default-selected-values",
+        "focus-mode",
+        "layout",
+        "selected-value",
+        "selected-values",
+        "selection-mode",
+        "shape",
+        "size",
+        "spacing"
+      ]
     },
     {
       "module": "swatch-picker",
@@ -396,7 +410,17 @@
       "react": "ColorSwatch",
       "tag": "spui-color-swatch",
       "define": "defineColorSwatch",
-      "summary": "Represent one selectable color with an accessible name and selected state."
+      "summary": "Represent one selectable color with an accessible name and selected state.",
+      "customElementAttributes": [
+        "aria-label",
+        "border-color",
+        "color",
+        "disabled",
+        "selected",
+        "shape",
+        "size",
+        "value"
+      ]
     },
     {
       "module": "swatch-picker",
@@ -420,7 +444,16 @@
       "react": "ImageSwatch",
       "tag": "spui-image-swatch",
       "define": "defineImageSwatch",
-      "summary": "Represent one selectable image or texture swatch with a caller-provided accessible name."
+      "summary": "Represent one selectable image or texture swatch with a caller-provided accessible name.",
+      "customElementAttributes": [
+        "aria-label",
+        "disabled",
+        "selected",
+        "shape",
+        "size",
+        "src",
+        "value"
+      ]
     },
     {
       "module": "swatch-picker",
@@ -442,7 +475,13 @@
       "react": "EmptySwatch",
       "tag": "spui-empty-swatch",
       "define": "defineEmptySwatch",
-      "summary": "Offer an accessible add-color action within a swatch set."
+      "summary": "Offer an accessible add-color action within a swatch set.",
+      "customElementAttributes": [
+        "aria-label",
+        "disabled",
+        "shape",
+        "size"
+      ]
     },
     {
       "module": "swatch-picker",
@@ -496,7 +535,16 @@
         ]
       },
       "summary": "Keep priority actions visible as space changes, move the rest into a menu, and let a stored user preference switch the shelf to compact spacing.",
-      "highValueAdditions": []
+      "highValueAdditions": [],
+      "customElementAttributes": [
+        "aria-label",
+        "density",
+        "has-hidden-items",
+        "minimum-visible",
+        "overflow-axis",
+        "overflow-direction",
+        "padding"
+      ]
     },
     {
       "react": "OverflowProvider",
@@ -550,7 +598,13 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Register one stable action with the responsive overflow engine; pin essential actions and provide its MenuItem representation for narrow layouts."
+      "summary": "Register one stable action with the responsive overflow engine; pin essential actions and provide its MenuItem representation for narrow layouts.",
+      "customElementAttributes": [
+        "group-id",
+        "id",
+        "pinned",
+        "priority"
+      ]
     },
     {
       "react": "OverflowDivider",
@@ -619,7 +673,36 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Compose direct or grouped CarouselCard slides with localized navigation, optional autoplay, numeric or responsive page groups, drag interaction, and theme-aware motion."
+      "summary": "Compose direct or grouped CarouselCard slides with localized navigation, optional autoplay, numeric or responsive page groups, drag interaction, and theme-aware motion.",
+      "customElementAttributes": [
+        "active-index",
+        "align",
+        "appearance",
+        "aria-label",
+        "aria-roledescription",
+        "autoplay",
+        "autoplay-interval",
+        "circular",
+        "controlled",
+        "default-active-index",
+        "default-selected-index",
+        "draggable",
+        "group-size",
+        "motion",
+        "motion-duration",
+        "motion-physics-duration",
+        "navigation-label",
+        "next-label",
+        "pause-label",
+        "play-label",
+        "previous-label",
+        "selected-index",
+        "slide-group-label",
+        "slide-label",
+        "slide-width",
+        "whitespace",
+        "wrap"
+      ]
     },
     {
       "react": "ButtonGroup",
@@ -640,7 +723,10 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Group related buttons under one accessible label, with horizontal or vertical layout and native button tab behavior."
+      "summary": "Group related buttons under one accessible label, with horizontal or vertical layout and native button tab behavior.",
+      "customElementAttributes": [
+        "orientation"
+      ]
     },
     {
       "react": "Button",
@@ -660,7 +746,45 @@
           "named ::part hooks"
         ]
       },
-      "summary": "Render a native button or accessible link/action anchor with context-inherited sizing, automatic icon-only layout, and the active SharePoint accent."
+      "summary": "Render a native button or accessible link/action anchor with context-inherited sizing, automatic icon-only layout, and the active SharePoint accent.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-controls",
+        "aria-current",
+        "aria-describedby",
+        "aria-description",
+        "aria-disabled",
+        "aria-expanded",
+        "aria-haspopup",
+        "aria-label",
+        "aria-labelledby",
+        "aria-pressed",
+        "as",
+        "disabled",
+        "disabled-focusable",
+        "download",
+        "form",
+        "formaction",
+        "formenctype",
+        "formnovalidate",
+        "formtarget",
+        "href",
+        "hreflang",
+        "icon-only",
+        "icon-position",
+        "name",
+        "referrerpolicy",
+        "rel",
+        "shape",
+        "size",
+        "tabindex",
+        "target",
+        "title",
+        "type",
+        "value",
+        "variant",
+        "vertical"
+      ]
     },
     {
       "react": "MenuButton",
@@ -686,7 +810,23 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "A themed menu trigger that composes with Menu for open state, keyboard focus, and dismissal."
+      "summary": "A themed menu trigger that composes with Menu for open state, keyboard focus, and dismissal.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-controls",
+        "aria-describedby",
+        "aria-expanded",
+        "aria-haspopup",
+        "aria-label",
+        "aria-labelledby",
+        "disabled",
+        "disabled-focusable",
+        "shape",
+        "size",
+        "tabindex",
+        "title",
+        "type"
+      ]
     },
     {
       "react": "CompoundButton",
@@ -711,7 +851,15 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Present a primary action with a descriptive second line and optional decorative icon."
+      "summary": "Present a primary action with a descriptive second line and optional decorative icon.",
+      "customElementAttributes": [
+        "appearance",
+        "disabled",
+        "disabled-focusable",
+        "icon-position",
+        "shape",
+        "size"
+      ]
     },
     {
       "react": "ToggleButton",
@@ -737,7 +885,25 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "A button with an accessible pressed state, controlled or uncontrolled operation, and theme-derived selected styling."
+      "summary": "A button with an accessible pressed state, controlled or uncontrolled operation, and theme-derived selected styling.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-describedby",
+        "aria-label",
+        "checked",
+        "controlled",
+        "default-checked",
+        "default-pressed",
+        "disabled",
+        "disabled-focusable",
+        "icon-position",
+        "is-accessible",
+        "pressed",
+        "shape",
+        "size",
+        "tabindex",
+        "title"
+      ]
     },
     {
       "react": "SplitButton",
@@ -762,7 +928,10 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Pair a primary action with a localized menu trigger; replace either button slot with a React element or partial prop object while retaining composed Menu behavior."
+      "summary": "Pair a primary action with a localized menu trigger; replace either button slot with a React element or partial prop object while retaining composed Menu behavior.",
+      "customElementAttributes": [
+        "aria-label"
+      ]
     },
     {
       "react": "Input",
@@ -788,7 +957,47 @@
           "named ::part hooks"
         ]
       },
-      "summary": "A bare native input with controlled/default values, Fluent size and appearance variants, before/after content slots, input/change events, and native form validation. Supply aria-label or aria-labelledby; use TextField when a shadow-safe visible label is needed."
+      "summary": "A bare native input with controlled/default values, Fluent size and appearance variants, before/after content slots, input/change events, and native form validation. Supply aria-label or aria-labelledby; use TextField when a shadow-safe visible label is needed.",
+      "customElementAttributes": [
+        "accept",
+        "alt",
+        "appearance",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "autocomplete",
+        "capture",
+        "checked",
+        "default-checked",
+        "disabled",
+        "form",
+        "formaction",
+        "formenctype",
+        "formmethod",
+        "formnovalidate",
+        "formtarget",
+        "height",
+        "inputmode",
+        "list",
+        "max",
+        "maxlength",
+        "min",
+        "minlength",
+        "multiple",
+        "name",
+        "pattern",
+        "placeholder",
+        "read-only",
+        "required",
+        "size",
+        "src",
+        "step",
+        "type",
+        "value",
+        "width"
+      ]
     },
     {
       "react": "FileUpload",
@@ -811,7 +1020,28 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Select files by browsing or drag and drop, enforce type/count/size constraints, expose accessible removal and events, and contribute selected files to native forms. The consumer owns upload transport and SharePoint persistence."
+      "summary": "Select files by browsing or drag and drop, enforce type/count/size constraints, expose accessible removal and events, and contribute selected files to native forms. The consumer owns upload transport and SharePoint persistence.",
+      "customElementAttributes": [
+        "accept",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "browse-label",
+        "disabled",
+        "drop-label",
+        "invalid-message",
+        "label",
+        "max-file-size",
+        "max-files",
+        "multiple",
+        "name",
+        "remove-label",
+        "required",
+        "required-message",
+        "selected-label"
+      ]
     },
     {
       "react": "Image",
@@ -860,7 +1090,16 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Group related content in a themed surface with filled, outline, subtle, and alternative appearances plus compact, medium, large, and horizontal layouts. Selectable cards provide a themed, keyboard-operable checkbox with controlled or default selection. Nonselectable cards support off, no-tab, tab-exit, and tab-only focus modes. SharePointCard remains available as an alias."
+      "summary": "Group related content in a themed surface with filled, outline, subtle, and alternative appearances plus compact, medium, large, and horizontal layouts. Selectable cards provide a themed, keyboard-operable checkbox with controlled or default selection. Nonselectable cards support off, no-tab, tab-exit, and tab-only focus modes. SharePointCard remains available as an alias.",
+      "customElementAttributes": [
+        "aria-label",
+        "default-selected",
+        "disabled",
+        "focus-mode",
+        "selectable",
+        "selected",
+        "selection-label"
+      ]
     },
     {
       "react": "CardHeader",
@@ -961,7 +1200,13 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Present a document, person, task, approval, or list item with replaceable fields and actions."
+      "summary": "Present a document, person, task, approval, or list item with replaceable fields and actions.",
+      "customElementAttributes": [
+        "description",
+        "kind",
+        "subtitle",
+        "title"
+      ]
     },
     {
       "react": "Badge",
@@ -983,7 +1228,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Show a compact status or category label alongside its related content."
+      "summary": "Show a compact status or category label alongside its related content.",
+      "customElementAttributes": [
+        "appearance",
+        "color",
+        "icon-position",
+        "shape",
+        "size"
+      ]
     },
     {
       "react": "CounterBadge",
@@ -1005,7 +1257,18 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Display an accessible count or dot badge with an optional overflow limit."
+      "summary": "Display an accessible count or dot badge with an optional overflow limit.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-label",
+        "color",
+        "count",
+        "dot",
+        "overflow-count",
+        "shape",
+        "show-zero",
+        "size"
+      ]
     },
     {
       "react": "PresenceBadge",
@@ -1027,7 +1290,13 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Show a compact, accessible presence status with an optional out-of-office marker."
+      "summary": "Show a compact, accessible presence status with an optional out-of-office marker.",
+      "customElementAttributes": [
+        "aria-label",
+        "out-of-office",
+        "size",
+        "status"
+      ]
     },
     {
       "react": "Tag",
@@ -1056,7 +1325,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Represent a selected value or status with theme-derived appearance and optional dismissal."
+      "summary": "Represent a selected value or status with theme-derived appearance and optional dismissal.",
+      "customElementAttributes": [
+        "disabled",
+        "dismiss-label",
+        "dismissible",
+        "label",
+        "selected"
+      ]
     },
     {
       "react": "TagGroup",
@@ -1080,7 +1356,18 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Arrange related tags as a labelled horizontal or vertical collection."
+      "summary": "Arrange related tags as a labelled horizontal or vertical collection.",
+      "customElementAttributes": [
+        "appearance",
+        "default-selected-values",
+        "disabled",
+        "dismissible",
+        "label",
+        "orientation",
+        "role",
+        "selected-values",
+        "size"
+      ]
     },
     {
       "react": "InteractionTag",
@@ -1105,7 +1392,15 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Compose a selectable primary action and optional dismiss action in a theme-derived tag."
+      "summary": "Compose a selectable primary action and optional dismiss action in a theme-derived tag.",
+      "customElementAttributes": [
+        "appearance",
+        "disabled",
+        "selected",
+        "shape",
+        "size",
+        "value"
+      ]
     },
     {
       "react": "InteractionTagPrimary",
@@ -1128,7 +1423,13 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Provide the primary button and optional media, icon, and secondary text for InteractionTag."
+      "summary": "Provide the primary button and optional media, icon, and secondary text for InteractionTag.",
+      "customElementAttributes": [
+        "disabled",
+        "has-secondary-action",
+        "selected",
+        "size"
+      ]
     },
     {
       "react": "InteractionTagSecondary",
@@ -1147,7 +1448,12 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Provide the accessible secondary dismiss button for InteractionTag."
+      "summary": "Provide the accessible secondary dismiss button for InteractionTag.",
+      "customElementAttributes": [
+        "disabled",
+        "label",
+        "remove-label"
+      ]
     },
     {
       "react": "Avatar",
@@ -1170,7 +1476,17 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Identify a person or entity with initials, an image, or composed icon and badge slots."
+      "summary": "Identify a person or entity with initials, an image, or composed icon and badge slots.",
+      "customElementAttributes": [
+        "color",
+        "decorative",
+        "id-for-color",
+        "image",
+        "initials",
+        "name",
+        "shape",
+        "size"
+      ]
     },
     {
       "react": "AvatarGroup",
@@ -1194,7 +1510,16 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Stack people avatars compactly and reveal the remaining members with a localized, keyboard-operable overflow control."
+      "summary": "Stack people avatars compactly and reveal the remaining members with a localized, keyboard-operable overflow control.",
+      "customElementAttributes": [
+        "expanded",
+        "label",
+        "layout",
+        "max-visible",
+        "show-less-label",
+        "show-more-label",
+        "size"
+      ]
     },
     {
       "react": "AvatarGroupProvider",
@@ -1236,7 +1561,17 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Represent one named person in an AvatarGroup, inheriting the group size and expanding to a labelled row inside its overflow popover."
+      "summary": "Represent one named person in an AvatarGroup, inheriting the group size and expanding to a labelled row inside its overflow popover.",
+      "customElementAttributes": [
+        "active",
+        "color",
+        "id-for-color",
+        "image",
+        "initials",
+        "name",
+        "shape",
+        "size"
+      ]
     },
     {
       "react": "AvatarGroupPopover",
@@ -1268,7 +1603,15 @@
           "named ::part hooks"
         ]
       },
-      "summary": "Show overflow members in a theme-aware, labelled popover with a count or icon trigger and keyboard dismissal."
+      "summary": "Show overflow members in a theme-aware, labelled popover with a count or icon trigger and keyboard dismissal.",
+      "customElementAttributes": [
+        "count",
+        "indicator",
+        "label",
+        "open",
+        "placement",
+        "trigger-label"
+      ]
     },
     {
       "react": "Checkbox",
@@ -1324,7 +1667,44 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Choose a color with controlled HSV or HEX values, interactive saturation/brightness and hue controls, opacity, HEX/RGB entry, and theme-derived swatches."
+      "summary": "Choose a color with controlled HSV or HEX values, interactive saturation/brightness and hue controls, opacity, HEX/RGB entry, and theme-derived swatches.",
+      "customElementAttributes": [
+        "alpha",
+        "alpha-label",
+        "area-label",
+        "area-value-text",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "blue-label",
+        "color-format",
+        "color-input-label",
+        "colors",
+        "default-alpha",
+        "default-color",
+        "default-value",
+        "disabled",
+        "format-label",
+        "green-label",
+        "hex-input-label",
+        "hue-label",
+        "invalid-message",
+        "label",
+        "name",
+        "read-only",
+        "red-label",
+        "required",
+        "rgb-label",
+        "saturation-label",
+        "shape",
+        "size",
+        "swatch-label",
+        "swatches-label",
+        "value",
+        "value-label"
+      ]
     },
     {
       "react": "ColorArea",
@@ -1352,7 +1732,14 @@
           "named ::part hooks"
         ],
         "reactRefType": "HTMLElement"
-      }
+      },
+      "customElementAttributes": [
+        "aria-label",
+        "color",
+        "default-color",
+        "disabled",
+        "shape"
+      ]
     },
     {
       "react": "ColorSlider",
@@ -1482,7 +1869,21 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Edit a single-line value with an accessible label and controlled change events."
+      "summary": "Edit a single-line value with an accessible label and controlled change events.",
+      "customElementAttributes": [
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "disabled",
+        "label",
+        "placeholder",
+        "read-only",
+        "required",
+        "type",
+        "value"
+      ]
     },
     {
       "react": "SharePointField",
@@ -1513,7 +1914,16 @@
         "customElementEvents": [
           "spui-field-value-change"
         ]
-      }
+      },
+      "customElementAttributes": [
+        "add-choice-label",
+        "disabled",
+        "empty-option-label",
+        "field",
+        "hint",
+        "validation-message",
+        "value"
+      ]
     },
     {
       "react": "SearchBox",
@@ -1541,7 +1951,31 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Search or filter content with a clear action, native form value, and Enter-to-submit behavior."
+      "summary": "Search or filter content with a clear action, native form value, and Enter-to-submit behavior.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "aria-required",
+        "autocomplete",
+        "clear-label",
+        "disabled",
+        "inputmode",
+        "label",
+        "maxlength",
+        "minlength",
+        "name",
+        "pattern",
+        "placeholder",
+        "read-only",
+        "required",
+        "size",
+        "type",
+        "value"
+      ]
     },
     {
       "react": "Text",
@@ -1563,7 +1997,20 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Set consistent, theme-aware type size, weight, font, alignment, emphasis, and semantic element."
+      "summary": "Set consistent, theme-aware type size, weight, font, alignment, emphasis, and semantic element.",
+      "customElementAttributes": [
+        "align",
+        "as",
+        "block",
+        "font",
+        "italic",
+        "size",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "weight",
+        "wrap"
+      ]
     },
     {
       "react": "Body1",
@@ -1950,7 +2397,33 @@
           "resize: none | horizontal | vertical | both"
         ]
       },
-      "summary": "Edit multi-line text with controlled or default values, Fluent appearances and sizes, native resize control, and change callbacks."
+      "summary": "Edit multi-line text with controlled or default values, Fluent appearances and sizes, native resize control, and change callbacks.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "autocomplete",
+        "cols",
+        "default-value",
+        "dirname",
+        "disabled",
+        "form",
+        "label",
+        "maxlength",
+        "minlength",
+        "name",
+        "placeholder",
+        "read-only",
+        "required",
+        "resize",
+        "rows",
+        "size",
+        "value",
+        "wrap"
+      ]
     },
     {
       "react": "Select",
@@ -1975,7 +2448,27 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Choose a value from a fixed native option list with browser keyboard behavior, configurable native focus, and tab order."
+      "summary": "Choose a value from a fixed native option list with browser keyboard behavior, configurable native focus, and tab order.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "auto-complete",
+        "autofocus",
+        "default-value",
+        "disabled",
+        "form",
+        "label",
+        "multiple",
+        "name",
+        "required",
+        "size",
+        "tabindex",
+        "value"
+      ]
     },
     {
       "react": "RadioGroup",
@@ -2000,7 +2493,22 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Choose one value from related radio options with controlled or default state, stacked or horizontal layout, native form participation, validity, reset, and keyboard behavior."
+      "summary": "Choose one value from related radio options with controlled or default state, stacked or horizontal layout, native form participation, validity, reset, and keyboard behavior.",
+      "customElementAttributes": [
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "default-value",
+        "disabled",
+        "label",
+        "layout",
+        "name",
+        "orientation",
+        "required",
+        "value"
+      ]
     },
     {
       "react": "Radio",
@@ -2074,7 +2582,40 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Filter and select one or multiple options with accessible checks, visible removable tags, and form-associated values; mount the listbox popup elsewhere without moving the input."
+      "summary": "Filter and select one or multiple options with accessible checks, visible removable tags, and form-associated values; mount the listbox popup elsewhere without moving the input.",
+      "customElementAttributes": [
+        "allow-freeform",
+        "appearance",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "button-trigger",
+        "clear-label",
+        "clearable",
+        "default-open",
+        "default-selected-options",
+        "disable-auto-focus",
+        "disabled",
+        "inline-popup",
+        "label",
+        "multiselect",
+        "name",
+        "no-results",
+        "open",
+        "placeholder",
+        "positioning",
+        "read-only",
+        "remove-selected-label",
+        "required",
+        "required-message",
+        "selected-label",
+        "selected-options",
+        "selected-value",
+        "size",
+        "value"
+      ]
     },
     {
       "react": "ComboOption",
@@ -2116,7 +2657,40 @@
           "React context provider"
         ]
       },
-      "summary": "Share Fluent-compatible option registration, selection, active-option, appearance, and open state with composed combobox descendants; custom value and callback fields remain supported."
+      "summary": "Share Fluent-compatible option registration, selection, active-option, appearance, and open state with composed combobox descendants; custom value and callback fields remain supported.",
+      "customElementAttributes": [
+        "allow-freeform",
+        "appearance",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "button-trigger",
+        "clear-label",
+        "clearable",
+        "default-open",
+        "default-selected-options",
+        "disable-auto-focus",
+        "disabled",
+        "inline-popup",
+        "label",
+        "multiselect",
+        "name",
+        "no-results",
+        "open",
+        "placeholder",
+        "positioning",
+        "read-only",
+        "remove-selected-label",
+        "required",
+        "required-message",
+        "selected-label",
+        "selected-options",
+        "selected-value",
+        "size",
+        "value"
+      ]
     },
     {
       "react": "Dropdown",
@@ -2151,7 +2725,40 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Choose from grouped options with a button trigger, replaceable button and listbox roots, controlled or default selection, keyboard interaction, accessible listbox semantics, and mountNode popup targeting."
+      "summary": "Choose from grouped options with a button trigger, replaceable button and listbox roots, controlled or default selection, keyboard interaction, accessible listbox semantics, and mountNode popup targeting.",
+      "customElementAttributes": [
+        "allow-freeform",
+        "appearance",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "button-trigger",
+        "clear-label",
+        "clearable",
+        "default-open",
+        "default-selected-options",
+        "disable-auto-focus",
+        "disabled",
+        "inline-popup",
+        "label",
+        "multiselect",
+        "name",
+        "no-results",
+        "open",
+        "placeholder",
+        "positioning",
+        "read-only",
+        "remove-selected-label",
+        "required",
+        "required-message",
+        "selected-label",
+        "selected-options",
+        "selected-value",
+        "size",
+        "value"
+      ]
     },
     {
       "react": "Listbox",
@@ -2245,7 +2852,32 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Edit a bounded numeric value with increment and decrement controls."
+      "summary": "Edit a bounded numeric value with increment and decrement controls.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "aria-valuetext",
+        "decrement-label",
+        "default-value",
+        "disabled",
+        "display-value",
+        "increment-label",
+        "label",
+        "max",
+        "min",
+        "name",
+        "precision",
+        "read-only",
+        "required",
+        "size",
+        "step",
+        "step-page",
+        "value"
+      ]
     },
     {
       "react": "Slider",
@@ -2272,7 +2904,27 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Choose a numeric value within a range using pointer or keyboard input."
+      "summary": "Choose a numeric value within a range using pointer or keyboard input.",
+      "customElementAttributes": [
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "aria-orientation",
+        "aria-required",
+        "aria-valuetext",
+        "default-value",
+        "disabled",
+        "label",
+        "max",
+        "min",
+        "name",
+        "size",
+        "step",
+        "value",
+        "vertical"
+      ]
     },
     {
       "react": "DatePicker",
@@ -2295,7 +2947,28 @@
         "reactRefType": "HTMLElement"
       },
       "summary": "Select localized dates using a keyboard-accessible calendar with RTL navigation, min/max constraints, and native form participation.",
-      "note": "SharePoint addition; Fluent UI v9 DatePicker remains in a separate compatibility package."
+      "note": "SharePoint addition; Fluent UI v9 DatePicker remains in a separate compatibility package.",
+      "customElementAttributes": [
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "calendar-label",
+        "disabled",
+        "invalid-date-message",
+        "label",
+        "max",
+        "min",
+        "name",
+        "next-month-label",
+        "placeholder",
+        "previous-month-label",
+        "read-only",
+        "required",
+        "required-message",
+        "value"
+      ]
     },
     {
       "react": "RichTextEditor",
@@ -2371,6 +3044,71 @@
       "summary": "Edit sanitized content with block styles, font family and size, text and highlight colors where the SharePoint field permits them, lists, tables, safe links, and host-managed images. Field metadata selects plain, restricted, compatible-rich, or FullHtml behavior.",
       "highValueAdditions": [
         "Preview SharePoint page titles and destination details before inserting internal links."
+      ],
+      "customElementAttributes": [
+        "allow-hyperlink",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "blockquote-label",
+        "bold-label",
+        "bullet-list-label",
+        "clear-formatting-label",
+        "color-swatch-label",
+        "content-mode",
+        "custom-color-label",
+        "delete-column-label",
+        "delete-row-label",
+        "delete-table-label",
+        "disabled",
+        "editor-label",
+        "font-family-label",
+        "font-size-label",
+        "format-block-label",
+        "heading-1-label",
+        "heading-2-label",
+        "heading-3-label",
+        "highlight-color-label",
+        "image-input-label",
+        "insert-column-after-label",
+        "insert-column-before-label",
+        "insert-image-label",
+        "insert-row-above-label",
+        "insert-row-below-label",
+        "insert-table-label",
+        "italic-label",
+        "label",
+        "link-apply-label",
+        "link-cancel-label",
+        "link-dialog-label",
+        "link-invalid-message",
+        "link-label",
+        "link-new-tab-label",
+        "link-picker-error-message",
+        "link-picker-label",
+        "link-picker-loading-label",
+        "link-prompt",
+        "link-remove-label",
+        "link-text-label",
+        "link-title-label",
+        "name",
+        "number-list-label",
+        "paragraph-label",
+        "placeholder",
+        "preformatted-label",
+        "read-only",
+        "redo-label",
+        "required",
+        "required-message",
+        "strike-label",
+        "text-color-label",
+        "theme-accent-label",
+        "toolbar-label",
+        "underline-label",
+        "undo-label",
+        "value"
       ]
     },
     {
@@ -2395,7 +3133,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Show indeterminate progress in eight sizes, primary or inverted appearance, four label positions, optional delayed display, and a provider-controlled default size."
+      "summary": "Show indeterminate progress in eight sizes, primary or inverted appearance, four label positions, optional delayed display, and a provider-controlled default size.",
+      "customElementAttributes": [
+        "appearance",
+        "delay",
+        "label",
+        "label-position",
+        "size"
+      ]
     },
     {
       "react": "ProgressBar",
@@ -2418,7 +3163,19 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Report determinate or indeterminate task progress with theme-aware Fluent colors, shapes, thicknesses, reduced-motion support, and accessible progressbar semantics."
+      "summary": "Report determinate or indeterminate task progress with theme-aware Fluent colors, shapes, thicknesses, reduced-motion support, and accessible progressbar semantics.",
+      "customElementAttributes": [
+        "aria-describedby",
+        "aria-label",
+        "aria-labelledby",
+        "aria-valuetext",
+        "color",
+        "label",
+        "max",
+        "shape",
+        "thickness",
+        "value"
+      ]
     },
     {
       "react": "MessageBar",
@@ -2442,7 +3199,13 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Present an accessible named status group, announce body and action changes at polite or assertive urgency, and adapt automatically between singleline and multiline layouts."
+      "summary": "Present an accessible named status group, announce body and action changes at polite or assertive urgency, and adapt automatically between singleline and multiline layouts.",
+      "customElementAttributes": [
+        "intent",
+        "layout",
+        "politeness",
+        "shape"
+      ]
     },
     {
       "react": "MessageBarActions",
@@ -2565,7 +3328,22 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Present a focused modal or non-modal task surface with title, actions, and dismissal controls."
+      "summary": "Present a focused modal or non-modal task surface with title, actions, and dismissal controls.",
+      "customElementAttributes": [
+        "aria-label",
+        "close-label",
+        "default-open",
+        "dialog-label",
+        "dismissible",
+        "inert-trap-focus",
+        "modal",
+        "modal-type",
+        "motion",
+        "motion-exit-complete",
+        "motion-visible",
+        "open",
+        "title"
+      ]
     },
     {
       "react": "DialogSurface",
@@ -2726,7 +3504,28 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Present a modal or non-modal task surface with optional full-screen expansion."
+      "summary": "Present a modal or non-modal task surface with optional full-screen expansion.",
+      "customElementAttributes": [
+        "aria-label",
+        "close-label",
+        "data-has-custom-backdrop",
+        "dismissible",
+        "expand-label",
+        "expandable",
+        "expanded",
+        "inert-trap-focus",
+        "modal",
+        "modal-type",
+        "motion",
+        "motion-exit-complete",
+        "motion-visible",
+        "open",
+        "position",
+        "restore-label",
+        "size",
+        "title",
+        "type"
+      ]
     },
     {
       "react": "InlineDrawer",
@@ -2753,7 +3552,16 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Show a non-modal drawer in the page layout with optional separator, title, navigation, and actions."
+      "summary": "Show a non-modal drawer in the page layout with optional separator, title, navigation, and actions.",
+      "customElementAttributes": [
+        "aria-label",
+        "motion",
+        "open",
+        "position",
+        "separator",
+        "size",
+        "title"
+      ]
     },
     {
       "react": "OverlayDrawer",
@@ -2779,7 +3587,28 @@
           "host className/style"
         ]
       },
-      "summary": "Use the modal or non-modal overlay drawer with Fluent overlay defaults."
+      "summary": "Use the modal or non-modal overlay drawer with Fluent overlay defaults.",
+      "customElementAttributes": [
+        "aria-label",
+        "close-label",
+        "data-has-custom-backdrop",
+        "dismissible",
+        "expand-label",
+        "expandable",
+        "expanded",
+        "inert-trap-focus",
+        "modal",
+        "modal-type",
+        "motion",
+        "motion-exit-complete",
+        "motion-visible",
+        "open",
+        "position",
+        "restore-label",
+        "size",
+        "title",
+        "type"
+      ]
     },
     {
       "react": "DrawerFooter",
@@ -2913,7 +3742,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Announce by intent with polite or assertive live-region behavior, and compose icon, avatar, action, or dismissal slots."
+      "summary": "Announce by intent with polite or assertive live-region behavior, and compose icon, avatar, action, or dismissal slots.",
+      "customElementAttributes": [
+        "appearance",
+        "assertive",
+        "dismiss-label",
+        "dismissible",
+        "intent"
+      ]
     },
     {
       "react": "Skeleton",
@@ -2943,7 +3779,16 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Show the shape of pending content while honoring reduced motion and forced colors."
+      "summary": "Show the shape of pending content while honoring reduced motion and forced colors.",
+      "customElementAttributes": [
+        "animated",
+        "animation",
+        "appearance",
+        "height",
+        "shape",
+        "size",
+        "width"
+      ]
     },
     {
       "react": "SkeletonItem",
@@ -2963,7 +3808,13 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Render a themed loading placeholder with Fluent size, shape, appearance, and motion options."
+      "summary": "Render a themed loading placeholder with Fluent size, shape, appearance, and motion options.",
+      "customElementAttributes": [
+        "animation",
+        "appearance",
+        "shape",
+        "size"
+      ]
     },
     {
       "react": "Link",
@@ -2985,7 +3836,15 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Navigate with an anchor or render an accessible button or span action when needed."
+      "summary": "Navigate with an anchor or render an accessible button or span action when needed.",
+      "customElementAttributes": [
+        "appearance",
+        "as",
+        "disabled",
+        "disabled-focusable",
+        "inline",
+        "underline"
+      ]
     },
     {
       "react": "Divider",
@@ -3008,7 +3867,15 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Separate adjacent content groups without creating an extra layout container."
+      "summary": "Separate adjacent content groups without creating an extra layout container.",
+      "customElementAttributes": [
+        "align",
+        "align-content",
+        "appearance",
+        "inset",
+        "orientation",
+        "vertical"
+      ]
     },
     {
       "react": "AccordionItem",
@@ -3034,7 +3901,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Identify one panel by value; compose an accessible AccordionHeader and AccordionPanel, or use the heading/default-content compatibility form."
+      "summary": "Identify one panel by value; compose an accessible AccordionHeader and AccordionPanel, or use the heading/default-content compatibility form.",
+      "customElementAttributes": [
+        "disabled",
+        "disabled-focusable",
+        "heading",
+        "open",
+        "value"
+      ]
     },
     {
       "react": "AccordionHeader",
@@ -3058,7 +3932,12 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Compose the labelled, keyboard-operable heading for an AccordionItem with optional leading and expandable icon slots."
+      "summary": "Compose the labelled, keyboard-operable heading for an AccordionItem with optional leading and expandable icon slots.",
+      "customElementAttributes": [
+        "expand-icon-position",
+        "inline",
+        "size"
+      ]
     },
     {
       "react": "AccordionPanel",
@@ -3106,7 +3985,13 @@
         "reactRefType": "HTMLElement",
         "forwardRefParameterType": "React.ForwardedRef<HTMLElement>"
       },
-      "summary": "Group composed sections with controlled or default values, single/multiple and collapsible behavior, change details, and optional linear/circular keyboard navigation."
+      "summary": "Group composed sections with controlled or default values, single/multiple and collapsible behavior, change details, and optional linear/circular keyboard navigation.",
+      "customElementAttributes": [
+        "collapsible",
+        "mode",
+        "multiple",
+        "navigation"
+      ]
     },
     {
       "react": "AccordionProvider",
@@ -3148,7 +4033,16 @@
           "named ::part hooks"
         ]
       },
-      "summary": "Render large local or asynchronously range-loaded collections with bounded horizontal or vertical viewport rendering, fixed or measured item sizes, and accessible list position metadata."
+      "summary": "Render large local or asynchronously range-loaded collections with bounded horizontal or vertical viewport rendering, fixed or measured item sizes, and accessible list position metadata.",
+      "customElementAttributes": [
+        "aria-label",
+        "axis",
+        "item-size",
+        "label",
+        "measure-items",
+        "overscan",
+        "row-height"
+      ]
     },
     {
       "module": "virtual-list",
@@ -3305,6 +4199,37 @@
       "highValueAdditions": [
         "Bring async range-backed composition to the existing composable rendering and selection model for large SharePoint lists.",
         "Add broad assistive-technology and layout performance checks to each composed DataGrid interaction."
+      ],
+      "customElementAttributes": [
+        "aria-label",
+        "auto-fit-columns",
+        "collapse-group-label",
+        "container-width-offset",
+        "edit-hint",
+        "empty-group-label",
+        "empty-label",
+        "expand-group-label",
+        "filter-label",
+        "filterable",
+        "focus-mode",
+        "group-by",
+        "label",
+        "loading-label",
+        "no-results-label",
+        "overscan",
+        "reorder-label",
+        "reorderable-columns",
+        "resizable-columns",
+        "resize-label",
+        "row-height",
+        "row-label",
+        "select-all-label",
+        "select-label",
+        "selection-appearance",
+        "selection-mode",
+        "sort-priority-label",
+        "subtle-selection",
+        "virtualize-columns"
       ]
     },
     {
@@ -3491,7 +4416,17 @@
           "named ::part hooks"
         ]
       },
-      "summary": "Browse nested folders or navigation nodes with hierarchy semantics and RTL-aware keys."
+      "summary": "Browse nested folders or navigation nodes with hierarchy semantics and RTL-aware keys.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-label",
+        "empty-label",
+        "label",
+        "navigation-mode",
+        "selection-mode",
+        "size",
+        "toggle-label"
+      ]
     },
     {
       "react": "TreeItemLayout",
@@ -3662,6 +4597,37 @@
       "summary": "Search, choose, and remove multiple values with keyboard, native form support, and popup placement that adapts to SharePoint sections.",
       "highValueAdditions": [
         "Add composed control, input, selected-tag group, and list primitives while preserving the single state engine."
+      ],
+      "customElementAttributes": [
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "clearable",
+        "default-open",
+        "default-selected-options",
+        "disable-auto-focus",
+        "disabled",
+        "inline",
+        "input-appearance",
+        "input-aria-describedby",
+        "input-aria-label",
+        "input-disabled",
+        "input-value",
+        "label",
+        "name",
+        "no-popover",
+        "no-results",
+        "open",
+        "placeholder",
+        "positioning",
+        "remove-label",
+        "required",
+        "required-message",
+        "selected-label",
+        "selected-options",
+        "selected-values"
       ]
     },
     {
@@ -3844,7 +4810,26 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Choose a whole-step or half-step score using accessible radio controls."
+      "summary": "Choose a whole-step or half-step score using accessible radio controls.",
+      "customElementAttributes": [
+        "aria-describedby",
+        "aria-description",
+        "aria-label",
+        "aria-labelledby",
+        "color",
+        "default-value",
+        "disabled",
+        "item-label",
+        "label",
+        "max",
+        "name",
+        "readonly",
+        "required",
+        "required-message",
+        "size",
+        "step",
+        "value"
+      ]
     },
     {
       "react": "RatingDisplay",
@@ -3868,7 +4853,17 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Display an accessible, theme-aware whole or fractional rating with compact and count modes."
+      "summary": "Display an accessible, theme-aware whole or fractional rating with compact and count modes.",
+      "customElementAttributes": [
+        "aria-label",
+        "color",
+        "compact",
+        "count",
+        "lang",
+        "max",
+        "size",
+        "value"
+      ]
     },
     {
       "react": "List",
@@ -3892,7 +4887,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Compose a keyboard-navigable list with single or multiple selection."
+      "summary": "Compose a keyboard-navigable list with single or multiple selection.",
+      "customElementAttributes": [
+        "default-selected-items",
+        "navigation-mode",
+        "role",
+        "selected-items",
+        "selection-mode"
+      ]
     },
     {
       "react": "ListItem",
@@ -3921,7 +4923,12 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Provide a selectable, navigable, actionable row within List."
+      "summary": "Provide a selectable, navigable, actionable row within List.",
+      "customElementAttributes": [
+        "disabled-selection",
+        "has-action",
+        "value"
+      ]
     },
     {
       "react": "RatingItem",
@@ -3944,7 +4951,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Compose a reusable filled or outlined rating item inside RatingDisplay."
+      "summary": "Compose a reusable filled or outlined rating item inside RatingDisplay.",
+      "customElementAttributes": [
+        "color",
+        "max",
+        "rating",
+        "size",
+        "value"
+      ]
     },
     {
       "react": "Breadcrumb",
@@ -3967,7 +4981,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Show the current location in a labelled navigation trail with a replaceable list root and optional arrow-key focus."
+      "summary": "Show the current location in a labelled navigation trail with a replaceable list root and optional arrow-key focus.",
+      "customElementAttributes": [
+        "aria-label",
+        "focus-mode",
+        "label",
+        "separator",
+        "size"
+      ]
     },
     {
       "react": "BreadcrumbItem",
@@ -3989,7 +5010,11 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Represent a destination or current location inside a Breadcrumb."
+      "summary": "Represent a destination or current location inside a Breadcrumb.",
+      "customElementAttributes": [
+        "current",
+        "size"
+      ]
     },
     {
       "react": "BreadcrumbButton",
@@ -4012,7 +5037,21 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Render a theme-aware breadcrumb action as a button or link with current and disabled states."
+      "summary": "Render a theme-aware breadcrumb action as a button or link with current and disabled states.",
+      "customElementAttributes": [
+        "aria-current",
+        "aria-label",
+        "current",
+        "disabled",
+        "disabled-focusable",
+        "href",
+        "rel",
+        "size",
+        "tabindex",
+        "target",
+        "title",
+        "type"
+      ]
     },
     {
       "react": "BreadcrumbDivider",
@@ -4060,7 +5099,12 @@
         "reactRefType": "HTMLElement",
         "forwardRefParameterType": "React.ForwardedRef<HTMLElement>"
       },
-      "summary": "Switch between related views with controlled selection and keyboard navigation."
+      "summary": "Switch between related views with controlled selection and keyboard navigation.",
+      "customElementAttributes": [
+        "default-selected-value",
+        "disabled",
+        "selected-value"
+      ]
     },
     {
       "react": "TabList",
@@ -4084,7 +5128,18 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Group Tabs with keyboard selection, a selection callback, and an option to reserve label width across selected states."
+      "summary": "Group Tabs with keyboard selection, a selection callback, and an option to reserve label width across selected states.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-label",
+        "default-selected-value",
+        "disabled",
+        "reserve-selected-tab-space",
+        "select-on-focus",
+        "selected-value",
+        "size",
+        "vertical"
+      ]
     },
     {
       "react": "TabListProvider",
@@ -4125,7 +5180,18 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Represent one selectable view in a TabList with optional leading icon content."
+      "summary": "Represent one selectable view in a TabList with optional leading icon content.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-controls",
+        "data-list-disabled",
+        "disabled",
+        "reserve-selected-tab-space",
+        "selected",
+        "size",
+        "tabindex",
+        "vertical"
+      ]
     },
     {
       "react": "TabPanel",
@@ -4147,7 +5213,11 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Contain the content associated with one Tab."
+      "summary": "Contain the content associated with one Tab.",
+      "customElementAttributes": [
+        "labelledby",
+        "selected"
+      ]
     },
     {
       "react": "InfoButton",
@@ -4171,7 +5241,20 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Open a keyboard-operable, theme-aware information popover with support for links and other focusable guidance."
+      "summary": "Open a keyboard-operable, theme-aware information popover with support for links and other focusable guidance.",
+      "customElementAttributes": [
+        "disabled",
+        "info",
+        "inline",
+        "label",
+        "open",
+        "placement",
+        "popover-arrow",
+        "popover-label",
+        "popover-placement",
+        "popover-trap-focus",
+        "size"
+      ]
     },
     {
       "react": "Tooltip",
@@ -4196,7 +5279,22 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Provide delayed hover/focus help with label, description, or inaccessible relationships; portal the surface to a custom mountNode while keeping the trigger in place; supports theme appearances, controlled visibility, arrows, and Fluent-compatible fallback, boundary, sizing, target, offset, and positioning-ref options."
+      "summary": "Provide delayed hover/focus help with label, description, or inaccessible relationships; portal the surface to a custom mountNode while keeping the trigger in place; supports theme appearances, controlled visibility, arrows, and Fluent-compatible fallback, boundary, sizing, target, offset, and positioning-ref options.",
+      "customElementAttributes": [
+        "align",
+        "appearance",
+        "content",
+        "delay",
+        "disabled",
+        "hide-delay",
+        "offset",
+        "open",
+        "placement",
+        "positioning",
+        "relationship",
+        "show-delay",
+        "with-arrow"
+      ]
     },
     {
       "react": "Popover",
@@ -4223,7 +5321,30 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Show a non-modal top-layer surface anchored to a trigger, with optional mountNode portal targeting, dismissal, focus return, and Fluent positioning fallbacks, boundaries, offsets, sizing, virtual targets, and update refs."
+      "summary": "Show a non-modal top-layer surface anchored to a trigger, with optional mountNode portal targeting, dismissal, focus return, and Fluent positioning fallbacks, boundaries, offsets, sizing, virtual targets, and update refs.",
+      "customElementAttributes": [
+        "align",
+        "appearance",
+        "arrow",
+        "close-on-iframe-focus",
+        "close-on-scroll",
+        "default-open",
+        "inert-trap-focus",
+        "inline",
+        "label",
+        "legacy-trap-focus",
+        "motion",
+        "mouse-leave-delay",
+        "offset",
+        "open",
+        "open-on-context",
+        "open-on-hover",
+        "placement",
+        "positioning",
+        "size",
+        "trap-focus",
+        "unstable-disable-auto-focus"
+      ]
     },
     {
       "react": "PopoverProvider",
@@ -4306,7 +5427,23 @@
           "named ::part hooks"
         ]
       },
-      "summary": "Open a Menu at a pointer or trigger edge with right-click, the Context Menu key, or Shift+F10."
+      "summary": "Open a Menu at a pointer or trigger edge with right-click, the Context Menu key, or Shift+F10.",
+      "customElementAttributes": [
+        "close-on-scroll",
+        "context-menu",
+        "default-open",
+        "hover-delay",
+        "inline",
+        "label",
+        "motion",
+        "open",
+        "open-on-context",
+        "open-on-hover",
+        "persist-on-item-click",
+        "placement",
+        "position-offset",
+        "positioning"
+      ]
     },
     {
       "react": "Menu",
@@ -4339,7 +5476,23 @@
           "named ::part hooks"
         ]
       },
-      "summary": "Offer a trigger-anchored command list with keyboard navigation, typeahead, nested submenus, dismissal, and optional popup mounting elsewhere."
+      "summary": "Offer a trigger-anchored command list with keyboard navigation, typeahead, nested submenus, dismissal, and optional popup mounting elsewhere.",
+      "customElementAttributes": [
+        "close-on-scroll",
+        "context-menu",
+        "default-open",
+        "hover-delay",
+        "inline",
+        "label",
+        "motion",
+        "open",
+        "open-on-context",
+        "open-on-hover",
+        "persist-on-item-click",
+        "placement",
+        "position-offset",
+        "positioning"
+      ]
     },
     {
       "react": "MenuItem",
@@ -4371,7 +5524,19 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Provide an enabled, disabled, checkbox, or radio command inside a Menu."
+      "summary": "Provide an enabled, disabled, checkbox, or radio command inside a Menu.",
+      "customElementAttributes": [
+        "aria-controls",
+        "aria-expanded",
+        "aria-haspopup",
+        "checked",
+        "disabled",
+        "has-submenu",
+        "kind",
+        "name",
+        "persist-on-click",
+        "value"
+      ]
     },
     {
       "react": "MenuItemCheckbox",
@@ -4399,7 +5564,19 @@
           "host className/style"
         ]
       },
-      "summary": "Render a selectable menu checkbox with controlled group values and persistent checked state."
+      "summary": "Render a selectable menu checkbox with controlled group values and persistent checked state.",
+      "customElementAttributes": [
+        "aria-controls",
+        "aria-expanded",
+        "aria-haspopup",
+        "checked",
+        "disabled",
+        "has-submenu",
+        "kind",
+        "name",
+        "persist-on-click",
+        "value"
+      ]
     },
     {
       "react": "MenuItemRadio",
@@ -4427,7 +5604,19 @@
           "host className/style"
         ]
       },
-      "summary": "Render a menu radio choice grouped by its name value."
+      "summary": "Render a menu radio choice grouped by its name value.",
+      "customElementAttributes": [
+        "aria-controls",
+        "aria-expanded",
+        "aria-haspopup",
+        "checked",
+        "disabled",
+        "has-submenu",
+        "kind",
+        "name",
+        "persist-on-click",
+        "value"
+      ]
     },
     {
       "react": "MenuItemSwitch",
@@ -4453,7 +5642,19 @@
           "host className/style"
         ]
       },
-      "summary": "Render a menu checkbox with a switch indicator for an immediate setting."
+      "summary": "Render a menu checkbox with a switch indicator for an immediate setting.",
+      "customElementAttributes": [
+        "aria-controls",
+        "aria-expanded",
+        "aria-haspopup",
+        "checked",
+        "disabled",
+        "has-submenu",
+        "kind",
+        "name",
+        "persist-on-click",
+        "value"
+      ]
     },
     {
       "react": "MenuItemLink",
@@ -4478,7 +5679,15 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Navigate from a menu item using a native anchor with disabled link semantics."
+      "summary": "Navigate from a menu item using a native anchor with disabled link semantics.",
+      "customElementAttributes": [
+        "aria-label",
+        "disabled",
+        "download",
+        "href",
+        "rel",
+        "target"
+      ]
     },
     {
       "react": "MenuList",
@@ -4500,7 +5709,11 @@
           "host className/style"
         ]
       },
-      "summary": "Compose menu items and optionally control their checked values and alignment hints."
+      "summary": "Compose menu items and optionally control their checked values and alignment hints.",
+      "customElementAttributes": [
+        "has-checkmarks",
+        "has-icons"
+      ]
     },
     {
       "react": "MenuPopover",
@@ -4562,7 +5775,13 @@
           "host className/style"
         ]
       },
-      "summary": "Mark the trigger in a compound Menu composition and provide an accessible custom-element trigger."
+      "summary": "Mark the trigger in a compound Menu composition and provide an accessible custom-element trigger.",
+      "customElementAttributes": [
+        "aria-controls",
+        "aria-expanded",
+        "aria-haspopup",
+        "disabled"
+      ]
     },
     {
       "react": "MenuBar",
@@ -4604,7 +5823,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Render a top-level MenuBar command with accessible menu-trigger state and roving tab focus."
+      "summary": "Render a top-level MenuBar command with accessible menu-trigger state and roving tab focus.",
+      "customElementAttributes": [
+        "aria-controls",
+        "aria-expanded",
+        "aria-haspopup",
+        "aria-label",
+        "disabled"
+      ]
     },
     {
       "react": "MenuDivider",
@@ -4689,7 +5915,16 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Announce brief, dismissible feedback with intent-based live politeness, priority scheduling, and a three-second timeout that continues while hovered or the window is unfocused."
+      "summary": "Announce brief, dismissible feedback with intent-based live politeness, priority scheduling, and a three-second timeout that continues while hovered or the window is unfocused.",
+      "customElementAttributes": [
+        "appearance",
+        "dismiss-label",
+        "intent",
+        "politeness",
+        "priority",
+        "timeout",
+        "toast-id"
+      ]
     },
     {
       "react": "ToastBody",
@@ -4758,7 +5993,10 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Compose a toast title with intent media and a trailing title action."
+      "summary": "Compose a toast title with intent media and a trailing title action.",
+      "customElementAttributes": [
+        "intent"
+      ]
     },
     {
       "react": "ToastTrigger",
@@ -4808,7 +6046,12 @@
         },
         "reactRefType": "HTMLElement"
       },
-      "summary": "Host a bounded notification region with priority-queued, timed, focus-aware Toasts, keyboard movement and dismissal, and the useToastController API."
+      "summary": "Host a bounded notification region with priority-queued, timed, focus-aware Toasts, keyboard movement and dismissal, and the useToastController API.",
+      "customElementAttributes": [
+        "aria-label",
+        "limit",
+        "position"
+      ]
     },
     {
       "react": "Toolbar",
@@ -4830,7 +6073,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Group related commands with one tab stop, arrow-key navigation, optional size, and controlled or default named radio selections."
+      "summary": "Group related commands with one tab stop, arrow-key navigation, optional size, and controlled or default named radio selections.",
+      "customElementAttributes": [
+        "label",
+        "loop",
+        "orientation",
+        "size",
+        "vertical"
+      ]
     },
     {
       "react": "ToolbarButton",
@@ -4853,7 +6103,45 @@
           "host className/style"
         ]
       },
-      "summary": "Toolbar command button with a subtle appearance and medium size by default."
+      "summary": "Toolbar command button with a subtle appearance and medium size by default.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-controls",
+        "aria-current",
+        "aria-describedby",
+        "aria-description",
+        "aria-disabled",
+        "aria-expanded",
+        "aria-haspopup",
+        "aria-label",
+        "aria-labelledby",
+        "aria-pressed",
+        "as",
+        "disabled",
+        "disabled-focusable",
+        "download",
+        "form",
+        "formaction",
+        "formenctype",
+        "formnovalidate",
+        "formtarget",
+        "href",
+        "hreflang",
+        "icon-only",
+        "icon-position",
+        "name",
+        "referrerpolicy",
+        "rel",
+        "shape",
+        "size",
+        "tabindex",
+        "target",
+        "title",
+        "type",
+        "value",
+        "variant",
+        "vertical"
+      ]
     },
     {
       "react": "ToolbarToggleButton",
@@ -4876,7 +6164,25 @@
           "host className/style"
         ]
       },
-      "summary": "Toggle toolbar command with the library ToggleButton pressed state and subtle appearance by default."
+      "summary": "Toggle toolbar command with the library ToggleButton pressed state and subtle appearance by default.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-describedby",
+        "aria-label",
+        "checked",
+        "controlled",
+        "default-checked",
+        "default-pressed",
+        "disabled",
+        "disabled-focusable",
+        "icon-position",
+        "is-accessible",
+        "pressed",
+        "shape",
+        "size",
+        "tabindex",
+        "title"
+      ]
     },
     {
       "react": "ToolbarRadioGroup",
@@ -4897,7 +6203,12 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Group mutually exclusive toolbar radio commands under an accessible radiogroup name."
+      "summary": "Group mutually exclusive toolbar radio commands under an accessible radiogroup name.",
+      "customElementAttributes": [
+        "aria-label",
+        "label",
+        "orientation"
+      ]
     },
     {
       "react": "ToolbarRadioButton",
@@ -4919,7 +6230,19 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Selectable toolbar radio command associated with a named checked-value set."
+      "summary": "Selectable toolbar radio command associated with a named checked-value set.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-describedby",
+        "aria-label",
+        "aria-labelledby",
+        "checked",
+        "disabled",
+        "name",
+        "size",
+        "title",
+        "value"
+      ]
     },
     {
       "react": "ToolbarDivider",
@@ -4941,7 +6264,11 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Theme-derived non-interactive divider within a toolbar."
+      "summary": "Theme-derived non-interactive divider within a toolbar.",
+      "customElementAttributes": [
+        "orientation",
+        "vertical"
+      ]
     },
     {
       "react": "ToolbarGroup",
@@ -4962,7 +6289,11 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Group related toolbar commands under an optional accessible name; controls remain part of the parent toolbar's single roving tab sequence."
+      "summary": "Group related toolbar commands under an optional accessible name; controls remain part of the parent toolbar's single roving tab sequence.",
+      "customElementAttributes": [
+        "label",
+        "orientation"
+      ]
     },
     {
       "react": "ToolbarSeparator",
@@ -4982,7 +6313,11 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Theme-derived non-interactive separator that reports the orientation matching its parent Toolbar layout."
+      "summary": "Theme-derived non-interactive separator that reports the orientation matching its parent Toolbar layout.",
+      "customElementAttributes": [
+        "orientation",
+        "vertical"
+      ]
     },
     {
       "react": "Persona",
@@ -5009,7 +6344,21 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Present a person with an Avatar, four composable identity text lines, and localized presence context."
+      "summary": "Present a person with an Avatar, four composable identity text lines, and localized presence context.",
+      "customElementAttributes": [
+        "color",
+        "image",
+        "initials",
+        "name",
+        "presence",
+        "presence-label",
+        "presence-only",
+        "secondary-text",
+        "size",
+        "tertiary-text",
+        "text-alignment",
+        "text-position"
+      ]
     },
     {
       "react": "Nav",
@@ -5044,7 +6393,22 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Navigate app destinations with grouped disclosures, a responsive localized mobile drawer, and an optional compact desktop rail that retains screen-reader labels."
+      "summary": "Navigate app destinations with grouped disclosures, a responsive localized mobile drawer, and an optional compact desktop rail that retains screen-reader labels.",
+      "customElementAttributes": [
+        "aria-label",
+        "close-label",
+        "collapse-label",
+        "collapsed",
+        "collapsible",
+        "density",
+        "expand-label",
+        "full-width",
+        "label",
+        "multiple",
+        "open",
+        "open-label",
+        "tabbable"
+      ]
     },
     {
       "react": "NavItem",
@@ -5117,7 +6481,15 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Provide the accessible disclosure button for a NavCategory."
+      "summary": "Provide the accessible disclosure button for a NavCategory.",
+      "customElementAttributes": [
+        "aria-label",
+        "compact",
+        "controls",
+        "disabled",
+        "expanded",
+        "selected"
+      ]
     },
     {
       "react": "NavSubItemGroup",
@@ -5204,7 +6576,15 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Separate navigation groups."
+      "summary": "Separate navigation groups.",
+      "customElementAttributes": [
+        "align-content",
+        "appearance",
+        "aria-label",
+        "aria-labelledby",
+        "inset",
+        "vertical"
+      ]
     },
     {
       "react": "NavSectionHeader",
@@ -5270,7 +6650,12 @@
           "useTableCompositeNavigation"
         ]
       },
-      "summary": "Render a responsive, theme-aware table surface with small, medium, and large density plus an optional flex-based non-native layout."
+      "summary": "Render a responsive, theme-aware table surface with small, medium, and large density plus an optional flex-based non-native layout.",
+      "customElementAttributes": [
+        "appearance",
+        "no-native-elements",
+        "size"
+      ]
     },
     {
       "module": "table",
@@ -5507,7 +6892,10 @@
       "slots": [
         "content"
       ],
-      "summary": "Represent one accessible carousel slide, with optional intrinsic sizing for content-driven galleries."
+      "summary": "Represent one accessible carousel slide, with optional intrinsic sizing for content-driven galleries.",
+      "customElementAttributes": [
+        "auto-size"
+      ]
     },
     {
       "module": "carousel",
@@ -5608,7 +6996,12 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Add a previous or next action to a composed Carousel control strip; the Carousel owns bounds, wrapping, and disabled state."
+      "summary": "Add a previous or next action to a composed Carousel control strip; the Carousel owns bounds, wrapping, and disabled state.",
+      "customElementAttributes": [
+        "disabled",
+        "label",
+        "nav-type"
+      ]
     },
     {
       "react": "CarouselAutoplayButton",
@@ -5645,7 +7038,26 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Expose a localized, accessible play/pause control synchronized with its parent Carousel autoplay state."
+      "summary": "Expose a localized, accessible play/pause control synchronized with its parent Carousel autoplay state.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-describedby",
+        "aria-label",
+        "checked",
+        "controlled",
+        "default-checked",
+        "disabled",
+        "disabled-focusable",
+        "icon-position",
+        "is-accessible",
+        "pause-label",
+        "play-label",
+        "selected",
+        "shape",
+        "size",
+        "tabindex",
+        "title"
+      ]
     },
     {
       "react": "CarouselNavContainer",
@@ -5673,7 +7085,10 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Arrange Carousel navigation, previous/next, and autoplay controls in inline or overlay layouts."
+      "summary": "Arrange Carousel navigation, previous/next, and autoplay controls in inline or overlay layouts.",
+      "customElementAttributes": [
+        "layout"
+      ]
     },
     {
       "react": "CarouselSlider",
@@ -5694,7 +7109,10 @@
           "host className/style"
         ],
         "reactRefType": "HTMLElement"
-      }
+      },
+      "customElementAttributes": [
+        "card-focus"
+      ]
     },
     {
       "react": "CarouselViewport",
@@ -5804,7 +7222,19 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Accessible keyboard-operable navigation toggle control."
+      "summary": "Accessible keyboard-operable navigation toggle control.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-expanded",
+        "aria-label",
+        "disabled",
+        "disabled-focusable",
+        "icon-position",
+        "shape",
+        "size",
+        "title",
+        "type"
+      ]
     },
     {
       "react": "NavDrawer",

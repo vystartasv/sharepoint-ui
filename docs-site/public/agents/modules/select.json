@@ -29,7 +29,27 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Choose a value from a fixed native option list with browser keyboard behavior, configurable native focus, and tab order."
+      "summary": "Choose a value from a fixed native option list with browser keyboard behavior, configurable native focus, and tab order.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "auto-complete",
+        "autofocus",
+        "default-value",
+        "disabled",
+        "form",
+        "label",
+        "multiple",
+        "name",
+        "required",
+        "size",
+        "tabindex",
+        "value"
+      ]
     }
   ]
 }

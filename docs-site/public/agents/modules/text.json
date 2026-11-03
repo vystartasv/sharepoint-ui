@@ -26,7 +26,20 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Set consistent, theme-aware type size, weight, font, alignment, emphasis, and semantic element."
+      "summary": "Set consistent, theme-aware type size, weight, font, alignment, emphasis, and semantic element.",
+      "customElementAttributes": [
+        "align",
+        "as",
+        "block",
+        "font",
+        "italic",
+        "size",
+        "strikethrough",
+        "truncate",
+        "underline",
+        "weight",
+        "wrap"
+      ]
     },
     {
       "react": "Body1",

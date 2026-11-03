@@ -37,7 +37,12 @@
         },
         "reactRefType": "HTMLElement"
       },
-      "summary": "Host a bounded notification region with priority-queued, timed, focus-aware Toasts, keyboard movement and dismissal, and the useToastController API."
+      "summary": "Host a bounded notification region with priority-queued, timed, focus-aware Toasts, keyboard movement and dismissal, and the useToastController API.",
+      "customElementAttributes": [
+        "aria-label",
+        "limit",
+        "position"
+      ]
     }
   ]
 }

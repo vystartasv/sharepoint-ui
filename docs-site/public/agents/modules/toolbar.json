@@ -26,7 +26,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Group related commands with one tab stop, arrow-key navigation, optional size, and controlled or default named radio selections."
+      "summary": "Group related commands with one tab stop, arrow-key navigation, optional size, and controlled or default named radio selections.",
+      "customElementAttributes": [
+        "label",
+        "loop",
+        "orientation",
+        "size",
+        "vertical"
+      ]
     },
     {
       "react": "ToolbarRadioGroup",
@@ -47,7 +54,12 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Group mutually exclusive toolbar radio commands under an accessible radiogroup name."
+      "summary": "Group mutually exclusive toolbar radio commands under an accessible radiogroup name.",
+      "customElementAttributes": [
+        "aria-label",
+        "label",
+        "orientation"
+      ]
     },
     {
       "react": "ToolbarRadioButton",
@@ -69,7 +81,19 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Selectable toolbar radio command associated with a named checked-value set."
+      "summary": "Selectable toolbar radio command associated with a named checked-value set.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-describedby",
+        "aria-label",
+        "aria-labelledby",
+        "checked",
+        "disabled",
+        "name",
+        "size",
+        "title",
+        "value"
+      ]
     },
     {
       "react": "ToolbarDivider",
@@ -91,7 +115,11 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Theme-derived non-interactive divider within a toolbar."
+      "summary": "Theme-derived non-interactive divider within a toolbar.",
+      "customElementAttributes": [
+        "orientation",
+        "vertical"
+      ]
     },
     {
       "react": "ToolbarGroup",
@@ -112,7 +140,11 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Group related toolbar commands under an optional accessible name; controls remain part of the parent toolbar's single roving tab sequence."
+      "summary": "Group related toolbar commands under an optional accessible name; controls remain part of the parent toolbar's single roving tab sequence.",
+      "customElementAttributes": [
+        "label",
+        "orientation"
+      ]
     },
     {
       "react": "ToolbarSeparator",
@@ -132,7 +164,11 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Theme-derived non-interactive separator that reports the orientation matching its parent Toolbar layout."
+      "summary": "Theme-derived non-interactive separator that reports the orientation matching its parent Toolbar layout.",
+      "customElementAttributes": [
+        "orientation",
+        "vertical"
+      ]
     }
   ]
 }

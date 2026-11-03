@@ -29,7 +29,22 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Provide delayed hover/focus help with label, description, or inaccessible relationships; portal the surface to a custom mountNode while keeping the trigger in place; supports theme appearances, controlled visibility, arrows, and Fluent-compatible fallback, boundary, sizing, target, offset, and positioning-ref options."
+      "summary": "Provide delayed hover/focus help with label, description, or inaccessible relationships; portal the surface to a custom mountNode while keeping the trigger in place; supports theme appearances, controlled visibility, arrows, and Fluent-compatible fallback, boundary, sizing, target, offset, and positioning-ref options.",
+      "customElementAttributes": [
+        "align",
+        "appearance",
+        "content",
+        "delay",
+        "disabled",
+        "hide-delay",
+        "offset",
+        "open",
+        "placement",
+        "positioning",
+        "relationship",
+        "show-delay",
+        "with-arrow"
+      ]
     }
   ]
 }

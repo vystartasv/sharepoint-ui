@@ -30,7 +30,23 @@
           "named ::part hooks"
         ]
       },
-      "summary": "Open a Menu at a pointer or trigger edge with right-click, the Context Menu key, or Shift+F10."
+      "summary": "Open a Menu at a pointer or trigger edge with right-click, the Context Menu key, or Shift+F10.",
+      "customElementAttributes": [
+        "close-on-scroll",
+        "context-menu",
+        "default-open",
+        "hover-delay",
+        "inline",
+        "label",
+        "motion",
+        "open",
+        "open-on-context",
+        "open-on-hover",
+        "persist-on-item-click",
+        "placement",
+        "position-offset",
+        "positioning"
+      ]
     },
     {
       "react": "Menu",
@@ -63,7 +79,23 @@
           "named ::part hooks"
         ]
       },
-      "summary": "Offer a trigger-anchored command list with keyboard navigation, typeahead, nested submenus, dismissal, and optional popup mounting elsewhere."
+      "summary": "Offer a trigger-anchored command list with keyboard navigation, typeahead, nested submenus, dismissal, and optional popup mounting elsewhere.",
+      "customElementAttributes": [
+        "close-on-scroll",
+        "context-menu",
+        "default-open",
+        "hover-delay",
+        "inline",
+        "label",
+        "motion",
+        "open",
+        "open-on-context",
+        "open-on-hover",
+        "persist-on-item-click",
+        "placement",
+        "position-offset",
+        "positioning"
+      ]
     },
     {
       "react": "MenuItem",
@@ -95,7 +127,19 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Provide an enabled, disabled, checkbox, or radio command inside a Menu."
+      "summary": "Provide an enabled, disabled, checkbox, or radio command inside a Menu.",
+      "customElementAttributes": [
+        "aria-controls",
+        "aria-expanded",
+        "aria-haspopup",
+        "checked",
+        "disabled",
+        "has-submenu",
+        "kind",
+        "name",
+        "persist-on-click",
+        "value"
+      ]
     },
     {
       "react": "MenuItemCheckbox",
@@ -123,7 +167,19 @@
           "host className/style"
         ]
       },
-      "summary": "Render a selectable menu checkbox with controlled group values and persistent checked state."
+      "summary": "Render a selectable menu checkbox with controlled group values and persistent checked state.",
+      "customElementAttributes": [
+        "aria-controls",
+        "aria-expanded",
+        "aria-haspopup",
+        "checked",
+        "disabled",
+        "has-submenu",
+        "kind",
+        "name",
+        "persist-on-click",
+        "value"
+      ]
     },
     {
       "react": "MenuItemRadio",
@@ -151,7 +207,19 @@
           "host className/style"
         ]
       },
-      "summary": "Render a menu radio choice grouped by its name value."
+      "summary": "Render a menu radio choice grouped by its name value.",
+      "customElementAttributes": [
+        "aria-controls",
+        "aria-expanded",
+        "aria-haspopup",
+        "checked",
+        "disabled",
+        "has-submenu",
+        "kind",
+        "name",
+        "persist-on-click",
+        "value"
+      ]
     },
     {
       "react": "MenuItemSwitch",
@@ -177,7 +245,19 @@
           "host className/style"
         ]
       },
-      "summary": "Render a menu checkbox with a switch indicator for an immediate setting."
+      "summary": "Render a menu checkbox with a switch indicator for an immediate setting.",
+      "customElementAttributes": [
+        "aria-controls",
+        "aria-expanded",
+        "aria-haspopup",
+        "checked",
+        "disabled",
+        "has-submenu",
+        "kind",
+        "name",
+        "persist-on-click",
+        "value"
+      ]
     },
     {
       "react": "MenuItemLink",
@@ -202,7 +282,15 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Navigate from a menu item using a native anchor with disabled link semantics."
+      "summary": "Navigate from a menu item using a native anchor with disabled link semantics.",
+      "customElementAttributes": [
+        "aria-label",
+        "disabled",
+        "download",
+        "href",
+        "rel",
+        "target"
+      ]
     },
     {
       "react": "MenuList",
@@ -224,7 +312,11 @@
           "host className/style"
         ]
       },
-      "summary": "Compose menu items and optionally control their checked values and alignment hints."
+      "summary": "Compose menu items and optionally control their checked values and alignment hints.",
+      "customElementAttributes": [
+        "has-checkmarks",
+        "has-icons"
+      ]
     },
     {
       "react": "MenuPopover",
@@ -286,7 +378,13 @@
           "host className/style"
         ]
       },
-      "summary": "Mark the trigger in a compound Menu composition and provide an accessible custom-element trigger."
+      "summary": "Mark the trigger in a compound Menu composition and provide an accessible custom-element trigger.",
+      "customElementAttributes": [
+        "aria-controls",
+        "aria-expanded",
+        "aria-haspopup",
+        "disabled"
+      ]
     },
     {
       "react": "MenuBar",
@@ -328,7 +426,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Render a top-level MenuBar command with accessible menu-trigger state and roving tab focus."
+      "summary": "Render a top-level MenuBar command with accessible menu-trigger state and roving tab focus.",
+      "customElementAttributes": [
+        "aria-controls",
+        "aria-expanded",
+        "aria-haspopup",
+        "aria-label",
+        "disabled"
+      ]
     },
     {
       "react": "MenuDivider",

@@ -39,7 +39,22 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Navigate app destinations with grouped disclosures, a responsive localized mobile drawer, and an optional compact desktop rail that retains screen-reader labels."
+      "summary": "Navigate app destinations with grouped disclosures, a responsive localized mobile drawer, and an optional compact desktop rail that retains screen-reader labels.",
+      "customElementAttributes": [
+        "aria-label",
+        "close-label",
+        "collapse-label",
+        "collapsed",
+        "collapsible",
+        "density",
+        "expand-label",
+        "full-width",
+        "label",
+        "multiple",
+        "open",
+        "open-label",
+        "tabbable"
+      ]
     },
     {
       "react": "NavItem",
@@ -112,7 +127,15 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Provide the accessible disclosure button for a NavCategory."
+      "summary": "Provide the accessible disclosure button for a NavCategory.",
+      "customElementAttributes": [
+        "aria-label",
+        "compact",
+        "controls",
+        "disabled",
+        "expanded",
+        "selected"
+      ]
     },
     {
       "react": "NavSubItemGroup",
@@ -199,7 +222,15 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Separate navigation groups."
+      "summary": "Separate navigation groups.",
+      "customElementAttributes": [
+        "align-content",
+        "appearance",
+        "aria-label",
+        "aria-labelledby",
+        "inset",
+        "vertical"
+      ]
     },
     {
       "react": "NavSectionHeader",
@@ -291,7 +322,19 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Accessible keyboard-operable navigation toggle control."
+      "summary": "Accessible keyboard-operable navigation toggle control.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-expanded",
+        "aria-label",
+        "disabled",
+        "disabled-focusable",
+        "icon-position",
+        "shape",
+        "size",
+        "title",
+        "type"
+      ]
     },
     {
       "react": "NavDrawer",

@@ -24,7 +24,45 @@
           "named ::part hooks"
         ]
       },
-      "summary": "Render a native button or accessible link/action anchor with context-inherited sizing, automatic icon-only layout, and the active SharePoint accent."
+      "summary": "Render a native button or accessible link/action anchor with context-inherited sizing, automatic icon-only layout, and the active SharePoint accent.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-controls",
+        "aria-current",
+        "aria-describedby",
+        "aria-description",
+        "aria-disabled",
+        "aria-expanded",
+        "aria-haspopup",
+        "aria-label",
+        "aria-labelledby",
+        "aria-pressed",
+        "as",
+        "disabled",
+        "disabled-focusable",
+        "download",
+        "form",
+        "formaction",
+        "formenctype",
+        "formnovalidate",
+        "formtarget",
+        "href",
+        "hreflang",
+        "icon-only",
+        "icon-position",
+        "name",
+        "referrerpolicy",
+        "rel",
+        "shape",
+        "size",
+        "tabindex",
+        "target",
+        "title",
+        "type",
+        "value",
+        "variant",
+        "vertical"
+      ]
     },
     {
       "react": "ToolbarButton",
@@ -47,7 +85,45 @@
           "host className/style"
         ]
       },
-      "summary": "Toolbar command button with a subtle appearance and medium size by default."
+      "summary": "Toolbar command button with a subtle appearance and medium size by default.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-controls",
+        "aria-current",
+        "aria-describedby",
+        "aria-description",
+        "aria-disabled",
+        "aria-expanded",
+        "aria-haspopup",
+        "aria-label",
+        "aria-labelledby",
+        "aria-pressed",
+        "as",
+        "disabled",
+        "disabled-focusable",
+        "download",
+        "form",
+        "formaction",
+        "formenctype",
+        "formnovalidate",
+        "formtarget",
+        "href",
+        "hreflang",
+        "icon-only",
+        "icon-position",
+        "name",
+        "referrerpolicy",
+        "rel",
+        "shape",
+        "size",
+        "tabindex",
+        "target",
+        "title",
+        "type",
+        "value",
+        "variant",
+        "vertical"
+      ]
     }
   ]
 }

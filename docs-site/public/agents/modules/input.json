@@ -30,7 +30,47 @@
           "named ::part hooks"
         ]
       },
-      "summary": "A bare native input with controlled/default values, Fluent size and appearance variants, before/after content slots, input/change events, and native form validation. Supply aria-label or aria-labelledby; use TextField when a shadow-safe visible label is needed."
+      "summary": "A bare native input with controlled/default values, Fluent size and appearance variants, before/after content slots, input/change events, and native form validation. Supply aria-label or aria-labelledby; use TextField when a shadow-safe visible label is needed.",
+      "customElementAttributes": [
+        "accept",
+        "alt",
+        "appearance",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "autocomplete",
+        "capture",
+        "checked",
+        "default-checked",
+        "disabled",
+        "form",
+        "formaction",
+        "formenctype",
+        "formmethod",
+        "formnovalidate",
+        "formtarget",
+        "height",
+        "inputmode",
+        "list",
+        "max",
+        "maxlength",
+        "min",
+        "minlength",
+        "multiple",
+        "name",
+        "pattern",
+        "placeholder",
+        "read-only",
+        "required",
+        "size",
+        "src",
+        "step",
+        "type",
+        "value",
+        "width"
+      ]
     }
   ]
 }

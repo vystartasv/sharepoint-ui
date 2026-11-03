@@ -33,7 +33,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Represent a selected value or status with theme-derived appearance and optional dismissal."
+      "summary": "Represent a selected value or status with theme-derived appearance and optional dismissal.",
+      "customElementAttributes": [
+        "disabled",
+        "dismiss-label",
+        "dismissible",
+        "label",
+        "selected"
+      ]
     },
     {
       "react": "TagGroup",
@@ -57,7 +64,18 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Arrange related tags as a labelled horizontal or vertical collection."
+      "summary": "Arrange related tags as a labelled horizontal or vertical collection.",
+      "customElementAttributes": [
+        "appearance",
+        "default-selected-values",
+        "disabled",
+        "dismissible",
+        "label",
+        "orientation",
+        "role",
+        "selected-values",
+        "size"
+      ]
     },
     {
       "react": "InteractionTag",
@@ -82,7 +100,15 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Compose a selectable primary action and optional dismiss action in a theme-derived tag."
+      "summary": "Compose a selectable primary action and optional dismiss action in a theme-derived tag.",
+      "customElementAttributes": [
+        "appearance",
+        "disabled",
+        "selected",
+        "shape",
+        "size",
+        "value"
+      ]
     },
     {
       "react": "InteractionTagPrimary",
@@ -105,7 +131,13 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Provide the primary button and optional media, icon, and secondary text for InteractionTag."
+      "summary": "Provide the primary button and optional media, icon, and secondary text for InteractionTag.",
+      "customElementAttributes": [
+        "disabled",
+        "has-secondary-action",
+        "selected",
+        "size"
+      ]
     },
     {
       "react": "InteractionTagSecondary",
@@ -124,7 +156,12 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Provide the accessible secondary dismiss button for InteractionTag."
+      "summary": "Provide the accessible secondary dismiss button for InteractionTag.",
+      "customElementAttributes": [
+        "disabled",
+        "label",
+        "remove-label"
+      ]
     }
   ]
 }

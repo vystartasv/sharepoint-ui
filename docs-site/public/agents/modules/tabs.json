@@ -30,7 +30,12 @@
         "reactRefType": "HTMLElement",
         "forwardRefParameterType": "React.ForwardedRef<HTMLElement>"
       },
-      "summary": "Switch between related views with controlled selection and keyboard navigation."
+      "summary": "Switch between related views with controlled selection and keyboard navigation.",
+      "customElementAttributes": [
+        "default-selected-value",
+        "disabled",
+        "selected-value"
+      ]
     },
     {
       "react": "TabList",
@@ -54,7 +59,18 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Group Tabs with keyboard selection, a selection callback, and an option to reserve label width across selected states."
+      "summary": "Group Tabs with keyboard selection, a selection callback, and an option to reserve label width across selected states.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-label",
+        "default-selected-value",
+        "disabled",
+        "reserve-selected-tab-space",
+        "select-on-focus",
+        "selected-value",
+        "size",
+        "vertical"
+      ]
     },
     {
       "react": "TabListProvider",
@@ -95,7 +111,18 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Represent one selectable view in a TabList with optional leading icon content."
+      "summary": "Represent one selectable view in a TabList with optional leading icon content.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-controls",
+        "data-list-disabled",
+        "disabled",
+        "reserve-selected-tab-space",
+        "selected",
+        "size",
+        "tabindex",
+        "vertical"
+      ]
     },
     {
       "react": "TabPanel",
@@ -117,7 +144,11 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Contain the content associated with one Tab."
+      "summary": "Contain the content associated with one Tab.",
+      "customElementAttributes": [
+        "labelledby",
+        "selected"
+      ]
     }
   ]
 }

@@ -29,7 +29,22 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Choose one value from related radio options with controlled or default state, stacked or horizontal layout, native form participation, validity, reset, and keyboard behavior."
+      "summary": "Choose one value from related radio options with controlled or default state, stacked or horizontal layout, native form participation, validity, reset, and keyboard behavior.",
+      "customElementAttributes": [
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "default-value",
+        "disabled",
+        "label",
+        "layout",
+        "name",
+        "orientation",
+        "required",
+        "value"
+      ]
     },
     {
       "react": "Radio",

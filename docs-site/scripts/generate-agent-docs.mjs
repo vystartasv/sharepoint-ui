@@ -62,17 +62,58 @@ function elementEventsFor(source, fileName) {
     composed: delivery(item.composed),
   })).sort((a, b) => a.name.localeCompare(b.name));
 }
+function elementAttributesFor(source, fileName) {
+  const root = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  const classAttributes = new Map();
+  const tagAttributes = {};
+  const readName = node => node && (ts.isIdentifier(node) || ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) ? node.text : undefined;
+  const observedAttributes = node => {
+    const property = node.members?.find(member => ts.isPropertyDeclaration(member) && readName(member.name) === "observedAttributes" && ts.getModifiers(member)?.some(modifier => modifier.kind === ts.SyntaxKind.StaticKeyword));
+    return property && ts.isArrayLiteralExpression(property.initializer)
+      ? property.initializer.elements.map(readName).filter(Boolean)
+      : [];
+  };
+  const readClasses = node => {
+    if ((ts.isClassDeclaration(node) || ts.isClassExpression(node)) && node.name) classAttributes.set(node.name.text, observedAttributes(node));
+    ts.forEachChild(node, readClasses);
+  };
+  readClasses(root);
+  const readDefinitions = node => {
+    if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === "define") {
+      const receiver = node.expression.expression;
+      const isCustomElements = (ts.isIdentifier(receiver) && receiver.text === "customElements") || (ts.isPropertyAccessExpression(receiver) && receiver.name.text === "customElements");
+      const tag = readName(node.arguments[0]);
+      const definition = node.arguments[1];
+      const className = definition && ts.isIdentifier(definition) ? definition.text : undefined;
+      const attrs = definition && (ts.isClassDeclaration(definition) || ts.isClassExpression(definition))
+        ? observedAttributes(definition)
+        : className ? classAttributes.get(className) ?? [] : [];
+      if (isCustomElements && tag && attrs.length) tagAttributes[tag] = [...new Set(attrs)].sort();
+    }
+    ts.forEachChild(node, readDefinitions);
+  };
+  readDefinitions(root);
+  return tagAttributes;
+}
 const modules = new Map();
-for (const component of catalog.components) modules.set(component.module, [...(modules.get(component.module) ?? []), component]);
-
 const elementModuleEvents = {};
-for (const module of modules.keys()) {
-  const sourcePath = resolve(packageRoot, "src/elements", `${module}.ts`);
-  const source = await readFile(sourcePath, "utf8").catch(() => "");
-  elementModuleEvents[module] = elementEventsFor(source, sourcePath);
+const elementModuleAttributes = {};
+for (let componentIndex = 0; componentIndex < catalog.components.length; componentIndex++) {
+  const component = catalog.components[componentIndex];
+  const sourcePath = resolve(packageRoot, "src/elements", `${component.module}.ts`);
+  if (!(component.module in elementModuleAttributes)) {
+    const source = await readFile(sourcePath, "utf8").catch(() => "");
+    elementModuleEvents[component.module] = elementEventsFor(source, sourcePath);
+    elementModuleAttributes[component.module] = elementAttributesFor(source, sourcePath);
+  }
+  const attributes = component.tag ? elementModuleAttributes[component.module]?.[component.tag] : undefined;
+  const enriched = attributes ? { ...component, customElementAttributes: attributes } : component;
+  catalog.components[componentIndex] = enriched;
+  modules.set(component.module, [...(modules.get(component.module) ?? []), enriched]);
 }
 catalog.elementEventScope = "Events are listed by source module because a module can define a parent and its child tags. Check event.target when a module composes multiple tags; detailProperties lists statically declared top-level keys and may be incomplete when detailPropertiesComplete is false.";
 const sliceContract = Object.fromEntries(["composition", "state", "customElements"].map(key => [key, catalog.agentContract[key]]));
+sliceContract.customElements += " Where present, a component JSON slice reports its tag's statically declared observed attributes as customElementAttributes; set non-attribute objects and callbacks as DOM properties.";
 await writeFile(join(output, "components.json"), `${JSON.stringify(catalog, null, 2)}\n`);
 await mkdir(join(output, "modules"), { recursive: true });
 await mkdir(join(output, "components"), { recursive: true });

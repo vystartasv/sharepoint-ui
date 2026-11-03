@@ -28,7 +28,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Show indeterminate progress in eight sizes, primary or inverted appearance, four label positions, optional delayed display, and a provider-controlled default size."
+      "summary": "Show indeterminate progress in eight sizes, primary or inverted appearance, four label positions, optional delayed display, and a provider-controlled default size.",
+      "customElementAttributes": [
+        "appearance",
+        "delay",
+        "label",
+        "label-position",
+        "size"
+      ]
     }
   ]
 }

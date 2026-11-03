@@ -36,7 +36,16 @@
         ]
       },
       "summary": "Keep priority actions visible as space changes, move the rest into a menu, and let a stored user preference switch the shelf to compact spacing.",
-      "highValueAdditions": []
+      "highValueAdditions": [],
+      "customElementAttributes": [
+        "aria-label",
+        "density",
+        "has-hidden-items",
+        "minimum-visible",
+        "overflow-axis",
+        "overflow-direction",
+        "padding"
+      ]
     },
     {
       "react": "OverflowProvider",
@@ -90,7 +99,13 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Register one stable action with the responsive overflow engine; pin essential actions and provide its MenuItem representation for narrow layouts."
+      "summary": "Register one stable action with the responsive overflow engine; pin essential actions and provide its MenuItem representation for narrow layouts.",
+      "customElementAttributes": [
+        "group-id",
+        "id",
+        "pinned",
+        "priority"
+      ]
     },
     {
       "react": "OverflowDivider",

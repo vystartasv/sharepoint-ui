@@ -54,7 +54,21 @@
       "tag": "spui-swatch-picker",
       "define": "defineSwatchPicker",
       "summary": "Render accessible color and image swatches as a keyboard-operable single- or multi-selection grid or row.",
-      "highValueAdditions": []
+      "highValueAdditions": [],
+      "customElementAttributes": [
+        "aria-label",
+        "columns",
+        "default-selected-value",
+        "default-selected-values",
+        "focus-mode",
+        "layout",
+        "selected-value",
+        "selected-values",
+        "selection-mode",
+        "shape",
+        "size",
+        "spacing"
+      ]
     },
     {
       "module": "swatch-picker",
@@ -78,7 +92,17 @@
       "react": "ColorSwatch",
       "tag": "spui-color-swatch",
       "define": "defineColorSwatch",
-      "summary": "Represent one selectable color with an accessible name and selected state."
+      "summary": "Represent one selectable color with an accessible name and selected state.",
+      "customElementAttributes": [
+        "aria-label",
+        "border-color",
+        "color",
+        "disabled",
+        "selected",
+        "shape",
+        "size",
+        "value"
+      ]
     },
     {
       "module": "swatch-picker",
@@ -102,7 +126,16 @@
       "react": "ImageSwatch",
       "tag": "spui-image-swatch",
       "define": "defineImageSwatch",
-      "summary": "Represent one selectable image or texture swatch with a caller-provided accessible name."
+      "summary": "Represent one selectable image or texture swatch with a caller-provided accessible name.",
+      "customElementAttributes": [
+        "aria-label",
+        "disabled",
+        "selected",
+        "shape",
+        "size",
+        "src",
+        "value"
+      ]
     },
     {
       "module": "swatch-picker",
@@ -124,7 +157,13 @@
       "react": "EmptySwatch",
       "tag": "spui-empty-swatch",
       "define": "defineEmptySwatch",
-      "summary": "Offer an accessible add-color action within a swatch set."
+      "summary": "Offer an accessible add-color action within a swatch set.",
+      "customElementAttributes": [
+        "aria-label",
+        "disabled",
+        "shape",
+        "size"
+      ]
     },
     {
       "module": "swatch-picker",

@@ -31,7 +31,21 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Present a person with an Avatar, four composable identity text lines, and localized presence context."
+      "summary": "Present a person with an Avatar, four composable identity text lines, and localized presence context.",
+      "customElementAttributes": [
+        "color",
+        "image",
+        "initials",
+        "name",
+        "presence",
+        "presence-label",
+        "presence-only",
+        "secondary-text",
+        "size",
+        "tertiary-text",
+        "text-alignment",
+        "text-position"
+      ]
     }
   ]
 }

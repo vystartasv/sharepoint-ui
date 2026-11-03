@@ -31,7 +31,27 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Choose a numeric value within a range using pointer or keyboard input."
+      "summary": "Choose a numeric value within a range using pointer or keyboard input.",
+      "customElementAttributes": [
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "aria-orientation",
+        "aria-required",
+        "aria-valuetext",
+        "default-value",
+        "disabled",
+        "label",
+        "max",
+        "min",
+        "name",
+        "size",
+        "step",
+        "value",
+        "vertical"
+      ]
     }
   ]
 }

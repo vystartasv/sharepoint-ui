@@ -3,7 +3,7 @@
   "agentContract": {
     "composition": "Import named components from @spfx-fast/sharepoint-ui/react. Put one SharePointUIProvider around the view. Compose with children by default; use only the slots and component props listed for that component.",
     "state": "State props, initial default props, callback names, and callback arguments vary by component. Follow that component's signature and callbackProps; update controlled state in its callback.",
-    "customElements": "Import the component's define function from @spfx-fast/sharepoint-ui/elements/{module} and register it once. Set objects and callbacks as DOM properties. For event names and statically visible detail keys, use the source module's event inventory at https://vystartasv.github.io/sharepoint-ui/agents/events/{module}.json; it is module-scoped, so check event.target when composed tags emit events."
+    "customElements": "Import the component's define function from @spfx-fast/sharepoint-ui/elements/{module} and register it once. Set objects and callbacks as DOM properties. For event names and statically visible detail keys, use the source module's event inventory at https://vystartasv.github.io/sharepoint-ui/agents/events/{module}.json; it is module-scoped, so check event.target when composed tags emit events. Where present, a component JSON slice reports its tag's statically declared observed attributes as customElementAttributes; set non-attribute objects and callbacks as DOM properties."
   },
   "elementEventInventory": {
     "url": "https://vystartasv.github.io/sharepoint-ui/agents/events/tag-picker.json",
@@ -60,6 +60,37 @@
     "summary": "Search, choose, and remove multiple values with keyboard, native form support, and popup placement that adapts to SharePoint sections.",
     "highValueAdditions": [
       "Add composed control, input, selected-tag group, and list primitives while preserving the single state engine."
+    ],
+    "customElementAttributes": [
+      "aria-describedby",
+      "aria-description",
+      "aria-invalid",
+      "aria-label",
+      "aria-labelledby",
+      "clearable",
+      "default-open",
+      "default-selected-options",
+      "disable-auto-focus",
+      "disabled",
+      "inline",
+      "input-appearance",
+      "input-aria-describedby",
+      "input-aria-label",
+      "input-disabled",
+      "input-value",
+      "label",
+      "name",
+      "no-popover",
+      "no-results",
+      "open",
+      "placeholder",
+      "positioning",
+      "remove-label",
+      "required",
+      "required-message",
+      "selected-label",
+      "selected-options",
+      "selected-values"
     ]
   }
 }

@@ -34,7 +34,16 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Show the shape of pending content while honoring reduced motion and forced colors."
+      "summary": "Show the shape of pending content while honoring reduced motion and forced colors.",
+      "customElementAttributes": [
+        "animated",
+        "animation",
+        "appearance",
+        "height",
+        "shape",
+        "size",
+        "width"
+      ]
     },
     {
       "react": "SkeletonItem",
@@ -54,7 +63,13 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Render a themed loading placeholder with Fluent size, shape, appearance, and motion options."
+      "summary": "Render a themed loading placeholder with Fluent size, shape, appearance, and motion options.",
+      "customElementAttributes": [
+        "animation",
+        "appearance",
+        "shape",
+        "size"
+      ]
     }
   ]
 }

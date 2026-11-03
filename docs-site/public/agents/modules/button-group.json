@@ -25,7 +25,10 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Group related buttons under one accessible label, with horizontal or vertical layout and native button tab behavior."
+      "summary": "Group related buttons under one accessible label, with horizontal or vertical layout and native button tab behavior.",
+      "customElementAttributes": [
+        "orientation"
+      ]
     }
   ]
 }

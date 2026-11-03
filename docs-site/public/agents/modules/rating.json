@@ -38,7 +38,26 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Choose a whole-step or half-step score using accessible radio controls."
+      "summary": "Choose a whole-step or half-step score using accessible radio controls.",
+      "customElementAttributes": [
+        "aria-describedby",
+        "aria-description",
+        "aria-label",
+        "aria-labelledby",
+        "color",
+        "default-value",
+        "disabled",
+        "item-label",
+        "label",
+        "max",
+        "name",
+        "readonly",
+        "required",
+        "required-message",
+        "size",
+        "step",
+        "value"
+      ]
     }
   ]
 }

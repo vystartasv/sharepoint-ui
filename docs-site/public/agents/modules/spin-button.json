@@ -31,7 +31,32 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Edit a bounded numeric value with increment and decrement controls."
+      "summary": "Edit a bounded numeric value with increment and decrement controls.",
+      "customElementAttributes": [
+        "appearance",
+        "aria-describedby",
+        "aria-description",
+        "aria-invalid",
+        "aria-label",
+        "aria-labelledby",
+        "aria-valuetext",
+        "decrement-label",
+        "default-value",
+        "disabled",
+        "display-value",
+        "increment-label",
+        "label",
+        "max",
+        "min",
+        "name",
+        "precision",
+        "read-only",
+        "required",
+        "size",
+        "step",
+        "step-page",
+        "value"
+      ]
     }
   ]
 }

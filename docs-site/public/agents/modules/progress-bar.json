@@ -27,7 +27,19 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Report determinate or indeterminate task progress with theme-aware Fluent colors, shapes, thicknesses, reduced-motion support, and accessible progressbar semantics."
+      "summary": "Report determinate or indeterminate task progress with theme-aware Fluent colors, shapes, thicknesses, reduced-motion support, and accessible progressbar semantics.",
+      "customElementAttributes": [
+        "aria-describedby",
+        "aria-label",
+        "aria-labelledby",
+        "aria-valuetext",
+        "color",
+        "label",
+        "max",
+        "shape",
+        "thickness",
+        "value"
+      ]
     }
   ]
 }

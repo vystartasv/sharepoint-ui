@@ -27,7 +27,14 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Show the current location in a labelled navigation trail with a replaceable list root and optional arrow-key focus."
+      "summary": "Show the current location in a labelled navigation trail with a replaceable list root and optional arrow-key focus.",
+      "customElementAttributes": [
+        "aria-label",
+        "focus-mode",
+        "label",
+        "separator",
+        "size"
+      ]
     },
     {
       "react": "BreadcrumbItem",
@@ -49,7 +56,11 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Represent a destination or current location inside a Breadcrumb."
+      "summary": "Represent a destination or current location inside a Breadcrumb.",
+      "customElementAttributes": [
+        "current",
+        "size"
+      ]
     },
     {
       "react": "BreadcrumbButton",
@@ -72,7 +83,21 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Render a theme-aware breadcrumb action as a button or link with current and disabled states."
+      "summary": "Render a theme-aware breadcrumb action as a button or link with current and disabled states.",
+      "customElementAttributes": [
+        "aria-current",
+        "aria-label",
+        "current",
+        "disabled",
+        "disabled-focusable",
+        "href",
+        "rel",
+        "size",
+        "tabindex",
+        "target",
+        "title",
+        "type"
+      ]
     },
     {
       "react": "BreadcrumbDivider",

@@ -29,7 +29,17 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Represent one named person in an AvatarGroup, inheriting the group size and expanding to a labelled row inside its overflow popover."
+      "summary": "Represent one named person in an AvatarGroup, inheriting the group size and expanding to a labelled row inside its overflow popover.",
+      "customElementAttributes": [
+        "active",
+        "color",
+        "id-for-color",
+        "image",
+        "initials",
+        "name",
+        "shape",
+        "size"
+      ]
     },
     {
       "react": "AvatarGroupPopover",
@@ -61,7 +71,15 @@
           "named ::part hooks"
         ]
       },
-      "summary": "Show overflow members in a theme-aware, labelled popover with a count or icon trigger and keyboard dismissal."
+      "summary": "Show overflow members in a theme-aware, labelled popover with a count or icon trigger and keyboard dismissal.",
+      "customElementAttributes": [
+        "count",
+        "indicator",
+        "label",
+        "open",
+        "placement",
+        "trigger-label"
+      ]
     }
   ]
 }
