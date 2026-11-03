@@ -689,6 +689,27 @@
   margin: 0;
 }
 
+.component-demo__stage:has(.sharepoint-field-preview) {
+  display: block;
+}
+
+.sharepoint-field-preview {
+  display: grid;
+  width: min(100%, 42rem);
+  gap: 1rem;
+}
+
+.sharepoint-field-preview spui-sharepoint-field,
+.sharepoint-field-preview spui-input,
+.sharepoint-field-preview spui-textarea,
+.sharepoint-field-preview spui-rich-text-editor,
+.sharepoint-field-preview spui-select,
+.sharepoint-field-preview spui-combobox,
+.sharepoint-field-preview spui-date-picker {
+  display: block;
+  width: 100%;
+}
+
 .component-demo__stage:has(> spui-virtual-list) {
   display: block;
   padding: 0.5rem;

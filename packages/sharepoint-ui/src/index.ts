@@ -1,5 +1,6 @@
 export { defineSharePointUIElements } from "./elements.js";
 export { defineButton } from "./elements/button.js";
+export { defineSharePointField, type SharePointFieldElement, type SharePointFieldOption, type SharePointFieldValueChangeDetail } from "./elements/sharepoint-fields.js";
 export { defineButtonGroup } from "./elements/button-group.js";
 export { defineCompoundButton, defineMenuButton, defineSplitButton, defineToggleButton } from "./elements/button-variants.js";
 export type { ButtonAppearance, ButtonShape, ButtonSize } from "./elements/button.js";

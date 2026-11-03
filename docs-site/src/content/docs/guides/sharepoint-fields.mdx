@@ -159,7 +159,7 @@ Only supplied values are included, so omitted fields remain untouched in a PATCH
 
 ## Render a metadata-driven form
 
-[`SharePointField`](/sharepoint-ui/components/sharepoint-fields/sharepoint-field/) chooses the matching library control, applies the field label and description, and maps its value callback to one `onValueChange` shape. It handles text, numeric, URL, plain and rich Note, Choice, MultiChoice, Boolean, DateTime, Lookup, and User fields. This convenience renderer is React-only; `getSharePointFieldAdapter()` remains framework-independent for custom-element and other-framework forms. The form can stay driven by SharePoint metadata:
+[`SharePointField`](/sharepoint-ui/components/sharepoint-fields/sharepoint-field/) chooses the matching library control, applies the field label and description, and maps changes to one value shape. It handles text, numeric, URL, plain and rich Note, Choice, MultiChoice, Boolean, DateTime, Lookup, and User fields. Use the React adapter or the framework-free `<spui-sharepoint-field>` custom element; both use the same SharePoint metadata adapter. The form can stay driven by SharePoint metadata:
 
 ```tsx
 import { useState } from "react";
@@ -200,6 +200,24 @@ The `options` prop is for Lookup and User fields: the host loads those choices w
 | `renderUnsupported` | Render a custom control for an unsupported field type. |
 | `emptyOptionLabel`, `addChoiceLabel` | Localize the empty and fill-in choice prompts. |
 | `id`, `className`, `style`, `data-*`, ARIA attributes | Target and style the field wrapper like other React components. |
+
+For plain JavaScript, Copilot UX, or another framework, register the custom element and assign metadata and options as properties:
+
+```ts
+import { defineSharePointField } from "@spfx-fast/sharepoint-ui/elements/sharepoint-fields";
+
+defineSharePointField();
+const field = document.querySelector("spui-sharepoint-field")!;
+field.field = column;
+field.value = item[column.InternalName];
+field.options = lookupOptions; // Lookup and User values loaded by the host
+field.addEventListener("spui-field-value-change", event => {
+  const { field: changedField, value } = event.detail;
+  draft[changedField.InternalName] = value;
+});
+```
+
+`field` and `options` are JavaScript properties because they contain objects. The element dispatches a bubbling, composed `spui-field-value-change` event and never fetches or saves SharePoint data itself.
 
 ## Customize a single control
 

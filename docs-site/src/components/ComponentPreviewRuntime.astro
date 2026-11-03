@@ -5,7 +5,7 @@
   import { registerPreviewElements } from "./preview-elements.generated.js";
 
   const themePresets = themeCapture.presets;
-  const componentValueSelector = ["input[type=range]", "input[type=checkbox]", "input[type=radio]", "select", "textarea", "spui-slider", "spui-input", "spui-textarea", "spui-select", "spui-radio-group", "spui-combobox", "spui-tag-picker", "spui-color-picker", "spui-spin-button", "spui-rich-text-editor"].join(",");
+  const componentValueSelector = ["input[type=range]", "input[type=checkbox]", "input[type=radio]", "select", "textarea", "spui-slider", "spui-input", "spui-textarea", "spui-select", "spui-radio-group", "spui-combobox", "spui-tag-picker", "spui-color-picker", "spui-spin-button", "spui-rich-text-editor", "spui-sharepoint-field"].join(",");
 
   document.querySelectorAll("[data-component-demo]").forEach(async (demo) => {
     const appearance = demo.querySelector("[data-preview-appearance]");
@@ -125,9 +125,20 @@
       interactionSummary = values.length ? ` · Selected: ${values.join(", ")}` : " · Selection cleared";
       updateStatus(event.target);
     });
+    stage?.addEventListener("spui-field-value-change", event => updateStatus(event.target));
     try {
       await registerPreviewElements(demo);
       updateStatus();
+      stage?.querySelectorAll<HTMLElement & { field?: object; value?: unknown }>("spui-sharepoint-field[data-preview-field]").forEach(field => {
+        const type = field.dataset.previewField;
+        const examples = {
+          title: { field: { InternalName: "Title", DisplayName: "Request title", TypeAsString: "Text", Required: true, MaxLength: 255 }, value: "Quarterly access review" },
+          status: { field: { InternalName: "Status", DisplayName: "Status", TypeAsString: "Choice", Required: true, Choices: ["In progress", "Approved", "Needs changes"] }, value: "In progress" },
+          notes: { field: { InternalName: "ReviewNotes", DisplayName: "Review notes", TypeAsString: "Note", RichText: true, RichTextMode: "Compatible", AllowHyperlink: true }, value: "<p>Ready for <strong>team review</strong>.</p>" },
+        } as const;
+        const example = examples[type as keyof typeof examples];
+        if (example) { field.field = example.field; field.value = example.value; }
+      });
       const virtualList = stage?.querySelector("spui-virtual-list");
       if (virtualList && "items" in virtualList) {
         virtualList.items = [

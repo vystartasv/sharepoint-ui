@@ -106,7 +106,20 @@ defineButton();
 
 For a Copilot surface that reads SharePoint data, updates the visible-state context, and saves through `SPHttpClient`, use the [SPFx CLI template](https://github.com/vystartasv/sharepoint-ui/tree/main/templates/spfx-fast-copilot-access-review) or the [complete tenant-connected example](https://github.com/vystartasv/sharepoint-ui/tree/main/examples/spfx124-copilot-ux). Both are framework-free and import only the custom elements they use.
 
-For a metadata-driven React form, render `<SharePointField field={field} value={values[name]} onValueChange={...} options={lookupOptions[name]} />` from `@spfx-fast/sharepoint-ui/react`. It selects the matching control, applies accessible labels and field constraints, and includes rich-text Notes. The host supplies loaded Lookup/User options through `options`; SharePoint Choice fields use their metadata directly. For custom layouts, request definitions with `getSharePointFieldMetadataUrl(webUrl, listId)` and inspect each `getSharePointFieldAdapter(field)` recipe. Use `serializeSharePointFieldValues(fields, valuesByInternalName)` to assemble a PATCH body: omitted values stay untouched and `null` clears optional fields. New-item forms must include every required value. `getSharePointListItemUrl(webUrl, listId, itemId)` builds a validated item endpoint; the host supplies authorization, ETag, and REST entity-type metadata. Generic and focused serializers reject empty required values and read-only writes, enforce configured numeric precision and bounds, and reject values over the configured text length. `getSharePointNextPageUrl(webUrl, nextLink)` safely resolves same-origin OData paging links; `getSharePointLookupOptionsUrl(field, sourceWebUrl)` builds lookup requests. The app supplies authorized fetches, people search, permissions, and persistence.
+For a metadata-driven form, use `<SharePointField>` from `/react` or `<spui-sharepoint-field>` without React. Both select the control from SharePoint metadata, apply accessible labels and field rules, and support rich-text Notes. Load Lookup/User options in the host; Choice values come from field metadata. For custom elements, register once and set object data as properties:
+
+```ts
+import { defineSharePointField } from "@spfx-fast/sharepoint-ui/elements/sharepoint-fields";
+
+defineSharePointField();
+const control = document.querySelector("spui-sharepoint-field")!;
+control.field = column;
+control.value = item[column.InternalName];
+control.options = lookupOptions;
+control.addEventListener("spui-field-value-change", event => updateDraft(event.detail.field, event.detail.value));
+```
+
+For custom layouts, request definitions with `getSharePointFieldMetadataUrl(webUrl, listId)` and inspect each `getSharePointFieldAdapter(field)` recipe. Use `serializeSharePointFieldValues(fields, valuesByInternalName)` to assemble a PATCH body: omitted values stay untouched and `null` clears optional fields. New-item forms must include every required value. `getSharePointListItemUrl(webUrl, listId, itemId)` builds a validated item endpoint; the host supplies authorization, ETag, and REST entity-type metadata. Generic and focused serializers reject empty required values and read-only writes, enforce configured numeric precision and bounds, and reject values over the configured text length. `getSharePointNextPageUrl(webUrl, nextLink)` safely resolves same-origin OData paging links; `getSharePointLookupOptionsUrl(field, sourceWebUrl)` builds lookup requests. The app supplies authorized fetches, people search, permissions, and persistence.
 
 Forward adapter `min`, `max`, and `maxLength` to matching controls when present. The serializers enforce numeric bounds and text lengths too; SharePoint remains the final validator.
 

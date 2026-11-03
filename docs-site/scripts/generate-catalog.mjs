@@ -163,7 +163,7 @@ function exampleFor(component) {
   };
   if (component.react === "SharePointField") return {
     tag: "div",
-    markup: '<div class="sharepoint-field-preview"><spui-field label="Request title" value="Quarterly access review" required></spui-field><spui-select label="Status" value="In progress"><option value="In progress">In progress</option><option value="Approved">Approved</option><option value="Needs changes">Needs changes</option></spui-select><spui-rich-text-editor label="Review notes" content-mode="rich" value="&lt;p&gt;Ready for team review.&lt;/p&gt;"></spui-rich-text-editor></div>',
+    markup: '<div class="sharepoint-field-preview"><spui-sharepoint-field data-preview-field="title"></spui-sharepoint-field><spui-sharepoint-field data-preview-field="status"></spui-sharepoint-field><spui-sharepoint-field data-preview-field="notes"></spui-sharepoint-field></div>',
     content: "",
     related: true,
   };
@@ -274,10 +274,28 @@ for (const [module, entries] of familyIndex) {
       "```",
       "",
       "Load options and save values through the host's authorized SharePoint services. See the [complete SharePoint field guide](/sharepoint-ui/guides/sharepoint-fields/) for metadata loading, lookup paging, and PATCH serialization.",
+      "",
+      "## Use from plain JavaScript or another framework",
+      "",
+      "Import the element definition once, then set metadata and values as JavaScript properties (objects cannot be passed through HTML attributes):",
+      "",
+      "```js",
+      'import { defineSharePointField } from "@spfx-fast/sharepoint-ui/elements/sharepoint-fields";',
+      "",
+      "defineSharePointField();",
+      'const control = document.querySelector("spui-sharepoint-field");',
+      "control.field = fieldMetadata;",
+      "control.value = currentValue; // or set defaultValue for an uncontrolled field",
+      "control.options = lookupOptions; // only needed for Lookup and User fields",
+      'control.addEventListener("spui-field-value-change", event => {',
+      "  const { value, field } = event.detail;",
+      "  updateDraft(field.InternalName, value);",
+      "});",
+      "```",
     ].join("\n") : "";
     const relatedApis = entry.api?.relatedReactApis?.length ? entry.api.relatedReactApis.map(api => `<p><strong><code>${escapeHtml(api.name)}</code>:</strong> ${escapeHtml(api.description)}</p>`).join("\n") : "";
     const previewNote = entry.react === "SharePointField"
-      ? "These interactive controls show the kinds of field SharePointField composes. The React renderer chooses the control from SharePoint metadata; preview values are illustrative."
+      ? "These are live SharePointField custom elements using sample SharePoint metadata. In your app, load metadata and options from your tenant; the preview makes no network calls."
       : example.related
       ? `The ${titleFor(module)} example is assembled so this API can be seen in its working context.`
       : !entry.tag?.startsWith("spui-")

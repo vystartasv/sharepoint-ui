@@ -1486,10 +1486,11 @@
     },
     {
       "react": "SharePointField",
-      "reactOnly": true,
+      "tag": "spui-sharepoint-field",
+      "define": "defineSharePointField",
       "module": "sharepoint-fields",
       "category": "forms",
-      "summary": "Render a SharePoint list field from its metadata with the matching accessible library control.",
+      "summary": "Render SharePoint field metadata with accessible controls in React or as a framework-free custom element.",
       "api": {
         "reactSignature": "{ field, value, defaultValue, options: providedOptions, onValueChange, disabled = false, hint, validationMessage, renderUnsupported, addChoiceLabel = \"Add another choice\", emptyOptionLabel = \"Select an option\", className, style, ...hostProps }: SharePointFieldProps",
         "callbackProps": [
@@ -1500,6 +1501,17 @@
           "SharePointUIProvider tokens",
           "Field label, hint, and validation states",
           "id, ARIA, data attributes, className, and style"
+        ],
+        "customElementProperties": [
+          "field",
+          "value",
+          "defaultValue",
+          "options",
+          "onValueChange",
+          "renderUnsupported"
+        ],
+        "customElementEvents": [
+          "spui-field-value-change"
         ]
       }
     },
