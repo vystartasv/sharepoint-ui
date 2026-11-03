@@ -7,24 +7,36 @@ SharePoint UI's strongest measured advantage is its framework-free custom-elemen
 
 ## Measured result
 
-On 2026-11-03, the repository benchmark bundled `Button`, `Input`, `Card`, and `Tag` from SharePoint UI `0.4.2` and Fluent UI React `9.75.0` as minified, tree-shaken browser ESM targeting ES2022. React and React DOM were external in both React builds.
+On 2026-11-03, the repository benchmark bundled `Button`, `Input`, `Card`, and `Tag` from SharePoint UI `0.4.3` and Fluent UI React `9.75.0` as minified, tree-shaken browser ESM targeting ES2022 with esbuild 0.28.2. React and React DOM were external in both React builds.
 
 | Import path | Raw JavaScript | Gzip | Brotli | Gzip change vs Fluent |
 | --- | ---: | ---: | ---: | ---: |
-| SharePoint UI custom elements, no React | 47,858 bytes | 11,560 bytes | 10,256 bytes | 74.0% less |
-| SharePoint UI React adapters | 95,567 bytes | 23,590 bytes | 20,737 bytes | 46.9% less |
+| SharePoint UI custom elements, no React | 47,862 bytes | 11,562 bytes | 10,254 bytes | 74.0% less |
+| SharePoint UI React adapters | 95,927 bytes | 23,729 bytes | 20,840 bytes | 46.6% less |
 | Fluent UI React 9.75.0 | 181,420 bytes | 44,411 bytes | 38,069 bytes | Baseline |
 
 This is a concrete advantage for compact SharePoint and Copilot task surfaces: the four-component custom-element slice is 74% smaller after gzip than the matching Fluent imports.
 
 ## SharePoint metadata fields
 
-The same benchmark also measures the metadata-driven `SharePointField` renderer and its control registrations. In this import-only slice, the framework-free custom element is 46,356 gzip bytes; the React adapter is 62,177 gzip bytes. The no-React entry is 25.4% smaller. This slice includes the field types and control code the renderer can select; it is not the size of one rendered text field.
+The same benchmark measures the metadata-driven `SharePointField` renderer. Eagerly importing every supported control is 51,725 gzip bytes for the custom element and 67,112 bytes for the React adapter: the no-React import is 22.9% smaller. This includes the field types and control code the renderer can select; it is not the size of one rendered text field.
 
 | Import path | Raw JavaScript | Gzip | Brotli | Modules included |
 | --- | ---: | ---: | ---: | ---: |
-| `SharePointField` custom element, no React | 211,010 bytes | 46,356 bytes | 37,955 bytes | 15 |
-| `SharePointField` React adapter | 270,408 bytes | 62,177 bytes | 51,250 bytes | 17 |
+| `SharePointField` custom element, no React | 230,860 bytes | 51,725 bytes | 42,367 bytes | 16 |
+| `SharePointField` React adapter | 289,585 bytes | 67,112 bytes | 55,446 bytes | 17 |
+
+The custom-element renderer can split rich text, lookup/person, and date controls into on-demand chunks when the consuming bundler supports dynamic imports. Its entry is 18,906 gzip bytes before a control chunk is requested. The measured entry-plus-required-chunks payload depends on the fields used:
+
+| Fields used | Gzip payload |
+| --- | ---: |
+| Common text, choice, Boolean, and multi-choice fields | 23,347 bytes |
+| Rich-text Note | 39,231 bytes |
+| Lookup or User | 32,433 bytes |
+| Date or date-time | 29,689 bytes |
+| A form using all four groups | 54,659 bytes |
+
+Splitting reduces what a typical form needs up front, but adds chunk overhead: loading every field group this way is about 5.7% larger than the eager custom-element bundle in this measurement.
 
 ## Reproduce it
 
@@ -34,6 +46,6 @@ From the repository root, run:
 npm run benchmark:no-react-payload
 ```
 
-The script builds the library, bundles the package's public element and React entry points, and compares a four-control slice with the Fluent UI version installed by the SPFx demo. It also measures the SharePoint field renderer through both public entry points. The measurements cover JavaScript imports only. They do not measure CSS files, React's host-provided runtime, SharePoint startup cost, render speed, or complete behavioral parity.
+The script builds the library, bundles the package's public element and React entry points, and compares a four-control slice with the Fluent UI version installed by the SPFx demo. It also measures the SharePoint field renderer through both public entry points and estimates entry-plus-chunk payloads for common field combinations. The measurements cover JavaScript imports only. They do not measure CSS files, React's host-provided runtime, SharePoint startup cost, render speed, or complete behavioral parity.
 
 Choose custom elements when React is unnecessary or when the same UI needs to work across multiple frameworks. Choose the React adapter when its familiar composition model is useful; it still produced a smaller four-component JavaScript slice in this measurement.
