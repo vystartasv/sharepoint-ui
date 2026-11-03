@@ -65,7 +65,7 @@ import { defineTeachingPopover as defineNativeTeachingPopover, type TeachingPopo
 export type { TeachingPopoverCarouselValueChangeType, TeachingPopoverCarouselValueChangeDetail, TeachingPopoverFinishDetail } from "./elements/teaching-popover.js";
 import { defineMenu, defineMenuItem, defineMenuItemLink, defineMenuDivider, defineMenuGroup, defineMenuGroupHeader, defineMenuList, defineMenuPopover, defineMenuSplitGroup, defineMenuTrigger, defineMenuBar as defineNativeMenuBar, defineMenuBarItem, type MenuOpenChangeData } from "./elements/menu.js";
 export type { MenuOpenChangeData, MenuOpenChangeType } from "./elements/menu.js";
-import { defineText, type TextFont, type TextSize, type TextTag, type TextWeight } from "./elements/text.js";
+import { getTextSizeStyles, type TextFont, type TextSize, type TextTag, type TextWeight } from "./elements/text.js";
 import { defineToast, defineToastBody, defineToastFooter, defineToastTitle, type ToastIntent, type ToastPoliteness } from "./elements/toast.js";
 import { defineToaster, type ToastAnnounce, type ToastPosition } from "./elements/toaster.js";
 export type { ToastAnnounce, ToastAnnounceOptions } from "./elements/toaster.js";
@@ -564,9 +564,29 @@ export function SharePointUIProvider({ children, lang, dir, appearance, baseAppe
 }
 
 export type TextProps = ElementProps & { as?: TextTag; size?: TextSize; weight?: TextWeight; font?: TextFont; align?: "start" | "center" | "end" | "justify"; italic?: boolean; underline?: boolean; strikethrough?: boolean; truncate?: boolean; wrap?: boolean; block?: boolean; children?: React.ReactNode };
-export const Text = /* @__PURE__ */ React.forwardRef<HTMLElement, TextProps>(function Text({ as = "span", size = 300, weight, font = "base", align = "start", italic = false, underline = false, strikethrough = false, truncate = false, wrap = true, block = false, children, ...props }: TextProps, forwardedRef): React.ReactElement {
-  ensureDefined(defineText);
-  return React.createElement("spui-text", useCustomElementProps({ ...props, ref: forwardedRef, as, size, weight, font, align, italic: italic || undefined, underline: underline || undefined, strikethrough: strikethrough || undefined, truncate: truncate || undefined, wrap: wrap ? undefined : "false", block: block || undefined }), children);
+export const Text = /* @__PURE__ */ React.forwardRef<HTMLElement, TextProps>(function Text({ as = "span", size = 300, weight, font = "base", align = "start", italic = false, underline = false, strikethrough = false, truncate = false, wrap = true, block = false, children, style, ...props }: TextProps, forwardedRef): React.ReactElement {
+  const defaultBold = as === "strong" || as === "b";
+  const defaultItalic = as === "em" || as === "i";
+  const sizeStyles = getTextSizeStyles(size);
+  const textStyle: React.CSSProperties = {
+    boxSizing: "border-box",
+    margin: 0,
+    color: "inherit",
+    ...sizeStyles,
+    fontFamily: font === "monospace" ? "var(--spui-font-family-mono,var(--fontFamilyMonospace,ui-monospace,monospace))" : font === "numeric" ? "var(--fontFamilyNumeric,var(--fontFamilyBase,inherit))" : "var(--spui-font-family,var(--fontFamilyBase,inherit))",
+    fontWeight: `var(--fontWeight${weight ? weight[0].toUpperCase() + weight.slice(1) : defaultBold ? "Bold" : "Regular"},${weight === "medium" ? 500 : weight === "semibold" ? 600 : weight === "bold" || (!weight && defaultBold) ? 700 : 400})`,
+    fontVariantNumeric: font === "numeric" ? "tabular-nums" : undefined,
+    textAlign: align,
+    fontStyle: italic || defaultItalic ? "italic" : "normal",
+    textDecorationLine: [underline && "underline", strikethrough && "line-through"].filter(Boolean).join(" ") || "none",
+    textUnderlineOffset: underline ? ".15em" : undefined,
+    whiteSpace: wrap ? as === "pre" ? "pre-wrap" : "normal" : "nowrap",
+    overflowWrap: wrap ? "anywhere" : "normal",
+    display: block ? "block" : undefined,
+    ...(truncate ? { display: "inline-block", maxWidth: "100%", verticalAlign: "bottom", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", overflowWrap: "normal" } : {}),
+    ...style,
+  };
+  return React.createElement(as, useHostProps({ ...props, ref: forwardedRef, style: textStyle }), children);
 });
 
 export type TextPresetProps = Omit<Parameters<typeof Text>[0], "size" | "weight" | "font">;

@@ -21,6 +21,16 @@ const extendedSizeTokens: Record<string, [string, string]> = {
 };
 const tags = new Set<TextTag>(["span", "p", "div", "strong", "b", "em", "i", "small", "code", "pre", "blockquote", "h1", "h2", "h3", "h4", "h5", "h6"]);
 
+export function getTextSizeStyles(size: TextSize | string): { fontSize: string; lineHeight: string } {
+  const [fallbackSize, fallbackLine] = sizes[size] ?? sizes["300"];
+  const fluentTokens = fluentSizeTokens[size];
+  const [fontToken, lineToken] = extendedSizeTokens[size] ?? (fluentTokens ? [`--${fluentTokens[0]}`, `--${fluentTokens[1]}`] : [`--${fluentSizeTokens["300"][0]}`, `--${fluentSizeTokens["300"][1]}`]);
+  return {
+    fontSize: `var(--spui-text-font-size,var(${fontToken},${fallbackSize}))`,
+    lineHeight: `var(--spui-text-line-height,var(${lineToken},${fallbackLine}))`,
+  };
+}
+
 export function defineText(): void {
   if (customElements.get("spui-text")) return;
   class SpuiText extends HTMLElement {
@@ -53,12 +63,9 @@ export function defineText(): void {
     private syncSize(): void {
       const content = this.shadowRoot?.querySelector<HTMLElement>(".text");
       if (!content) return;
-      const size = this.getAttribute("size") ?? "300";
-      const [fallbackSize, fallbackLine] = sizes[size] ?? sizes["300"];
-      const fluentTokens = fluentSizeTokens[size];
-      const [fontToken, lineToken] = extendedSizeTokens[size] ?? (fluentTokens ? [`--${fluentTokens[0]}`, `--${fluentTokens[1]}`] : [`--${fluentSizeTokens["300"][0]}`, `--${fluentSizeTokens["300"][1]}`]);
-      content.style.fontSize = `var(--spui-text-font-size,var(${fontToken},${fallbackSize}))`;
-      content.style.lineHeight = `var(--spui-text-line-height,var(${lineToken},${fallbackLine}))`;
+      const sizeStyles = getTextSizeStyles(this.getAttribute("size") ?? "300");
+      content.style.fontSize = sizeStyles.fontSize;
+      content.style.lineHeight = sizeStyles.lineHeight;
     }
   }
   customElements.define("spui-text", SpuiText);
