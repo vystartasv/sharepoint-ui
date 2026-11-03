@@ -2255,6 +2255,10 @@
           {
             "name": "RichTextEditorProps.onImageUploadError",
             "description": "Receives the failed image filename and error when the application-managed upload fails or returns an unsafe URL."
+          },
+          {
+            "name": "SharePointUIProvider.strings.richTextLink*",
+            "description": "Customize the link editor's accessible name, field labels, action labels, and invalid-URL message for the active language."
           }
         ],
         "callbackProps": [
@@ -2271,9 +2275,9 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Edit sanitized rich HTML with controlled or uncontrolled form values, accessible formatting history, table editing, and application-managed durable image upload for SharePoint persistence.",
+      "summary": "Edit sanitized rich HTML with controlled or uncontrolled form values, formatting history, table editing, an accessible link editor, and application-managed durable image upload for SharePoint persistence.",
       "highValueAdditions": [
-        "Add an accessible link editor with URL, display text, title, and remove-link actions."
+        "Add an open-in-new-tab option that preserves target and rel=noopener noreferrer through sanitization."
       ]
     },
     {

@@ -34,10 +34,11 @@ function cleanHtml(html: string): string {
         if (!ALLOWED.has(element.tagName)) { clean(element); child.replaceWith(...[...child.childNodes]); continue; }
         for (const attr of [...element.attributes]) {
           const link = element.tagName === "A" && attr.name === "href" && safeHref(attr.value);
+          const linkTitle = element.tagName === "A" && attr.name === "title" && attr.value.length <= 512;
           const span = ["TD", "TH"].includes(element.tagName) && ["colspan", "rowspan"].includes(attr.name) && /^\d{1,2}$/.test(attr.value) && Number(attr.value) > 0;
           const scope = element.tagName === "TH" && attr.name === "scope" && ["row", "col", "rowgroup", "colgroup"].includes(attr.value);
           const image = element.tagName === "IMG" && ((attr.name === "src" && safeImageSrc(attr.value)) || attr.name === "alt" || ((attr.name === "width" || attr.name === "height") && /^\d{1,4}$/.test(attr.value)));
-          if (!link && !span && !scope && !image) element.removeAttribute(attr.name);
+          if (!link && !linkTitle && !span && !scope && !image) element.removeAttribute(attr.name);
         }
         clean(element);
       } else if (child.nodeType !== Node.TEXT_NODE) child.remove();
@@ -51,7 +52,7 @@ export function defineRichTextEditor(): void {
   if (customElements.get("spui-rich-text-editor")) return;
   class SpuiRichTextEditor extends HTMLElement implements SharePointRichTextEditorElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "editor-label", "placeholder", "disabled", "read-only", "required", "required-message", "value", "name", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "bold-label", "italic-label", "underline-label", "bullet-list-label", "number-list-label", "link-label", "undo-label", "redo-label", "insert-table-label", "insert-image-label", "image-input-label", "insert-row-above-label", "insert-row-below-label", "insert-column-before-label", "insert-column-after-label", "delete-row-label", "delete-column-label", "delete-table-label", "toolbar-label", "link-prompt"];
+    static observedAttributes = ["label", "editor-label", "placeholder", "disabled", "read-only", "required", "required-message", "value", "name", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "bold-label", "italic-label", "underline-label", "bullet-list-label", "number-list-label", "link-label", "undo-label", "redo-label", "insert-table-label", "insert-image-label", "image-input-label", "insert-row-above-label", "insert-row-below-label", "insert-column-before-label", "insert-column-after-label", "delete-row-label", "delete-column-label", "delete-table-label", "toolbar-label", "link-prompt", "link-dialog-label", "link-text-label", "link-title-label", "link-apply-label", "link-remove-label", "link-cancel-label", "link-invalid-message"];
     private editor!: HTMLDivElement;
     private internals: ElementInternals | undefined;
     private formDisabled = false;
@@ -63,6 +64,12 @@ export function defineRichTextEditor(): void {
     get uploadImage(): ((file: File) => Promise<string>) | undefined { return this.imageUploader; }
     set uploadImage(value: ((file: File) => Promise<string>) | undefined) { this.imageUploader = value; this.syncImageButton(); }
     private imageInput?: HTMLInputElement;
+    private linkForm?: HTMLFormElement;
+    private linkUrlInput?: HTMLInputElement;
+    private linkTextInput?: HTMLInputElement;
+    private linkTitleInput?: HTMLInputElement;
+    private linkError?: HTMLElement;
+    private linkRemoveButton?: HTMLButtonElement;
     private uploadingImage = false;
     private savedCell?: HTMLTableCellElement;
     private selectedTablePath?: { table: number; row: number; cell: number };
@@ -115,6 +122,10 @@ export function defineRichTextEditor(): void {
       this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only")));
       this.editor.setAttribute("aria-disabled", String(disabled));
       this.shadowRoot?.querySelectorAll<HTMLButtonElement>("[role=toolbar] button").forEach(button => { button.disabled = readOnly; });
+      if (this.linkForm) {
+        if (readOnly) this.linkForm.hidden = true;
+        this.linkForm.querySelectorAll<HTMLInputElement | HTMLButtonElement>("input,button").forEach(control => { control.disabled = readOnly; });
+      }
       this.syncImageButton();
     }
     private syncImageButton(): void {
@@ -253,13 +264,110 @@ export function defineRichTextEditor(): void {
     private command(command: string, value?: string): void {
       if (command === "insertImage") { this.imageInput?.click(); return; }
       if (["insertRowAbove", "insertRowBelow", "insertColumnBefore", "insertColumnAfter", "deleteRow", "deleteColumn", "deleteTable"].includes(command)) { this.editTable(command); return; }
+      if (command === "createLink") { this.openLinkEditor(); return; }
       this.restoreSelection();
-      if (command === "createLink") { const href = window.prompt(this.getAttribute("link-prompt") ?? "Link URL"); if (!href || !safeHref(href)) return; value = href.trim(); }
       if (command === "insertTable") value = '<table><caption><br></caption><thead><tr><th scope="col"><br></th><th scope="col"><br></th></tr></thead><tbody><tr><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td></tr></tbody></table><p><br></p>';
       this.editor.ownerDocument.execCommand(command === "insertTable" ? "insertHTML" : command, false, value);
       this.sanitizeEditor();
       this.syncForm();
       this.onSelectionChange();
+      this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
+    }
+    private linkAtRange(range?: Range): HTMLAnchorElement | undefined {
+      const node = range?.startContainer;
+      const element = node instanceof Element ? node : node?.parentElement;
+      const link = element?.closest<HTMLAnchorElement>("a");
+      return link && this.editor.contains(link) ? link : undefined;
+    }
+    private openLinkEditor(): void {
+      if (!this.linkForm || this.formDisabled || this.hasAttribute("disabled") || this.hasAttribute("read-only")) return;
+      const selection = this.selection();
+      const activeRange = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
+      if (activeRange && this.editor.contains(activeRange.commonAncestorContainer)) this.savedRange = activeRange.cloneRange();
+      if (!this.savedRange || !this.editor.contains(this.savedRange.commonAncestorContainer)) {
+        const range = this.editor.ownerDocument.createRange();
+        range.selectNodeContents(this.editor);
+        range.collapse(false);
+        this.savedRange = range;
+      }
+      const link = this.linkAtRange(this.savedRange);
+      this.linkUrlInput!.value = link?.getAttribute("href") ?? "";
+      this.linkTextInput!.value = link?.textContent ?? this.savedRange.toString();
+      this.linkTitleInput!.value = link?.getAttribute("title") ?? "";
+      this.linkRemoveButton!.hidden = !link;
+      this.linkError!.hidden = true;
+      this.linkUrlInput!.removeAttribute("aria-invalid");
+      this.linkForm.hidden = false;
+      this.linkUrlInput!.focus();
+      this.linkUrlInput!.select();
+    }
+    private closeLinkEditor(restoreEditor: boolean): void {
+      if (!this.linkForm) return;
+      this.linkForm.hidden = true;
+      this.linkError!.hidden = true;
+      this.linkUrlInput!.removeAttribute("aria-invalid");
+      if (restoreEditor) this.restoreSelection();
+      else this.shadowRoot?.querySelector<HTMLButtonElement>('button[data-command="createLink"]')?.focus();
+    }
+    private applyLink(): void {
+      const href = this.linkUrlInput!.value.trim();
+      if (!safeHref(href)) {
+        this.linkError!.textContent = this.getAttribute("link-invalid-message") ?? "Enter a valid HTTP, HTTPS, or mailto link.";
+        this.linkError!.hidden = false;
+        this.linkUrlInput!.setAttribute("aria-invalid", "true");
+        this.linkUrlInput!.focus();
+        return;
+      }
+      const normalizedHref = new URL(href, this.editor.ownerDocument.baseURI).href;
+      const displayText = this.linkTextInput!.value.trim() || href;
+      const title = this.linkTitleInput!.value.trim();
+      const range = this.savedRange?.cloneRange();
+      const existing = this.linkAtRange(range);
+      let link = existing;
+      if (existing) {
+        existing.setAttribute("href", normalizedHref);
+        if (existing.textContent !== displayText) existing.textContent = displayText;
+        if (title) existing.setAttribute("title", title); else existing.removeAttribute("title");
+      } else if (range?.collapsed) {
+        link = this.editor.ownerDocument.createElement("a");
+        link.href = normalizedHref;
+        link.textContent = displayText;
+        if (title) link.title = title;
+        range.insertNode(link);
+      } else {
+        this.restoreSelection();
+        const created = this.editor.ownerDocument.execCommand("createLink", false, normalizedHref);
+        const selection = this.selection();
+        link = this.linkAtRange(range) ?? this.linkAtRange(selection?.rangeCount ? selection.getRangeAt(0) : undefined);
+        if (!created && !link && range && !range.collapsed) {
+          link = this.editor.ownerDocument.createElement("a");
+          link.href = normalizedHref;
+          link.append(range.extractContents());
+          range.insertNode(link);
+        }
+        if (link) {
+          if (link.textContent !== displayText) link.textContent = displayText;
+          if (title) link.setAttribute("title", title); else link.removeAttribute("title");
+        }
+      }
+      if (link) {
+        const caret = this.editor.ownerDocument.createRange();
+        caret.selectNodeContents(link);
+        caret.collapse(false);
+        this.savedRange = caret;
+      }
+      this.closeLinkEditor(true);
+      this.sanitizeEditor();
+      this.syncForm();
+      this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
+    }
+    private removeLink(): void {
+      const link = this.linkAtRange(this.savedRange);
+      if (!link) return;
+      link.replaceWith(...link.childNodes);
+      this.closeLinkEditor(true);
+      this.sanitizeEditor();
+      this.syncForm();
       this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
     }
     private async insertUploadedImage(file: File): Promise<void> {
@@ -286,6 +394,26 @@ export function defineRichTextEditor(): void {
       const actions: Array<[string,string,string?,string?,string?]> = [["Bold","bold"],["Italic","italic"],["Underline","underline"],["Bulleted list","insertUnorderedList",undefined,"• List"],["Numbered list","insertOrderedList",undefined,"1. List"],["Undo","undo"],["Redo","redo"],["Insert table","insertTable"],["Insert image","insertImage",undefined,undefined,"insert-image-label"],["Insert row above","insertRowAbove",undefined,undefined,"insert-row-above-label"],["Insert row below","insertRowBelow",undefined,undefined,"insert-row-below-label"],["Insert column before","insertColumnBefore",undefined,undefined,"insert-column-before-label"],["Insert column after","insertColumnAfter",undefined,undefined,"insert-column-after-label"],["Delete row","deleteRow",undefined,undefined,"delete-row-label"],["Delete column","deleteColumn",undefined,undefined,"delete-column-label"],["Delete table","deleteTable",undefined,undefined,"delete-table-label"],["Link","createLink"]];
       for (const [title, command, value, short, labelAttribute] of actions) { const button = document.createElement("button"); button.type = "button"; button.dataset.command = command; button.dataset.fallback = short ?? title; if (labelAttribute) { button.dataset.labelAttribute = labelAttribute; if (command.startsWith("insertRow") || command.startsWith("insertColumn") || command.startsWith("delete")) button.dataset.tableCommand = command; } button.tabIndex = toolbar.children.length === 0 ? 0 : -1; button.textContent = title; button.setAttribute("aria-label", title); button.addEventListener("mousedown", event => event.preventDefault()); button.addEventListener("click", () => this.command(command, value)); toolbar.append(button); }
       this.imageInput = document.createElement("input"); this.imageInput.type = "file"; this.imageInput.accept = "image/*"; this.imageInput.hidden = true; this.imageInput.setAttribute("aria-label", this.getAttribute("image-input-label") ?? "Choose image"); this.imageInput.addEventListener("change", () => { const file = this.imageInput?.files?.[0]; if (file) void this.insertUploadedImage(file); this.imageInput!.value = ""; }); toolbar.append(this.imageInput);
+      const linkForm = document.createElement("form"); this.linkForm = linkForm; linkForm.className = "link-editor"; linkForm.part.add("link-editor"); linkForm.hidden = true; linkForm.setAttribute("aria-label", this.getAttribute("link-dialog-label") ?? "Edit link");
+      const makeLinkField = (attribute: string, fallback: string, type = "text"): HTMLInputElement => {
+        const field = document.createElement("label"); field.className = "link-field"; field.dataset.labelAttribute = attribute; field.append(document.createTextNode(this.getAttribute(attribute) ?? fallback));
+        const input = document.createElement("input"); input.type = type; input.part.add(attribute === "link-prompt" ? "link-url" : attribute === "link-text-label" ? "link-text" : "link-title"); field.append(input); linkForm.append(field); return input;
+      };
+      this.linkUrlInput = makeLinkField("link-prompt", "Link URL"); this.linkUrlInput.inputMode = "url"; this.linkUrlInput.setAttribute("autocomplete", "url"); this.linkUrlInput.placeholder = "https://";
+      this.linkTextInput = makeLinkField("link-text-label", "Display text");
+      this.linkTitleInput = makeLinkField("link-title-label", "Title"); this.linkTitleInput.maxLength = 512;
+      this.linkError = document.createElement("div"); this.linkError.className = "link-error"; this.linkError.part.add("link-error"); this.linkError.id = `rich-text-link-error-${crypto.randomUUID()}`; this.linkError.setAttribute("role", "alert"); this.linkError.hidden = true; linkForm.append(this.linkError);
+      this.linkUrlInput.setAttribute("aria-describedby", this.linkError.id);
+      const linkActions = document.createElement("div"); linkActions.className = "link-actions";
+      const makeLinkAction = (action: "apply" | "remove" | "cancel", attribute: string, fallback: string, onClick: () => void): HTMLButtonElement => {
+        const button = document.createElement("button"); button.type = action === "apply" ? "submit" : "button"; button.dataset.linkAction = action; button.dataset.labelAttribute = attribute; button.part.add(`link-${action}`); button.textContent = this.getAttribute(attribute) ?? fallback; button.addEventListener("click", onClick); linkActions.append(button); return button;
+      };
+      makeLinkAction("apply", "link-apply-label", "Apply link", () => {});
+      this.linkRemoveButton = makeLinkAction("remove", "link-remove-label", "Remove link", () => this.removeLink());
+      makeLinkAction("cancel", "link-cancel-label", "Cancel", () => this.closeLinkEditor(false));
+      linkForm.append(linkActions);
+      linkForm.addEventListener("submit", event => { event.preventDefault(); this.applyLink(); });
+      linkForm.addEventListener("keydown", event => { if ((event as KeyboardEvent).key === "Escape") { event.preventDefault(); event.stopPropagation(); this.closeLinkEditor(false); } });
       toolbar.addEventListener("focusin", event => { const active = event.target as HTMLButtonElement; toolbar.querySelectorAll<HTMLButtonElement>("button").forEach(button => { button.tabIndex = button === active ? 0 : -1; }); });
       toolbar.addEventListener("keydown", event => {
         const key = (event as KeyboardEvent).key;
@@ -318,8 +446,9 @@ export function defineRichTextEditor(): void {
         this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
       });
       this.editor.addEventListener("blur", () => { this.sanitizeEditor(); this.syncForm(); this.dispatchEvent(new CustomEvent("spui-change", { detail: { value: this.value }, bubbles: true, composed: true })); });
-      const style = document.createElement("style"); style.textContent = `${base}:host{display:grid;gap:6px}label{font-weight:600;color:var(--spui-ui-muted,var(--spui-semantic-body-text,inherit))}[role=toolbar]{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface,#fff)}button{border:0;border-radius:4px;background:transparent;color:var(--spui-ui-text,inherit);padding:6px 8px;font:inherit;cursor:pointer}button:hover:not(:disabled){background:var(--spui-ui-surface-hover,#eee)}button:disabled{opacity:.55;cursor:not-allowed}button:focus-visible,[role=textbox]:focus-visible{outline:2px solid var(--spui-focus-ring,#005a9e);outline-offset:2px}[role=textbox]{min-height:120px;box-sizing:border-box;padding:10px 12px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit;line-height:1.5;overflow:auto;caret-color:var(--spui-focus-ring,#005a9e)}[role=textbox]:empty:before{content:attr(data-placeholder);color:var(--spui-ui-muted,#666);pointer-events:none}table{border-collapse:collapse;max-width:100%;margin-block:8px}caption{text-align:start;font-weight:600}td,th{min-width:56px;padding:6px 9px;border:1px solid var(--spui-ui-stroke,#c8c8c8);text-align:start}th{background:var(--spui-ui-surface-hover,#f5f5f5);font-weight:600}a{color:var(--spui-semantic-link,#0f6cbd)}@media(forced-colors:active){button{border:1px solid ButtonText}td,th{border-color:CanvasText}}`;
-      shadow.replaceChildren(style,label,toolbar,this.editor);
+      const style = document.createElement("style"); style.textContent = `${base}:host{display:grid;gap:6px}label{font-weight:600;color:var(--spui-ui-muted,var(--spui-semantic-body-text,inherit))}[role=toolbar]{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface,#fff)}button{border:0;border-radius:4px;background:transparent;color:var(--spui-ui-text,inherit);padding:6px 8px;font:inherit;cursor:pointer}button:hover:not(:disabled){background:var(--spui-ui-surface-hover,#eee)}button:disabled{opacity:.55;cursor:not-allowed}button:focus-visible,[role=textbox]:focus-visible,input:focus-visible{outline:2px solid var(--spui-focus-ring,#005a9e);outline-offset:2px}[role=textbox]{min-height:120px;box-sizing:border-box;padding:10px 12px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit;line-height:1.5;overflow:auto;caret-color:var(--spui-focus-ring,#005a9e)}[role=textbox]:empty:before{content:attr(data-placeholder);color:var(--spui-ui-muted,#666);pointer-events:none}table{border-collapse:collapse;max-width:100%;margin-block:8px}caption{text-align:start;font-weight:600}td,th{min-width:56px;padding:6px 9px;border:1px solid var(--spui-ui-stroke,#c8c8c8);text-align:start}th{background:var(--spui-ui-surface-hover,#f5f5f5);font-weight:600}a{color:var(--spui-semantic-link,#0f6cbd)}@media(forced-colors:active){button{border:1px solid ButtonText}td,th{border-color:CanvasText}}`;
+      style.textContent += `.link-editor{display:flex;flex-wrap:wrap;align-items:end;gap:8px;padding:8px;border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface-hover,var(--spui-ui-surface,#fff))}.link-editor[hidden]{display:none}.link-field{display:grid;flex:1 1 150px;gap:4px;min-width:0;color:var(--spui-ui-text,inherit);font-size:13px}.link-field input{box-sizing:border-box;width:100%;min-width:0;min-height:32px;padding:5px 8px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#8a8886));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit)}.link-actions{display:flex;flex-wrap:wrap;gap:4px}.link-actions button{border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,4px);background:var(--spui-ui-surface,#fff)}.link-actions [data-link-action=apply]{border-color:transparent;background:var(--spui-semantic-primary-button-background,var(--spui-ui-accent,#0078d4));color:var(--spui-ui-accent-text,#fff)}.link-error{flex:1 0 100%;color:var(--spui-ui-danger,var(--spui-semantic-error-text,#c50f1f));font-size:13px}`;
+      shadow.replaceChildren(style,label,toolbar,linkForm,this.editor);
       syncHostAccessibleName(this, this.editor);
       this.syncDisabled();
       this.refreshStrings();
@@ -338,6 +467,19 @@ export function defineRichTextEditor(): void {
         button.textContent = button.dataset.command === "insertUnorderedList" && !this.hasAttribute(attribute) ? "• List" : button.dataset.command === "insertOrderedList" && !this.hasAttribute(attribute) ? "1. List" : text;
         button.setAttribute("aria-label", text);
       });
+      if (this.linkForm) {
+        this.linkForm.setAttribute("aria-label", this.getAttribute("link-dialog-label") ?? "Edit link");
+        const fieldFallbacks: Record<string, string> = { "link-prompt": "Link URL", "link-text-label": "Display text", "link-title-label": "Title" };
+        this.linkForm.querySelectorAll<HTMLElement>(".link-field[data-label-attribute]").forEach(field => {
+          const attribute = field.dataset.labelAttribute!;
+          if (field.firstChild) field.firstChild.textContent = this.getAttribute(attribute) ?? fieldFallbacks[attribute] ?? "";
+        });
+        const actionFallbacks: Record<string, string> = { "link-apply-label": "Apply link", "link-remove-label": "Remove link", "link-cancel-label": "Cancel" };
+        this.linkForm.querySelectorAll<HTMLButtonElement>("button[data-label-attribute]").forEach(button => {
+          const attribute = button.dataset.labelAttribute!;
+          button.textContent = this.getAttribute(attribute) ?? actionFallbacks[attribute] ?? "";
+        });
+      }
       this.syncTableActions();
     }
   }
