@@ -3,9 +3,9 @@ import { base } from "./shared.js";
 let dialogId = 0;
 
 export type DialogOpenChangeData =
-  | { type: "escapeKeyDown"; open: boolean; event: KeyboardEvent }
-  | { type: "backdropClick"; open: boolean; event: MouseEvent }
-  | { type: "triggerClick"; open: boolean; event: MouseEvent };
+  | { type: "escapeKeyDown"; open: boolean; event: KeyboardEvent; trigger?: HTMLElement }
+  | { type: "backdropClick"; open: boolean; event: MouseEvent; trigger?: HTMLElement }
+  | { type: "triggerClick"; open: boolean; event: MouseEvent; trigger?: HTMLElement };
 
 const dialogParts = [
   ["spui-dialog-surface", "surface"],
@@ -45,10 +45,10 @@ export function defineDialogTrigger(): void {
   class SpuiDialogTrigger extends HTMLElement {
     constructor() {
       super();
-      this.addEventListener("click", event => this.dispatchEvent(new CustomEvent("spui-dialog-trigger", { bubbles: true, composed: true, detail: { action: this.getAttribute("action") ?? (this.closest("spui-dialog-surface") ? "close" : "open"), trigger: event.composedPath().find(node => node instanceof HTMLElement && node.matches("button,a[href],[role=button]")), originalEvent: event } })));
+      this.addEventListener("click", event => this.dispatchEvent(new CustomEvent("spui-dialog-trigger", { bubbles: true, composed: true, detail: { action: this.getAttribute("action") ?? (this.closest('[slot="surface"],spui-dialog-surface') ? "close" : "open"), trigger: event.composedPath().find(node => node instanceof HTMLElement && node.matches("button,a[href],[role=button]")), originalEvent: event } })));
     }
     connectedCallback(): void {
-      if (!this.hasAttribute("slot") && !this.closest("spui-dialog-surface")) this.slot = "trigger";
+      if (!this.hasAttribute("slot") && !this.closest('[slot="surface"],spui-dialog-surface')) this.slot = "trigger";
       if (!this.shadowRoot) { const shadow = this.attachShadow({ mode: "open" }); const style = document.createElement("style"); style.textContent = `${base}:host{display:contents}`; const slot = document.createElement("slot"); shadow.append(style, slot); }
     }
   }
@@ -132,13 +132,14 @@ export function defineDialog(): void {
 
     private syncAccessibleName(dialog: HTMLDialogElement): void {
       const explicitLabel = this.getAttribute("aria-label");
-      const composedTitle = this.querySelector("spui-dialog-title");
+      const composedTitle = this.querySelector("[data-spui-dialog-title],spui-dialog-title");
       if (explicitLabel) {
         dialog.setAttribute("aria-label", explicitLabel);
         dialog.removeAttribute("aria-labelledby");
       } else if (composedTitle) {
-        const titleSlot = composedTitle.shadowRoot?.querySelector<HTMLSlotElement>("slot:not([name])");
-        const titleText = titleSlot?.assignedNodes({ flatten: true }).map(node => node.textContent ?? "").join("").trim();
+        const titleText = composedTitle.matches("[data-spui-dialog-title]")
+          ? [...composedTitle.childNodes].filter(node => !(node instanceof Element && node.hasAttribute("data-spui-dialog-title-action"))).map(node => node.textContent ?? "").join("").trim()
+          : composedTitle.shadowRoot?.querySelector<HTMLSlotElement>("slot:not([name])")?.assignedNodes({ flatten: true }).map(node => node.textContent ?? "").join("").trim();
         dialog.setAttribute("aria-label", titleText || this.getAttribute("title") || "Dialog");
         dialog.removeAttribute("aria-labelledby");
       } else {
@@ -170,17 +171,17 @@ export function defineDialog(): void {
       return controls;
     }
 
-    private closeDialog(type: DialogOpenChangeData["type"], event: DialogOpenChangeData["event"]): void {
+    private closeDialog(type: DialogOpenChangeData["type"], event: DialogOpenChangeData["event"], trigger?: HTMLElement): void {
       if (!this.open) return;
       if (this.hasAttribute("motion")) {
         if (this.getAttribute("motion-visible") === "false") return;
-        this.emitOpenChange({ open: false, type, event } as DialogOpenChangeData);
+        this.emitOpenChange({ open: false, type, event, trigger } as DialogOpenChangeData);
         return;
       }
       this.removeAttribute("open");
       const dialog = this.shadowRoot?.querySelector("dialog");
       if (dialog?.open) dialog.close();
-      this.emitOpenChange({ open: false, type, event } as DialogOpenChangeData);
+      this.emitOpenChange({ open: false, type, event, trigger } as DialogOpenChangeData);
     }
 
     private render(): void {
@@ -255,8 +256,8 @@ export function defineDialog(): void {
       shadow.append(style, overlayStyle, triggerSlot, backdrop, dialog);
       this.addEventListener("spui-dialog-trigger", event => {
         const detail = (event as CustomEvent<{ action?: string; trigger?: HTMLElement; originalEvent: MouseEvent }>).detail;
-        if (detail?.action === "close") this.closeDialog("triggerClick", detail.originalEvent);
-        else if (!this.open) { this.previousFocus = detail?.trigger ?? this.querySelector<HTMLElement>('spui-dialog-trigger[slot="trigger"] button,spui-dialog-trigger[slot="trigger"] a[href],[slot="trigger"] [role="button"]') ?? undefined; this.open = true; if (detail?.originalEvent) this.emitOpenChange({ open: true, type: "triggerClick", event: detail.originalEvent }); }
+        if (detail?.action === "close") this.closeDialog("triggerClick", detail.originalEvent, detail.trigger);
+        else if (!this.open) { this.previousFocus = detail?.trigger ?? this.querySelector<HTMLElement>('spui-dialog-trigger[slot="trigger"] button,spui-dialog-trigger[slot="trigger"] a[href],[slot="trigger"] [role="button"]') ?? undefined; this.open = true; if (detail?.originalEvent) this.emitOpenChange({ open: true, type: "triggerClick", event: detail.originalEvent, trigger: detail.trigger }); }
       });
     }
 

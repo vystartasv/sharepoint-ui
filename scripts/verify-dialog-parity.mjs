@@ -6,7 +6,7 @@ import { build } from "esbuild";
 import ts from "typescript";
 
 const typeFixturePath = resolve("packages/sharepoint-ui/src/.dialog-open-change-type-contract.tsx");
-const typeFixture = `import { Dialog, type DialogOpenChangeEvent, type DialogOnOpenChangeData } from "./react.js"; const example = <Dialog onOpenChange={(event, data) => { const typedEvent: DialogOpenChangeEvent = event; const target: HTMLElement = event.currentTarget; const open: boolean = data.open; const eventType: DialogOnOpenChangeData["type"] = data.type; void [typedEvent, target, open, eventType]; }} />;`;
+const typeFixture = `import * as React from "react"; import { Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, DialogTrigger, type DialogOpenChangeEvent, type DialogOnOpenChangeData } from "./react.js"; const surfaceRef = React.createRef<HTMLDivElement>(); const surface = <DialogSurface ref={surfaceRef} onClick={event => { const currentTarget: HTMLDivElement = event.currentTarget; void currentTarget; }} />; const titleRef = React.createRef<HTMLHeadingElement>(); const title = <DialogTitle ref={titleRef} onClick={event => { const currentTarget: HTMLHeadingElement = event.currentTarget; void currentTarget; }} />; const contentRef = React.createRef<HTMLElement>(); const content = <DialogContent as="section" ref={contentRef} onClick={event => { const target: HTMLDivElement = event.currentTarget; void target; }} />; const body = <DialogBody as="article" />; const actionsRef = React.createRef<HTMLDivElement>(); const actions = <DialogActions ref={actionsRef} position="start" fluid onClick={event => { const target: HTMLDivElement = event.currentTarget; void target; }} />; const triggerRef = React.createRef<HTMLElement>(); const trigger = <DialogTrigger ref={triggerRef}>{props => <button {...props}>Open</button>}</DialogTrigger>; const example = <Dialog onOpenChange={(event, data) => { const typedEvent: DialogOpenChangeEvent = event; const target: HTMLElement = event.currentTarget; const open: boolean = data.open; const eventType: DialogOnOpenChangeData["type"] = data.type; void [typedEvent, target, open, eventType, surface, title, content, body, actions, trigger]; }} />;`;
 const originalFileExists = ts.sys.fileExists;
 const originalReadFile = ts.sys.readFile;
 const originalGetSourceFile = ts.createCompilerHost({}).getSourceFile;
@@ -29,17 +29,32 @@ const bundle = await build({
       function App() {
         const [open, setOpen] = React.useState(false);
         const [fallbackOpen, setFallbackOpen] = React.useState(false);
+        const [enhancedOpen, setEnhancedOpen] = React.useState(false);
         const [changes, setChanges] = React.useState([]);
+        const surfaceRef = React.useRef(null);
+        const titleRef = React.useRef(null);
+        const contentRef = React.useRef(null);
+        const bodyRef = React.useRef(null);
+        const actionsRef = React.useRef(null);
+        const keyboardTriggerRef = React.useRef(null);
+        window.surfaceRef = surfaceRef;
+        window.titleRef = titleRef;
+        window.contentRef = contentRef;
+        window.bodyRef = bodyRef;
+        window.actionsRef = actionsRef;
+        window.keyboardTriggerRef = keyboardTriggerRef;
         return <>
           <button data-testid="outside">Outside control</button>
-          <Dialog data-testid="alert" defaultOpen modalType="alert"><DialogSurface><DialogTitle>Important update</DialogTitle><DialogActions position="start" fluid><DialogTrigger action="close"><button data-testid="alert-action">Acknowledge</button></DialogTrigger></DialogActions></DialogSurface></Dialog>
-          <Dialog data-testid="composed" open={open} closeLabel="Dismiss composed dialog" surfaceMotion={Motion} onOpenChange={(event,data) => { window.dialogOpenChanges.push({open:data.open,type:data.type,eventType:event.type,sameEvent:event===data.event,currentTarget:event.currentTarget.tagName,nativeEventType:event.nativeEvent.type}); setOpen(data.open); setChanges(current => [...current, data.open]); }}><DialogTrigger><button data-testid="trigger">Open composed dialog</button></DialogTrigger><DialogTrigger disableButtonEnhancement><button data-testid="plain-trigger">Open without enhancement</button></DialogTrigger><DialogSurface backdrop={{ appearance: "dimmed" }} backdropMotion={Motion}><DialogContent><DialogTitle action={<button data-testid="dialog-title-action">Help</button>}>Composed dialog title</DialogTitle><DialogBody><p data-testid="body-copy">Composed dialog body</p></DialogBody><DialogActions><button data-testid="action">Save</button></DialogActions></DialogContent></DialogSurface></Dialog>
+          <Dialog data-testid="alert" defaultOpen modalType="alert"><DialogSurface><DialogTitle>Important update</DialogTitle><DialogActions data-testid="alert-actions" position="start" fluid><DialogTrigger action="close"><button data-testid="alert-action">Acknowledge</button></DialogTrigger></DialogActions></DialogSurface></Dialog>
+          <Dialog data-testid="composed" open={open} closeLabel="Dismiss composed dialog" surfaceMotion={Motion} onOpenChange={(event,data) => { window.dialogOpenChanges.push({open:data.open,type:data.type,eventType:event.type,sameEvent:event===data.event,currentTarget:event.currentTarget.tagName,nativeEventType:event.nativeEvent.type}); setOpen(data.open); setChanges(current => [...current, data.open]); }}><DialogTrigger><button data-testid="trigger">Open composed dialog</button></DialogTrigger><DialogTrigger disableButtonEnhancement><button data-testid="plain-trigger">Open without enhancement</button></DialogTrigger><DialogSurface id="composed-surface" className="surface-root" ref={surfaceRef} onClick={event => window.surfaceClicks.push([event.currentTarget.tagName,event.target.tagName])} backdrop={{ appearance: "dimmed" }} backdropMotion={Motion}><DialogContent id="content-root" ref={contentRef} onClick={event => window.contentClicks.push([event.currentTarget.tagName,event.target.tagName])}><DialogTitle id="composed-title" ref={titleRef} onClick={event => window.titleClicks.push([event.currentTarget.tagName,event.target.tagName])} action={<button data-testid="dialog-title-action">Help</button>}>Composed dialog title</DialogTitle><DialogBody id="body-root" ref={bodyRef} onClick={event => window.bodyClicks.push([event.currentTarget.tagName,event.target.tagName])}><p data-testid="body-copy">Composed dialog body</p></DialogBody><DialogActions id="actions-root" ref={actionsRef} onClick={event => window.actionsClicks.push([event.currentTarget.tagName,event.target.tagName])}><button data-testid="action">Save</button></DialogActions></DialogContent></DialogSurface></Dialog>
           <output data-testid="changes">{changes.join(",")}</output>
+          <Dialog data-testid="trigger-accessibility" open={enhancedOpen} onOpenChange={(event,data) => { window.enhancedTriggerChanges.push({open:data.open,type:data.type,currentTarget:event.currentTarget.tagName}); setEnhancedOpen(data.open); }}><DialogTrigger><button data-testid="cancel-trigger" onClick={event => { window.cancelTriggerClicks++; event.preventDefault(); }}>Cancel open</button></DialogTrigger><DialogTrigger ref={keyboardTriggerRef}><div data-testid="keyboard-trigger">Open with keyboard</div></DialogTrigger><DialogSurface><DialogTitle>Keyboard trigger dialog</DialogTitle><DialogBody>Keyboard trigger content</DialogBody></DialogSurface></Dialog>
           <Dialog data-testid="legacy" inertTrapFocus unmountOnClose={false} title="Legacy title" actions={<button data-testid="legacy-action">Done</button>}><p data-testid="legacy-copy">Legacy body</p></Dialog>
           <button data-testid="fallback-trigger" onClick={() => setFallbackOpen(true)}>Open contained-focus dialog</button><Dialog data-testid="fallback" open={fallbackOpen} onOpenChange={(event,data) => {window.fallbackOpenChanges.push({open:data.open,type:data.type,eventType:event.type,sameEvent:event===data.event});setFallbackOpen(data.open)}} inertTrapFocus={false}><DialogSurface><DialogTitle>Contained focus</DialogTitle><DialogBody><button data-testid="fallback-one">First</button><Input data-testid="fallback-input" aria-label="Fallback dialog field"/><button data-testid="fallback-two">Last</button></DialogBody></DialogSurface></Dialog>
+          <div hidden><DialogContent as="section" data-testid="polymorphic-content">Content root</DialogContent><DialogBody as="article" data-testid="polymorphic-body">Body root</DialogBody></div>
         </>;
       }
-      createRoot(document.querySelector("#root")).render(<App/>);window.dialogOpenChanges=[];window.fallbackOpenChanges=[];`,
+      createRoot(document.querySelector("#root")).render(<App/>);window.dialogOpenChanges=[];window.fallbackOpenChanges=[];window.enhancedTriggerChanges=[];window.cancelTriggerClicks=0;window.surfaceClicks=[];window.titleClicks=[];window.contentClicks=[];window.bodyClicks=[];window.actionsClicks=[];`,
     resolveDir: process.cwd(), sourcefile: "dialog-parity.tsx", loader: "tsx",
   },
   bundle: true, format: "iife", platform: "browser", target: ["es2020"], write: false,
@@ -60,6 +75,7 @@ try {
   page.on("pageerror", error => errors.push(error.message));
   await page.goto(`http://127.0.0.1:${server.address().port}`);
   await page.addScriptTag({ path: require.resolve("axe-core") });
+  assert.deepEqual(await page.evaluate(() => [document.querySelector('[data-testid="polymorphic-content"]')?.localName, document.querySelector('[data-testid="polymorphic-body"]')?.localName]), ["section", "article"], "DialogContent and DialogBody honor the Fluent polymorphic as prop");
 
   const alert = page.getByTestId("alert");
   await page.waitForFunction(() => document.querySelector("[data-testid=alert]")?.shadowRoot?.querySelector("dialog")?.open);
@@ -67,35 +83,43 @@ try {
   assert.equal(await alert.evaluate(host => host.shadowRoot.querySelector(".close").hidden), true, "alert mode requires an explicit action");
   await page.keyboard.press("Escape");
   assert.equal(await alert.evaluate(host => host.shadowRoot.querySelector("dialog").open), true, "alert mode ignores Escape");
-  assert.equal(await alert.evaluate(host => host.querySelector("spui-dialog-actions").getAttribute("position")), "start");
-  assert.equal(await alert.evaluate(host => host.querySelector("spui-dialog-actions").hasAttribute("fluid")), true);
+  assert.equal(await page.getByTestId("alert-actions").evaluate(root => getComputedStyle(root).justifyContent), "flex-start", "DialogActions position=start aligns its native root");
+  assert.equal(await page.getByTestId("alert-actions").locator("button").evaluate(trigger => getComputedStyle(trigger).flex), "1 1 0%", "DialogActions fluid expands action slots");
   await page.getByTestId("alert-action").click();
   await page.waitForFunction(() => !document.querySelector("[data-testid=alert]")?.shadowRoot?.querySelector("dialog")?.open);
-  await page.waitForFunction(() => !document.querySelector("[data-testid=alert]")?.querySelector("spui-dialog-title"));
-  assert.equal(await alert.evaluate(host => host.querySelector("spui-dialog-surface")?.querySelector("spui-dialog-title")), null, "unmountOnClose removes composed content while retaining its surface and trigger");
+  await page.waitForFunction(() => !document.querySelector("[data-testid=alert]")?.querySelector("[data-spui-dialog-title]"));
+  assert.equal(await alert.evaluate(host => host.querySelector('[slot="surface"]')?.querySelector("[data-spui-dialog-title]")), null, "unmountOnClose removes composed content while retaining its surface and trigger");
 
   const composed = page.getByTestId("composed");
   const trigger = page.getByTestId("trigger");
   assert.equal(await page.getByTestId("plain-trigger").getAttribute("aria-haspopup"), null, "disableButtonEnhancement leaves its child unchanged");
   assert.equal(await trigger.getAttribute("aria-haspopup"), "dialog", "trigger exposes dialog popup semantics");
+  assert.equal(await composed.locator("spui-dialog-trigger").count(), 0, "React DialogTrigger enhances its child without a wrapper element");
+  assert.equal(await trigger.getAttribute("type"), "button", "enhanced submit-capable child is normalized to type=button");
   await trigger.click();
   await page.waitForFunction(() => document.querySelector("[data-testid=composed]")?.shadowRoot?.querySelector("dialog")?.open);
   assert.equal(await page.getByRole("button", { name: "Dismiss composed dialog" }).count(), 1, "React closeLabel customizes the close button accessible name");
-  assert.deepEqual(await page.evaluate(() => window.dialogOpenChanges), [{ open: true, type: "triggerClick", eventType: "click", sameEvent: true, currentTarget: "DIALOG", nativeEventType: "click" }], "Dialog callback exposes a React-shaped event with Fluent surface currentTarget and native source event");
-  await page.waitForFunction(() => document.querySelector("[data-testid=composed]")?.querySelector("spui-dialog-title"));
+  assert.deepEqual(await page.evaluate(() => window.dialogOpenChanges), [{ open: true, type: "triggerClick", eventType: "click", sameEvent: true, currentTarget: "BUTTON", nativeEventType: "click" }], "Dialog callback exposes a React-shaped event with the Fluent trigger root currentTarget and native source event");
+  await page.waitForFunction(() => document.querySelector("[data-testid=composed]")?.querySelector("[data-spui-dialog-title]"));
   const relations = await composed.evaluate(host => {
     const dialog = host.shadowRoot.querySelector("dialog");
-    const title = host.querySelector("spui-dialog-title");
-    const titleText = title.shadowRoot.querySelector("slot:not([name])").assignedNodes({ flatten: true }).map(node => node.textContent).join("").trim();
-    return { open: dialog.open, label: dialog.getAttribute("aria-label"), titleText, titleRole: title.getAttribute("role"), hiddenFallback: host.shadowRoot.querySelector("header h2").hidden, surfaceAssigned: host.shadowRoot.querySelector("slot[name=surface]").assignedElements().length };
+    const title = host.querySelector("[data-spui-dialog-title]");
+    const titleText = [...title.childNodes].filter(node => !(node instanceof Element && node.hasAttribute("data-spui-dialog-title-action"))).map(node => node.textContent).join("").trim();
+    return { open: dialog.open, label: dialog.getAttribute("aria-label"), titleText, titleTag: title.localName, titleRole: title.getAttribute("role"), hiddenFallback: host.shadowRoot.querySelector("header h2").hidden, surfaceAssigned: host.shadowRoot.querySelector("slot[name=surface]").assignedElements().length };
   });
   assert.equal(relations.open, true);
   assert.equal(relations.label, relations.titleText, "composed title names the native dialog");
-  assert.equal(relations.titleRole, "heading");
+  assert.equal(relations.titleTag, "h2", "DialogTitle uses Fluent's native h2 root");
+  assert.equal(await page.evaluate(() => window.titleRef.current?.id), "composed-title", "DialogTitle ref and id target its native root");
+  assert.deepEqual(await page.evaluate(() => ({ content: [window.contentRef.current?.tagName, window.contentRef.current?.id], body: [window.bodyRef.current?.tagName, window.bodyRef.current?.id], actions: [window.actionsRef.current?.tagName, window.actionsRef.current?.id] })), { content: ["DIV", "content-root"], body: ["DIV", "body-root"], actions: ["DIV", "actions-root"] }, "DialogContent, DialogBody, and DialogActions refs and attributes target native roots");
+  await page.locator("#composed-title").click();
+  assert.deepEqual(await page.evaluate(() => window.titleClicks), [["H2", "H2"]], "DialogTitle React events use the native root");
+  assert.deepEqual(await page.evaluate(() => window.contentClicks), [["DIV", "H2"]], "DialogContent events use its native div root");
   assert.equal(await page.getByTestId("dialog-title-action").count(), 1, "DialogTitle exposes its optional action");
-  assert.equal(await composed.evaluate(host => host.querySelector("spui-dialog-title").shadowRoot.querySelector("slot[name=action]").assignedElements().length), 1, "the title action is assigned to the native action slot");
+  assert.equal(await page.getByTestId("dialog-title-action").count(), 1, "the title action remains composed inside the native heading");
   assert.equal(relations.hiddenFallback, true, "legacy chrome is hidden for the composed surface");
   assert.equal(relations.surfaceAssigned, 1);
+  assert.deepEqual(await page.evaluate(() => ({ tag: window.surfaceRef.current?.tagName, id: window.surfaceRef.current?.id, className: window.surfaceRef.current?.className })), { tag: "DIV", id: "composed-surface", className: "surface-root" }, "DialogSurface props and ref target its native Fluent div root");
   assert.equal(await composed.locator("[data-motion=surface]").getAttribute("data-visible"), "true", "surfaceMotion receives the current open state");
   assert.equal(await composed.locator("[data-motion=backdrop]").getAttribute("data-visible"), "true", "backdropMotion receives the current open state");
   assert.equal(await composed.getAttribute("data-has-custom-backdrop"), "true", "custom backdrop switches to the managed modal overlay path");
@@ -124,13 +148,37 @@ try {
   assert.equal(dialogForcedColors.backdrop, dialogSystemColors.canvas, "Dialog backdrop uses Canvas in forced colors");
   await page.emulateMedia({ forcedColors: "none" });
   assert.equal(await page.getByTestId("body-copy").isVisible(), true);
+  await page.getByTestId("body-copy").click();
+  assert.deepEqual(await page.evaluate(() => window.bodyClicks), [["DIV", "P"]], "DialogBody events use its native div root");
+  assert.deepEqual(await page.evaluate(() => window.contentClicks.at(-1)), ["DIV", "P"], "DialogContent receives bubbled descendant events with its own root currentTarget");
   await page.getByTestId("action").click();
+  assert.deepEqual(await page.evaluate(() => window.actionsClicks), [["DIV", "BUTTON"]], "DialogActions events use its native div root");
+  assert.deepEqual(await page.evaluate(() => window.surfaceClicks), [["DIV", "H2"], ["DIV", "P"], ["DIV", "BUTTON"]], "DialogSurface React events use native root target and currentTarget");
   assert.equal(await composed.evaluate(host => host.hasAttribute("open")), true, "interior action does not dismiss the dialog");
   await page.keyboard.press("Escape");
   await page.waitForFunction(() => !document.querySelector("[data-testid=composed]")?.shadowRoot?.querySelector("dialog")?.open);
   assert.deepEqual(await page.evaluate(() => window.dialogOpenChanges.at(-1)), { open: false, type: "escapeKeyDown", eventType: "keydown", sameEvent: true, currentTarget: "DIALOG", nativeEventType: "keydown" }, "Dialog close callback includes the Fluent Escape reason and source event");
   await page.waitForFunction(() => document.querySelector("[data-testid=changes]")?.textContent === "true,false");
   assert.equal(await page.getByTestId("changes").textContent(), "true,false", "controlled open state reports both transitions");
+
+  const triggerAccessibility = page.getByTestId("trigger-accessibility");
+  await page.getByTestId("cancel-trigger").click();
+  assert.equal(await page.evaluate(() => window.cancelTriggerClicks), 1, "the child click handler runs before trigger activation");
+  assert.equal(await triggerAccessibility.evaluate(host => host.shadowRoot.querySelector("dialog").open), false, "a canceled child click does not open the dialog");
+  const keyboardTrigger = page.getByTestId("keyboard-trigger");
+  assert.deepEqual(await keyboardTrigger.evaluate(element => ({ role: element.getAttribute("role"), tabIndex: element.tabIndex, popup: element.getAttribute("aria-haspopup") })), { role: "button", tabIndex: 0, popup: "dialog" }, "non-button triggers receive button semantics and keyboard focus");
+  assert.equal(await page.evaluate(() => window.keyboardTriggerRef.current?.tagName), "DIV", "DialogTrigger ref forwards to its child root");
+  await keyboardTrigger.focus();
+  await page.keyboard.press("Enter");
+  await page.waitForFunction(() => document.querySelector("[data-testid=trigger-accessibility]")?.shadowRoot?.querySelector("dialog")?.open);
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(() => !document.querySelector("[data-testid=trigger-accessibility]")?.shadowRoot?.querySelector("dialog")?.open);
+  await keyboardTrigger.focus();
+  await page.keyboard.press("Space");
+  await page.waitForFunction(() => document.querySelector("[data-testid=trigger-accessibility]")?.shadowRoot?.querySelector("dialog")?.open);
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(() => !document.querySelector("[data-testid=trigger-accessibility]")?.shadowRoot?.querySelector("dialog")?.open);
+  assert.deepEqual(await page.evaluate(() => window.enhancedTriggerChanges), [{ open: true, type: "triggerClick", currentTarget: "DIV" }, { open: false, type: "escapeKeyDown", currentTarget: "DIALOG" }, { open: true, type: "triggerClick", currentTarget: "DIV" }, { open: false, type: "escapeKeyDown", currentTarget: "DIALOG" }], "custom element triggers open through Enter and Space and preserve callback reasons");
 
   const legacy = page.getByTestId("legacy");
   await legacy.evaluate(host => { host.open = true; });

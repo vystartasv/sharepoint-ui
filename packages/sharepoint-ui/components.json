@@ -2435,7 +2435,7 @@
       "module": "dialog",
       "category": "overlays",
       "api": {
-        "reactSignature": "{ children, backdrop, backdropMotion, ...props }: ElementProps & { children?: React.ReactNode; backdrop?: DialogBackdropSlotProps; backdropMotion?: React.ComponentType<PresenceMotionSlotProps> }",
+        "reactSignature": "{ children, backdrop, backdropMotion, style, ...props }: DialogSurfaceProps",
         "callbackProps": [],
         "slots": [
           "default",
@@ -2446,8 +2446,9 @@
         "styling": [
           "SharePointUIProvider tokens",
           "CSS custom properties",
-          "host className/style"
-        ]
+          "native div root className/style"
+        ],
+        "reactRefType": "HTMLDivElement"
       },
       "summary": "Compose the visible surface inside the native accessible dialog element."
     },
@@ -2458,7 +2459,7 @@
       "module": "dialog",
       "category": "overlays",
       "api": {
-        "reactSignature": "{ children, action, ...props }: ElementProps & { children?: React.ReactNode; action?: React.ReactNode }",
+        "reactSignature": "{ children, action, style, ...props }: DialogTitleProps",
         "callbackProps": [],
         "slots": [
           "default",
@@ -2467,9 +2468,9 @@
         "styling": [
           "SharePointUIProvider tokens",
           "CSS custom properties",
-          "host className/style"
+          "native h2 root className/style"
         ],
-        "reactRefType": "HTMLElement"
+        "reactRefType": "HTMLHeadingElement"
       },
       "summary": "Render the dialog heading and provide its accessible name, with an optional trailing action."
     },
@@ -2480,7 +2481,7 @@
       "module": "dialog",
       "category": "overlays",
       "api": {
-        "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+        "reactSignature": "{ as: Root = \"div\", children, style, ...props }: DialogContentProps",
         "callbackProps": [],
         "slots": [
           "default"
@@ -2488,7 +2489,7 @@
         "styling": [
           "SharePointUIProvider tokens",
           "CSS custom properties",
-          "host className/style"
+          "native polymorphic root className/style"
         ],
         "reactRefType": "HTMLElement"
       },
@@ -2501,7 +2502,7 @@
       "module": "dialog",
       "category": "overlays",
       "api": {
-        "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+        "reactSignature": "{ as: Root = \"div\", children, style, ...props }: DialogBodyProps",
         "callbackProps": [],
         "slots": [
           "default"
@@ -2509,7 +2510,7 @@
         "styling": [
           "SharePointUIProvider tokens",
           "CSS custom properties",
-          "host className/style"
+          "native polymorphic root className/style"
         ],
         "reactRefType": "HTMLElement"
       },
@@ -2522,7 +2523,7 @@
       "module": "dialog",
       "category": "overlays",
       "api": {
-        "reactSignature": "{ children, fluid = false, position = \"end\", ...props }: ElementProps & { children?: React.ReactNode; fluid?: boolean; position?: \"start\" | \"end\" }",
+        "reactSignature": "{ children, fluid = false, position = \"end\", style, ...props }: DialogActionsProps",
         "callbackProps": [],
         "slots": [
           "default"
@@ -2530,9 +2531,9 @@
         "styling": [
           "SharePointUIProvider tokens",
           "CSS custom properties",
-          "host className/style"
+          "native div root className/style"
         ],
-        "reactRefType": "HTMLElement"
+        "reactRefType": "HTMLDivElement"
       },
       "summary": "Align dialog actions consistently at the end of a composed dialog."
     },
@@ -2543,7 +2544,7 @@
       "module": "dialog",
       "category": "overlays",
       "api": {
-        "reactSignature": "{ children, action, disableButtonEnhancement = false, ...props }: ElementProps & { children?: React.ReactNode; action?: \"open\" | \"close\"; disableButtonEnhancement?: boolean }",
+        "reactSignature": "{ children, action, disableButtonEnhancement = false, onClick: triggerOnClick, onKeyDown: triggerOnKeyDown, onKeyUp: triggerOnKeyUp, className: triggerClassName, style: triggerStyle, ...props }: DialogTriggerProps",
         "callbackProps": [],
         "slots": [
           "default",

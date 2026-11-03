@@ -1055,6 +1055,7 @@ export type DrawerSurfaceMotionSlotProps = PresenceMotionSlotProps & { position:
 export type DrawerBackdropMotionSlotProps = PresenceMotionSlotProps & { size: "small" | "medium" | "large" | "full" };
 type DialogMotionContextValue = { visible: boolean; unmountOnClose: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps> };
 const DialogMotionContext = React.createContext<DialogMotionContextValue>({ visible: true, unmountOnClose: true });
+const DialogSurfaceContext = React.createContext(false);
 
 function setDialogSurfaceContent(children: React.ReactNode, mounted: boolean, hasMotion: boolean): React.ReactNode {
   return React.Children.map(children, child => {
@@ -1094,7 +1095,8 @@ export const Dialog = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps
     if (!onOpenChange || !ref.current) return;
     const surface = ref.current.shadowRoot?.querySelector("dialog");
     if (!surface) return;
-    const callbackEvent = createReactEventBridge(change.event, dispatchEvent, surface) as unknown as DialogOpenChangeEvent;
+    const callbackTarget = change.trigger ?? (change.type === "backdropClick" ? sourceEventTarget(change.event, ref.current) ?? surface : surface);
+    const callbackEvent = createReactEventBridge(change.event, dispatchEvent, callbackTarget) as unknown as DialogOpenChangeEvent;
     onOpenChange(callbackEvent, { ...change, event: callbackEvent } as DialogOnOpenChangeData);
   });
   const surfaceOptions = getDialogSurfaceOptions(children);
@@ -1108,10 +1110,13 @@ export const Dialog = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps
 
 export type DialogBackdropSlotProps = React.ReactElement | (React.HTMLAttributes<HTMLDivElement> & { appearance?: "dimmed" | "transparent" });
 
-export function DialogSurface({ children, backdrop, backdropMotion, ...props }: ElementProps & { children?: React.ReactNode; backdrop?: DialogBackdropSlotProps; backdropMotion?: React.ComponentType<PresenceMotionSlotProps> }): React.ReactElement {
+export type DialogSurfaceProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & { children?: React.ReactNode; backdrop?: DialogBackdropSlotProps; backdropMotion?: React.ComponentType<PresenceMotionSlotProps> };
+
+export const DialogSurface = /* @__PURE__ */ React.forwardRef<HTMLDivElement, DialogSurfaceProps>(function DialogSurface({ children, backdrop, backdropMotion, style, ...props }: DialogSurfaceProps, forwardedRef): React.ReactElement {
   const motion = React.useContext(DialogMotionContext);
   ensureDefined(defineDialogSurface);
-  const surface = React.createElement("spui-dialog-surface", useCustomElementProps(props), children);
+  const surfaceChildren = React.createElement(DialogSurfaceContext.Provider, { value: true }, children);
+  const surface = React.createElement("div", { ...props, ref: forwardedRef, slot: "surface", style: { display: "block", minWidth: 0, color: "inherit", background: "inherit", ...style } }, surfaceChildren);
   const surfaceContent = motion.surfaceMotion
     ? React.createElement(motion.surfaceMotion, { visible: motion.visible, appear: motion.unmountOnClose, unmountOnExit: motion.unmountOnClose, slot: "surface" }, surface)
     : React.cloneElement(surface, { slot: "surface" });
@@ -1126,31 +1131,120 @@ export function DialogSurface({ children, backdrop, backdropMotion, ...props }: 
       : slotContent;
   }
   return React.createElement(React.Fragment, null, backdropContent, surfaceContent);
+});
+
+export type DialogTitleProps = Omit<React.HTMLAttributes<HTMLHeadingElement>, "children"> & { children?: React.ReactNode; action?: React.ReactNode };
+
+export const DialogTitle = /* @__PURE__ */ React.forwardRef<HTMLHeadingElement, DialogTitleProps>(function DialogTitle({ children, action, style, ...props }: DialogTitleProps, forwardedRef): React.ReactElement {
+  ensureDefined(defineDialogTitle);
+  return React.createElement("h2", { ...props, ref: forwardedRef, "data-spui-dialog-title": "", style: { display: "flex", alignItems: "center", gap: 12, margin: 0, padding: "20px 20px 0", fontSize: 20, lineHeight: 1.3, fontWeight: 650, ...style } }, children, action == null ? null : React.createElement("div", { "data-spui-dialog-title-action": "", style: { marginInlineStart: "auto" } }, action));
+});
+
+export type DialogContentProps = React.HTMLAttributes<HTMLDivElement> & { [attribute: `data-${string}`]: string | number | boolean | undefined; as?: React.ElementType; children?: React.ReactNode };
+
+export const DialogContent = /* @__PURE__ */ React.forwardRef<HTMLElement, DialogContentProps>(function DialogContent({ as: Root = "div", children, style, ...props }: DialogContentProps, forwardedRef): React.ReactElement {
+  ensureDefined(defineDialogContent);
+  return React.createElement(Root, { ...props, ref: forwardedRef, style: { display: "block", ...style } }, children);
+});
+
+export type DialogBodyProps = React.HTMLAttributes<HTMLDivElement> & { [attribute: `data-${string}`]: string | number | boolean | undefined; as?: React.ElementType; children?: React.ReactNode };
+
+export const DialogBody = /* @__PURE__ */ React.forwardRef<HTMLElement, DialogBodyProps>(function DialogBody({ as: Root = "div", children, style, ...props }: DialogBodyProps, forwardedRef): React.ReactElement {
+  ensureDefined(defineDialogBody);
+  return React.createElement(Root, { ...props, ref: forwardedRef, style: { display: "block", padding: "16px 20px 20px", lineHeight: 1.5, ...style } }, children);
+});
+
+export type DialogActionsProps = React.HTMLAttributes<HTMLDivElement> & { [attribute: `data-${string}`]: string | number | boolean | undefined; children?: React.ReactNode; fluid?: boolean; position?: "start" | "end" };
+
+function applyDialogActionFluid(children: React.ReactNode): React.ReactNode {
+  return React.Children.map(children, child => {
+    if (!React.isValidElement(child)) return child;
+    if (child.type === React.Fragment) return React.cloneElement(child, undefined, applyDialogActionFluid(child.props.children));
+    const childProps = child.props as { style?: React.CSSProperties };
+    return React.cloneElement(child as React.ReactElement<{ style?: React.CSSProperties }>, { style: { flex: 1, ...childProps.style } });
+  });
 }
 
-export const DialogTitle = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; action?: React.ReactNode }>(function DialogTitle({ children, action, ...props }: ElementProps & { children?: React.ReactNode; action?: React.ReactNode }, forwardedRef): React.ReactElement {
-  ensureDefined(defineDialogTitle);
-  return React.createElement("spui-dialog-title", useCustomElementProps({ ref: forwardedRef, ...props, role: props.role ?? "heading", "aria-level": props["aria-level"] ?? 2 }), children, action == null ? null : React.createElement("div", { slot: "action" }, action));
-});
-
-export const DialogContent = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function DialogContent({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
-  ensureDefined(defineDialogContent);
-  return React.createElement("spui-dialog-content", useCustomElementProps({ ...props, ref: forwardedRef }), children);
-});
-
-export const DialogBody = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function DialogBody({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
-  ensureDefined(defineDialogBody);
-  return React.createElement("spui-dialog-body", useCustomElementProps({ ...props, ref: forwardedRef }), children);
-});
-
-export const DialogActions = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; fluid?: boolean; position?: "start" | "end" }>(function DialogActions({ children, fluid = false, position = "end", ...props }: ElementProps & { children?: React.ReactNode; fluid?: boolean; position?: "start" | "end" }, forwardedRef): React.ReactElement {
+export const DialogActions = /* @__PURE__ */ React.forwardRef<HTMLDivElement, DialogActionsProps>(function DialogActions({ children, fluid = false, position = "end", style, ...props }: DialogActionsProps, forwardedRef): React.ReactElement {
   ensureDefined(defineDialogActions);
-  return React.createElement("spui-dialog-actions", useCustomElementProps({ ref: forwardedRef, ...props, fluid: fluid || undefined, position }), children);
+  return React.createElement("div", { ...props, ref: forwardedRef, style: { display: "flex", justifyContent: position === "start" ? "flex-start" : "flex-end", flexWrap: "wrap", gap: 8, padding: "12px 20px 20px", borderTop: "1px solid var(--spui-ui-stroke,var(--spui-semantic-body-divider,#d1d1d1))", ...style } }, fluid ? applyDialogActionFluid(children) : children);
 });
 
-export const DialogTrigger = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; action?: "open" | "close"; disableButtonEnhancement?: boolean }>(function DialogTrigger({ children, action, disableButtonEnhancement = false, ...props }: ElementProps & { children?: React.ReactNode; action?: "open" | "close"; disableButtonEnhancement?: boolean }, forwardedRef): React.ReactElement {
-  ensureDefined(defineDialogTrigger);
-  return React.createElement("spui-dialog-trigger", useCustomElementProps({ ref: forwardedRef, ...props, action, "disable-button-enhancement": disableButtonEnhancement || undefined }), children);
+export type DialogTriggerChildProps = React.HTMLAttributes<HTMLElement> & { slot?: string; "aria-haspopup"?: React.AriaAttributes["aria-haspopup"] };
+export type DialogTriggerProps = Omit<ElementProps, "children"> & { children?: React.ReactElement | ((props: DialogTriggerChildProps) => React.ReactElement | null) | null; action?: "open" | "close"; disableButtonEnhancement?: boolean };
+
+function setDialogTriggerRef(ref: React.Ref<HTMLElement> | undefined, value: HTMLElement | null): void {
+  if (typeof ref === "function") ref(value);
+  else if (ref) (ref as React.MutableRefObject<HTMLElement | null>).current = value;
+}
+
+export const DialogTrigger = /* @__PURE__ */ React.forwardRef<HTMLElement, DialogTriggerProps>(function DialogTrigger({ children, action, disableButtonEnhancement = false, onClick: triggerOnClick, onKeyDown: triggerOnKeyDown, onKeyUp: triggerOnKeyUp, className: triggerClassName, style: triggerStyle, ...props }: DialogTriggerProps, forwardedRef): React.ReactElement | null {
+  const insideSurface = React.useContext(DialogSurfaceContext);
+  const resolvedAction = action ?? (insideSurface ? "close" : "open");
+  const childProps: DialogTriggerChildProps = { ...props, ...(insideSurface ? {} : { slot: "trigger" }), ...(!disableButtonEnhancement && resolvedAction === "open" ? { "aria-haspopup": "dialog" } : {}), className: triggerClassName, style: triggerStyle };
+  const child = typeof children === "function" ? children(childProps) : children;
+  if (!React.isValidElement(child) || child.type === React.Fragment) return null;
+  const originalProps = child.props as Record<string, unknown>;
+  const childRef = (originalProps.ref ?? (child as React.ReactElement & { ref?: React.Ref<HTMLElement> }).ref) as React.Ref<HTMLElement> | undefined;
+  const onClick = (event: React.MouseEvent<HTMLElement>): void => {
+    (originalProps.onClick as React.MouseEventHandler<HTMLElement> | undefined)?.(event);
+    triggerOnClick?.(event);
+    if (!event.isDefaultPrevented()) {
+      const trigger = event.currentTarget;
+      trigger.dispatchEvent(new CustomEvent("spui-dialog-trigger", { bubbles: true, composed: true, detail: { action: resolvedAction, trigger, originalEvent: event.nativeEvent } }));
+    }
+  };
+  const tag = typeof child.type === "string" ? child.type : "div";
+  const nativeButton = tag === "button";
+  const nativeAnchor = tag === "a";
+  const href = originalProps.href;
+  const disabled = Boolean(originalProps.disabled || originalProps["aria-disabled"] === true || originalProps["aria-disabled"] === "true");
+  const disabledFocusable = Boolean(originalProps.disabledFocusable);
+  const isLink = nativeAnchor && Boolean(href);
+  const onKeyDown = (event: React.KeyboardEvent<HTMLElement>): void => {
+    (originalProps.onKeyDown as React.KeyboardEventHandler<HTMLElement> | undefined)?.(event);
+    triggerOnKeyDown?.(event);
+    if (event.isDefaultPrevented()) return;
+    if (disabled && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); event.stopPropagation(); return; }
+    if (!nativeButton && event.key === " ") event.preventDefault();
+    else if (!nativeButton && event.key === "Enter") { event.preventDefault(); event.currentTarget.click(); }
+  };
+  const onKeyUp = (event: React.KeyboardEvent<HTMLElement>): void => {
+    (originalProps.onKeyUp as React.KeyboardEventHandler<HTMLElement> | undefined)?.(event);
+    triggerOnKeyUp?.(event);
+    if (event.isDefaultPrevented()) return;
+    if (disabled && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); event.stopPropagation(); return; }
+    if (!nativeButton && event.key === " ") { event.preventDefault(); event.currentTarget.click(); }
+  };
+  const triggerProps: Record<string, unknown> = {
+    ...childProps,
+    ...originalProps,
+    className: [triggerClassName, originalProps.className as string | undefined].filter(Boolean).join(" ") || undefined,
+    style: { ...(triggerStyle as React.CSSProperties | undefined), ...(originalProps.style as React.CSSProperties | undefined) },
+    ref: (node: HTMLElement | null) => { setDialogTriggerRef(childRef, node); setDialogTriggerRef(forwardedRef, node); },
+    onClick: disabledFocusable ? undefined : onClick,
+    onKeyDown: !nativeButton && !isLink ? onKeyDown : triggerOnKeyDown || originalProps.onKeyDown ? onKeyDown : undefined,
+    onKeyUp: !nativeButton && !isLink ? onKeyUp : triggerOnKeyUp || originalProps.onKeyUp ? onKeyUp : undefined,
+  };
+  if (!disableButtonEnhancement) {
+    triggerProps["aria-haspopup"] = "dialog";
+    if (nativeButton) {
+      triggerProps.type = "button";
+      triggerProps.disabled = disabled && !disabledFocusable;
+      triggerProps["aria-disabled"] = disabledFocusable ? true : originalProps["aria-disabled"];
+      if (disabledFocusable) triggerProps.onClick = undefined;
+      if (!originalProps.onKeyDown && !triggerOnKeyDown) triggerProps.onKeyDown = undefined;
+      if (!originalProps.onKeyUp && !triggerOnKeyUp) triggerProps.onKeyUp = undefined;
+    } else {
+      triggerProps.role = isLink && !disabled ? originalProps.role : "button";
+      triggerProps.tabIndex = disabledFocusable || (!isLink && !disabled) ? 0 : originalProps.tabIndex;
+      triggerProps["aria-disabled"] = disabled || undefined;
+      triggerProps.onKeyDown = onKeyDown;
+      triggerProps.onKeyUp = onKeyUp;
+      if (nativeAnchor && disabled) triggerProps.href = undefined;
+    }
+  }
+  return React.cloneElement(child as React.ReactElement<Record<string, unknown>>, triggerProps);
 });
 
 export type DrawerProps = ElementProps & { type?: "overlay" | "inline"; open?: boolean; defaultOpen?: boolean; unmountOnClose?: boolean; separator?: boolean; title?: string; modal?: boolean; modalType?: "modal" | "non-modal" | "alert"; inertTrapFocus?: boolean; dismissible?: boolean; position?: "start" | "end" | "top" | "bottom"; size?: "small" | "medium" | "large" | "full"; expandable?: boolean; expanded?: boolean; surfaceMotion?: React.ComponentType<DrawerSurfaceMotionSlotProps>; backdropMotion?: React.ComponentType<DrawerBackdropMotionSlotProps>; closeLabel?: string; expandLabel?: string; restoreLabel?: string; actions?: React.ReactNode; onOpenChange?: (open: boolean) => void; onExpandedChange?: (expanded: boolean) => void; onDismiss?: () => void; children?: React.ReactNode };
@@ -3079,6 +3173,20 @@ export type VirtualListScrollToHandle = { scrollTo: (index: number, align?: "sta
 
 export type VirtualizerSlotProps = React.ReactElement<any> | React.HTMLAttributes<HTMLDivElement>;
 export type VirtualizerBookendSlots = { before?: VirtualizerSlotProps; after?: VirtualizerSlotProps; beforeContainer?: VirtualizerSlotProps; afterContainer?: VirtualizerSlotProps };
+type VirtualizerScrollViewContainer = VirtualizerSlotProps;
+type VirtualizerScrollViewRoot = { elementType: React.ElementType; props: Record<string, unknown>; ref?: React.Ref<HTMLDivElement> };
+const VirtualizerScrollViewRootContext = React.createContext<VirtualizerScrollViewRoot | null>(null);
+function mergeVirtualizerRootProps(slotProps: Record<string, unknown>, rootProps: Record<string, unknown>): Record<string, unknown> {
+  const merged = { ...slotProps, ...rootProps };
+  for (const key of Object.keys(slotProps)) {
+    const slotHandler = slotProps[key];
+    const rootHandler = rootProps[key];
+    if (/^on[A-Z]/.test(key) && typeof slotHandler === "function" && typeof rootHandler === "function") {
+      merged[key] = (...args: unknown[]) => { slotHandler(...args); rootHandler(...args); };
+    }
+  }
+  return merged;
+}
 export type VirtualListProps<T> = ElementProps & VirtualizerBookendSlots & { items?: T[]; itemCount?: number; dataSource?: VirtualListDataSource<T>; onDataLoadError?: (error: unknown, range: { start: number; end: number }) => void; renderItem: (item: T | undefined, index: number) => React.ReactNode; itemKey?: (item: T | undefined, index: number) => string | number; onRenderedRange?: (range: { start: number; end: number; total: number }) => void; onScrollStateChange?: (scrolling: boolean) => void; viewportRef?: React.Ref<HTMLDivElement>; scrollToIndexRef?: React.RefObject<VirtualListScrollToHandle | null>; virtualizerLength?: number; label?: string; rowHeight?: number; measureItems?: boolean; overscan?: number; axis?: "vertical" | "horizontal"; scrollMode?: "element" | "window" };
 type VirtualListEngineProps<T> = VirtualListProps<T> & { onScrollOffsetChange?: (offset: number) => void; gap?: number; itemSizes?: readonly number[]; reversed?: boolean; enablePagination?: boolean };
 function renderVirtualizerSlot(slot: VirtualizerSlotProps | undefined, name: "before" | "after"): React.ReactElement {
@@ -3287,9 +3395,21 @@ function VirtualListEngine<T>({ items, itemCount, dataSource, onDataLoadError, r
   }, [scrollHandle, scrollToIndexRef]);
   React.useEffect(() => onRenderedRange?.({ start: first, end: last, total }), [first, last, total, onRenderedRange]);
   const host = useHostProps(props);
-  return <div {...host} ref={hostRef}>
-    <div ref={node => { viewport.current = node; if (typeof viewportRef === "function") viewportRef(node); else if (viewportRef) (viewportRef as React.MutableRefObject<HTMLDivElement | null>).current = node; }} role="list" aria-label={resolvedAccessibleLabel} tabIndex={0}
-      onScroll={event => {
+  const scrollViewRoot = React.useContext(VirtualizerScrollViewRootContext);
+  const ScrollRoot = scrollViewRoot?.elementType ?? "div";
+  const scrollRootProps = scrollViewRoot ? mergeVirtualizerRootProps(scrollViewRoot.props, host) : {};
+  const { onScroll: rootOnScroll, ...scrollRootAttributes } = scrollRootProps as React.HTMLAttributes<HTMLDivElement>;
+  const setViewportRef = (node: HTMLDivElement | null): void => {
+    viewport.current = node;
+    if (typeof viewportRef === "function") viewportRef(node);
+    else if (viewportRef) (viewportRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+    if (typeof scrollViewRoot?.ref === "function") scrollViewRoot.ref(node);
+    else if (scrollViewRoot?.ref) (scrollViewRoot.ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+  };
+  return <div {...(scrollViewRoot ? {} : host)} ref={hostRef}>
+    <ScrollRoot {...scrollRootAttributes} ref={setViewportRef} role={scrollRootAttributes.role ?? "list"} aria-label={scrollRootAttributes["aria-label"] ?? resolvedAccessibleLabel} tabIndex={scrollRootAttributes.tabIndex ?? 0}
+      onScroll={(event: React.UIEvent<HTMLDivElement>) => {
+        if (scrollViewRoot && typeof rootOnScroll === "function") rootOnScroll(event);
         if (windowScroll) return;
         const element = event.currentTarget;
         const offset = horizontal ? Math.abs(element.scrollLeft) : element.scrollTop;
@@ -3313,7 +3433,7 @@ function VirtualListEngine<T>({ items, itemCount, dataSource, onDataLoadError, r
         }
         if (!frame.current) frame.current = requestAnimationFrame(() => { frame.current = 0; setScrollOffset(offset); });
       }}
-      aria-busy={dataLoading || undefined} style={{ ...props.style, position: "relative", overflow: windowScroll ? "visible" : "auto", width: horizontal ? "var(--spui-list-width,320px)" : undefined, height: windowScroll ? totalSize : horizontal ? rowHeight : props.style?.height ?? "var(--spui-list-height,320px)", overscrollBehavior: "contain" }}>
+      aria-busy={dataLoading || undefined} style={{ ...(scrollViewRoot ? scrollRootAttributes.style as React.CSSProperties : props.style), position: "relative", overflow: windowScroll ? "visible" : "auto", width: horizontal ? "var(--spui-list-width,320px)" : undefined, height: windowScroll ? totalSize : horizontal ? rowHeight : props.style?.height ?? "var(--spui-list-height,320px)", overscrollBehavior: "contain" }}>
       <div style={{ position: "relative", width: horizontal ? totalHeight : "100%", height: horizontal ? "100%" : totalHeight }}>
         {renderVirtualizerBookend(beforeContainer, renderVirtualizerSlot(before, "before"), "before", beforeOffset, axis, rtl)}
         {Array.from({ length: Math.max(0, last - first) }, (_, offset) => {
@@ -3330,7 +3450,7 @@ function VirtualListEngine<T>({ items, itemCount, dataSource, onDataLoadError, r
         })}
         {renderVirtualizerBookend(afterContainer, renderVirtualizerSlot(after, "after"), "after", afterOffset, axis, rtl)}
       </div>
-    </div>
+    </ScrollRoot>
   </div>;
 }
 
@@ -3517,7 +3637,7 @@ type ScrollViewBaseProps = Omit<ElementProps, "children"> & {
   updateScrollPosition?: (position: number) => void;
   gap?: number;
   enablePagination?: boolean;
-  container?: Pick<React.HTMLAttributes<HTMLDivElement>, "className" | "style">;
+  container?: VirtualizerScrollViewContainer;
   label?: string;
 } & VirtualizerBookendSlots;
 
@@ -3545,9 +3665,11 @@ export function VirtualizerScrollView({ children, itemSize, numItems, virtualize
   const localScrollViewRef = React.useRef<HTMLElement | null>(null);
   const scrollViewRef = providedScrollViewRef ?? localScrollViewRef;
   const adaptiveLength = useAdaptiveScrollViewLength(axis, itemSize, numItems, bufferItems, scrollViewRef);
-  const style = { height: "320px", ...props.style, ...container?.style };
-  const className = [props.className, container?.className].filter(Boolean).join(" ") || undefined;
-  return <Virtualizer {...props} className={className} style={style} axis={axis} reversed={reversed} numItems={numItems} itemSize={itemSize} virtualizerLength={virtualizerLength ?? adaptiveLength} bufferItems={bufferItems} bufferSize={bufferSize} scrollViewRef={scrollViewRef} containerSizeRef={containerSizeRef} getItemSize={undefined} gap={gap} enableScrollLoad={enableScrollLoad} enablePagination={enablePagination} onRenderedFlaggedIndex={onRenderedFlaggedIndex} flaggedIndex={flaggedIndex} imperativeVirtualizerRef={imperativeVirtualizerRef} imperativeRef={imperativeRef} updateScrollPosition={updateScrollPosition} label={label}>{children}</Virtualizer>;
+  const slotProps = React.isValidElement(container) ? container.props as Record<string, unknown> : (container ?? {}) as Record<string, unknown>;
+  const style = { height: "320px", ...props.style, ...slotProps.style as React.CSSProperties | undefined };
+  const className = [props.className, slotProps.className as string | undefined].filter(Boolean).join(" ") || undefined;
+  const root: VirtualizerScrollViewRoot = { elementType: React.isValidElement(container) ? container.type as React.ElementType : "div", props: slotProps, ref: React.isValidElement(container) ? (container as React.ReactElement & { ref?: React.Ref<HTMLDivElement> }).ref : undefined };
+  return <VirtualizerScrollViewRootContext.Provider value={root}><Virtualizer {...props} className={className} style={style} axis={axis} reversed={reversed} numItems={numItems} itemSize={itemSize} virtualizerLength={virtualizerLength ?? adaptiveLength} bufferItems={bufferItems} bufferSize={bufferSize} scrollViewRef={scrollViewRef} containerSizeRef={containerSizeRef} getItemSize={undefined} gap={gap} enableScrollLoad={enableScrollLoad} enablePagination={enablePagination} onRenderedFlaggedIndex={onRenderedFlaggedIndex} flaggedIndex={flaggedIndex} imperativeVirtualizerRef={imperativeVirtualizerRef} imperativeRef={imperativeRef} updateScrollPosition={updateScrollPosition} label={label}>{children}</Virtualizer></VirtualizerScrollViewRootContext.Provider>;
 }
 
 /** Responsive measured compatibility view for Fluent's legacy dynamic VirtualizerScrollView API. */
@@ -3555,9 +3677,11 @@ export function VirtualizerScrollViewDynamic({ children, itemSize, numItems, vir
   const localScrollViewRef = React.useRef<HTMLElement | null>(null);
   const scrollViewRef = providedScrollViewRef ?? localScrollViewRef;
   const adaptiveLength = useAdaptiveScrollViewLength(axis, itemSize, numItems, bufferItems, scrollViewRef);
-  const style = { height: "320px", ...props.style, ...container?.style };
-  const className = [props.className, container?.className].filter(Boolean).join(" ") || undefined;
-  return <Virtualizer {...props} className={className} style={style} axis={axis} reversed={reversed} numItems={numItems} itemSize={itemSize} virtualizerLength={virtualizerLength ?? adaptiveLength} bufferItems={bufferItems} bufferSize={bufferSize} scrollViewRef={scrollViewRef} containerSizeRef={containerSizeRef} getItemSize={getItemSize} gap={gap} measureItems={true} enableScrollLoad={enableScrollLoad} enablePagination={enablePagination} virtualizerContext={virtualizerContext} onRenderedFlaggedIndex={onRenderedFlaggedIndex} flaggedIndex={flaggedIndex} imperativeVirtualizerRef={imperativeVirtualizerRef} imperativeRef={imperativeRef} updateScrollPosition={updateScrollPosition} label={label}>{children}</Virtualizer>;
+  const slotProps = React.isValidElement(container) ? container.props as Record<string, unknown> : (container ?? {}) as Record<string, unknown>;
+  const style = { height: "320px", ...props.style, ...slotProps.style as React.CSSProperties | undefined };
+  const className = [props.className, slotProps.className as string | undefined].filter(Boolean).join(" ") || undefined;
+  const root: VirtualizerScrollViewRoot = { elementType: React.isValidElement(container) ? container.type as React.ElementType : "div", props: slotProps, ref: React.isValidElement(container) ? (container as React.ReactElement & { ref?: React.Ref<HTMLDivElement> }).ref : undefined };
+  return <VirtualizerScrollViewRootContext.Provider value={root}><Virtualizer {...props} className={className} style={style} axis={axis} reversed={reversed} numItems={numItems} itemSize={itemSize} virtualizerLength={virtualizerLength ?? adaptiveLength} bufferItems={bufferItems} bufferSize={bufferSize} scrollViewRef={scrollViewRef} containerSizeRef={containerSizeRef} getItemSize={getItemSize} gap={gap} measureItems={true} enableScrollLoad={enableScrollLoad} enablePagination={enablePagination} virtualizerContext={virtualizerContext} onRenderedFlaggedIndex={onRenderedFlaggedIndex} flaggedIndex={flaggedIndex} imperativeVirtualizerRef={imperativeVirtualizerRef} imperativeRef={imperativeRef} updateScrollPosition={updateScrollPosition} label={label}>{children}</Virtualizer></VirtualizerScrollViewRootContext.Provider>;
 }
 
 const EMPTY_DATA_GRID_ITEMS: unknown[] = [];
