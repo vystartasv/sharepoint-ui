@@ -11,7 +11,7 @@ export function getDirectionFromLanguage(language?: string | null): "ltr" | "rtl
 
 const rtlLanguageTags = ["ar", "arc", "bal", "bcc", "bgn", "bqi", "ckb", "dv", "fa", "glk", "he", "khw", "ks", "lrc", "mzn", "nqo", "ps", "rhg", "sd", "ug", "ur", "yi", "az-Arab", "ku-Arab", "ms-Arab", "pa-Arab", "uz-Arab", "kk-Arab", "ky-Arab", "tt-Arab"];
 const ltrScriptTags = ["ar-Latn", "fa-Latn", "he-Latn", "ks-Deva", "sd-Deva", "ur-Latn", "ug-Latn", "yi-Latn"];
-const directionByLanguage = `:host(:lang(*):not([dir])){direction:ltr}${rtlLanguageTags.map(tag => `:host(:lang(${tag}):not([dir]))`).join(",")}{direction:rtl}${ltrScriptTags.map(tag => `:host(:lang(${tag}):not([dir]))`).join(",")}{direction:ltr}`;
+const directionByLanguage = `${rtlLanguageTags.map(tag => `:host(:lang(${tag}):not([dir]))`).join(",")}{direction:rtl}${ltrScriptTags.map(tag => `:host(:lang(${tag}):not([dir]))`).join(",")}{direction:ltr}`;
 export const base = `:host{font:inherit;font-family:var(--spui-font-family,inherit);color:var(--spui-ui-text,var(--spui-semantic-body-text,var(--colorNeutralForeground1,#323130)));color-scheme:var(--spui-color-scheme,light dark)}${directionByLanguage}button,input,textarea{font:inherit;font-family:var(--spui-font-family,inherit)}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-semantic-focus-border,var(--colorStrokeFocus2,#005a9e)));outline-offset:2px}`;
 
 export type NativeFormControl = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
