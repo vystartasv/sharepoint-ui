@@ -6,7 +6,7 @@ import ts from "typescript";
 import { chromium } from "playwright";
 
 const typeFixturePath = resolve("packages/sharepoint-ui/src/.carousel-autoplay-event-type-contract.tsx");
-const typeFixture = `import * as React from "react"; import { CarouselAutoplayButton } from "./react.js"; const example = <CarouselAutoplayButton onCheckedChange={(event, data) => { const callbackEvent: Event | React.SyntheticEvent = event; if (data.type === "click") { const branch: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement> = data.event; const checked: boolean = data.checked; void [branch, checked]; } else { const branch: Event | React.SyntheticEvent = data.event; void branch; } void callbackEvent; }} />;`;
+const typeFixture = `import * as React from "react"; import { CarouselAutoplayButton } from "./react.js"; const example = <CarouselAutoplayButton checked defaultChecked appearance="primary" disabledFocusable iconPosition="after" isAccessible shape="circular" size="large" onCheckedChange={(event, data) => { const callbackEvent: Event | React.SyntheticEvent = event; if (data.type === "click") { const branch: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement> = data.event; const checked: boolean = data.checked; void [branch, checked]; } else { const branch: Event | React.SyntheticEvent = data.event; void branch; } void callbackEvent; }} />;`;
 const typeOptions = { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.NodeNext, moduleResolution: ts.ModuleResolutionKind.NodeNext, jsx: ts.JsxEmit.ReactJSX, strict: true, skipLibCheck: true, noEmit: true };
 const originalReadFile = ts.sys.readFile;
 const originalGetSourceFile = ts.createCompilerHost(typeOptions).getSourceFile;
@@ -21,7 +21,7 @@ const bundle = await build({
     sourcefile: "carousel-autoplay-callback.tsx",
     loader: "tsx",
     resolveDir: process.cwd(),
-    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{CarouselAutoplayButton}from"${resolve("packages/sharepoint-ui/src/react.tsx")}";createRoot(document.querySelector("#root")).render(<CarouselAutoplayButton data-testid="autoplay" onCheckedChange={(event,data)=>window.callback={eventType:event.type,sameEvent:event===data.event,type:data.type,checked:data.checked,currentTarget:event.currentTarget.tagName,target:event.target.tagName,nativeEventType:event.nativeEvent.type}}/>);`,
+    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{CarouselAutoplayButton}from"${resolve("packages/sharepoint-ui/src/react.tsx")}";createRoot(document.querySelector("#root")).render(<><CarouselAutoplayButton data-testid="autoplay" onCheckedChange={(event,data)=>window.callback={eventType:event.type,sameEvent:event===data.event,type:data.type,checked:data.checked,currentTarget:event.currentTarget.tagName,target:event.target.tagName,nativeEventType:event.nativeEvent.type}}/><CarouselAutoplayButton data-testid="configured" checked appearance="primary" shape="circular" size="large" iconPosition="after" isAccessible icon={<b>i</b>}/><CarouselAutoplayButton data-testid="default-checked" defaultChecked/><CarouselAutoplayButton data-testid="disabled-focusable" disabled disabledFocusable onCheckedChange={()=>window.disabledActivated=true}/></>);`,
   },
   bundle: true,
   format: "iife",
@@ -53,8 +53,20 @@ try {
   assert.equal(callback.currentTarget, "BUTTON");
   assert.equal(callback.target, "SPAN");
   assert.equal(callback.nativeEventType, "click");
+  const configured = page.getByTestId("configured");
+  assert.equal(await configured.locator("button").getAttribute("aria-pressed"), "true", "checked controls the selected state");
+  assert.equal(await configured.locator("button").getAttribute("class"), "primary", "appearance reaches the native toggle button");
+  assert.equal(await configured.locator("button").evaluate(node => getComputedStyle(node).borderRadius), "999px", "shape reaches the native toggle button");
+  assert.equal(await configured.locator("button").evaluate(node => getComputedStyle(node).minHeight), "40px", "size reaches the native toggle button");
+  assert.equal(await configured.locator("button").evaluate(node => getComputedStyle(node).color), "rgb(255, 255, 255)", "isAccessible applies selected foreground contrast");
+  assert.equal(await page.getByTestId("default-checked").locator("button").getAttribute("aria-pressed"), "true", "defaultChecked initializes the uncontrolled selected state");
+  const disabledFocusable = page.getByTestId("disabled-focusable").locator("button");
+  assert.equal(await disabledFocusable.evaluate(node => node.disabled), false);
+  assert.equal(await disabledFocusable.getAttribute("aria-disabled"), "true", "disabledFocusable keeps a disabled toggle in the tab order");
+  await disabledFocusable.evaluate(node => node.click());
+  assert.equal(await page.evaluate(() => window.disabledActivated), undefined, "disabledFocusable prevents activation");
   assert.deepEqual(errors, [], "no browser errors");
-  console.log(JSON.stringify({ status: "passed", checked: callback.checked, originalClickEvent: true, pageErrors: errors.length }));
+  console.log(JSON.stringify({ status: "passed", checked: callback.checked, inheritedToggleProps: ["appearance", "checked", "defaultChecked", "disabled", "disabledFocusable", "iconPosition", "isAccessible", "shape", "size"], originalClickEvent: true, pageErrors: errors.length }));
 } finally {
   await browser?.close();
   await new Promise((done, reject) => server.close(error => error ? reject(error) : done()));

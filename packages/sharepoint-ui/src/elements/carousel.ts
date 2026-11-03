@@ -1,4 +1,5 @@
 import { base } from "./shared.js";
+import { buttonControlCss } from "./button.js";
 
 let carouselId = 0;
 export type CarouselAlign = "start" | "center" | "end";
@@ -186,25 +187,46 @@ export function defineCarouselButton(): void {
 export function defineCarouselAutoplayButton(): void {
   if (customElements.get("spui-carousel-autoplay-button")) return;
   class SpuiCarouselAutoplayButton extends HTMLElement implements SharePointCarouselAutoplayButtonElement {
-    static observedAttributes = ["selected", "play-label", "pause-label"];
+    static observedAttributes = ["selected", "checked", "default-checked", "controlled", "is-accessible", "appearance", "size", "shape", "disabled", "disabled-focusable", "icon-position", "play-label", "pause-label", "aria-label", "aria-describedby", "title", "tabindex"];
     private button?: HTMLButtonElement;
     get selected(): boolean { return this.hasAttribute("selected"); }
     set selected(value: boolean) { this.toggleAttribute("selected", Boolean(value)); }
     connectedCallback(): void {
       if (!this.shadowRoot) {
         const root = this.attachShadow({ mode: "open" }); const style = document.createElement("style");
-        style.textContent = `${base}:host{display:inline-flex}button{box-sizing:border-box;min-width:44px;min-height:44px;padding:6px 10px;border:1px solid var(--spui-ui-stroke,#d1d1d1);border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface,#fff);color:var(--spui-ui-text,inherit);font:inherit;cursor:pointer}button:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#0078d4));outline-offset:2px}@media(forced-colors:active){button{border-color:ButtonText}button:focus-visible{outline-color:Highlight}}`;
-        this.button = document.createElement("button"); this.button.type = "button";
-        const icon = document.createElement("slot"); icon.name = "icon";
-        const label = document.createElement("span"); label.part.add("label");
-        this.button.append(icon, label);
-        this.button.addEventListener("click", event => this.dispatchEvent(new CustomEvent("spui-carousel-autoplay-toggle", { bubbles: true, composed: true, detail: { checked: !this.selected, event, type: "click" } })));
+        style.textContent = `${buttonControlCss}:host{display:inline-block;vertical-align:middle}:host([selected]) button{border-color:var(--spui-toggle-pressed-border,var(--spui-ui-accent,var(--colorBrandBackground,#0078d4)));background:var(--spui-toggle-pressed-background,color-mix(in srgb,var(--spui-ui-accent,var(--colorBrandBackground,#0078d4)) 12%,var(--spui-ui-surface,var(--colorNeutralBackground1,#fff))))}:host([selected]) button:hover:not(:disabled){background:var(--spui-toggle-pressed-hover,color-mix(in srgb,var(--spui-ui-accent,var(--colorBrandBackground,#0078d4)) 18%,var(--spui-ui-surface,var(--colorNeutralBackground1,#fff))))}:host([is-accessible][selected]) button{border-color:var(--spui-ui-accent,var(--colorBrandBackground,#0078d4));background:var(--spui-ui-accent,var(--colorBrandBackground,#0078d4));color:var(--spui-ui-accent-text,#fff)}:host([is-accessible][selected]) button:hover:not(:disabled){background:var(--spui-ui-accent-hover,var(--colorBrandBackgroundHover,#106ebe))}:host([disabled-focusable]) button:disabled{opacity:1}@media(forced-colors:active){:host([selected]) button{outline:1px solid Highlight}}`;
+        this.button = document.createElement("button"); this.button.type = "button"; this.button.part.add("control");
+        const iconWrap = document.createElement("span"); iconWrap.className = "icon"; iconWrap.hidden = true; iconWrap.setAttribute("aria-hidden", "true");
+        const icon = document.createElement("slot"); icon.name = "icon"; icon.addEventListener("slotchange", () => { iconWrap.hidden = !icon.assignedNodes({ flatten: true }).length; }); iconWrap.append(icon);
+        const content = document.createElement("span"); content.className = "content"; const label = document.createElement("span"); label.part.add("label"); content.append(label);
+        this.button.append(iconWrap, content);
+        this.button.addEventListener("click", event => {
+          if (this.hasAttribute("disabled")) { event.preventDefault(); event.stopImmediatePropagation(); return; }
+          const checked = !this.selected;
+          if (!this.hasAttribute("controlled")) this.selected = checked;
+          this.dispatchEvent(new CustomEvent("spui-carousel-autoplay-toggle", { bubbles: true, composed: true, detail: { checked, event, type: "click" } }));
+        });
         root.append(style, this.button);
       }
+      if (!this.selected && !this.hasAttribute("controlled")) this.selected = this.hasAttribute("default-checked") || this.hasAttribute("checked");
       this.sync();
     }
-    attributeChangedCallback(): void { this.sync(); }
-    private sync(): void { if (!this.button) return; const label = this.button.querySelector<HTMLElement>("[part=label]"); if (!label) return; label.textContent = this.selected ? (this.getAttribute("pause-label") || "Pause") : (this.getAttribute("play-label") || "Play"); this.button.setAttribute("aria-label", label.textContent); this.button.setAttribute("aria-pressed", String(this.selected)); }
+    attributeChangedCallback(name: string, _oldValue: string | null, value: string | null): void {
+      if (name === "checked" && this.isConnected && !this.hasAttribute("controlled")) this.selected = value !== null;
+      if (this.isConnected) this.sync();
+    }
+    private sync(): void {
+      if (!this.button) return;
+      const label = this.button.querySelector<HTMLElement>("[part=label]"); if (!label) return;
+      const appearance = this.getAttribute("appearance") ?? "secondary";
+      this.button.className = appearance === "primary" ? "primary" : appearance === "outline" || appearance === "subtle" || appearance === "transparent" ? appearance : "secondary";
+      label.textContent = this.selected ? (this.getAttribute("pause-label") || "Pause") : (this.getAttribute("play-label") || "Play");
+      this.button.disabled = this.hasAttribute("disabled") && !this.hasAttribute("disabled-focusable");
+      if (this.hasAttribute("disabled-focusable") && this.hasAttribute("disabled")) this.button.setAttribute("aria-disabled", "true"); else this.button.removeAttribute("aria-disabled");
+      for (const name of ["aria-label", "aria-describedby", "title"]) { const value = this.getAttribute(name); if (name === "aria-label" && value === null) this.button.setAttribute(name, label.textContent); else if (value === null) this.button.removeAttribute(name); else this.button.setAttribute(name, value); }
+      if (this.hasAttribute("tabindex")) this.button.setAttribute("tabindex", this.getAttribute("tabindex")!); else if (!this.hasAttribute("disabled-focusable")) this.button.removeAttribute("tabindex");
+      this.button.setAttribute("aria-pressed", String(this.selected));
+    }
   }
   customElements.define("spui-carousel-autoplay-button", SpuiCarouselAutoplayButton);
 }

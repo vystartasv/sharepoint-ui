@@ -11,7 +11,7 @@ const bundle = await build({
     sourcefile: "fluent-secondary-slots.tsx",
     loader: "tsx",
     resolveDir: root,
-    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{BreadcrumbButton,CarouselAutoplayButton,CarouselButton,Hamburger,NavDivider,ToolbarButton,ToolbarDivider,ToolbarRadioButton,ToolbarToggleButton}from"${reactPath}";const icon=(id:string)=> <svg data-testid={id} viewBox="0 0 16 16"><path d="M2 2h12v12H2z"/></svg>;createRoot(document.querySelector("#root")).render(<><BreadcrumbButton data-testid="breadcrumb" icon={icon("breadcrumb-icon")}>Breadcrumb</BreadcrumbButton><CarouselButton data-testid="carousel" icon={icon("carousel-icon")}>Next</CarouselButton><CarouselAutoplayButton data-testid="autoplay" icon={icon("autoplay-icon")}/><Hamburger data-testid="hamburger" icon={icon("hamburger-icon")} label="Open navigation"/><NavDivider data-testid="nav-divider" wrapper={{className:"nav-wrapper", "data-testid":"nav-wrapper"}}/><ToolbarButton data-testid="toolbar" icon={icon("toolbar-icon")}>Command</ToolbarButton><ToolbarDivider data-testid="toolbar-divider" wrapper={<span className="toolbar-wrapper" data-testid="toolbar-wrapper"/>}/><ToolbarRadioButton data-testid="radio" name="view" value="list" icon={icon("radio-icon")}>List</ToolbarRadioButton><ToolbarToggleButton data-testid="toggle" name="mode" value="compact" icon={icon("toggle-icon")}>Compact</ToolbarToggleButton></>);`,
+    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{BreadcrumbButton,CarouselAutoplayButton,CarouselButton,Hamburger,NavDivider,ToolbarButton,ToolbarDivider,ToolbarRadioButton,ToolbarToggleButton}from"${reactPath}";const icon=(id:string)=> <svg data-testid={id} viewBox="0 0 16 16"><path d="M2 2h12v12H2z"/></svg>;createRoot(document.querySelector("#root")).render(<><BreadcrumbButton data-testid="breadcrumb" icon={icon("breadcrumb-icon")}>Breadcrumb</BreadcrumbButton><CarouselButton data-testid="carousel" icon={icon("carousel-icon")}>Next</CarouselButton><CarouselAutoplayButton data-testid="autoplay" icon={icon("autoplay-icon")}/><Hamburger data-testid="hamburger" icon={icon("hamburger-icon")} label="Open navigation"/><NavDivider data-testid="nav-divider" wrapper={{className:"nav-wrapper", "data-testid":"nav-wrapper"}} appearance="brand" alignContent="end" inset vertical style={{"--spui-ui-accent":"rgb(12, 34, 56)"}}/><NavDivider data-testid="nav-divider-default"/><ToolbarButton data-testid="toolbar" icon={icon("toolbar-icon")}>Command</ToolbarButton><ToolbarDivider data-testid="toolbar-divider" wrapper={<span className="toolbar-wrapper" data-testid="toolbar-wrapper"/>}/><ToolbarRadioButton data-testid="radio" name="view" value="list" icon={icon("radio-icon")}>List</ToolbarRadioButton><ToolbarToggleButton data-testid="toggle" name="mode" value="compact" icon={icon("toggle-icon")}>Compact</ToolbarToggleButton></>);`,
   },
   bundle: true,
   format: "iife",
@@ -53,12 +53,22 @@ try {
     assert.equal(await wrapper.count(), 1, `${name} accepts a wrapper slot`);
     assert.equal(await host.evaluate(node => node.shadowRoot?.querySelector('slot[name="wrapper"]')?.assignedElements().length), 1, `${name} wrapper reaches the native engine`);
   }
+  const navDivider = page.getByTestId("nav-divider");
+  assert.equal(await navDivider.getAttribute("role"), "separator");
+  assert.equal(await navDivider.getAttribute("aria-orientation"), "vertical", "vertical NavDivider exposes its orientation to assistive technology");
+  assert.deepEqual(await navDivider.evaluate(node => {
+    const before = node.shadowRoot.querySelector(".line");
+    const after = node.shadowRoot.querySelector(".line:last-child");
+    const style = getComputedStyle(node);
+    return { appearance: node.dataset.dividerAppearance, align: node.dataset.alignContent, before: getComputedStyle(before).backgroundColor, afterGrow: getComputedStyle(after).flexGrow, insetStart: style.marginInlineStart, insetEnd: style.marginInlineEnd, width: style.width };
+  }), { appearance: "brand", align: "end", before: "rgb(12, 34, 56)", afterGrow: "0", insetStart: "16px", insetEnd: "16px", width: "1px" }, "NavDivider props affect appearance, label alignment, inset, and vertical geometry");
+  assert.equal(await page.getByTestId("nav-divider-default").getAttribute("aria-orientation"), "horizontal", "NavDivider defaults to horizontal orientation");
   assert.equal(await page.getByRole("button", { name: "Breadcrumb" }).count(), 1);
   assert.equal(await page.getByRole("button", { name: "Next" }).count(), 1);
   assert.equal(await page.getByRole("button", { name: "Play" }).count(), 1);
   assert.equal(await page.getByRole("button", { name: "Open navigation" }).count(), 1);
   assert.deepEqual(errors, []);
-  console.log(JSON.stringify({ status: "passed", iconSlots: iconHosts.length, wrapperSlots: 2, accessibleNames: true, pageErrors: errors.length }));
+  console.log(JSON.stringify({ status: "passed", iconSlots: iconHosts.length, wrapperSlots: 2, navDividerProps: ["alignContent", "appearance", "inset", "vertical"], accessibleNames: true, pageErrors: errors.length }));
 } finally {
   await browser?.close();
   await new Promise((done, reject) => server.close(error => error ? reject(error) : done()));

@@ -450,7 +450,31 @@ export function defineNavSubItemGroup(): void {
 
 export function defineNavDivider(): void {
   if (customElements.get("spui-nav-divider")) return;
-  class SpuiNavDivider extends HTMLElement { connectedCallback(): void { this.setAttribute("role", "separator"); if (!this.shadowRoot) { const shadow = this.attachShadow({ mode: "open" }); const slot = document.createElement("slot"); slot.name = "wrapper"; const line = document.createElement("div"); line.part.add("divider"); slot.append(line); const style = document.createElement("style"); style.textContent = `${base}:host{display:block;height:1px;margin:6px 12px}:host([compact]){margin-inline:8px}[part=divider]{height:1px;background:var(--spui-ui-stroke,var(--spui-semantic-body-divider,#d1d1d1))}@media(forced-colors:active){[part=divider]{background:CanvasText}}`; shadow.append(style, slot); } } }
+  class SpuiNavDivider extends HTMLElement {
+    static observedAttributes = ["align-content", "appearance", "inset", "vertical", "aria-label", "aria-labelledby"];
+    connectedCallback(): void { if (!this.shadowRoot) this.render(); this.sync(); }
+    attributeChangedCallback(): void { if (this.isConnected) this.sync(); }
+    private sync(): void {
+      const vertical = this.hasAttribute("vertical");
+      this.dataset.orientation = vertical ? "vertical" : "horizontal";
+      this.dataset.alignContent = this.getAttribute("align-content") ?? "center";
+      this.dataset.dividerAppearance = this.getAttribute("appearance") ?? "default";
+      this.setAttribute("role", "separator");
+      this.setAttribute("aria-orientation", vertical ? "vertical" : "horizontal");
+      const wrapper = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="wrapper"]');
+      const hasWrapper = Boolean(wrapper?.assignedNodes().some(node => node.nodeType === Node.ELEMENT_NODE || Boolean(node.textContent?.trim())));
+      this.dataset.hasLabel = String(hasWrapper);
+    }
+    private render(): void {
+      const shadow = this.attachShadow({ mode: "open" });
+      const before = document.createElement("span"); before.className = "line"; before.part.add("line"); before.setAttribute("aria-hidden", "true");
+      const wrapper = document.createElement("slot"); wrapper.name = "wrapper"; wrapper.addEventListener("slotchange", () => this.sync());
+      const after = document.createElement("span"); after.className = "line"; after.part.add("line"); after.setAttribute("aria-hidden", "true");
+      const style = document.createElement("style");
+      style.textContent = `${base}:host{box-sizing:border-box;display:flex;align-items:center;gap:var(--spui-divider-gap,12px);min-width:0;margin-block:var(--spui-divider-margin-block,12px);color:var(--spui-ui-muted,var(--spui-semantic-body-subtext,#616161));font:inherit}:host([data-orientation=vertical]){display:inline-flex;flex-direction:column;align-self:stretch;min-height:1em;width:1px;margin-inline:var(--spui-divider-margin-inline,12px);margin-block:0}:host([data-has-label=false]) slot{display:none}:host([data-has-label=false]) .line:last-child{display:none}:host([data-has-label=true]) slot{min-width:0;font-size:.875em;line-height:1.25;text-align:center}.line{flex:1;min-height:1px;background:var(--spui-divider-color,var(--spui-ui-stroke,var(--spui-semantic-body-divider,#d1d1d1)))}:host([data-orientation=vertical]) .line{min-width:1px;min-height:0;width:1px;height:auto;background:var(--spui-divider-color,var(--spui-ui-stroke,var(--spui-semantic-body-divider,#d1d1d1)))}:host([data-divider-appearance=brand]) .line{background:var(--spui-divider-color,var(--spui-base-accent,var(--spui-ui-accent,#0078d4)))}:host([data-divider-appearance=strong]) .line{background:var(--spui-divider-color,color-mix(in srgb,var(--spui-ui-text,#242424) 44%,var(--spui-ui-stroke,#d1d1d1)))}:host([data-divider-appearance=subtle]) .line{background:var(--spui-divider-color,color-mix(in srgb,var(--spui-ui-stroke,#d1d1d1) 56%,transparent))}:host([data-align-content=start]) .line:first-child{flex:0}:host([data-align-content=end]) .line:last-child{flex:0}:host([data-align-content=center]) .line{flex:1}:host([inset]){margin-inline:var(--spui-divider-inset,16px)}@media(forced-colors:active){.line{background:CanvasText}}`;
+      shadow.append(style, before, wrapper, after);
+    }
+  }
   customElements.define("spui-nav-divider", SpuiNavDivider);
 }
 

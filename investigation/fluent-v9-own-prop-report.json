@@ -5,13 +5,13 @@
   "summary": {
     "comparedComponents": 231,
     "missingLocalComponentExports": 0,
-    "componentsWithPropNameGaps": 9,
+    "componentsWithPropNameGaps": 7,
     "componentsWithSlotPropGaps": 2,
     "componentsWithPropValueGaps": 1,
     "manualReviewComponents": 0,
     "unavailableBaselineComponents": 0,
     "nonComponentContracts": 10,
-    "missingOwnPropCount": 45,
+    "missingOwnPropCount": 32,
     "declaredSlotPropCount": 242,
     "missingSlotPropCount": 2,
     "missingLiteralValueCount": 1
@@ -1018,7 +1018,7 @@
       "family": "carousel",
       "component": "CarouselAutoplayButton",
       "localComponent": "CarouselAutoplayButton",
-      "status": "review-prop-gaps",
+      "status": "own-prop-names-covered",
       "fluentOwnProps": [
         "appearance",
         "checked",
@@ -1035,23 +1035,22 @@
         "icon"
       ],
       "localOwnProps": [
-        "icon",
-        "onCheckedChange",
-        "pauseLabel",
-        "playLabel",
-        "slot"
-      ],
-      "missingLocally": [
         "appearance",
         "checked",
         "defaultChecked",
         "disabled",
         "disabledFocusable",
+        "icon",
         "iconPosition",
         "isAccessible",
+        "onCheckedChange",
+        "pauseLabel",
+        "playLabel",
         "shape",
-        "size"
+        "size",
+        "slot"
       ],
+      "missingLocally": [],
       "missingSlotProps": [],
       "localAdditions": [
         "icon",
@@ -3672,7 +3671,7 @@
       "family": "nav",
       "component": "NavDivider",
       "localComponent": "NavDivider",
-      "status": "review-prop-gaps",
+      "status": "own-prop-names-covered",
       "fluentOwnProps": [
         "alignContent",
         "appearance",
@@ -3683,14 +3682,13 @@
         "wrapper"
       ],
       "localOwnProps": [
-        "wrapper"
-      ],
-      "missingLocally": [
         "alignContent",
         "appearance",
         "inset",
-        "vertical"
+        "vertical",
+        "wrapper"
       ],
+      "missingLocally": [],
       "missingSlotProps": [],
       "localAdditions": [
         "wrapper"

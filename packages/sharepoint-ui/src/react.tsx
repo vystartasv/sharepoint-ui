@@ -1620,7 +1620,7 @@ export const TagPickerInput = /* @__PURE__ */ React.forwardRef<HTMLElement, Omit
   return React.createElement("spui-tag-picker-input", useCustomElementProps({ ...props, ref, value, placeholder, disabled: disabled || undefined, clearable: clearable || undefined, appearance }));
 });
 
-export function TagPickerList({ children }: ElementProps & { children?: React.ReactNode }): React.ReactElement {
+export function TagPickerList({ children }: ElementProps & { children?: React.ReactNode; disableAutoFocus?: boolean }): React.ReactElement {
   return React.createElement(React.Fragment, null, children);
 }
 
@@ -1770,7 +1770,8 @@ export type CarouselAutoplayChangeData = { checked: boolean } & (
   | { event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>; type: "click" }
 );
 
-export const CarouselAutoplayButton = /* @__PURE__ */ React.forwardRef<HTMLElement, Omit<ElementProps, "slot"> & { icon?: React.ReactNode; playLabel?: string; pauseLabel?: string; onCheckedChange?: (event: SharePointUIEvent, data: CarouselAutoplayChangeData) => void; slot?: string | null }>(function CarouselAutoplayButton({ icon, playLabel, pauseLabel, onCheckedChange, ...props }: Omit<ElementProps, "slot"> & { icon?: React.ReactNode; playLabel?: string; pauseLabel?: string; onCheckedChange?: (event: SharePointUIEvent, data: CarouselAutoplayChangeData) => void; slot?: string | null }, forwardedRef): React.ReactElement {
+export type CarouselAutoplayButtonProps = Omit<ElementProps, "slot"> & { icon?: React.ReactNode; appearance?: ButtonAppearance; checked?: boolean; defaultChecked?: boolean; disabled?: boolean; disabledFocusable?: boolean; iconPosition?: "before" | "after"; isAccessible?: boolean; shape?: ButtonShape; size?: ButtonSize; playLabel?: string; pauseLabel?: string; onCheckedChange?: (event: SharePointUIEvent, data: CarouselAutoplayChangeData) => void; slot?: string | null };
+export const CarouselAutoplayButton = /* @__PURE__ */ React.forwardRef<HTMLElement, CarouselAutoplayButtonProps>(function CarouselAutoplayButton({ icon, appearance = "secondary", checked, defaultChecked, disabled = false, disabledFocusable = false, iconPosition = "before", isAccessible = false, shape = "rounded", size = "medium", playLabel, pauseLabel, onCheckedChange, ...props }: CarouselAutoplayButtonProps, forwardedRef): React.ReactElement {
   const strings = React.useContext(UIContext).strings;
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -1782,7 +1783,8 @@ export const CarouselAutoplayButton = /* @__PURE__ */ React.forwardRef<HTMLEleme
     const callbackEvent = createReactEventBridge(sourceEvent, event, target as HTMLButtonElement | HTMLAnchorElement) as React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>;
     onCheckedChange?.(callbackEvent, { ...change, event: callbackEvent } as CarouselAutoplayChangeData);
   });
-  return React.createElement("spui-carousel-autoplay-button", useCustomElementProps({ ...props, ref, slot: props.slot === null ? null : props.slot || "autoplay", "play-label": playLabel || strings.carouselPlay || "Play", "pause-label": pauseLabel || strings.carouselPause || "Pause" }), renderIconSlot(icon));
+  React.useLayoutEffect(() => { const element = ref.current as (HTMLElement & { selected: boolean }) | null; if (element && checked !== undefined) element.selected = checked; }, [checked]);
+  return React.createElement("spui-carousel-autoplay-button", useCustomElementProps({ ...props, ref, slot: props.slot === null ? null : props.slot || "autoplay", appearance, checked, controlled: checked !== undefined || undefined, "default-checked": defaultChecked || undefined, disabled: disabled || undefined, "disabled-focusable": disabledFocusable || undefined, "icon-position": iconPosition, "is-accessible": isAccessible || undefined, shape, size, "play-label": playLabel || strings.carouselPlay || "Play", "pause-label": pauseLabel || strings.carouselPause || "Pause" }), renderIconSlot(icon));
 });
 
 export type CarouselNavButtonSlotProps = React.ReactElement | Omit<Parameters<typeof CarouselButton>[0], "navType" | "slot">;
@@ -1998,10 +2000,10 @@ export const NavSubItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementP
   return React.createElement("spui-nav-sub-item", useCustomElementProps({ ref: forwardedRef, ...props, value, href, disabled: disabled || undefined }), renderNavAvatar(avatar), icon === undefined ? null : React.createElement("span", { slot: "icon" }, icon), children);
 });
 
-export type NavDividerProps = ElementProps & { wrapper?: DividerWrapper };
-export const NavDivider = /* @__PURE__ */ React.forwardRef<HTMLElement, NavDividerProps>(function NavDivider({ wrapper, ...props }: NavDividerProps, forwardedRef): React.ReactElement {
+export type NavDividerProps = ElementProps & { wrapper?: DividerWrapper; alignContent?: "start" | "center" | "end"; appearance?: DividerAppearance; inset?: boolean; vertical?: boolean };
+export const NavDivider = /* @__PURE__ */ React.forwardRef<HTMLElement, NavDividerProps>(function NavDivider({ wrapper, alignContent = "center", appearance = "default", inset = false, vertical = false, ...props }: NavDividerProps, forwardedRef): React.ReactElement {
   ensureDefined(defineNavDivider);
-  return React.createElement("spui-nav-divider", useCustomElementProps({ ref: forwardedRef, ...props }), renderDividerWrapper(wrapper));
+  return React.createElement("spui-nav-divider", useCustomElementProps({ ref: forwardedRef, ...props, "align-content": alignContent, appearance, inset: inset || undefined, vertical: vertical || undefined }), renderDividerWrapper(wrapper));
 });
 
 export const NavSectionHeader = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function NavSectionHeader({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {

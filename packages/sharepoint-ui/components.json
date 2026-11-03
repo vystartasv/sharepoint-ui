@@ -3581,7 +3581,7 @@
       "module": "tag-picker",
       "category": "form-option",
       "api": {
-        "reactSignature": "{ children }: ElementProps & { children?: React.ReactNode }",
+        "reactSignature": "{ children }: ElementProps & { children?: React.ReactNode; disableAutoFocus?: boolean }",
         "callbackProps": [],
         "slots": [
           "children"
@@ -4984,7 +4984,13 @@
       "module": "nav",
       "category": "navigation",
       "api": {
-        "reactSignature": "{ wrapper, ...props }: NavDividerProps",
+        "reactSignature": "{ wrapper, alignContent = \"center\", appearance = \"default\", inset = false, vertical = false, ...props }: NavDividerProps",
+        "relatedReactApis": [
+          { "name": "NavDividerProps.alignContent", "description": "Aligns wrapper content at the start, center, or end of the divider." },
+          { "name": "NavDividerProps.appearance", "description": "Selects the default, brand, strong, or subtle theme-derived divider line." },
+          { "name": "NavDividerProps.inset", "description": "Adds logical inline spacing around the divider." },
+          { "name": "NavDividerProps.vertical", "description": "Renders a vertical divider and sets aria-orientation accordingly." }
+        ],
         "callbackProps": [],
         "slots": [
           "wrapper"
@@ -5409,6 +5415,11 @@
       "module": "carousel",
       "category": "views",
       "api": {
+        "relatedReactApis": [
+          { "name": "CarouselAutoplayButtonProps.checked", "description": "Controls whether autoplay is running; onCheckedChange reports the requested next value." },
+          { "name": "CarouselAutoplayButtonProps.defaultChecked", "description": "Sets the initial uncontrolled autoplay state." },
+          { "name": "CarouselAutoplayButtonProps.appearance", "description": "Uses the same appearance options as a ToggleButton." }
+        ],
         "callbackProps": [
           "onCheckedChange"
         ],
@@ -5417,7 +5428,7 @@
           "CSS custom properties",
           "host className/style"
         ],
-        "reactSignature": "{ icon, playLabel, pauseLabel, onCheckedChange, ...props }: Omit<ElementProps, \"slot\"> & { icon?: React.ReactNode; playLabel?: string; pauseLabel?: string; onCheckedChange?: (event: SharePointUIEvent, data: CarouselAutoplayChangeData) => void; slot?: string | null }",
+        "reactSignature": "{ icon, appearance = \"secondary\", checked, defaultChecked, disabled = false, disabledFocusable = false, iconPosition = \"before\", isAccessible = false, shape = \"rounded\", size = \"medium\", playLabel, pauseLabel, onCheckedChange, ...props }: CarouselAutoplayButtonProps",
         "slots": [
           "icon"
         ],
