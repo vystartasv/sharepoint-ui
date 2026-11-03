@@ -469,6 +469,17 @@
   padding: 0.5rem;
 }
 
+.component-demo__stage:has(> spui-data-grid) {
+  display: block;
+  padding: 0.5rem;
+}
+
+.component-demo__stage > spui-data-grid {
+  display: block;
+  width: 100%;
+  min-height: 14rem;
+}
+
 .component-demo__stage > spui-virtual-list {
   display: block;
   width: 100%;

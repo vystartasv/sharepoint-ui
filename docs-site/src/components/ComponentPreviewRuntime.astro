@@ -118,6 +118,20 @@
         virtualList.renderItem = (item) => `${item.title} · ${item.owner}`;
         updateStatus();
       }
+      const dataGrid = stage?.querySelector("spui-data-grid");
+      if (dataGrid && "columns" in dataGrid && "items" in dataGrid) {
+        dataGrid.columns = [
+          { id: "workItem", label: "Work item", sortable: true, resizable: true, width: "minmax(12rem, 2fr)" },
+          { id: "owner", label: "Owner", sortable: true, resizable: true, width: "minmax(8rem, 1fr)" },
+          { id: "status", label: "Status", sortable: true, resizable: true, width: "minmax(8rem, 1fr)" },
+        ];
+        dataGrid.items = [
+          { workItem: "Quarterly access review", owner: "Maria Chen", status: "In progress" },
+          { workItem: "Site launch checklist", owner: "Daniel Morgan", status: "Ready" },
+          { workItem: "Content migration plan", owner: "Aisha Khan", status: "Needs review" },
+        ];
+        updateStatus();
+      }
     } catch (error) {
       if (status) status.textContent = `${demo.dataset.label ?? "Component"} preview could not be loaded.`;
       console.error("SharePoint UI preview failed to load", error);
