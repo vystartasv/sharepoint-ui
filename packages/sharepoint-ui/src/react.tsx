@@ -205,7 +205,12 @@ export type CarouselContextValue = {
 export type CarouselAnnouncerFunction = (index: number, totalSlides: number, slideGroupList: number[][]) => string;
 const CarouselContext = React.createContext<CarouselContextValue | undefined>(undefined);
 
-const ensureDefined = (define: () => void): void => { if (typeof customElements !== "undefined") define(); };
+const definedReactElements = new WeakSet<() => void>();
+const ensureDefined = (define: () => void): void => {
+  if (typeof customElements === "undefined" || definedReactElements.has(define)) return;
+  define();
+  definedReactElements.add(define);
+};
 function hasDesignThemeValues(theme?: SharePointUIDesignTheme): boolean {
   return Object.values(theme ?? {}).some(value => typeof value === "string" || typeof value === "number" ? value !== undefined : value != null && Object.keys(value).length > 0);
 }
@@ -475,7 +480,26 @@ export const Button = /* @__PURE__ */ React.forwardRef<HTMLElement, ButtonProps>
   ensureDefined(defineButton);
   const buttonContext = useButtonContext();
   const iconOnly = props.iconOnly ?? (icon != null && props.children == null);
-  return React.createElement("spui-button", useCustomElementProps({ ...props, ref: forwardedRef, as, value: value === undefined ? undefined : Array.isArray(value) ? value.join(",") : String(value), download: download === false ? undefined : download === true ? "" : download, hreflang: hrefLang, referrerpolicy: referrerPolicy, formaction: formAction, formenctype: formEncType, formmethod: formMethod, formnovalidate: formNoValidate || undefined, formtarget: formTarget, size: props.size ?? buttonContext.size ?? "medium", vertical: vertical || undefined, "icon-only": iconOnly || undefined, iconOnly: undefined, "disabled-focusable": disabledFocusable || undefined, "icon-position": iconPosition, variant: props.variant }), icon == null ? null : React.createElement("span", { slot: "icon", "aria-hidden": true }, icon), props.children);
+  return React.createElement("spui-button", useCustomElementProps({
+    ...props,
+    ref: forwardedRef,
+    ...(as === "a" ? { as } : {}),
+    ...(value === undefined ? {} : { value: Array.isArray(value) ? value.join(",") : String(value) }),
+    ...(download === undefined || download === false ? {} : { download: download === true ? "" : download }),
+    ...(hrefLang === undefined ? {} : { hreflang: hrefLang }),
+    ...(referrerPolicy === undefined ? {} : { referrerpolicy: referrerPolicy }),
+    ...(formAction === undefined ? {} : { formaction: formAction }),
+    ...(formEncType === undefined ? {} : { formenctype: formEncType }),
+    ...(formMethod === undefined ? {} : { formmethod: formMethod }),
+    ...(formNoValidate ? { formnovalidate: true } : {}),
+    ...(formTarget === undefined ? {} : { formtarget: formTarget }),
+    ...((props.size ?? buttonContext.size) === undefined ? {} : { size: props.size ?? buttonContext.size }),
+    ...(vertical ? { vertical: true } : {}),
+    ...(iconOnly ? { "icon-only": true } : {}),
+    ...(disabledFocusable ? { "disabled-focusable": true } : {}),
+    ...(iconPosition === "after" ? { "icon-position": iconPosition } : {}),
+    ...(props.variant === undefined ? {} : { variant: props.variant }),
+  }), icon == null ? null : React.createElement("span", { slot: "icon", "aria-hidden": true }, icon), props.children);
 });
 
 /** A themed menu trigger. Compose it as Menu's trigger; Menu owns open state, focus, and dismissal. */

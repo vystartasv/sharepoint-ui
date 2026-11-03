@@ -37,7 +37,15 @@ try {
     await press("top", "ArrowDown");
     await press("submenu-trigger", openKey);
     const opened = await page.getByTestId("submenu").evaluate(node => node.open);const bubbledOpenChange=await page.evaluate(()=>window.menuOpenChanges.at(-1));
-    await page.waitForFunction(() => window.deepActiveTestId() === "child-a");
+    try {
+      await page.waitForFunction(() => window.deepActiveTestId() === "child-a", null, { timeout: 5000 });
+    } catch (error) {
+      const state = await page.evaluate(() => ({
+        active: window.deepActiveTestId(),
+        menus: [...document.querySelectorAll("spui-menu")].map(menu => ({ testId: menu.getAttribute("data-testid"), open: menu.open, placement: menu.getAttribute("placement"), items: [...menu.querySelectorAll("spui-menu-item")].map(item => ({ testId: item.getAttribute("data-testid"), slot: item.getAttribute("slot"), focused: item.shadowRoot?.activeElement === document.activeElement || item.shadowRoot?.activeElement != null })) })),
+      }));
+      throw new Error(`submenu focus failed: ${JSON.stringify(state)}`, { cause: error });
+    }
     const firstChildFocused = await page.evaluate(() => window.deepActiveTestId());
     const triggerSemantics = await page.getByTestId("submenu-trigger").evaluate(node => { const button=node.shadowRoot.querySelector("button"); return { haspopup:button?.getAttribute("aria-haspopup"), expanded:button?.getAttribute("aria-expanded") }; });
     const placement = await page.getByTestId("submenu").getAttribute("placement");

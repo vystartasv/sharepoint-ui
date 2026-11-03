@@ -11,6 +11,7 @@
     "adapters": [
       "Fluent React 9.75.0 Button in FluentProvider",
       "SharePoint UI React Button in SharePointUIProvider",
+      "Raw React spui-button host in SharePointUIProvider (adapter-overhead control)",
       "SharePoint UI spui-button custom element"
     ]
   },
@@ -53,6 +54,28 @@
         { "fluentReact": { "medianMs": 8.3, "p95Ms": 9.5 }, "sharePointReact": { "medianMs": 9.7, "p95Ms": 12.0 } },
         { "fluentReact": { "medianMs": 8.7, "p95Ms": 9.9 }, "sharePointReact": { "medianMs": 9.4, "p95Ms": 10.2 } }
       ]
+    },
+    {
+      "phase": "after-button-default-prop-elision-and-registration-cache",
+      "count": 100,
+      "fluentReact": { "medianMs": 1.8, "p95Ms": 2.6 },
+      "sharePointReact": { "medianMs": 1.8, "p95Ms": 1.9 },
+      "sharePointRawReact": { "medianMs": 1.5, "p95Ms": 1.7 },
+      "sharePointNative": { "medianMs": 1.3, "p95Ms": 1.4 },
+      "fluentThemedReact": { "medianMs": 1.8, "p95Ms": 2.6 },
+      "sharePointThemedReact": { "medianMs": 2.0, "p95Ms": 2.0 },
+      "sharePointRawThemedReact": { "medianMs": 1.6, "p95Ms": 1.7 }
+    },
+    {
+      "phase": "after-button-default-prop-elision-and-registration-cache",
+      "count": 500,
+      "fluentReact": { "medianMs": 7.7, "p95Ms": 9.2 },
+      "sharePointReact": { "medianMs": 8.6, "p95Ms": 10.3 },
+      "sharePointRawReact": { "medianMs": 7.4, "p95Ms": 8.4 },
+      "sharePointNative": { "medianMs": 6.7, "p95Ms": 7.0 },
+      "fluentThemedReact": { "medianMs": 8.7, "p95Ms": 9.3 },
+      "sharePointThemedReact": { "medianMs": 8.8, "p95Ms": 9.9 },
+      "sharePointRawThemedReact": { "medianMs": 7.5, "p95Ms": 7.7 }
     }
   ],
   "stylesheetExperiment": {
@@ -67,7 +90,7 @@
   "findings": [
     "The Button renderer considered null previous control equal to null activeElement on first render, so it called focus() on every newly mounted Button. Requiring a non-null previous control removed this work and preserved focus on actual rerenders.",
     "In default Fluent appearance, default CSS fallbacks already inherit SharePoint semantic tokens. The React adapter now skips writing the full default token map to every host, retaining the default font and color scheme; explicit themes, Fluent tokens, custom properties, non-default appearances, densities, and direct style overrides retain host tokens.",
-    "After both optimizations, the 500-Button SPUI React median is 9.4–10.7 ms versus Fluent 8.3–9.3 ms; 100-Button medians are 1.9 ms for both. The matched Button mount gap is nearly closed, with a remaining 0.7–1.4 ms median difference at 500.",
+    "The React Button adapter now omits undefined optional attributes and default-valued host attributes that the custom element already treats as defaults. ensureDefined caches successful custom-element registration per definition function instead of repeating a registry lookup for every React instance. In the latest uninstrumented 20-round run, 100 React Buttons match Fluent at 1.8 ms median; at 500, SPUI is 8.6 ms default (Fluent 7.7 ms) and 8.8 ms themed (Fluent 8.7 ms). The raw React custom-element host is 7.4/7.5 ms, showing about 1.2 ms residual wrapper overhead in the 500-item case.",
     "The post-change CPU profile no longer samples focus calls; the most common measured operation is the benchmark's forced getBoundingClientRect layout."
   ],
   "checks": [
@@ -80,5 +103,5 @@
     "Not a cross-browser, SharePoint-host, or user-perceived latency benchmark.",
     "The native path is not used as the React adapter performance claim."
   ],
-  "status": "Button mount performance is close to Fluent in this synthetic local workload; cross-browser, tenant, update, and large-list scrolling performance remain unverified."
+  "Button mount performance is competitive in this synthetic local workload but remains 0.9 ms slower at 500 default-theme buttons; cross-browser, tenant, update, and large-list scrolling performance remain unverified."
 }

@@ -489,7 +489,7 @@ export function defineMenu(): void {
     }); }
     private focusItem(index: number): void { const items = this.menuItems(); if (!items.length) return; items[(index + items.length) % items.length].focus(); }
     private focusItemAfterOpen(index: number): void { requestAnimationFrame(() => requestAnimationFrame(() => { if (this.isOpen) this.focusItem(index); })); }
-    private activeIndex(): number { const active = this.shadowRoot?.activeElement ?? document.activeElement; return this.menuItems().findIndex(item => item === active || item.shadowRoot?.activeElement === active); }
+    private activeIndex(): number { return this.menuItems().findIndex(item => item.matches(":focus-within") || item.shadowRoot?.activeElement != null); }
     private onClick = (event: MouseEvent): void => {
       const target = event.target;
       if (!(target instanceof Node)) return;
@@ -525,6 +525,7 @@ export function defineMenu(): void {
     private onMenuEnter = (event: Event): void => {
       const target = event.target;
       if (!this.isOpen || target === this || target instanceof Node && (this.contains(target) || this.shadowRoot?.contains(target))) return;
+      if (target instanceof Element && target.closest("spui-menu")?.contains(this)) return;
       const nativeEvent = (event as CustomEvent<{ nativeEvent?: Event }>).detail?.nativeEvent;
       if (nativeEvent instanceof MouseEvent) this.setOpen(false, { event: nativeEvent, type: "menuMouseEnter" });
     };
@@ -600,7 +601,7 @@ export function defineMenu(): void {
       if (this.hasAttribute("open") !== next) this.toggleAttribute("open", next);
       this.syncVisibility(); this.emitOpenChange(source);
     }
-    private emitOpenChange(source: MenuOpenChangeSource = { event: new Event("programmatic"), type: "programmatic" }): void { const detail = { open: this.isOpen, ...source, keyboard: source.keyboard ?? false, bubble: false } as MenuOpenChangeData; this.dispatchEvent(new CustomEvent<MenuOpenChangeData>("spui-open-change", { bubbles: true, composed: true, detail })); }
+    private emitOpenChange(source: MenuOpenChangeSource = { event: new Event("programmatic"), type: "programmatic" }): void { const detail = { open: this.isOpen, ...source, keyboard: source.keyboard ?? false, bubble: Boolean(this.parentMenu()) } as MenuOpenChangeData; this.dispatchEvent(new CustomEvent<MenuOpenChangeData>("spui-open-change", { bubbles: true, composed: true, detail })); }
     private clearTypeahead(): void { if (this.typeaheadTimer !== undefined) clearTimeout(this.typeaheadTimer); this.typeaheadTimer = undefined; }
     private clearHoverTimer(): void { if (this.hoverTimer !== undefined) clearTimeout(this.hoverTimer); this.hoverTimer = undefined; }
   }
