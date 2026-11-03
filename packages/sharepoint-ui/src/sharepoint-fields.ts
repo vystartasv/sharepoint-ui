@@ -125,8 +125,7 @@ export function getSharePointFieldAdapter(field: SharePointFieldMetadata): Share
     const control = finish("input");
     control.inputType = normalized === "url" ? "url" : ["integer", "number", "currency"].includes(normalized) ? "number" : "text";
     if (control.inputType === "number") {
-      const decimals = field.Decimals ?? field.decimals;
-      const decimalPlaces = typeof decimals === "number" ? decimals : typeof decimals === "string" && /^\d+$/.test(decimals) ? Number(decimals) : undefined;
+      const decimalPlaces = getConfiguredDecimalPlaces(field);
       control.step = normalized === "integer" || decimalPlaces === 0 ? 1 : decimalPlaces == null ? "any" : 10 ** -decimalPlaces;
     }
     return control;
@@ -290,6 +289,11 @@ export function serializeSharePointFieldValue(field: SharePointFieldMetadata, va
     if (!Number.isFinite(numeric) || (type === "integer" && !Number.isSafeInteger(numeric))) {
       throw new TypeError(`${adapter.label} requires a ${type === "integer" ? "safe integer" : "finite number"}, numeric string, or null.`);
     }
+    const allowedDecimals = type === "integer" ? 0 : getConfiguredDecimalPlaces(field);
+    const precisionSource = typeof value === "string" || typeof value === "number" ? value : numeric;
+    if (allowedDecimals != null && getNumericDecimalPlaces(precisionSource) > allowedDecimals) {
+      throw new RangeError(`${adapter.label} allows at most ${allowedDecimals} decimal places.`);
+    }
     return { [adapter.name]: numeric };
   }
   if (type === "datetime") {
@@ -352,6 +356,21 @@ function serializeSharePointDateValue(value: string): string | undefined {
   if (!Number.isFinite(parsed.getTime())) return undefined;
   if (dateOnly || dateTime?.[4]) return value;
   return parsed.toISOString();
+}
+
+function getConfiguredDecimalPlaces(field: SharePointFieldMetadata): number | undefined {
+  const decimals = field.Decimals ?? field.decimals;
+  const value = typeof decimals === "number" ? decimals : typeof decimals === "string" && /^\d+$/.test(decimals.trim()) ? Number(decimals) : undefined;
+  return value != null && Number.isSafeInteger(value) && value >= 0 ? value : undefined;
+}
+
+function getNumericDecimalPlaces(value: string | number): number {
+  const [coefficient, exponentText] = String(value).trim().toLowerCase().split("e");
+  const [integer = "", fraction = ""] = coefficient.split(".");
+  const exponent = Number(exponentText ?? 0);
+  const significantFractionLength = fraction.replace(/0+$/, "").length;
+  const removableIntegerZeros = exponent < 0 ? integer.match(/0+$/)?.[0].length ?? 0 : 0;
+  return Math.max(0, significantFractionLength - exponent - removableIntegerZeros);
 }
 
 function parseLookupId(value: SharePointLookupId): number {
