@@ -15,7 +15,7 @@ defineButton();
 <spui-button appearance="primary">Create request</spui-button>
 ```
 
-In plain HTML, add the package's emitted module through your bundler. In another framework, use that framework's normal custom-element integration and listen to the documented `spui-*` events. The [Button API page](/sharepoint-ui-docs/components/button/) lists its tag, slots, callbacks, and styling hooks.
+In plain HTML, add the package's emitted module through your bundler. In another framework, use that framework's normal custom-element integration and listen to the documented `spui-*` events. The [Button API page](/sharepoint-ui/components/button/) lists its tag, slots, callbacks, and styling hooks.
 
 ## Register a selection of elements
 
@@ -23,4 +23,4 @@ Prefer leaf imports when a web part uses a small set of components. `defineShare
 
 ## Forms and labels
 
-Form-associated elements participate in native form value and reset behavior where the component supports it. For a visible label, use `TextField` in React or the native label factory documented on the [Label page](/sharepoint-ui-docs/components/label/). A label outside a shadow root cannot label an internal control by ID; use the component's own label API or provide `aria-label` / `aria-labelledby` as documented.
+Form-associated elements participate in native form value and reset behavior where the component supports it. For a visible label, use `TextField` in React or the native label factory documented on the [Label page](/sharepoint-ui/components/label/). A label outside a shadow root cannot label an internal control by ID; use the component's own label API or provide `aria-label` / `aria-labelledby` as documented.

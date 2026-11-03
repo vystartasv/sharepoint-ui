@@ -164,7 +164,7 @@ function exampleFor(component) {
   if (component.react === "RichTextEditor") return { tag: "spui-rich-text-editor", attrs: 'label="Project notes" value="&lt;p&gt;Quarterly review: &lt;strong&gt;in progress&lt;/strong&gt;.&lt;/p&gt;"', content: "", related: false };
   const customTag = component.tag?.startsWith("spui-") ? component.tag : undefined;
   if (!customTag) {
-    if (component.react === "Image") return { tag: "img", attrs: 'src="/sharepoint-ui-docs/preview-image.svg" alt="Blue and violet abstract shapes" width="220" height="120"', content: "", related: true };
+    if (component.react === "Image") return { tag: "img", attrs: 'src="/sharepoint-ui/preview-image.svg" alt="Blue and violet abstract shapes" width="220" height="120"', content: "", related: true };
     if (presetText[component.react]) return { tag: "spui-text", attrs: `size="${presetText[component.react][0]}" weight="${presetText[component.react][1]}"`, content: "Quarterly access review", related: true };
     return { tag: familyPreviewTags[component.module] ?? grouped.get(component.module)?.find(item => item.tag?.startsWith("spui-"))?.tag, attrs: "", content: `Live ${titleFor(component.module)} example`, related: true };
   }
@@ -213,7 +213,7 @@ for (const [module, entries] of familyIndex) {
     let slug = slugFor(entry.react ?? entry.tag ?? name);
     if (!slug || localSlugs.has(slug)) slug = `${slug || "component"}-${localSlugs.size + 1}`;
     localSlugs.add(slug);
-    const pagePath = `/sharepoint-ui-docs/components/${module}/${slug}/`;
+    const pagePath = `/sharepoint-ui/components/${module}/${slug}/`;
     const example = exampleFor(entry);
     const markup = markupFor(example);
     const react = entry.react ? `<strong>React export:</strong> <code>${escapeHtml(entry.react)}</code>` : "<strong>React export:</strong> Not supplied";

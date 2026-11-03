@@ -25,7 +25,7 @@ const componentSidebar = [...componentsByModule.entries()].sort(([a], [b]) => a.
 
 export default defineConfig({
   site: "https://vystartasv.github.io",
-  base: "/sharepoint-ui-docs",
+  base: "/sharepoint-ui",
   integrations: [starlight({
     title: "SharePoint UI",
     description: "Theme-aware components and reusable views for SharePoint Framework 1.24.",
