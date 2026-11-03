@@ -2267,6 +2267,10 @@
           {
             "name": "SharePointUIProvider.strings.richTextLink*",
             "description": "Customize the link editor's accessible name, field labels, action labels, picker states, and validation messages for the active language."
+          },
+          {
+            "name": "SharePointUIProvider.strings.richText*",
+            "description": "Localize the text-style menu, block names, formatting buttons, table actions, link editor, image controls, and required message."
           }
         ],
         "callbackProps": [
@@ -2285,7 +2289,7 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Edit sanitized rich HTML with controlled or uncontrolled form values, formatting history, table editing, a safe link editor with an optional host-provided SharePoint picker, and application-managed durable image upload.",
+      "summary": "Edit sanitized HTML with paragraph, heading, quote, and preformatted styles; inline formatting; lists; undo/redo; tables; safe links; and application-managed image upload. SharePoint field metadata selects plain, restricted, compatible-rich, or FullHtml behavior.",
       "highValueAdditions": [
         "Preview SharePoint page titles and destination details before inserting internal links."
       ]

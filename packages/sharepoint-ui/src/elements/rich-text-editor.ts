@@ -26,7 +26,8 @@ export interface SharePointRichTextEditorElement extends HTMLElement {
 declare global { interface HTMLElementTagNameMap { "spui-rich-text-editor": SharePointRichTextEditorElement; } }
 
 const toolbarIconPaths: Record<string, string> = {
-  bold: "M6 4h5a3 3 0 0 1 0 6H6z M6 10h6a3 3 0 0 1 0 6H6z", italic: "M10 4h6 M8 16h6 M13 4 9 16", underline: "M6 4v5a4 4 0 0 0 8 0V4 M5 16h10",
+  bold: "M6 4h5a3 3 0 0 1 0 6H6z M6 10h6a3 3 0 0 1 0 6H6z", italic: "M10 4h6 M8 16h6 M13 4 9 16", underline: "M6 4v5a4 4 0 0 0 8 0V4 M5 16h10", strikeThrough: "M3 10h14 M6 5c1-2 7-2 8 0 M6 15c1 2 7 2 8 0",
+  removeFormat: "M4 4l12 12 M6 6l4 4m2 2 2 2 M8 4h8 M5 16h5",
   insertUnorderedList: "M8 5h9 M8 10h9 M8 15h9 M4 5h.01 M4 10h.01 M4 15h.01", insertOrderedList: "M9 5h8 M9 10h8 M9 15h8 M4 4h1v3 M3.5 7h2 M3.5 10.5c0-1 2-1 2 0 0 .6-2 1.5-2 2.5h2 M4 14h1a1 1 0 0 1 0 2H4",
   undo: "M9 7 5 10l4 3 M5 10h7a4 4 0 0 1 4 4", redo: "M11 7 15 10l-4 3 M15 10H8a4 4 0 0 0-4 4",
   insertTable: "M3 4h14v12H3z M3 8h14 M3 12h14 M8 4v12 M13 4v12", insertImage: "M3 4h14v12H3z M4 14l4-4 3 3 2-2 3 3 M7 7h.01",
@@ -41,9 +42,9 @@ function createToolbarIcon(command: string): SVGSVGElement {
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path"); path.setAttribute("d", toolbarIconPaths[command] ?? "M4 10h12"); icon.append(path); return icon;
 }
 
-const ALLOWED = new Set(["P", "DIV", "SPAN", "BR", "HR", "STRONG", "B", "EM", "I", "U", "S", "DEL", "INS", "UL", "OL", "LI", "A", "H1", "H2", "H3", "H4", "H5", "H6", "BLOCKQUOTE", "PRE", "TABLE", "THEAD", "TBODY", "TFOOT", "TR", "TH", "TD", "CAPTION", "SUP", "SUB", "CODE", "IMG"]);
+const ALLOWED = new Set(["P", "DIV", "SPAN", "BR", "HR", "STRONG", "B", "EM", "I", "U", "S", "STRIKE", "DEL", "INS", "UL", "OL", "LI", "A", "H1", "H2", "H3", "H4", "H5", "H6", "BLOCKQUOTE", "PRE", "TABLE", "THEAD", "TBODY", "TFOOT", "TR", "TH", "TD", "CAPTION", "SUP", "SUB", "CODE", "IMG"]);
 const HTML_ONLY = new Set(["MAIN", "SECTION", "ARTICLE", "HEADER", "FOOTER", "ASIDE", "FIGURE", "FIGCAPTION", "DETAILS", "SUMMARY", "DL", "DT", "DD", "ABBR", "CITE", "Q", "MARK", "SMALL", "TIME", "WBR"]);
-const RESTRICTED = new Set(["P", "DIV", "SPAN", "BR", "STRONG", "B", "EM", "I", "U", "S", "DEL", "INS", "UL", "OL", "LI", "H1", "H2", "H3", "H4", "H5", "H6", "BLOCKQUOTE", "PRE", "SUP", "SUB", "CODE"]);
+const RESTRICTED = new Set(["P", "DIV", "SPAN", "BR", "STRONG", "B", "EM", "I", "U", "S", "STRIKE", "DEL", "INS", "UL", "OL", "LI", "H1", "H2", "H3", "H4", "H5", "H6", "BLOCKQUOTE", "PRE", "SUP", "SUB", "CODE"]);
 const DROP_CONTENT = new Set(["SCRIPT", "STYLE", "IFRAME", "OBJECT", "EMBED", "TEMPLATE"]);
 const HTML_STYLE_PROPERTIES = new Set(["background-color", "color", "direction", "font-family", "font-size", "font-style", "font-weight", "letter-spacing", "line-height", "list-style-type", "margin-block-end", "margin-block-start", "margin-inline-end", "margin-inline-start", "text-align", "text-decoration", "text-indent", "text-transform", "vertical-align", "white-space"]);
 function safeHref(value: string): boolean {
@@ -110,7 +111,7 @@ export function defineRichTextEditor(): void {
   if (customElements.get("spui-rich-text-editor")) return;
   class SpuiRichTextEditor extends HTMLElement implements SharePointRichTextEditorElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "editor-label", "placeholder", "content-mode", "allow-hyperlink", "disabled", "read-only", "required", "required-message", "value", "name", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "bold-label", "italic-label", "underline-label", "bullet-list-label", "number-list-label", "link-label", "undo-label", "redo-label", "insert-table-label", "insert-image-label", "image-input-label", "insert-row-above-label", "insert-row-below-label", "insert-column-before-label", "insert-column-after-label", "delete-row-label", "delete-column-label", "delete-table-label", "toolbar-label", "link-prompt", "link-dialog-label", "link-text-label", "link-title-label", "link-apply-label", "link-remove-label", "link-cancel-label", "link-new-tab-label", "link-invalid-message", "link-picker-label", "link-picker-loading-label", "link-picker-error-message"];
+    static observedAttributes = ["label", "editor-label", "placeholder", "content-mode", "allow-hyperlink", "disabled", "read-only", "required", "required-message", "value", "name", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "bold-label", "italic-label", "underline-label", "strike-label", "clear-formatting-label", "format-block-label", "paragraph-label", "heading-1-label", "heading-2-label", "heading-3-label", "blockquote-label", "preformatted-label", "bullet-list-label", "number-list-label", "link-label", "undo-label", "redo-label", "insert-table-label", "insert-image-label", "image-input-label", "insert-row-above-label", "insert-row-below-label", "insert-column-before-label", "insert-column-after-label", "delete-row-label", "delete-column-label", "delete-table-label", "toolbar-label", "link-prompt", "link-dialog-label", "link-text-label", "link-title-label", "link-apply-label", "link-remove-label", "link-cancel-label", "link-new-tab-label", "link-invalid-message", "link-picker-label", "link-picker-loading-label", "link-picker-error-message"];
     private editor!: HTMLDivElement;
     private internals: ElementInternals | undefined;
     private formDisabled = false;
@@ -141,7 +142,7 @@ export function defineRichTextEditor(): void {
     private selectedTablePath?: { table: number; row: number; cell: number };
     private events?: AbortController;
     private get contentMode(): "plain" | "restricted" | "rich" | "html" { const mode = this.getAttribute("content-mode"); return mode === "plain" || mode === "restricted" || mode === "rich" || mode === "html" ? mode : "html"; }
-    private get allowHyperlinks(): boolean { return this.contentMode !== "plain" && this.getAttribute("allow-hyperlink") !== "false"; }
+    private get allowHyperlinks(): boolean { return this.contentMode !== "plain" && this.contentMode !== "restricted" && this.getAttribute("allow-hyperlink") !== "false"; }
     constructor() { super(); try { this.internals = this.attachInternals(); } catch { /* Editing remains available in engines without form association. */ } }
     connectedCallback(): void {
       this.events?.abort();
@@ -190,7 +191,7 @@ export function defineRichTextEditor(): void {
       this.editor.contentEditable = readOnly ? "false" : this.contentMode === "plain" ? "plaintext-only" : "true";
       this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only")));
       this.editor.setAttribute("aria-disabled", String(disabled));
-      this.shadowRoot?.querySelectorAll<HTMLButtonElement>("[role=toolbar] button").forEach(button => { button.disabled = readOnly; });
+      this.shadowRoot?.querySelectorAll<HTMLButtonElement | HTMLSelectElement>("[role=toolbar] button,[role=toolbar] select").forEach(control => { control.disabled = readOnly; });
       if (this.linkForm) {
         if (readOnly) this.linkForm.hidden = true;
         this.linkForm.querySelectorAll<HTMLInputElement | HTMLButtonElement>("input,button").forEach(control => { control.disabled = readOnly; });
@@ -285,9 +286,16 @@ export function defineRichTextEditor(): void {
       const document = this.editor.ownerDocument;
       const toolbar = this.shadowRoot?.querySelector<HTMLElement>('[role="toolbar"]');
       if (!toolbar) return;
-      for (const button of toolbar.querySelectorAll<HTMLButtonElement>('button[data-command="bold"],button[data-command="italic"],button[data-command="underline"],button[data-command="insertUnorderedList"],button[data-command="insertOrderedList"]')) {
+      for (const button of toolbar.querySelectorAll<HTMLButtonElement>('button[data-command="bold"],button[data-command="italic"],button[data-command="underline"],button[data-command="strikeThrough"],button[data-command="insertUnorderedList"],button[data-command="insertOrderedList"]')) {
         try { button.setAttribute("aria-pressed", String(document.queryCommandState(button.dataset.command!))); }
         catch { button.setAttribute("aria-pressed", "false"); }
+      }
+      const format = toolbar.querySelector<HTMLSelectElement>('select[data-command="formatBlock"]');
+      if (format) {
+        try {
+          const block = document.queryCommandValue("formatBlock").replace(/[<>]/g, "").toUpperCase();
+          format.value = [...format.options].some(option => option.value === block) ? block : "P";
+        } catch { format.value = "P"; }
       }
     }
     private onEditorClick = (event: MouseEvent): void => {
@@ -370,12 +378,13 @@ export function defineRichTextEditor(): void {
     }
     private command(command: string, value?: string): void {
       if ((this.contentMode === "plain" && !["undo", "redo"].includes(command)) || (this.contentMode === "restricted" && ["insertTable", "insertImage", "insertRowAbove", "insertRowBelow", "insertColumnBefore", "insertColumnAfter", "deleteRow", "deleteColumn", "deleteTable"].includes(command)) || (command === "createLink" && !this.allowHyperlinks)) return;
+      if (command === "formatBlock" && !["P", "H1", "H2", "H3", "BLOCKQUOTE", "PRE"].includes(value?.toUpperCase() ?? "")) return;
       if (command === "insertImage") { this.imageInput?.click(); return; }
       if (["insertRowAbove", "insertRowBelow", "insertColumnBefore", "insertColumnAfter", "deleteRow", "deleteColumn", "deleteTable"].includes(command)) { this.editTable(command); return; }
       if (command === "createLink") { this.openLinkEditor(); return; }
       this.restoreSelection();
       if (command === "insertTable") value = '<table><caption><br></caption><thead><tr><th scope="col"><br></th><th scope="col"><br></th></tr></thead><tbody><tr><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td></tr></tbody></table><p><br></p>';
-      this.editor.ownerDocument.execCommand(command === "insertTable" ? "insertHTML" : command, false, value);
+      this.editor.ownerDocument.execCommand(command === "insertTable" ? "insertHTML" : command, false, command === "formatBlock" ? `<${value?.toLowerCase() ?? "p"}>` : value);
       this.sanitizeEditor();
       this.syncForm();
       this.onSelectionChange();
@@ -531,7 +540,13 @@ export function defineRichTextEditor(): void {
       const shadow = this.shadowRoot ?? this.attachShadow({ mode: "open" });
       const label = document.createElement("label"); label.textContent = this.getAttribute("label") ?? ""; label.hidden = !this.hasAttribute("label"); label.part.add("label");
       const toolbar = document.createElement("div"); toolbar.setAttribute("role", "toolbar"); toolbar.setAttribute("aria-orientation", "horizontal"); toolbar.part.add("toolbar");
-      const actions: Array<[string,string,string?,string?,string?]> = [["Bold","bold"],["Italic","italic"],["Underline","underline"],["Bulleted list","insertUnorderedList",undefined,"• List"],["Numbered list","insertOrderedList",undefined,"1. List"],["Undo","undo"],["Redo","redo"],["Insert table","insertTable"],["Insert image","insertImage",undefined,undefined,"insert-image-label"],["Insert row above","insertRowAbove",undefined,undefined,"insert-row-above-label"],["Insert row below","insertRowBelow",undefined,undefined,"insert-row-below-label"],["Insert column before","insertColumnBefore",undefined,undefined,"insert-column-before-label"],["Insert column after","insertColumnAfter",undefined,undefined,"insert-column-after-label"],["Delete row","deleteRow",undefined,undefined,"delete-row-label"],["Delete column","deleteColumn",undefined,undefined,"delete-column-label"],["Delete table","deleteTable",undefined,undefined,"delete-table-label"],["Link","createLink"]];
+      const format = document.createElement("select"); format.className = "toolbar-format"; format.dataset.command = "formatBlock"; format.dataset.labelAttribute = "format-block-label"; format.setAttribute("aria-label", this.getAttribute("format-block-label") ?? "Text style");
+      for (const [value, attribute, fallback] of [["P", "paragraph-label", "Paragraph"], ["H1", "heading-1-label", "Heading 1"], ["H2", "heading-2-label", "Heading 2"], ["H3", "heading-3-label", "Heading 3"], ["BLOCKQUOTE", "blockquote-label", "Quote"], ["PRE", "preformatted-label", "Preformatted"]]) {
+        const option = document.createElement("option"); option.value = value; option.dataset.labelAttribute = attribute; option.textContent = this.getAttribute(attribute) ?? fallback; format.append(option);
+      }
+      format.addEventListener("change", () => this.command("formatBlock", format.value));
+      toolbar.append(format);
+      const actions: Array<[string,string,string?,string?,string?]> = [["Bold","bold"],["Italic","italic"],["Underline","underline"],["Strikethrough","strikeThrough",undefined,undefined,"strike-label"],["Bulleted list","insertUnorderedList",undefined,"• List"],["Numbered list","insertOrderedList",undefined,"1. List"],["Clear formatting","removeFormat",undefined,undefined,"clear-formatting-label"],["Undo","undo"],["Redo","redo"],["Insert table","insertTable"],["Insert image","insertImage",undefined,undefined,"insert-image-label"],["Insert row above","insertRowAbove",undefined,undefined,"insert-row-above-label"],["Insert row below","insertRowBelow",undefined,undefined,"insert-row-below-label"],["Insert column before","insertColumnBefore",undefined,undefined,"insert-column-before-label"],["Insert column after","insertColumnAfter",undefined,undefined,"insert-column-after-label"],["Delete row","deleteRow",undefined,undefined,"delete-row-label"],["Delete column","deleteColumn",undefined,undefined,"delete-column-label"],["Delete table","deleteTable",undefined,undefined,"delete-table-label"],["Link","createLink"]];
       let tableActions: HTMLDivElement | undefined;
       for (const [title, command, value, , labelAttribute] of actions) {
         const isTableAction = command.startsWith("insertRow") || command.startsWith("insertColumn") || command.startsWith("delete");
@@ -539,7 +554,7 @@ export function defineRichTextEditor(): void {
         const button = document.createElement("button"); button.type = "button"; button.dataset.command = command; button.dataset.fallback = title;
         if (labelAttribute) button.dataset.labelAttribute = labelAttribute;
         if (isTableAction) button.dataset.tableCommand = command;
-        button.tabIndex = toolbar.querySelector("button[data-command]") ? -1 : 0; button.append(createToolbarIcon(command)); button.setAttribute("aria-label", title); button.title = title;
+        button.tabIndex = toolbar.querySelector("button[data-command],select[data-command]") ? -1 : 0; button.append(createToolbarIcon(command)); button.setAttribute("aria-label", title); button.title = title;
         button.addEventListener("mousedown", event => event.preventDefault()); button.addEventListener("click", () => this.command(command, value));
         (isTableAction ? tableActions! : toolbar).append(button);
       }
@@ -569,16 +584,18 @@ export function defineRichTextEditor(): void {
       linkForm.append(linkActions);
       linkForm.addEventListener("submit", event => { event.preventDefault(); this.applyLink(); });
       linkForm.addEventListener("keydown", event => { if ((event as KeyboardEvent).key === "Escape") { event.preventDefault(); event.stopPropagation(); this.closeLinkEditor(false); } });
-      toolbar.addEventListener("focusin", event => { const active = event.target as HTMLButtonElement; toolbar.querySelectorAll<HTMLButtonElement>("button").forEach(button => { button.tabIndex = button === active ? 0 : -1; }); });
+      toolbar.querySelectorAll<HTMLElement>("button[data-command],select[data-command]").forEach((control,index) => { control.tabIndex = index === 0 ? 0 : -1; });
+      toolbar.addEventListener("focusin", event => { const active = event.target; toolbar.querySelectorAll<HTMLElement>("button[data-command],select[data-command]").forEach(control => { control.tabIndex = control === active ? 0 : -1; }); });
       toolbar.addEventListener("keydown", event => {
         const key = (event as KeyboardEvent).key;
-      const buttons = [...toolbar.querySelectorAll<HTMLButtonElement>("button:not(:disabled):not([hidden])")];
-        const current = buttons.indexOf(event.target as HTMLButtonElement);
+        if (event.target instanceof HTMLSelectElement && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(key)) return;
+        const controls = [...toolbar.querySelectorAll<HTMLElement>("button[data-command]:not(:disabled):not([hidden]),select[data-command]:not(:disabled):not([hidden])")];
+        const current = controls.indexOf(event.target as HTMLElement);
         const rtl = getComputedStyle(this).direction === "rtl";
         const step = key === "ArrowRight" ? (rtl ? -1 : 1) : key === "ArrowLeft" ? (rtl ? 1 : -1) : 0;
-        const index = key === "Home" ? 0 : key === "End" ? buttons.length - 1 : step ? (current + step + buttons.length) % buttons.length : -1;
-        if (index < 0 || !buttons[index]) return;
-        event.preventDefault(); buttons[index].tabIndex = 0; buttons.forEach((button, buttonIndex) => { if (buttonIndex !== index) button.tabIndex = -1; }); buttons[index].focus();
+        const index = key === "Home" ? 0 : key === "End" ? controls.length - 1 : step ? (current + step + controls.length) % controls.length : -1;
+        if (index < 0 || !controls[index]) return;
+        event.preventDefault(); controls[index].tabIndex = 0; controls.forEach((control, controlIndex) => { if (controlIndex !== index) control.tabIndex = -1; }); controls[index].focus();
       });
       this.editor = document.createElement("div"); this.editor.setAttribute("role", "textbox"); this.editor.setAttribute("aria-multiline", "true"); this.syncEditorLabel(); const invalid = this.getAttribute("aria-invalid"); if (invalid !== null) this.editor.setAttribute("aria-invalid", invalid); this.editor.contentEditable = this.hasAttribute("disabled") || this.hasAttribute("read-only") ? "false" : this.contentMode === "plain" ? "plaintext-only" : "true"; this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only"))); this.editor.setAttribute("aria-disabled", String(this.hasAttribute("disabled"))); this.editor.setAttribute("aria-required", String(this.hasAttribute("required"))); this.editor.dataset.placeholder = this.getAttribute("placeholder") ?? "Write something…"; this.editor.part.add("editor");
       this.editor.addEventListener("keydown", event => { const key = (event as KeyboardEvent).key.toLowerCase(); const shortcut = (event as KeyboardEvent).metaKey || (event as KeyboardEvent).ctrlKey; if (!shortcut) return; if (key === "z") { event.preventDefault(); this.command((event as KeyboardEvent).shiftKey ? "redo" : "undo"); } else if (key === "y") { event.preventDefault(); this.command("redo"); } });
@@ -607,7 +624,7 @@ export function defineRichTextEditor(): void {
         this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
       });
       this.editor.addEventListener("blur", () => { this.sanitizeEditor(); this.syncForm(); this.dispatchEvent(new CustomEvent("spui-change", { detail: { value: this.value }, bubbles: true, composed: true })); });
-      const style = document.createElement("style"); style.textContent = `${base}:host{display:grid;gap:6px}label{font-weight:600;color:var(--spui-ui-muted,var(--spui-semantic-body-text,inherit))}[role=toolbar]{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:6px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface,#fff)}[role=toolbar][hidden],button[hidden]{display:none}.toolbar-group{display:flex;flex-wrap:wrap;gap:2px;padding-inline-start:4px;border-inline-start:1px solid var(--spui-ui-stroke,#c8c8c8)}.toolbar-group[hidden]{display:none}button{box-sizing:border-box;display:inline-grid;place-items:center;flex:none;width:36px;min-width:36px;min-height:36px;padding:0;border:0;border-radius:var(--spui-control-radius,4px);background:transparent;color:var(--spui-ui-text,inherit);font:inherit;cursor:pointer}button svg{display:block;width:18px;height:18px}button:hover:not(:disabled){background:var(--spui-ui-surface-hover,#eee)}button[aria-pressed=true]{background:color-mix(in srgb,var(--spui-ui-accent,#0078d4) 14%,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,var(--spui-semantic-body-text,#323130))}button:disabled{opacity:.42;cursor:not-allowed}button:focus-visible,[role=textbox]:focus-visible,input:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}[role=textbox]{min-height:120px;box-sizing:border-box;padding:10px 12px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit;line-height:1.5;overflow:auto;caret-color:var(--spui-focus-ring,var(--spui-ui-accent,#005a9e))}[role=textbox]:empty:before{content:attr(data-placeholder);color:var(--spui-ui-muted,#666);pointer-events:none}table{border-collapse:collapse;max-width:100%;margin-block:8px}caption{text-align:start;font-weight:600}td,th{min-width:56px;padding:6px 9px;border:1px solid var(--spui-ui-stroke,#c8c8c8);text-align:start}th{background:var(--spui-ui-surface-hover,#f5f5f5);font-weight:600}a{color:var(--spui-semantic-link,#0f6cbd)}@media(pointer:coarse){[role=toolbar] button{width:44px;min-width:44px;min-height:44px}}@media(forced-colors:active){button{border:1px solid ButtonText}button[aria-pressed=true]{color:Highlight;border-color:Highlight}td,th{border-color:CanvasText}}`;
+      const style = document.createElement("style"); style.textContent = `${base}:host{display:grid;gap:6px}label{font-weight:600;color:var(--spui-ui-muted,var(--spui-semantic-body-text,inherit))}[role=toolbar]{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:6px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface,#fff)}[role=toolbar][hidden],button[hidden]{display:none}.toolbar-group{display:flex;flex-wrap:wrap;gap:2px;padding-inline-start:4px;border-inline-start:1px solid var(--spui-ui-stroke,#c8c8c8)}.toolbar-group[hidden]{display:none}button{box-sizing:border-box;display:inline-grid;place-items:center;flex:none;width:36px;min-width:36px;min-height:36px;padding:0;border:0;border-radius:var(--spui-control-radius,4px);background:transparent;color:var(--spui-ui-text,inherit);font:inherit;cursor:pointer}.toolbar-format{box-sizing:border-box;max-width:172px;min-width:116px;min-height:36px;padding:0 8px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit}.toolbar-format:hover{background:var(--spui-ui-surface-hover,#eee)}button svg{display:block;width:18px;height:18px}button:hover:not(:disabled){background:var(--spui-ui-surface-hover,#eee)}button[aria-pressed=true]{background:color-mix(in srgb,var(--spui-ui-accent,#0078d4) 14%,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,var(--spui-semantic-body-text,#323130))}button:disabled{opacity:.42;cursor:not-allowed}button:focus-visible,select:focus-visible,[role=textbox]:focus-visible,input:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}[role=textbox]{min-height:120px;box-sizing:border-box;padding:10px 12px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit;line-height:1.5;overflow:auto;caret-color:var(--spui-focus-ring,var(--spui-ui-accent,#005a9e))}[role=textbox]:empty:before{content:attr(data-placeholder);color:var(--spui-ui-muted,#666);pointer-events:none}table{border-collapse:collapse;max-width:100%;margin-block:8px}caption{text-align:start;font-weight:600}td,th{min-width:56px;padding:6px 9px;border:1px solid var(--spui-ui-stroke,#c8c8c8);text-align:start}th{background:var(--spui-ui-surface-hover,#f5f5f5);font-weight:600}a{color:var(--spui-semantic-link,#0f6cbd)}@media(pointer:coarse){[role=toolbar] button{width:44px;min-width:44px;min-height:44px}[role=toolbar] select{min-height:44px}}@media(forced-colors:active){select{border:1px solid ButtonText;background:Field;color:FieldText}button{border:1px solid ButtonText}button[aria-pressed=true]{color:Highlight;border-color:Highlight}td,th{border-color:CanvasText}}`;
       style.textContent += `.link-editor{display:flex;flex-wrap:wrap;align-items:end;gap:8px;padding:8px;border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface-hover,var(--spui-ui-surface,#fff))}.link-editor[hidden]{display:none}.link-field{display:grid;flex:1 1 150px;gap:4px;min-width:0;color:var(--spui-ui-text,inherit);font-size:13px}.link-field input{box-sizing:border-box;width:100%;min-width:0;min-height:32px;padding:5px 8px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#8a8886));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit)}.link-actions{display:flex;flex-wrap:wrap;gap:4px}.link-actions button{border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,4px);background:var(--spui-ui-surface,#fff)}.link-actions [data-link-action=apply]{border-color:transparent;background:var(--spui-semantic-primary-button-background,var(--spui-ui-accent,#0078d4));color:var(--spui-ui-accent-text,#fff)}.link-error{flex:1 0 100%;color:var(--spui-ui-danger,var(--spui-semantic-error-text,#c50f1f));font-size:13px}`;
       style.textContent += `.link-new-tab{display:inline-flex;flex:1 0 100%;align-items:center;gap:8px;color:var(--spui-ui-text,inherit);font-size:13px}.link-new-tab input{width:16px;height:16px;min-height:16px;margin:0;accent-color:var(--spui-ui-accent,#0078d4)}`;
       style.textContent += `.link-picker-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}`;
@@ -624,13 +641,19 @@ export function defineRichTextEditor(): void {
       this.imageInput?.setAttribute("aria-label", this.getAttribute("image-input-label") ?? "Choose image");
       const label = this.getAttribute("label") ?? "Rich text";
       toolbar.setAttribute("aria-label", this.getAttribute("toolbar-label") ?? `${label} formatting`);
-      const attrs = ["bold-label","italic-label","underline-label","bullet-list-label","number-list-label","undo-label","redo-label","insert-table-label","insert-image-label","insert-row-above-label","insert-row-below-label","insert-column-before-label","insert-column-after-label","delete-row-label","delete-column-label","delete-table-label","link-label"];
+      const attrs = ["bold-label","italic-label","underline-label","strike-label","bullet-list-label","number-list-label","clear-formatting-label","undo-label","redo-label","insert-table-label","insert-image-label","insert-row-above-label","insert-row-below-label","insert-column-before-label","insert-column-after-label","delete-row-label","delete-column-label","delete-table-label","link-label"];
       toolbar.querySelectorAll<HTMLButtonElement>("button[data-command]").forEach((button,index) => {
         const attribute = button.dataset.labelAttribute ?? attrs[index];
         const text = this.getAttribute(attribute) ?? button.dataset.fallback ?? "";
         button.setAttribute("aria-label", text);
         button.title = text;
       });
+      const format = toolbar.querySelector<HTMLSelectElement>('select[data-command="formatBlock"]');
+      if (format) {
+        format.setAttribute("aria-label", this.getAttribute("format-block-label") ?? "Text style");
+        const labels: Record<string, [string, string]> = { P: ["paragraph-label", "Paragraph"], H1: ["heading-1-label", "Heading 1"], H2: ["heading-2-label", "Heading 2"], H3: ["heading-3-label", "Heading 3"], BLOCKQUOTE: ["blockquote-label", "Quote"], PRE: ["preformatted-label", "Preformatted"] };
+        format.querySelectorAll<HTMLOptionElement>("option").forEach(option => { const [attribute, fallback] = labels[option.value]; option.textContent = this.getAttribute(attribute) ?? fallback; });
+      }
       if (this.linkForm) {
         this.linkForm.setAttribute("aria-label", this.getAttribute("link-dialog-label") ?? "Edit link");
         const fieldFallbacks: Record<string, string> = { "link-prompt": "Link URL", "link-text-label": "Display text", "link-title-label": "Title" };
