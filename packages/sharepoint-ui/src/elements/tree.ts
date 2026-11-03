@@ -65,7 +65,7 @@ export function defineTree(): void {
       const rows = this.visible();
       if (!rows.some(row => row.key === this.activeKey)) this.activeKey = rows[0]?.key ?? "";
       this.root.replaceChildren();
-      this.root.setAttribute("aria-label", this.getAttribute("label") || this.getAttribute("aria-label") || "Tree");
+      this.root.setAttribute("aria-label", this.getAttribute("aria-label") || this.getAttribute("label") || "Tree");
       if (this.mode() === "multiple") this.root.setAttribute("aria-multiselectable", "true"); else this.root.removeAttribute("aria-multiselectable");
       if (!rows.length) {
         const empty = document.createElement("div"); empty.className = "empty"; empty.textContent = this.getAttribute("empty-label") || "No items"; this.root.append(empty); return;
