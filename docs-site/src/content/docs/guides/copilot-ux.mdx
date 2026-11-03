@@ -13,17 +13,17 @@ This preview uses SharePoint UI's real web components. Search, theme, direction,
 
 For the tenant-connected implementation, start with the [buildable SPFx 1.24.1 Copilot example on GitHub](https://github.com/vystartasv/sharepoint-ui/tree/main/examples/spfx124-copilot-ux). It reads and updates a real SharePoint list with the signed-in user's permissions, applies SharePoint `ThemeProvider` tokens, and updates Copilot's model context as the visible view changes. The README has the run and deployment steps.
 
-To generate this pattern directly with the [SPFx CLI custom template](https://github.com/vystartasv/sharepoint-ui/tree/main/templates/spfx-fast-copilot-access-review), run this from a repository checkout:
+To scaffold this pattern from GitHub without cloning the library repository, run:
 
 ```sh
 npx --yes @microsoft/spfx-cli@0.1.0-pre.3 create \
   --template spfx-fast-copilot-access-review \
+  --template-url https://github.com/vystartasv/sharepoint-ui/tree/main \
   --library-name spfx-fast-access-review \
   --component-name "Access review" \
   --component-description "Review SharePoint access items in Copilot" \
   --solution-name spfx-fast-access-review \
-  --package-manager npm \
-  --local-source ./templates
+  --package-manager npm
 ```
 
 :::note[Availability]

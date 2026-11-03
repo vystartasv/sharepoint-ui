@@ -134,10 +134,10 @@ With the current Microsoft SPFx CLI:
 ```sh
 spfx create \
   --template sharepoint-ui-webpart \
+  --template-url https://github.com/vystartasv/sharepoint-ui/tree/main \
   --library-name my-sharepoint-app \
   --component-name "My SharePoint App" \
-  --component-description "My SharePoint experience" \
-  --local-source ./templates
+  --component-description "My SharePoint experience"
 ```
 
 The generated app depends on `@spfx-fast/sharepoint-ui@^0.4.2`.
@@ -147,15 +147,15 @@ For a no-React Microsoft 365 Copilot UX component, use the framework-free access
 ```sh
 npx --yes @microsoft/spfx-cli@0.1.0-pre.3 create \
   --template spfx-fast-copilot-access-review \
+  --template-url https://github.com/vystartasv/sharepoint-ui/tree/main \
   --library-name spfx-fast-access-review \
   --component-name "Access review" \
   --component-description "Review SharePoint access items in Copilot" \
   --solution-name spfx-fast-access-review \
-  --package-manager npm \
-  --local-source ./templates
+  --package-manager npm
 ```
 
-The generated Copilot app reads and updates a SharePoint list, inherits tenant theme tokens, follows the current locale's text direction, and syncs visible state with Copilot. See [the template setup](templates/README.md) for remote-source usage and the current CLI category limitation.
+The generated Copilot app reads and updates a SharePoint list, inherits tenant theme tokens, follows the current locale's text direction, and syncs visible state with Copilot. See [the template setup](templates/README.md) for local use and the current CLI category limitation.
 
 ## Theme contract
 
