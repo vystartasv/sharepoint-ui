@@ -144,17 +144,18 @@ Use `null` to clear nullable values. Read-only fields and empty values for requi
 Pass the field metadata and current values keyed by SharePoint `InternalName` to `serializeSharePointFieldValues()`:
 
 ```ts
-import { serializeSharePointFieldValues } from "@spfx-fast/sharepoint-ui/sharepoint-fields";
+import { getSharePointListItemUrl, serializeSharePointFieldValues } from "@spfx-fast/sharepoint-ui/sharepoint-fields";
 
 const patch = serializeSharePointFieldValues(fields, {
   Title: "Quarterly access review",
   Approved: true,
   Summary: null // explicitly clear this optional field
 });
-await saveItem(patch);
+const itemUrl = getSharePointListItemUrl(webUrl, listId, itemId);
+await saveItem(itemUrl, patch);
 ```
 
-Only supplied values are included, so omitted fields remain untouched in a PATCH. Explicit `null` clears a nullable value; empty required values, read-only writes, unknown field names, property collisions, and invalid bounds throw before the request. Missing required fields are allowed in partial edits; new-item forms should include every required value.
+Only supplied values are included, so omitted fields remain untouched in a PATCH. Explicit `null` clears a nullable value; empty required values, read-only writes, unknown field names, property collisions, and invalid bounds throw before the request. Missing required fields are allowed in partial edits; new-item forms should include every required value. `getSharePointListItemUrl()` validates the list GUID and positive item ID. The host still sends the authorized request and supplies the list item's entity type and ETag as required by its REST update strategy; see Microsoft's [list-item REST guidance](https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-lists-and-list-items-with-rest#update-list-item).
 
 ## Render with existing controls
 

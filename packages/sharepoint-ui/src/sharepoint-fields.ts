@@ -191,13 +191,21 @@ export function getSharePointFieldAdapter(field: SharePointFieldMetadata): Share
 /** Build a bounded REST request for a list's field definitions and their type-specific metadata. */
 export function getSharePointFieldMetadataUrl(listWebUrl: string, listId: string, pageSize = 100): string {
   if (!Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 500) throw new RangeError("pageSize must be an integer from 1 to 500.");
-  const normalizedListId = listId.trim().replace(/[{}]/g, "");
-  if (!/^[\da-f]{8}-(?:[\da-f]{4}-){3}[\da-f]{12}$/i.test(normalizedListId)) throw new TypeError("listId must be a SharePoint list GUID.");
-
-  const url = new URL(listWebUrl);
-  if (!/^https?:$/.test(url.protocol) || url.username || url.password) throw new TypeError("listWebUrl must be an HTTP(S) SharePoint web URL.");
+  const normalizedListId = normalizeSharePointListId(listId, "listId must be a SharePoint list GUID.");
+  const url = parseSharePointWebUrl(listWebUrl, "listWebUrl");
   url.pathname = `${url.pathname.replace(/\/+$/, "")}/_api/web/lists(guid'${normalizedListId}')/fields`;
   url.search = new URLSearchParams({ "$select": "*", "$top": String(pageSize) }).toString();
+  url.hash = "";
+  return url.toString();
+}
+
+/** Build the REST endpoint for a single item in a SharePoint list. */
+export function getSharePointListItemUrl(webUrl: string, listId: string, itemId: number): string {
+  if (!Number.isSafeInteger(itemId) || itemId < 1) throw new RangeError("itemId must be a positive safe integer.");
+  const normalizedListId = normalizeSharePointListId(listId, "listId must be a SharePoint list GUID.");
+  const url = parseSharePointWebUrl(webUrl, "webUrl");
+  url.pathname = `${url.pathname.replace(/\/+$/, "")}/_api/web/lists(guid'${normalizedListId}')/items(${itemId})`;
+  url.search = "";
   url.hash = "";
   return url.toString();
 }
@@ -209,12 +217,10 @@ export function getSharePointLookupOptionsUrl(field: SharePointFieldMetadata, lo
   if (adapter.control !== "combobox" || !source) throw new TypeError("This field does not include SharePoint lookup-list metadata.");
   if (!Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 500) throw new RangeError("pageSize must be an integer from 1 to 500.");
 
-  const listId = source.listId.replace(/[{}]/g, "");
-  if (!/^[\da-f]{8}-(?:[\da-f]{4}-){3}[\da-f]{12}$/i.test(listId)) throw new TypeError("LookupList must contain a SharePoint list GUID.");
+  const listId = normalizeSharePointListId(source.listId, "LookupList must contain a SharePoint list GUID.");
   if (!/^[A-Za-z_][A-Za-z\d_]*$/.test(source.displayField)) throw new TypeError("LookupField must be a SharePoint internal field name.");
 
-  const url = new URL(lookupWebUrl);
-  if (!/^https?:$/.test(url.protocol) || url.username || url.password) throw new TypeError("lookupWebUrl must be an HTTP(S) SharePoint web URL.");
+  const url = parseSharePointWebUrl(lookupWebUrl, "lookupWebUrl");
   url.pathname = `${url.pathname.replace(/\/+$/, "")}/_api/web/lists(guid'${listId}')/items`;
   url.search = new URLSearchParams({
     "$select": `Id,${source.displayField}`,
@@ -396,6 +402,18 @@ function isSharePointFieldUrl(value: string): boolean {
   } catch {
     return false;
   }
+}
+
+function normalizeSharePointListId(value: string, errorMessage: string): string {
+  const normalized = value.trim().replace(/[{}]/g, "");
+  if (!/^[\da-f]{8}-(?:[\da-f]{4}-){3}[\da-f]{12}$/i.test(normalized)) throw new TypeError(errorMessage);
+  return normalized;
+}
+
+function parseSharePointWebUrl(value: string, label: string): URL {
+  const url = new URL(value);
+  if (!/^https?:$/.test(url.protocol) || url.username || url.password) throw new TypeError(`${label} must be an HTTP(S) SharePoint web URL.`);
+  return url;
 }
 
 function isSharePointUrlValue(value: SharePointFieldValue): value is SharePointUrlValue {
