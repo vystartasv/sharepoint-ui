@@ -145,6 +145,7 @@
     "verify:react-native-mouse-pointer-events": "npm run build:library && node scripts/verify-react-native-mouse-pointer-events.mjs",
     "verify:react-native-enter-leave-events": "npm run build:library && node scripts/verify-react-native-enter-leave-events.mjs",
     "verify:react-native-additional-events": "npm run build:library && node scripts/verify-react-native-additional-events.mjs",
+    "verify:react-native-form-control-events": "npm run build:library && node scripts/verify-react-native-form-control-events.mjs",
     "verify:button-polymorphic": "npm run build:library && node scripts/verify-button-polymorphic.mjs",
     "verify:compound-button-parity": "npm run build:library && node scripts/verify-compound-button-parity.mjs",
     "verify:toggle-button-parity": "npm run build:library && node scripts/verify-toggle-button-parity.mjs",

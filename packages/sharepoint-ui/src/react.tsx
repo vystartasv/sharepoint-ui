@@ -264,7 +264,7 @@ function useSpuiEvent(ref: React.RefObject<HTMLElement | null>, eventName: strin
 }
 
 type NativeMousePointerEventProps<T extends Element> = Pick<React.DOMAttributes<T>, "onAuxClick" | "onAuxClickCapture" | "onContextMenu" | "onContextMenuCapture" | "onDoubleClick" | "onDoubleClickCapture" | "onMouseDown" | "onMouseDownCapture" | "onMouseEnter" | "onMouseLeave" | "onMouseMove" | "onMouseMoveCapture" | "onMouseOut" | "onMouseOutCapture" | "onMouseOver" | "onMouseOverCapture" | "onMouseUp" | "onMouseUpCapture" | "onGotPointerCapture" | "onGotPointerCaptureCapture" | "onLostPointerCapture" | "onLostPointerCaptureCapture" | "onPointerCancel" | "onPointerCancelCapture" | "onPointerDown" | "onPointerDownCapture" | "onPointerEnter" | "onPointerLeave" | "onPointerMove" | "onPointerMoveCapture" | "onPointerOut" | "onPointerOutCapture" | "onPointerOver" | "onPointerOverCapture" | "onPointerUp" | "onPointerUpCapture">;
-type NativeAdditionalEventProps<T extends Element> = Pick<React.DOMAttributes<T>, "onChange" | "onChangeCapture" | "onCopy" | "onCopyCapture" | "onCut" | "onCutCapture" | "onPaste" | "onPasteCapture" | "onCompositionEnd" | "onCompositionEndCapture" | "onCompositionStart" | "onCompositionStartCapture" | "onCompositionUpdate" | "onCompositionUpdateCapture" | "onBeforeInput" | "onBeforeInputCapture" | "onInput" | "onInputCapture" | "onDrag" | "onDragCapture" | "onDragEnd" | "onDragEndCapture" | "onDragEnter" | "onDragEnterCapture" | "onDragExit" | "onDragExitCapture" | "onDragLeave" | "onDragLeaveCapture" | "onDragOver" | "onDragOverCapture" | "onDragStart" | "onDragStartCapture" | "onDrop" | "onDropCapture" | "onTouchCancel" | "onTouchCancelCapture" | "onTouchEnd" | "onTouchEndCapture" | "onTouchMove" | "onTouchMoveCapture" | "onTouchStart" | "onTouchStartCapture" | "onWheel" | "onWheelCapture" | "onAnimationStart" | "onAnimationStartCapture" | "onAnimationEnd" | "onAnimationEndCapture" | "onAnimationIteration" | "onAnimationIterationCapture" | "onTransitionEnd" | "onTransitionEndCapture">;
+type NativeAdditionalEventProps<T extends Element> = Pick<React.DOMAttributes<T>, "onInvalid" | "onInvalidCapture" | "onChange" | "onChangeCapture" | "onCopy" | "onCopyCapture" | "onCut" | "onCutCapture" | "onPaste" | "onPasteCapture" | "onCompositionEnd" | "onCompositionEndCapture" | "onCompositionStart" | "onCompositionStartCapture" | "onCompositionUpdate" | "onCompositionUpdateCapture" | "onBeforeInput" | "onBeforeInputCapture" | "onInput" | "onInputCapture" | "onDrag" | "onDragCapture" | "onDragEnd" | "onDragEndCapture" | "onDragEnter" | "onDragEnterCapture" | "onDragExit" | "onDragExitCapture" | "onDragLeave" | "onDragLeaveCapture" | "onDragOver" | "onDragOverCapture" | "onDragStart" | "onDragStartCapture" | "onDrop" | "onDropCapture" | "onTouchCancel" | "onTouchCancelCapture" | "onTouchEnd" | "onTouchEndCapture" | "onTouchMove" | "onTouchMoveCapture" | "onTouchStart" | "onTouchStartCapture" | "onWheel" | "onWheelCapture" | "onAnimationStart" | "onAnimationStartCapture" | "onAnimationEnd" | "onAnimationEndCapture" | "onAnimationIteration" | "onAnimationIterationCapture" | "onTransitionEnd" | "onTransitionEndCapture">;
 type NativeRootEventProps<T extends Element> = Pick<React.DOMAttributes<T>, "onKeyDown" | "onKeyDownCapture" | "onKeyUp" | "onKeyUpCapture" | "onKeyPress" | "onKeyPressCapture" | "onFocus" | "onFocusCapture" | "onBlur" | "onBlurCapture"> & NativeMousePointerEventProps<T> & NativeAdditionalEventProps<T>;
 function isComposedDescendant(root: Element, target: EventTarget | null): boolean {
   if (!(target instanceof Node)) return false;
@@ -280,7 +280,7 @@ function isComposedDescendant(root: Element, target: EventTarget | null): boolea
   }
   return false;
 }
-type NativeEventKind = "mouse" | "keyboard" | "focus" | "pointer" | "drag" | "touch" | "wheel" | "animation" | "transition" | "clipboard" | "composition" | "input" | "change";
+type NativeEventKind = "mouse" | "keyboard" | "focus" | "pointer" | "drag" | "touch" | "wheel" | "animation" | "transition" | "clipboard" | "composition" | "input" | "change" | "invalid";
 const nativeEventBindings: ReadonlyArray<{ eventName: string; prop: string; capture: boolean; kind: NativeEventKind }> = [
   ["click", "onClick", false, "mouse"], ["click", "onClickCapture", true, "mouse"],
   ["keydown", "onKeyDown", false, "keyboard"], ["keydown", "onKeyDownCapture", true, "keyboard"], ["keyup", "onKeyUp", false, "keyboard"], ["keyup", "onKeyUpCapture", true, "keyboard"], ["keypress", "onKeyPress", false, "keyboard"], ["keypress", "onKeyPressCapture", true, "keyboard"],
@@ -292,16 +292,20 @@ const nativeEventBindings: ReadonlyArray<{ eventName: string; prop: string; capt
   ["compositionend", "onCompositionEnd", false, "composition"], ["compositionend", "onCompositionEndCapture", true, "composition"], ["compositionstart", "onCompositionStart", false, "composition"], ["compositionstart", "onCompositionStartCapture", true, "composition"], ["compositionupdate", "onCompositionUpdate", false, "composition"], ["compositionupdate", "onCompositionUpdateCapture", true, "composition"],
   ["beforeinput", "onBeforeInput", false, "input"], ["beforeinput", "onBeforeInputCapture", true, "input"], ["input", "onInput", false, "input"], ["input", "onInputCapture", true, "input"],
   ["input", "onChange", false, "change"], ["input", "onChangeCapture", true, "change"],
+  ["invalid", "onInvalid", false, "invalid"], ["invalid", "onInvalidCapture", true, "invalid"],
   ["touchcancel", "onTouchCancel", false, "touch"], ["touchcancel", "onTouchCancelCapture", true, "touch"], ["touchend", "onTouchEnd", false, "touch"], ["touchend", "onTouchEndCapture", true, "touch"], ["touchmove", "onTouchMove", false, "touch"], ["touchmove", "onTouchMoveCapture", true, "touch"], ["touchstart", "onTouchStart", false, "touch"], ["touchstart", "onTouchStartCapture", true, "touch"],
   ["wheel", "onWheel", false, "wheel"], ["wheel", "onWheelCapture", true, "wheel"],
   ["animationstart", "onAnimationStart", false, "animation"], ["animationstart", "onAnimationStartCapture", true, "animation"], ["animationend", "onAnimationEnd", false, "animation"], ["animationend", "onAnimationEndCapture", true, "animation"], ["animationiteration", "onAnimationIteration", false, "animation"], ["animationiteration", "onAnimationIterationCapture", true, "animation"],
   ["transitionend", "onTransitionEnd", false, "transition"], ["transitionend", "onTransitionEndCapture", true, "transition"],
 ].map(([eventName, prop, capture, kind]) => ({ eventName, prop, capture, kind })) as ReadonlyArray<{ eventName: string; prop: string; capture: boolean; kind: NativeEventKind }>;
 const nativeEventPropNames = new Set(nativeEventBindings.map(binding => binding.prop));
-function nativeControlHostProps(props: Record<string, unknown>): Record<string, unknown> {
+function withoutNativeControlEventProps(props: Record<string, unknown>): Record<string, unknown> {
   const hostProps = { ...props };
   for (const prop of nativeEventPropNames) delete hostProps[prop];
-  return useCustomElementProps(hostProps);
+  return hostProps;
+}
+function nativeControlHostProps(props: Record<string, unknown>): Record<string, unknown> {
+  return useCustomElementProps(withoutNativeControlEventProps(props));
 }
 function useNativeControlEvents<T extends Element>(ref: React.RefObject<HTMLElement | null>, selector: string, onClick?: React.MouseEventHandler<T>, onClickCapture?: React.MouseEventHandler<T>, events?: NativeRootEventProps<T>): void {
   const handlers = { ...events, onClick, onClickCapture } as Record<string, unknown>;
@@ -319,9 +323,11 @@ function useNativeControlEvents<T extends Element>(ref: React.RefObject<HTMLElem
     for (const binding of activeBindings) {
       const listener = (event: Event): void => {
         const path = event.composedPath();
-        const control = path.find((entry): entry is Element => entry instanceof Element && entry.getRootNode() === shadowRoot && entry.matches(selector));
+        const nativeControl = path.find((entry): entry is Element => entry instanceof Element && (entry.getRootNode() === shadowRoot || host.contains(entry)) && entry.matches(selector));
+        const hostInvalid = binding.kind === "invalid" && event.target === host;
+        const control = nativeControl ?? (hostInvalid ? shadowRoot.querySelector(selector) : null);
         if (!control) return;
-        const target = path.find((entry): entry is Element => entry instanceof Element && !(entry instanceof HTMLSlotElement)) ?? control;
+        const target = hostInvalid ? control : path.find((entry): entry is Element => entry instanceof Element && !(entry instanceof HTMLSlotElement)) ?? control;
         const bridged = createReactEventBridge(event, event, control as T, target);
         if (binding.kind === "focus") Object.assign(bridged, { type: event.type === "focusin" ? "focus" : "blur" });
         if (binding.kind === "change") Object.assign(bridged, { type: "change" });
@@ -1246,12 +1252,13 @@ export const ProgressBar = /* @__PURE__ */ React.forwardRef<HTMLElement, Element
 
 export type SelectChangeEvent = React.ChangeEvent<HTMLSelectElement>;
 export type { SelectAppearance, SelectSize, SelectChangeData } from "./elements/select.js";
-export type SelectProps = Omit<ElementProps, "onChange"> & { label?: string; value?: string | number | readonly string[]; defaultValue?: string | number | readonly string[]; autoComplete?: string; required?: boolean; disabled?: boolean; name?: string; form?: string; multiple?: boolean; size?: "small" | "medium" | "large"; appearance?: "outline" | "underline" | "filled-darker" | "filled-lighter"; icon?: React.ReactNode; select?: React.ReactElement<React.SelectHTMLAttributes<HTMLSelectElement>> | React.SelectHTMLAttributes<HTMLSelectElement>; onValueChange?: (value: string) => void; onChange?: (event: SelectChangeEvent, data: { value: string }) => void; children?: React.ReactNode };
+export type SelectProps = Omit<NativeClickHostProps<HTMLSelectElement>, "onChange"> & { label?: string; value?: string | number | readonly string[]; defaultValue?: string | number | readonly string[]; autoComplete?: string; required?: boolean; disabled?: boolean; name?: string; form?: string; multiple?: boolean; size?: "small" | "medium" | "large"; appearance?: "outline" | "underline" | "filled-darker" | "filled-lighter"; icon?: React.ReactNode; select?: React.ReactElement<React.SelectHTMLAttributes<HTMLSelectElement>> | React.SelectHTMLAttributes<HTMLSelectElement>; onValueChange?: (value: string) => void; onChange?: (event: SelectChangeEvent, data: { value: string }) => void; children?: React.ReactNode };
 
 export const Select = /* @__PURE__ */ React.forwardRef<HTMLElement, SelectProps>(function Select(inputProps: SelectProps, forwardedRef): React.ReactElement {
   const { label, value, defaultValue, autoComplete, required, disabled, name, form, multiple, size = "medium", appearance = "outline", icon, select, onValueChange, onChange, children, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true, supportsSize: true });
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
+  useNativeControlEvents(ref, "select", props.onClick, props.onClickCapture, props);
   ensureDefined(defineSelect);
   useSpuiEvent(ref, "spui-change", (rawDetail, event) => {
     const detail = rawDetail as SpuiEventDetail & { optionText?: string };
@@ -1274,16 +1281,17 @@ export const Select = /* @__PURE__ */ React.forwardRef<HTMLElement, SelectProps>
       : React.createElement("select", { ...nativeSelectProps, ...select, slot: "select" }, children);
   const hostValue = value === undefined || Array.isArray(value) ? undefined : String(value);
   const hostDefaultValue = defaultValue === undefined || Array.isArray(defaultValue) ? undefined : String(defaultValue);
-  return React.createElement("spui-select", useCustomElementProps({ ...props, ref, label, value: hostValue, "default-value": hostDefaultValue, "auto-complete": autoComplete, size, appearance, required, disabled, name, form, multiple: slotMultiple === undefined && effectiveMultiple ? true : undefined }), selectSlot, icon == null ? null : React.createElement("span", { slot: "icon", "aria-hidden": true }, icon));
+  return React.createElement("spui-select", nativeControlHostProps({ ...props, ref, label, value: hostValue, "default-value": hostDefaultValue, "auto-complete": autoComplete, size, appearance, required, disabled, name, form, multiple: slotMultiple === undefined && effectiveMultiple ? true : undefined }), selectSlot, icon == null ? null : React.createElement("span", { slot: "icon", "aria-hidden": true }, icon));
 });
 
-export type RadioGroupProps = Omit<ElementProps, "onChange"> & { label?: string; value?: string; defaultValue?: string; name?: string; form?: string; required?: boolean; disabled?: boolean; layout?: "vertical" | "horizontal" | "horizontal-stacked"; orientation?: "vertical" | "horizontal"; onValueChange?: (value: string) => void; onChange?: (event: React.FormEvent<HTMLDivElement>, data: { value: string }) => void };
+export type RadioGroupProps = Omit<NativeClickHostProps<HTMLDivElement>, "onChange"> & { label?: string; value?: string; defaultValue?: string; name?: string; form?: string; required?: boolean; disabled?: boolean; layout?: "vertical" | "horizontal" | "horizontal-stacked"; orientation?: "vertical" | "horizontal"; onValueChange?: (value: string) => void; onChange?: (event: React.FormEvent<HTMLDivElement>, data: { value: string }) => void };
 
 export const RadioGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, RadioGroupProps>(function RadioGroup(inputProps: RadioGroupProps, forwardedRef): React.ReactElement {
   const { label, value, defaultValue, name, required, disabled, layout, orientation, onValueChange, onChange, children, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true });
   const ref = React.useRef<HTMLElement>(null)
   const callbackRoot = React.useRef<HTMLDivElement>(null);
   useExposeHostRef(ref, forwardedRef);;
+  useNativeControlEvents(ref, "fieldset", props.onClick, props.onClickCapture, props);
   ensureDefined(defineRadioGroup);
   useSpuiEvent(ref, "spui-change", (detail, event) => {
     const nextValue = String(detail.value ?? "");
@@ -1299,7 +1307,7 @@ export const RadioGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, RadioGro
     if (value !== undefined) element.value = value;
     else if (defaultValue !== undefined) element.defaultValue = defaultValue;
   }, [value, defaultValue]);
-  return React.createElement("div", { ref: callbackRoot, style: { display: "contents" }, "data-spui-radio-group-callback-root": "" }, React.createElement("spui-radio-group", useCustomElementProps({ ...props, ref, label, value, name, required, disabled, layout: layout ?? orientation ?? "vertical", orientation: undefined, "default-value": defaultValue }), children));
+  return React.createElement("div", { ref: callbackRoot, style: { display: "contents" }, "data-spui-radio-group-callback-root": "" }, React.createElement("spui-radio-group", nativeControlHostProps({ ...props, ref, label, value, name, required, disabled, layout: layout ?? orientation ?? "vertical", orientation: undefined, "default-value": defaultValue }), children));
 });
 
 export type RadioInputSlot = React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>;
@@ -1330,12 +1338,13 @@ export const Radio = /* @__PURE__ */ React.forwardRef<HTMLElement, RadioProps>(f
 
 export type SpinButtonChangeEvent = React.MouseEvent<HTMLButtonElement> | React.ChangeEvent<HTMLElement> | React.FocusEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>;
 export type SpinButtonOnChangeData = { value?: number | null; displayValue?: string };
-export type SpinButtonProps = Omit<ElementProps, "onChange"> & { label?: string; value?: number | null; defaultValue?: number | null; displayValue?: string; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; incrementButton?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; decrementButton?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; min?: number; max?: number; step?: number; stepPage?: number; precision?: number; appearance?: "outline" | "underline" | "filled-darker" | "filled-lighter"; size?: "small" | "medium"; incrementLabel?: string; decrementLabel?: string; name?: string; form?: string; required?: boolean; disabled?: boolean; readOnly?: boolean; onValueChange?: (value: number | undefined) => void; onChange?: (event: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => void };
+export type SpinButtonProps = Omit<NativeClickHostProps<HTMLInputElement>, "onChange"> & { label?: string; value?: number | null; defaultValue?: number | null; displayValue?: string; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; incrementButton?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; decrementButton?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; min?: number; max?: number; step?: number; stepPage?: number; precision?: number; appearance?: "outline" | "underline" | "filled-darker" | "filled-lighter"; size?: "small" | "medium"; incrementLabel?: string; decrementLabel?: string; name?: string; form?: string; required?: boolean; disabled?: boolean; readOnly?: boolean; onValueChange?: (value: number | undefined) => void; onChange?: (event: SpinButtonChangeEvent, data: SpinButtonOnChangeData) => void };
 
 export const SpinButton = /* @__PURE__ */ React.forwardRef<HTMLElement, SpinButtonProps>(function SpinButton(inputProps: SpinButtonProps, forwardedRef): React.ReactElement {
   const { label, value, defaultValue, displayValue, input, incrementButton, decrementButton, min, max, step, stepPage, precision, appearance = "outline", size = "medium", incrementLabel, decrementLabel, name, required, disabled, readOnly, onValueChange, onChange, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true, supportsSize: true });
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
+  useNativeControlEvents(ref, "input,button", props.onClick, props.onClickCapture, props);
   const context = React.useContext(UIContext);
   ensureDefined(defineSpinButton);
   useSpuiEvent(ref, "spui-change", detail => onValueChange?.(detail.value === "" || detail.value === undefined ? undefined : Number(detail.value)));
@@ -1354,16 +1363,17 @@ export const SpinButton = /* @__PURE__ */ React.forwardRef<HTMLElement, SpinButt
   const buttonSlot = (button: SpinButtonProps["incrementButton"], slot: "incrementButton" | "decrementButton", label: string): React.ReactNode => button == null ? null : React.isValidElement(button)
     ? React.cloneElement(button as React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>>, { slot, type: button.props.type ?? "button", "aria-label": button.props["aria-label"] ?? label } as React.ButtonHTMLAttributes<HTMLButtonElement> & { slot: string })
     : React.createElement("button", { ...button, slot, type: button.type ?? "button", "aria-label": button["aria-label"] ?? label });
-  return React.createElement("spui-spin-button", useCustomElementProps({ ...props, ref, label, value, "default-value": defaultValue, "display-value": value !== undefined ? displayValue : undefined, min, max, step, "step-page": stepPage, precision, appearance, size, "increment-label": resolvedIncrementLabel, "decrement-label": resolvedDecrementLabel, name, required, disabled, "read-only": readOnly }), inputSlot, buttonSlot(incrementButton, "incrementButton", resolvedIncrementLabel), buttonSlot(decrementButton, "decrementButton", resolvedDecrementLabel));
+  return React.createElement("spui-spin-button", nativeControlHostProps({ ...props, ref, label, value, "default-value": defaultValue, "display-value": value !== undefined ? displayValue : undefined, min, max, step, "step-page": stepPage, precision, appearance, size, "increment-label": resolvedIncrementLabel, "decrement-label": resolvedDecrementLabel, name, required, disabled, "read-only": readOnly }), inputSlot, buttonSlot(incrementButton, "incrementButton", resolvedIncrementLabel), buttonSlot(decrementButton, "decrementButton", resolvedDecrementLabel));
 });
 
 export type SliderOnChangeData = { value: number };
-export type SliderProps = Omit<ElementProps, "onChange"> & { label?: string; value?: number; defaultValue?: number; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; rail?: React.ReactNode; thumb?: React.ReactNode; min?: number; max?: number; step?: number; size?: "small" | "medium"; vertical?: boolean; name?: string; form?: string; disabled?: boolean; valueText?: string; onValueChange?: (value: number) => void; onChange?: (event: React.ChangeEvent<HTMLInputElement>, data: SliderOnChangeData) => void };
+export type SliderProps = Omit<NativeClickHostProps<HTMLInputElement>, "onChange"> & { label?: string; value?: number; defaultValue?: number; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; rail?: React.ReactNode; thumb?: React.ReactNode; min?: number; max?: number; step?: number; size?: "small" | "medium"; vertical?: boolean; name?: string; form?: string; disabled?: boolean; valueText?: string; onValueChange?: (value: number) => void; onChange?: (event: React.ChangeEvent<HTMLInputElement>, data: SliderOnChangeData) => void };
 
 export const Slider = /* @__PURE__ */ React.forwardRef<HTMLElement, SliderProps>(function Slider(inputProps: SliderProps, forwardedRef): React.ReactElement {
   const { label, value, defaultValue, input, rail, thumb, min = 0, max = 100, step = 1, size = "medium", vertical, name, disabled, valueText, onValueChange, onChange, ...props } = useFieldControlProps_unstable(inputProps, { supportsSize: true });
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
+  useNativeControlEvents(ref, "input", props.onClick, props.onClickCapture, props);
   ensureDefined(defineSlider);
   useSpuiEvent(ref, "spui-change", (detail, event) => {
     const nextValue = Number(detail.value);
@@ -1374,7 +1384,7 @@ export const Slider = /* @__PURE__ */ React.forwardRef<HTMLElement, SliderProps>
   const inputSlot = input == null ? null : React.isValidElement(input)
     ? React.cloneElement(input as React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>>, { slot: "input" } as React.InputHTMLAttributes<HTMLInputElement> & { slot: string })
     : React.createElement("input", { ...input, slot: "input" });
-  return React.createElement("spui-slider", useCustomElementProps({ ...props, ref, label, value, "default-value": defaultValue, min, max, step, size, vertical, name, disabled, "aria-valuetext": valueText }), inputSlot, rail == null ? null : React.createElement("span", { slot: "rail", "aria-hidden": true }, rail), thumb == null ? null : React.createElement("span", { slot: "thumb", "aria-hidden": true }, thumb));
+  return React.createElement("spui-slider", nativeControlHostProps({ ...props, ref, label, value, "default-value": defaultValue, min, max, step, size, vertical, name, disabled, "aria-valuetext": valueText }), inputSlot, rail == null ? null : React.createElement("span", { slot: "rail", "aria-hidden": true }, rail), thumb == null ? null : React.createElement("span", { slot: "thumb", "aria-hidden": true }, thumb));
 });
 
 export type DatePickerProps = ElementProps & { label?: string; value?: string; defaultValue?: string; min?: string; max?: string; name?: string; form?: string; placeholder?: string; required?: boolean; disabled?: boolean; readOnly?: boolean; calendarLabel?: string; previousMonthLabel?: string; nextMonthLabel?: string; invalidDateMessage?: string; requiredMessage?: string; onValueChange?: (value: string) => void };
@@ -1401,12 +1411,13 @@ export type ComboboxOpenChangeEvent = React.MouseEvent<HTMLElement> | React.Keyb
 export type ComboboxActiveOptionChangeData =
   | { event: React.SyntheticEvent | Event; type: undefined; previousOption: ComboboxOptionValue | null | undefined; nextOption: ComboboxOptionValue | null | undefined }
   | { event: CustomEvent<{ id: string; previousId: string | null }>; type: "change"; previousOption: ComboboxOptionValue | null | undefined; nextOption: ComboboxOptionValue | null | undefined };
-export type ComboBoxProps = ElementProps & { label?: string; selectedLabel?: string; value?: string; defaultValue?: string; selectedValue?: string; selectedOptions?: readonly string[]; defaultSelectedOptions?: readonly string[]; multiselect?: boolean; name?: string; form?: string; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; listbox?: React.ReactElement; placeholder?: string; required?: boolean; disabled?: boolean; freeform?: boolean; allowFreeform?: boolean; noResults?: string; clearable?: boolean; clearIcon?: React.ReactNode; expandIcon?: React.ReactNode; defaultOpen?: boolean; disableAutoFocus?: boolean; inlinePopup?: boolean; open?: boolean; appearance?: "filled-darker" | "filled-lighter" | "outline" | "underline"; size?: "small" | "medium" | "large"; positioning?: ComboboxPositioning; children?: React.ReactNode; onValueChange?: (value: string) => void; onOptionSelect?: (event: ComboboxSelectionEvent, data: ComboboxOptionSelectData) => void; onSelectedOptionsChange?: (selectedOptions: string[]) => void; onOpenChange?: (event: ComboboxOpenChangeEvent, data: { open: boolean }) => void; onActiveOptionChange?: (event: React.SyntheticEvent | Event, data: ComboboxActiveOptionChangeData) => void };
+export type ComboBoxProps = NativeClickHostProps<HTMLInputElement> & { label?: string; selectedLabel?: string; value?: string; defaultValue?: string; selectedValue?: string; selectedOptions?: readonly string[]; defaultSelectedOptions?: readonly string[]; multiselect?: boolean; name?: string; form?: string; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; listbox?: React.ReactElement; placeholder?: string; required?: boolean; disabled?: boolean; freeform?: boolean; allowFreeform?: boolean; noResults?: string; clearable?: boolean; clearIcon?: React.ReactNode; expandIcon?: React.ReactNode; defaultOpen?: boolean; disableAutoFocus?: boolean; inlinePopup?: boolean; open?: boolean; appearance?: "filled-darker" | "filled-lighter" | "outline" | "underline"; size?: "small" | "medium" | "large"; positioning?: ComboboxPositioning; children?: React.ReactNode; onValueChange?: (value: string) => void; onOptionSelect?: (event: ComboboxSelectionEvent, data: ComboboxOptionSelectData) => void; onSelectedOptionsChange?: (selectedOptions: string[]) => void; onOpenChange?: (event: ComboboxOpenChangeEvent, data: { open: boolean }) => void; onActiveOptionChange?: (event: React.SyntheticEvent | Event, data: ComboboxActiveOptionChangeData) => void };
 
 export const ComboBox = /* @__PURE__ */ React.forwardRef<HTMLElement, ComboBoxProps>(function ComboBox(inputProps: ComboBoxProps, forwardedRef): React.ReactElement {
   const { label, selectedLabel, value, defaultValue, selectedValue, selectedOptions, defaultSelectedOptions, multiselect = false, name, input, listbox, placeholder, required, disabled, freeform, allowFreeform, noResults, clearable, clearIcon, expandIcon, defaultOpen, disableAutoFocus, inlinePopup, open, appearance, size, positioning, onValueChange, onOptionSelect, onSelectedOptionsChange, onOpenChange, onActiveOptionChange, children, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true, supportsSize: true });
   const ref = React.useRef<HTMLElement & { selectedOptions: string[] }>(null)
   useExposeHostRef(ref, forwardedRef);;
+  useNativeControlEvents(ref as React.RefObject<HTMLElement | null>, "input,button", props.onClick, props.onClickCapture, props as NativeRootEventProps<HTMLInputElement>);
   const context = React.useContext(UIContext);
   const provider = React.useContext(CompoundComboboxContext);
   ensureDefined(defineCombobox);
@@ -1467,7 +1478,7 @@ export const ComboBox = /* @__PURE__ */ React.forwardRef<HTMLElement, ComboBoxPr
   const expandIconSlot = expandIcon == null ? null : React.isValidElement(expandIcon)
     ? React.cloneElement(expandIcon as React.ReactElement<{ slot?: string }>, { slot: "expand-icon" })
     : React.createElement("span", { slot: "expand-icon", "aria-hidden": true }, expandIcon);
-  return React.createElement(CompoundComboboxContext.Provider, { value: { ...provider, mode: "combobox", value: value ?? provider?.value, selectedOptions: selectedOptions ?? provider?.selectedOptions, multiselect } }, React.createElement("spui-combobox", useCustomElementProps({ ...props, ref, label, "selected-label": selectedLabel ?? context.strings.selectedOptionsLabel, value: value ?? defaultValue ?? provider?.value, "selected-value": selectedValue, multiselect: multiselect || undefined, name, placeholder, required, disabled, "allow-freeform": freeform ?? allowFreeform, "no-results": noResults ?? context.strings.noResults, clearable, "default-open": open === undefined && provider?.open === undefined ? defaultOpen : undefined, open: open ?? provider?.open ? "" : undefined, "disable-auto-focus": disableAutoFocus, appearance: appearance ?? provider?.appearance, size: size ?? provider?.size, positioning: typeof positioning === "string" ? positioning : positioning?.position ? `${positioning.position}${positioning.align && positioning.align !== "center" ? `-${positioning.align}` : ""}` : undefined, "inline-popup": inlinePopup }), children, inputSlot, clearIconSlot, expandIconSlot, listboxSlot));
+  return React.createElement(CompoundComboboxContext.Provider, { value: { ...provider, mode: "combobox", value: value ?? provider?.value, selectedOptions: selectedOptions ?? provider?.selectedOptions, multiselect } }, React.createElement("spui-combobox", nativeControlHostProps({ ...props, ref, label, "selected-label": selectedLabel ?? context.strings.selectedOptionsLabel, value: value ?? defaultValue ?? provider?.value, "selected-value": selectedValue, multiselect: multiselect || undefined, name, placeholder, required, disabled, "allow-freeform": freeform ?? allowFreeform, "no-results": noResults ?? context.strings.noResults, clearable, "default-open": open === undefined && provider?.open === undefined ? defaultOpen : undefined, open: open ?? provider?.open ? "" : undefined, "disable-auto-focus": disableAutoFocus, appearance: appearance ?? provider?.appearance, size: size ?? provider?.size, positioning: typeof positioning === "string" ? positioning : positioning?.position ? `${positioning.position}${positioning.align && positioning.align !== "center" ? `-${positioning.align}` : ""}` : undefined, "inline-popup": inlinePopup }), children, inputSlot, clearIconSlot, expandIconSlot, listboxSlot));
 });
 
 export const ComboOption = /* @__PURE__ */ React.forwardRef<HTMLElement, { value: string; label?: string; disabled?: boolean; children?: React.ReactNode }>(function ComboOption({ value, label, disabled, children }: { value: string; label?: string; disabled?: boolean; children?: React.ReactNode }, forwardedRef): React.ReactElement {
@@ -1511,7 +1522,7 @@ export function ComboboxProvider({ value, children }: { value: ComboboxProviderV
   return <CompoundComboboxContext.Provider value={{ ...value, mode: "combobox" }}>{children}</CompoundComboboxContext.Provider>;
 }
 
-export type DropdownProps = ElementProps & {
+export type DropdownProps = NativeClickHostProps<HTMLInputElement> & {
   label?: string;
   button?: React.ReactNode;
   appearance?: "filled-darker" | "filled-lighter" | "outline" | "underline";
@@ -1545,6 +1556,7 @@ export const Dropdown = /* @__PURE__ */ React.forwardRef<HTMLElement, DropdownPr
   const provider = React.useContext(CompoundComboboxContext);
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
+  useNativeControlEvents(ref, "input,button", props.onClick, props.onClickCapture, props);
   ensureDefined(defineCombobox);
   useSpuiEvent(ref, "spui-open-change", (detail, event) => {
     const nextOpen = Boolean(detail.open);
@@ -1589,7 +1601,7 @@ export const Dropdown = /* @__PURE__ */ React.forwardRef<HTMLElement, DropdownPr
   // virtual child tree empty so it does not try to restore replaced list items.
   const listboxSlot = listbox == null ? null : React.cloneElement(listbox, { slot: "listbox" }, null);
   return React.createElement(CompoundComboboxContext.Provider, { value: { ...provider, mode: "combobox", multiselect, selectedOptions: selectedOptions ?? provider?.selectedOptions, value: value ?? provider?.value } },
-    React.createElement("spui-combobox", useCustomElementProps({ ...props, ref, label: label ?? "", value: value ?? defaultValue ?? provider?.value, "selected-value": !multiselect ? selectedOptions?.[0] ?? defaultSelectedOptions?.[0] ?? provider?.selectedOptions?.[0] : undefined, "selected-options": multiselect ? selectedOptions ? JSON.stringify(selectedOptions) : provider?.selectedOptions ? JSON.stringify(provider.selectedOptions) : undefined : undefined, "default-selected-options": defaultSelectedOptions && multiselect ? JSON.stringify(defaultSelectedOptions) : undefined, multiselect: multiselect || undefined, disabled, placeholder, "read-only": "", "button-trigger": "", "clear-label": strings.clear, open: (open ?? provider?.open) ? "" : undefined, "default-open": defaultOpen ? "" : undefined, clearable: clearable ? "" : undefined, "disable-auto-focus": disableAutoFocus ? "" : undefined, appearance: appearance ?? provider?.appearance, size: size ?? provider?.size, positioning: typeof positioning === "string" ? positioning : positioning?.position ? `${positioning.position}${positioning.align && positioning.align !== "center" ? `-${positioning.align}` : ""}` : undefined, "inline-popup": inlinePopup ? "" : undefined, "no-results": strings.noResults }), children, buttonSlot, clearButtonSlot, expandIcon == null ? null : React.createElement("span", { slot: "expand-icon", "aria-hidden": true }, expandIcon), listboxSlot));
+    React.createElement("spui-combobox", nativeControlHostProps({ ...props, ref, label: label ?? "", value: value ?? defaultValue ?? provider?.value, "selected-value": !multiselect ? selectedOptions?.[0] ?? defaultSelectedOptions?.[0] ?? provider?.selectedOptions?.[0] : undefined, "selected-options": multiselect ? selectedOptions ? JSON.stringify(selectedOptions) : provider?.selectedOptions ? JSON.stringify(provider.selectedOptions) : undefined : undefined, "default-selected-options": defaultSelectedOptions && multiselect ? JSON.stringify(defaultSelectedOptions) : undefined, multiselect: multiselect || undefined, disabled, placeholder, "read-only": "", "button-trigger": "", "clear-label": strings.clear, open: (open ?? provider?.open) ? "" : undefined, "default-open": defaultOpen ? "" : undefined, clearable: clearable ? "" : undefined, "disable-auto-focus": disableAutoFocus ? "" : undefined, appearance: appearance ?? provider?.appearance, size: size ?? provider?.size, positioning: typeof positioning === "string" ? positioning : positioning?.position ? `${positioning.position}${positioning.align && positioning.align !== "center" ? `-${positioning.align}` : ""}` : undefined, "inline-popup": inlinePopup ? "" : undefined, "no-results": strings.noResults }), children, buttonSlot, clearButtonSlot, expandIcon == null ? null : React.createElement("span", { slot: "expand-icon", "aria-hidden": true }, expandIcon), listboxSlot));
 });
 
 export type ListboxProps = ElementProps & { children?: React.ReactNode; selectedOptions?: string[]; defaultSelectedOptions?: string[]; multiselect?: boolean; disableAutoFocus?: boolean; onOptionSelect?: (event: ComboboxSelectionEvent, data: ComboboxOptionSelectData) => void };
@@ -5404,13 +5416,14 @@ export function Field({ children, label, hint, validationMessage, validationMess
   </div>;
 }
 
-export type InputProps = Omit<ElementProps, "children" | "onChange" | "defaultValue" | "defaultChecked"> & { children?: never; type?: InputType; value?: string | number | readonly string[]; defaultValue?: string | number | readonly string[]; checked?: boolean; defaultChecked?: boolean; accept?: string; alt?: string; autoComplete?: string; capture?: boolean | string; form?: string; formAction?: string; formEncType?: string; formMethod?: string; formNoValidate?: boolean; formTarget?: string; height?: number | string; list?: string; max?: number | string; maxLength?: number; min?: number | string; minLength?: number; multiple?: boolean; pattern?: string; src?: string; step?: number | string; width?: number | string; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; onValueChange?: (value: string) => void; onChange?: (event: React.ChangeEvent<HTMLInputElement>, data: { value: string }) => void; contentBefore?: React.ReactNode; contentAfter?: React.ReactNode; size?: InputSize; appearance?: InputAppearance; disabled?: boolean; required?: boolean; readOnly?: boolean; placeholder?: string; name?: string };
+export type InputProps = Omit<NativeClickHostProps<HTMLInputElement>, "children" | "onChange" | "defaultValue" | "defaultChecked"> & { children?: never; type?: InputType; value?: string | number | readonly string[]; defaultValue?: string | number | readonly string[]; checked?: boolean; defaultChecked?: boolean; accept?: string; alt?: string; autoComplete?: string; capture?: boolean | string; form?: string; formAction?: string; formEncType?: string; formMethod?: string; formNoValidate?: boolean; formTarget?: string; height?: number | string; list?: string; max?: number | string; maxLength?: number; min?: number | string; minLength?: number; multiple?: boolean; pattern?: string; src?: string; step?: number | string; width?: number | string; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; onValueChange?: (value: string) => void; onChange?: (event: React.ChangeEvent<HTMLInputElement>, data: { value: string }) => void; contentBefore?: React.ReactNode; contentAfter?: React.ReactNode; size?: InputSize; appearance?: InputAppearance; disabled?: boolean; required?: boolean; readOnly?: boolean; placeholder?: string; name?: string };
 
 /** Bare input primitive. Supply aria-label or aria-labelledby; use TextField when a shadow-safe visible label is needed. */
 export const Input = /* @__PURE__ */ React.forwardRef<HTMLElement, InputProps>(function Input(inputProps: InputProps, forwardedRef): React.ReactElement {
   const { type = "text", value, defaultValue, checked, defaultChecked, input: inputControl, onValueChange, onChange, contentBefore, contentAfter, size = "medium", appearance = "outline", disabled, required, readOnly, placeholder, capture, formNoValidate, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true, supportsSize: true });
   const ref = React.useRef<HTMLElement & { value: string; defaultValue: string; type: string; checked: boolean }>(null);
   React.useImperativeHandle(forwardedRef, () => ref.current!, []);
+  useNativeControlEvents(ref, "input", props.onClick, props.onClickCapture, props);
   ensureDefined(defineInput);
   useSpuiEvent(ref, "spui-input", (detail, event) => {
     const nextValue = String(detail.value ?? "");
@@ -5430,23 +5443,24 @@ export const Input = /* @__PURE__ */ React.forwardRef<HTMLElement, InputProps>(f
   const inputSlot = inputControl == null ? null : React.isValidElement(inputControl)
     ? React.cloneElement(inputControl as React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>>, { slot: "input" } as React.InputHTMLAttributes<HTMLInputElement> & { slot: string })
     : React.createElement("input", { ...inputControl, slot: "input" });
-  return React.createElement("spui-input", useCustomElementProps({ ...props, ref, type, value: undefined, defaultValue: undefined, size, appearance, disabled, required, placeholder, checked: checked || undefined, "default-checked": defaultChecked || undefined, capture: capture === true ? "" : capture || undefined, formnovalidate: formNoValidate || undefined, "read-only": readOnly || undefined }),
+  return React.createElement("spui-input", nativeControlHostProps({ ...props, ref, type, value: undefined, defaultValue: undefined, size, appearance, disabled, required, placeholder, checked: checked || undefined, "default-checked": defaultChecked || undefined, capture: capture === true ? "" : capture || undefined, formnovalidate: formNoValidate || undefined, "read-only": readOnly || undefined }),
     inputSlot,
     contentBefore == null ? null : React.createElement("span", { slot: "before" }, contentBefore),
     contentAfter == null ? null : React.createElement("span", { slot: "after" }, contentAfter));
 });
 
-export type FileUploadProps = ElementProps & { label?: string; name?: string; form?: string; accept?: string; multiple?: boolean; disabled?: boolean; required?: boolean; maxFiles?: number; maxFileSize?: number; browseLabel?: string; dropLabel?: string; removeLabel?: string; selectedLabel?: string; onFilesChange?: (files: File[]) => void; onFilesError?: (errors: FileUploadError[]) => void };
+export type FileUploadProps = NativeClickHostProps<HTMLDivElement> & { label?: string; name?: string; form?: string; accept?: string; multiple?: boolean; disabled?: boolean; required?: boolean; maxFiles?: number; maxFileSize?: number; browseLabel?: string; dropLabel?: string; removeLabel?: string; selectedLabel?: string; onFilesChange?: (files: File[]) => void; onFilesError?: (errors: FileUploadError[]) => void };
 
 export const FileUpload = /* @__PURE__ */ React.forwardRef<HTMLElement, FileUploadProps>(function FileUpload(inputProps: FileUploadProps, forwardedRef): React.ReactElement {
   const { label, name, accept, multiple = false, disabled = false, required = false, maxFiles, maxFileSize, browseLabel, dropLabel, removeLabel, selectedLabel, onFilesChange, onFilesError, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true });
   const context = React.useContext(UIContext);
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
+  useNativeControlEvents(ref, ".drop", props.onClick, props.onClickCapture, props);
   ensureDefined(defineFileUpload);
   useSpuiEvent(ref, "spui-file-change", detail => onFilesChange?.(detail.files ?? []));
   useSpuiEvent(ref, "spui-file-error", detail => onFilesError?.(detail.errors ?? []));
-  return React.createElement("spui-file-upload", useCustomElementProps({ ...props, ref, label, name, accept, multiple: multiple || undefined, disabled: disabled || undefined, required: required || undefined, "max-files": maxFiles, "max-file-size": maxFileSize, "browse-label": browseLabel ?? context.strings.fileUploadBrowse, "drop-label": dropLabel ?? context.strings.fileUploadDrop, "remove-label": removeLabel ?? context.strings.fileUploadRemove, "selected-label": selectedLabel ?? context.strings.fileUploadSelected, "required-message": context.strings.fileUploadRequired, "file-type-message": context.strings.fileUploadTypeError, "file-too-large-message": context.strings.fileUploadSizeError, "max-files-message": context.strings.fileUploadLimitError }));
+  return React.createElement("spui-file-upload", nativeControlHostProps({ ...props, ref, label, name, accept, multiple: multiple || undefined, disabled: disabled || undefined, required: required || undefined, "max-files": maxFiles, "max-file-size": maxFileSize, "browse-label": browseLabel ?? context.strings.fileUploadBrowse, "drop-label": dropLabel ?? context.strings.fileUploadDrop, "remove-label": removeLabel ?? context.strings.fileUploadRemove, "selected-label": selectedLabel ?? context.strings.fileUploadSelected, "required-message": context.strings.fileUploadRequired, "file-type-message": context.strings.fileUploadTypeError, "file-too-large-message": context.strings.fileUploadSizeError, "max-files-message": context.strings.fileUploadLimitError }));
 });
 
 export type ImageProps = Omit<React.ImgHTMLAttributes<HTMLImageElement>, "alt" | "loading" | "decoding"> & {
@@ -5473,6 +5487,7 @@ export const SearchBox = /* @__PURE__ */ React.forwardRef<HTMLElement, SearchBox
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   const context = React.useContext(UIContext);
+  useNativeControlEvents(ref, "input", props.onClick, props.onClickCapture, props);
   ensureDefined(defineSearchBox);
   useSpuiEvent(ref, "spui-input", onValueChange || onChange ? (detail, event) => {
     const nextValue = String(detail.value ?? "");
@@ -5489,7 +5504,7 @@ export const SearchBox = /* @__PURE__ */ React.forwardRef<HTMLElement, SearchBox
     if (value !== undefined) element.value = value;
     else if (defaultValue !== undefined) element.defaultValue = defaultValue;
   }, [value, defaultValue]);
-  return React.createElement("spui-search-box", useCustomElementProps({ ...props, ref, label, type, value: undefined, size, appearance, "clear-label": clearLabel ?? context.strings.clear, "read-only": readOnly || undefined }),
+  return React.createElement("spui-search-box", nativeControlHostProps({ ...props, ref, label, type, value: undefined, size, appearance, "clear-label": clearLabel ?? context.strings.clear, "read-only": readOnly || undefined }),
     contentBefore == null ? null : React.createElement("span", { slot: "content-before" }, contentBefore),
     contentAfter == null ? null : React.createElement("span", { slot: "content-after" }, contentAfter),
     dismiss == null ? null : React.createElement("span", { slot: "dismiss" }, dismiss));
@@ -6158,12 +6173,13 @@ export type TextAreaAppearance = "outline" | "filled-darker" | "filled-lighter" 
 export type TextAreaSize = "small" | "medium" | "large";
 export type TextAreaResize = "none" | "horizontal" | "vertical" | "both";
 export type TextAreaChangeData = { value: string };
-export type TextAreaProps = Omit<ElementProps, "onChange" | "defaultValue"> & { label?: string; value?: string | number | readonly string[]; defaultValue?: string | number | readonly string[]; textarea?: React.ReactElement<React.TextareaHTMLAttributes<HTMLTextAreaElement>> | React.TextareaHTMLAttributes<HTMLTextAreaElement>; rows?: number; cols?: number; autoComplete?: string; dirName?: string; form?: string; maxLength?: number; minLength?: number; name?: string; wrap?: "hard" | "soft" | "off"; placeholder?: string; disabled?: boolean; required?: boolean; readOnly?: boolean; appearance?: TextAreaAppearance; size?: TextAreaSize; resize?: TextAreaResize; onValueChange?: (value: string) => void; onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>, data: TextAreaChangeData) => void };
+export type TextAreaProps = Omit<NativeClickHostProps<HTMLTextAreaElement>, "onChange" | "defaultValue"> & { label?: string; value?: string | number | readonly string[]; defaultValue?: string | number | readonly string[]; textarea?: React.ReactElement<React.TextareaHTMLAttributes<HTMLTextAreaElement>> | React.TextareaHTMLAttributes<HTMLTextAreaElement>; rows?: number; cols?: number; autoComplete?: string; dirName?: string; form?: string; maxLength?: number; minLength?: number; name?: string; wrap?: "hard" | "soft" | "off"; placeholder?: string; disabled?: boolean; required?: boolean; readOnly?: boolean; appearance?: TextAreaAppearance; size?: TextAreaSize; resize?: TextAreaResize; onValueChange?: (value: string) => void; onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>, data: TextAreaChangeData) => void };
 
 export const TextArea = /* @__PURE__ */ React.forwardRef<HTMLElement, TextAreaProps>(function TextArea(inputProps: TextAreaProps, forwardedRef): React.ReactElement {
   const { label, value, defaultValue, textarea, rows, placeholder, disabled, required, readOnly, appearance = "outline", size = "medium", resize = "none", onValueChange, onChange, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true, supportsSize: true });
   const ref = React.useRef<HTMLElement & { value: string; defaultValue: string }>(null);
   React.useImperativeHandle(forwardedRef, () => ref.current!, []);
+  useNativeControlEvents(ref, "textarea", props.onClick, props.onClickCapture, props);
   ensureDefined(defineTextArea);
   useSpuiEvent(ref, "spui-input", onValueChange || onChange ? (detail, event) => {
     const nextValue = String(detail.value ?? "");
@@ -6182,15 +6198,16 @@ export const TextArea = /* @__PURE__ */ React.forwardRef<HTMLElement, TextAreaPr
   const textareaSlot = textarea == null ? null : React.isValidElement(textarea)
     ? React.cloneElement(textarea as React.ReactElement<React.TextareaHTMLAttributes<HTMLTextAreaElement>>, { slot: "textarea" } as React.TextareaHTMLAttributes<HTMLTextAreaElement> & { slot: string })
     : React.createElement("textarea", { ...textarea, slot: "textarea" });
-  return React.createElement("spui-textarea", useCustomElementProps({ ...props, ref, label, value: undefined, defaultValue: undefined, rows, placeholder, disabled, required, appearance, size, resize, "default-value": defaultValue, "read-only": readOnly || undefined }), textareaSlot);
+  return React.createElement("spui-textarea", nativeControlHostProps({ ...props, ref, label, value: undefined, defaultValue: undefined, rows, placeholder, disabled, required, appearance, size, resize, "default-value": defaultValue, "read-only": readOnly || undefined }), textareaSlot);
 });
 
 export type CheckboxCheckedState = boolean | "mixed";
-export type CheckboxProps = Omit<ElementProps, "onChange" | "children"> & { children?: never; checked?: CheckboxCheckedState; defaultChecked?: CheckboxCheckedState; disabled?: boolean; disabledFocusable?: boolean; required?: boolean; name?: string; form?: string; value?: string; label?: React.ReactNode; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; indicator?: React.ReactNode; labelPosition?: "before" | "after"; shape?: "square" | "circular"; size?: "small" | "medium" | "large"; onCheckedChange?: (checked: boolean) => void; onChange?: (event: React.ChangeEvent<HTMLInputElement>, data: { checked: CheckboxCheckedState }) => void };
+export type CheckboxProps = Omit<NativeClickHostProps<HTMLInputElement>, "onChange" | "children"> & { children?: never; checked?: CheckboxCheckedState; defaultChecked?: CheckboxCheckedState; disabled?: boolean; disabledFocusable?: boolean; required?: boolean; name?: string; form?: string; value?: string; label?: React.ReactNode; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; indicator?: React.ReactNode; labelPosition?: "before" | "after"; shape?: "square" | "circular"; size?: "small" | "medium" | "large"; onCheckedChange?: (checked: boolean) => void; onChange?: (event: React.ChangeEvent<HTMLInputElement>, data: { checked: CheckboxCheckedState }) => void };
 type ToggleHostProps = ElementProps & { disabled?: boolean; shape?: string; size?: string; "label-position"?: string; "disabled-focusable"?: boolean };
 function useToggle(define: () => void, props: ToggleHostProps, checked?: CheckboxCheckedState, defaultChecked?: CheckboxCheckedState, onCheckedChange?: (checked: boolean) => void, onStateChange?: (event: React.ChangeEvent<HTMLInputElement>, data: { checked: CheckboxCheckedState }) => void, forwardedRef?: React.ForwardedRef<HTMLElement>): Record<string, unknown> {
   const ref = React.useRef<HTMLElement>(null);
   React.useImperativeHandle(forwardedRef, () => ref.current!, []);
+  useNativeControlEvents(ref, "input", (props as NativeClickHostProps<HTMLInputElement>).onClick, (props as NativeClickHostProps<HTMLInputElement>).onClickCapture, props as unknown as NativeRootEventProps<HTMLInputElement>);
   ensureDefined(define);
   useSpuiEvent(ref, "spui-change", onCheckedChange || onStateChange ? (detail, event) => {
     const nextChecked = detail.checked === "mixed" ? "mixed" : Boolean(detail.checked);
@@ -6206,7 +6223,7 @@ function useToggle(define: () => void, props: ToggleHostProps, checked?: Checkbo
     else if (defaultChecked !== undefined) element.defaultChecked = defaultChecked;
   }, [checked, defaultChecked]);
   const elementProps: Record<string, unknown> = { ...useFieldControlProps_unstable(props, { supportsRequired: true, supportsSize: true }), ref };
-  return useHostProps(elementProps);
+  return nativeControlHostProps(elementProps);
 }
 
 export const Checkbox = /* @__PURE__ */ React.forwardRef<HTMLElement, CheckboxProps>(function Checkbox({ checked, defaultChecked, disabledFocusable, onCheckedChange, onChange, label, input, indicator, labelPosition = "after", shape = "square", size, ...props }: CheckboxProps, forwardedRef): React.ReactElement {
@@ -6223,7 +6240,7 @@ export const Checkbox = /* @__PURE__ */ React.forwardRef<HTMLElement, CheckboxPr
   return React.createElement("spui-checkbox", customElementProps(elementProps), inputSlot, indicatorSlot, labelSlot);
 });
 
-export type SwitchProps = Omit<ElementProps, "onChange"> & { label?: React.ReactNode; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; indicator?: React.ReactNode; checked?: boolean; defaultChecked?: boolean; disabled?: boolean; disabledFocusable?: boolean; required?: boolean; name?: string; form?: string; value?: string; size?: "small" | "medium"; labelPosition?: "before" | "after" | "above"; onCheckedChange?: (checked: boolean) => void; onChange?: (event: React.ChangeEvent<HTMLInputElement>, data: { checked: boolean }) => void };
+export type SwitchProps = Omit<NativeClickHostProps<HTMLInputElement>, "onChange"> & { label?: React.ReactNode; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; indicator?: React.ReactNode; checked?: boolean; defaultChecked?: boolean; disabled?: boolean; disabledFocusable?: boolean; required?: boolean; name?: string; form?: string; value?: string; size?: "small" | "medium"; labelPosition?: "before" | "after" | "above"; onCheckedChange?: (checked: boolean) => void; onChange?: (event: React.ChangeEvent<HTMLInputElement>, data: { checked: boolean }) => void };
 
 export const Switch = /* @__PURE__ */ React.forwardRef<HTMLElement, SwitchProps>(function Switch({ checked, defaultChecked, disabledFocusable, onCheckedChange, onChange, label, children, input, indicator, size, labelPosition = "after", ...props }: SwitchProps, forwardedRef): React.ReactElement {
   const elementProps = useToggle(defineSwitch, { ...props, size, "label-position": labelPosition, "disabled-focusable": disabledFocusable || undefined }, checked, defaultChecked,
