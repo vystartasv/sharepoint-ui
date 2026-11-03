@@ -1413,6 +1413,7 @@
       "note": "React Field composes a single native or custom form control. createFormField returns a light-DOM wrapper for framework-neutral consumers.",
       "api": {
         "reactSignature": "{ children, label, hint, validationMessage, validationMessageIcon, validationState, required, disabled, orientation = \"vertical\", size = \"medium\", className, style, ...props }: FieldProps",
+        "reactRefType": "HTMLDivElement",
         "callbackProps": [],
         "slots": [
           "label",

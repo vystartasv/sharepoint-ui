@@ -5709,7 +5709,7 @@ export type FieldProps = ElementProps & {
 };
 
 /** Pair one form control with a theme-aware label, hint, and validation message. */
-export function Field({ children, label, hint, validationMessage, validationMessageIcon, validationState, required, disabled, orientation = "vertical", size = "medium", className, style, ...props }: FieldProps): React.ReactElement {
+export const Field = /* @__PURE__ */ React.forwardRef<HTMLDivElement, FieldProps>(function Field({ children, label, hint, validationMessage, validationMessageIcon, validationState, required, disabled, orientation = "vertical", size = "medium", className, style, ...props }: FieldProps, forwardedRef): React.ReactElement {
   const generatedId = React.useId();
   const initialControl = React.isValidElement(children) && children.type !== React.Fragment ? children as React.ReactElement<Record<string, unknown>> : undefined;
   const initialControlProps = initialControl?.props ?? {};
@@ -5790,7 +5790,7 @@ export function Field({ children, label, hint, validationMessage, validationMess
     hintId,
     disabled: Boolean(disabled || controlProps.disabled),
   };
-  return <div {...useHostProps({ ...props, className: ["spui-form-field", className].filter(Boolean).join(" "), style: gridStyle, "data-orientation": orientation, "data-size": size, "data-validation-state": state })}>
+  return <div {...useHostProps({ ...props, ref: forwardedRef, className: ["spui-form-field", className].filter(Boolean).join(" "), style: gridStyle, "data-orientation": orientation, "data-size": size, "data-validation-state": state })}>
     {label == null ? null : <Label id={labelId} htmlFor={controlId} size={size} required={requiredValue} disabled={Boolean(disabled || controlProps.disabled)} style={{ gridArea: orientation === "horizontal" ? "1 / 1 / span 3 / 2" : undefined }}>{label}</Label>}
     <div style={{ gridArea: orientation === "horizontal" ? "1 / 2 / span 3 / 3" : undefined, minWidth: 0 }}><FieldContext.Provider value={fieldContextValue}>{enhancedControl}</FieldContext.Provider></div>
     {hint == null ? null : <div id={hintId} style={{ gridArea: orientation === "horizontal" ? "2 / 2" : undefined, color: "var(--spui-ui-muted,var(--spui-semantic-body-subtext,#616161))", fontSize: "var(--spui-field-hint-size,12px)" }}>{hint}</div>}
@@ -5798,7 +5798,7 @@ export function Field({ children, label, hint, validationMessage, validationMess
       {state === "none" ? null : <span data-slot="validationMessageIcon" aria-hidden="true">{validationMessageIcon ?? (state === "success" ? "✓" : "!")}</span>}{validationMessage}
     </div>}
   </div>;
-}
+});
 
 export type InputProps = Omit<NativeClickHostProps<HTMLInputElement>, "children" | "onChange" | "defaultValue" | "defaultChecked"> & { children?: never; type?: InputType; value?: string | number | readonly string[]; defaultValue?: string | number | readonly string[]; checked?: boolean; defaultChecked?: boolean; accept?: string; alt?: string; autoComplete?: string; capture?: boolean | string; form?: string; formAction?: string; formEncType?: string; formMethod?: string; formNoValidate?: boolean; formTarget?: string; height?: number | string; list?: string; max?: number | string; maxLength?: number; min?: number | string; minLength?: number; multiple?: boolean; pattern?: string; src?: string; step?: number | string; width?: number | string; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; onValueChange?: (value: string) => void; onChange?: (event: React.ChangeEvent<HTMLInputElement>, data: { value: string }) => void; contentBefore?: React.ReactNode; contentAfter?: React.ReactNode; size?: InputSize; appearance?: InputAppearance; disabled?: boolean; required?: boolean; readOnly?: boolean; placeholder?: string; name?: string };
 
