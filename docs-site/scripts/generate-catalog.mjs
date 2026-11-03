@@ -233,6 +233,7 @@ for (const [module, entries] of familyIndex) {
     localSlugs.add(slug);
     const pagePath = `/sharepoint-ui/components/${module}/${slug}/`;
     const example = exampleFor(entry);
+    if (/Live .+ example/.test([example.content, example.markup].filter(Boolean).join(" "))) throw new Error(`Generic preview placeholder for ${entry.react ?? entry.tag ?? name} in ${module}.`);
     const markup = markupFor(example);
     const react = entry.react ? `<strong>React export:</strong> <code>${escapeHtml(entry.react)}</code>` : "<strong>React export:</strong> Not supplied";
     const customElement = entry.tag?.startsWith("spui-") ? `<strong>Custom element:</strong> <code>&lt;${escapeHtml(entry.tag)}&gt;</code>` : "<strong>Custom element:</strong> Not supplied";
