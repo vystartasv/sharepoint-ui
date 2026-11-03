@@ -139,6 +139,23 @@ The helper rejects text values over SharePoint's `MaxLength` and numeric values 
 
 Use `null` to clear nullable values. Read-only fields and empty values for required fields are rejected; `false` and `0` are valid values. Numeric strings are parsed as whole values; non-finite numbers and unsafe integers are rejected, and configured `Decimals` precision is enforced (trailing zeroes do not count as extra precision). URL fields accept absolute HTTP(S) or server-relative URLs and serialize to SharePoint's [`SP.FieldUrlValue`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.sharepoint.client.fieldurlvalue?view=sharepoint-csom) shape. Date-only ISO strings are preserved, date-time strings with a timezone keep that offset, and local date-time strings or `Date` objects become ISO UTC strings. The helper does not send the request or replace SharePoint-side validation.
 
+## Serialize one form patch
+
+Pass the field metadata and current values keyed by SharePoint `InternalName` to `serializeSharePointFieldValues()`:
+
+```ts
+import { serializeSharePointFieldValues } from "@spfx-fast/sharepoint-ui/sharepoint-fields";
+
+const patch = serializeSharePointFieldValues(fields, {
+  Title: "Quarterly access review",
+  Approved: true,
+  Summary: null // explicitly clear this optional field
+});
+await saveItem(patch);
+```
+
+Only supplied values are included, so omitted fields remain untouched in a PATCH. Explicit `null` clears a nullable value; empty required values, read-only writes, unknown field names, property collisions, and invalid bounds throw before the request. Missing required fields are allowed in partial edits; new-item forms should include every required value.
+
 ## Render with existing controls
 
 The recipe uses the same component names and prop concepts used elsewhere in the library. For a URL field, use `urlFormat` to render the saved URL as a `Link` or `Image` in a record view; use the `input` recipe when editing. A choice field can be rendered as a Select without inventing app-specific naming:

@@ -107,6 +107,7 @@ export type SharePointChoiceValue = string | readonly string[] | null;
 export type SharePointChoiceUpdate = Record<string, string | null | { results: string[] }>;
 export type SharePointUrlValue = { url: string; description?: string };
 export type SharePointFieldValue = string | number | boolean | Date | SharePointUrlValue | readonly string[] | readonly SharePointLookupId[] | null;
+export type SharePointFieldValues = Readonly<Record<string, SharePointFieldValue | undefined>>;
 export type SharePointFieldUpdateValue = string | number | boolean | null | { results: Array<string | number> } | { __metadata: { type: "SP.FieldUrlValue" }; Url: string; Description: string };
 export type SharePointFieldUpdate = Record<string, SharePointFieldUpdateValue>;
 
@@ -351,6 +352,32 @@ export function serializeSharePointFieldValue(field: SharePointFieldMetadata, va
   }
 
   throw new TypeError(adapter.unsupportedReason ?? `${adapter.fieldType} fields cannot be serialized by this helper.`);
+}
+
+/** Build one SharePoint item patch from values keyed by field InternalName; omitted values stay untouched. */
+export function serializeSharePointFieldValues(fields: readonly SharePointFieldMetadata[], values: SharePointFieldValues): SharePointFieldUpdate {
+  const update: SharePointFieldUpdate = {};
+  const fieldsByName = new Map<string, { field: SharePointFieldMetadata; adapter: SharePointFieldAdapter }>();
+  for (const field of fields) {
+    const adapter = getSharePointFieldAdapter(field);
+    if (!adapter.name) throw new TypeError("Every SharePoint field must include InternalName.");
+    if (fieldsByName.has(adapter.name)) throw new TypeError(`Duplicate SharePoint field InternalName: ${adapter.name}.`);
+    fieldsByName.set(adapter.name, { field, adapter });
+  }
+  for (const [name, value] of Object.entries(values)) {
+    const entry = fieldsByName.get(name);
+    if (!entry) throw new TypeError(`No SharePoint field metadata was supplied for ${name}.`);
+    const { field, adapter } = entry;
+    if (value === undefined) {
+      if (adapter.required) throw new TypeError(`${adapter.label} is required.`);
+      continue;
+    }
+    for (const [name, serializedValue] of Object.entries(serializeSharePointFieldValue(field, value))) {
+      if (Object.prototype.hasOwnProperty.call(update, name)) throw new TypeError(`Multiple SharePoint fields map to update property ${name}.`);
+      Object.defineProperty(update, name, { configurable: true, enumerable: true, value: serializedValue, writable: true });
+    }
+  }
+  return update;
 }
 
 function isLookupIdArray(value: SharePointLookupValue): value is readonly SharePointLookupId[] {
