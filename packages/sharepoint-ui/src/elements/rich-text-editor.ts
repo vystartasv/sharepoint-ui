@@ -11,8 +11,11 @@ export function getRichTextEditorFieldOptions(field: SharePointMultiLineField): 
   const richTextMode = field.RichTextMode ?? field.richTextMode;
   const mode = richTextMode?.trim().toLowerCase();
   const contentMode = richText === false ? "plain" : restricted ? "restricted" : mode === "fullhtml" ? "html" : mode === "compatible" || richText === true ? "rich" : "html";
-  const compatible = mode === "compatible" || (mode === undefined && richText === true);
-  const allowHyperlink = contentMode === "html" ? true : contentMode === "rich" && compatible && asBoolean(field.AllowHyperlink ?? field.allowHyperlink) === true;
+  const fieldAllowsHyperlinks = asBoolean(field.AllowHyperlink ?? field.allowHyperlink);
+  // Respect an explicit SharePoint restriction in every rich mode. If the
+  // host omitted this setting, keep links available and let sanitization decide
+  // which URL schemes and markup can be saved.
+  const allowHyperlink = contentMode !== "plain" && contentMode !== "restricted" && fieldAllowsHyperlinks !== false;
   return { contentMode, allowHyperlink };
 }
 

@@ -57,8 +57,8 @@ When no mode is supplied, the editor uses sanitized `html` mode so an unconstrai
 | --- | --- | --- |
 | `RichText: false` | `plain` | Plain text only |
 | `RichText: true`, `RestrictedMode: true` | `restricted` | Basic formatting; paste becomes plain text; no tables, images, or hyperlinks |
-| `RichText: true`, `RestrictedMode: false`, `RichTextMode: "Compatible"` (or omitted) | `rich` | Rich formatting, tables, and images when an upload callback is supplied; hyperlinks appear only when `AllowHyperlink` is true |
-| `RichText: true`, `RestrictedMode: false`, `RichTextMode: "FullHtml"` | `html` | Broad semantic HTML, safe inline formatting, tables, and links, still sanitized |
+| `RichText: true`, `RestrictedMode: false`, `RichTextMode: "Compatible"` (or omitted) | `rich` | Rich formatting, tables, and images when an upload callback is supplied; links are available unless `AllowHyperlink` is explicitly false |
+| `RichText: true`, `RestrictedMode: false`, `RichTextMode: "FullHtml"` | `html` | Broad safe semantic HTML, inline formatting, tables, and links unless `AllowHyperlink` is explicitly false |
 | No relevant settings supplied | `html` | Maximum supported editing for an unconstrained host; output is still sanitized |
 
 ```tsx
@@ -80,7 +80,7 @@ const field: SharePointMultiLineField = {
 <RichTextEditor label="Project notes" {...getRichTextEditorFieldOptions(field)} />
 ```
 
-The helper accepts SharePoint's PascalCase metadata and camelCase equivalents. `AllowHyperlink` controls links in Compatible mode; FullHtml mode allows safe links independently. Plain mode emits plain text. Other modes emit sanitized HTML; `html` accepts additional semantic elements and safe text styles (such as color, font, and alignment) while still removing scripts, embedded objects, unsafe URLs, and unsupported attributes. Set `contentMode="plain"`, `"restricted"`, or `"rich"` explicitly when a non-SharePoint host imposes those limits.
+The helper accepts SharePoint's PascalCase metadata and camelCase equivalents. An explicit `AllowHyperlink: false` disables link creation and strips link wrappers in every rich mode; when the property is absent, the helper leaves links available. Plain mode emits plain text. Other modes emit sanitized HTML; `html` accepts additional semantic elements and safe text styles (such as color, font, and alignment) while still removing scripts, embedded objects, unsafe URLs, and unsupported attributes. Set `contentMode="plain"`, `"restricted"`, or `"rich"` explicitly when a non-SharePoint host imposes those limits. Sanitization intentionally does not preserve arbitrary active HTML, scripts, embeds, or unsafe attributes.
 
 ## Load the editor only when needed
 
