@@ -251,16 +251,16 @@ function renderDividerWrapper(wrapper?: DividerWrapper): React.ReactNode {
     ? React.cloneElement(wrapper as React.ReactElement<{ slot?: string }>, { slot: "wrapper" })
     : React.createElement("div", { ...wrapper, slot: "wrapper" });
 }
-function useSpuiEvent(ref: React.RefObject<HTMLElement | null>, eventName: string, callback?: (detail: SpuiEventDetail, event: Event) => void): void {
+function useSpuiEvent(ref: React.RefObject<HTMLElement | null>, eventName: string, callback?: (detail: SpuiEventDetail, event: Event) => void, capture = false): void {
   const callbackRef = React.useRef(callback);
   React.useLayoutEffect(() => { callbackRef.current = callback; }, [callback]);
   React.useLayoutEffect(() => {
     const element = ref.current;
     if (!element || !callback) return;
     const listener = (event: Event) => callbackRef.current?.((event as CustomEvent<SpuiEventDetail>).detail, event);
-    element.addEventListener(eventName, listener);
-    return () => element.removeEventListener(eventName, listener);
-  }, [ref, eventName, Boolean(callback)]);
+    element.addEventListener(eventName, listener, capture);
+    return () => element.removeEventListener(eventName, listener, capture);
+  }, [ref, eventName, Boolean(callback), capture]);
 }
 
 function createReactEventBridge<T extends Element>(sourceEvent: Event, dispatchEvent: Event, currentTarget: T, target = sourceEvent.target): React.SyntheticEvent<T> {
@@ -474,15 +474,27 @@ const ButtonContext = React.createContext<ButtonContextValue | undefined>(undefi
 export const ButtonContextProvider = ButtonContext.Provider;
 export function useButtonContext(): ButtonContextValue { return React.useContext(ButtonContext) ?? {}; }
 
-export type ButtonProps = ElementProps & { as?: "button" | "a"; href?: string; target?: string; rel?: string; download?: string | boolean; hrefLang?: string; referrerPolicy?: string; form?: string; formAction?: string; formEncType?: string; formMethod?: string; formNoValidate?: boolean; formTarget?: string; name?: string; value?: string | number | readonly string[]; type?: "button" | "submit" | "reset"; variant?: "primary" | "default"; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; iconOnly?: boolean; disabled?: boolean; disabledFocusable?: boolean; vertical?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after" };
+export type ButtonProps = Omit<ElementProps, "onClick" | "onClickCapture"> & { onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>; onClickCapture?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>; as?: "button" | "a"; href?: string; target?: string; rel?: string; download?: string | boolean; hrefLang?: string; referrerPolicy?: string; form?: string; formAction?: string; formEncType?: string; formMethod?: string; formNoValidate?: boolean; formTarget?: string; name?: string; value?: string | number | readonly string[]; type?: "button" | "submit" | "reset"; variant?: "primary" | "default"; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; iconOnly?: boolean; disabled?: boolean; disabledFocusable?: boolean; vertical?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after" };
 
-export const Button = /* @__PURE__ */ React.forwardRef<HTMLElement, ButtonProps>(function Button({ as = "button", icon, iconPosition = "before", disabledFocusable = false, vertical = false, download, hrefLang, referrerPolicy, formAction, formEncType, formMethod, formNoValidate, formTarget, value, ...props }: ButtonProps, forwardedRef): React.ReactElement {
+export const Button = /* @__PURE__ */ React.forwardRef<HTMLElement, ButtonProps>(function Button({ as = "button", icon, iconPosition = "before", disabledFocusable = false, vertical = false, download, hrefLang, referrerPolicy, formAction, formEncType, formMethod, formNoValidate, formTarget, value, onClick, onClickCapture, ...props }: ButtonProps, forwardedRef): React.ReactElement {
+  const ref = React.useRef<HTMLElement>(null);
+  useExposeHostRef(ref, forwardedRef);
+  const bridgeClick = React.useCallback((handler: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>) => (_detail: SpuiEventDetail, event: Event) => {
+    const path = event.composedPath();
+    const control = path.find((entry): entry is HTMLButtonElement | HTMLAnchorElement => entry instanceof HTMLButtonElement || entry instanceof HTMLAnchorElement);
+    if (!control) return;
+    const target = path.find((entry): entry is Element => entry instanceof Element && !(entry instanceof HTMLSlotElement)) ?? control;
+    const bridged = createReactEventBridge(event, event, control, target) as React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>;
+    handler(bridged);
+  }, []);
+  useSpuiEvent(ref, "click", onClick ? bridgeClick(onClick) : undefined);
+  useSpuiEvent(ref, "click", onClickCapture ? bridgeClick(onClickCapture) : undefined, true);
   ensureDefined(defineButton);
   const buttonContext = useButtonContext();
   const iconOnly = props.iconOnly ?? (icon != null && props.children == null);
   return React.createElement("spui-button", useCustomElementProps({
     ...props,
-    ref: forwardedRef,
+    ref,
     ...(as === "a" ? { as } : {}),
     ...(value === undefined ? {} : { value: Array.isArray(value) ? value.join(",") : String(value) }),
     ...(download === undefined || download === false ? {} : { download: download === true ? "" : download }),
@@ -2555,11 +2567,11 @@ export function TeachingPopoverCarouselFooterButton({ navType, altText, children
   const edgeText = altText ?? (previous ? carousel?.initialStepText : navType === "next" ? carousel?.finalStepText : undefined);
   const buttonText = atEdge && edgeText != null ? edgeText : children ?? fallback;
   const label = getVisibleText(buttonText) || fallback;
-  const click = (event: React.MouseEvent<HTMLElement>): void => {
+  const click = (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>): void => {
     onClick?.(event);
     if (event.defaultPrevented) return;
-    if (previous) carousel?.setIndex((carousel.index || 0) - 1, event);
-    else if (navType === "next") carousel?.setIndex((carousel.index || 0) + 1, event);
+    if (previous) carousel?.setIndex((carousel.index || 0) - 1, event as React.MouseEvent<HTMLElement>);
+    else if (navType === "next") carousel?.setIndex((carousel.index || 0) + 1, event as React.MouseEvent<HTMLElement>);
     if (navType === "next" && atEdge) carousel?.onFinish?.(event, { value: carousel.value, event: event as React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>, type: "click" });
   };
   return React.createElement(Button, { ...props, type: props.type ?? "button", appearance: appearance ?? (navType === "next" ? "primary" : dismiss ? "subtle" : "secondary"), size, shape, icon, iconPosition, style: { minWidth: "96px", ...props.style }, "aria-label": props["aria-label"] ?? label, "data-spui-popover-close": dismiss ? "" : undefined, onClick: click }, buttonText);
