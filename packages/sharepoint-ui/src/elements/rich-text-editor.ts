@@ -275,17 +275,15 @@ export function defineRichTextEditor(): void {
     }
     private onSelectionChange = (): void => {
       const selection = this.selection();
-      if (selection?.rangeCount) {
-        const range = selection.getRangeAt(0);
-        if (this.editor.contains(range.commonAncestorContainer)) {
-          this.savedRange = range.cloneRange();
-          const node = range.startContainer;
-          const element = node instanceof Element ? node : node.parentElement;
-          const cell = element?.closest<HTMLTableCellElement>("td,th");
-          if (cell && this.editor.contains(cell)) { this.savedCell = cell; this.rememberCell(cell); }
-          this.syncToolbarState();
-        }
-      }
+      if (!selection?.rangeCount) return;
+      const range = selection.getRangeAt(0);
+      if (!this.editor.contains(range.commonAncestorContainer)) return;
+      this.savedRange = range.cloneRange();
+      const node = range.startContainer;
+      const element = node instanceof Element ? node : node.parentElement;
+      const cell = element?.closest<HTMLTableCellElement>("td,th");
+      if (cell && this.editor.contains(cell)) { this.savedCell = cell; this.rememberCell(cell); }
+      this.syncToolbarState();
       this.syncTableActions();
     };
     private syncToolbarState(): void {
