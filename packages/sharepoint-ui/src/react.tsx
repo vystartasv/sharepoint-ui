@@ -1953,10 +1953,11 @@ export const OptionGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, OptionG
   return <div {...props} ref={forwardedRef as React.Ref<HTMLDivElement>} role="group" aria-label={label}>{label ? <div>{label}</div> : null}{children}</div>;
 });
 
-export type RichTextEditorProps = NativeClickHostProps<HTMLDivElement> & { label?: string; editorLabel?: string; value?: string; defaultValue?: string; placeholder?: string; disabled?: boolean; readOnly?: boolean; required?: boolean; name?: string; form?: string; onValueChange?: (html: string) => void; onImageUpload?: (file: File) => Promise<string> };
+export type RichTextImageUploadErrorData = { fileName: string; error: unknown };
+export type RichTextEditorProps = NativeClickHostProps<HTMLDivElement> & { label?: string; editorLabel?: string; value?: string; defaultValue?: string; placeholder?: string; disabled?: boolean; readOnly?: boolean; required?: boolean; name?: string; form?: string; onValueChange?: (html: string) => void; onImageUpload?: (file: File) => Promise<string>; onImageUploadError?: (data: RichTextImageUploadErrorData) => void };
 
 export const RichTextEditor = /* @__PURE__ */ React.forwardRef<HTMLElement, RichTextEditorProps>(function RichTextEditor(inputProps: RichTextEditorProps, forwardedRef): React.ReactElement {
-  const { label, editorLabel, value, defaultValue, placeholder, disabled, readOnly, required, name, onValueChange, onImageUpload, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true });
+  const { label, editorLabel, value, defaultValue, placeholder, disabled, readOnly, required, name, onValueChange, onImageUpload, onImageUploadError, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true });
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   useNativeControlEvents(ref, '[role="textbox"]', props.onClick, props.onClickCapture, props);
@@ -1965,6 +1966,10 @@ export const RichTextEditor = /* @__PURE__ */ React.forwardRef<HTMLElement, Rich
   React.useEffect(() => { const element = ref.current as (HTMLElement & { uploadImage?: (file: File) => Promise<string> }) | null; if (element) element.uploadImage = onImageUpload; return () => { if (element) delete element.uploadImage; }; }, [onImageUpload]);
   useSpuiEvent(ref, "spui-input", value !== undefined || onValueChange ? detail => {
     onValueChange?.(String(detail.value ?? ""));
+  } : undefined);
+  useSpuiEvent(ref, "spui-image-upload-error", onImageUploadError ? detail => {
+    const data = detail as SpuiEventDetail & { fileName?: string; error?: unknown };
+    onImageUploadError({ fileName: String(data.fileName ?? ""), error: data.error });
   } : undefined);
   React.useLayoutEffect(() => {
     const element = ref.current as (HTMLElement & { value?: string }) | null;

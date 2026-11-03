@@ -2251,11 +2251,16 @@
           {
             "name": "RichTextEditorProps.onValueChange",
             "description": "Receives sanitized HTML after edits. With a controlled value prop, update that prop from this callback; the editor preserves its live selection while React applies the committed value."
+          },
+          {
+            "name": "RichTextEditorProps.onImageUploadError",
+            "description": "Receives the failed image filename and error when the application-managed upload fails or returns an unsafe URL."
           }
         ],
         "callbackProps": [
           "onValueChange",
-          "onImageUpload"
+          "onImageUpload",
+          "onImageUploadError"
         ],
         "slots": [],
         "styling": [
@@ -2266,7 +2271,10 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Edit sanitized rich HTML with controlled or uncontrolled form values, accessible formatting history, table editing, and application-managed durable image upload for SharePoint persistence."
+      "summary": "Edit sanitized rich HTML with controlled or uncontrolled form values, accessible formatting history, table editing, and application-managed durable image upload for SharePoint persistence.",
+      "highValueAdditions": [
+        "Add an accessible link editor with URL, display text, title, and remove-link actions."
+      ]
     },
     {
       "react": "Spinner",
