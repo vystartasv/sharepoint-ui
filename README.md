@@ -12,7 +12,7 @@ npm run build:spfx
 
 Build the Astro documentation site locally with `npm run build:docs`. Pushes to `main` automatically build and deploy it to [GitHub Pages](https://vystartasv.github.io/sharepoint-ui/).
 
-Before packaging a new tenant checkpoint, run `npm run version:spfx:patch` to advance the SPFx component, solution, feature, and lockfile versions together. This prevents SharePoint from retaining the previous web-part manifest after a solution-only version bump.
+Before packaging a new tenant checkpoint, run `npm run version:spfx:patch` to advance the SPFx web-part package, solution, feature, and lockfile versions together. The dry-run and artifact report also show the independent UI library version so the four version numbers are easy to distinguish.
 
 For a repeatable checkpoint, preview version changes with `npm run version:spfx:dry-run`, then bump and run `npm run build:spfx:measured`. It builds once and reports the hashed web-part bundle's raw/gzip/Brotli sizes plus the `.sppkg` size. Measure selected component imports with `npm run measure:component -- DataGrid DataGridBody DataGridCell`. Run `npm run verify:data-grid-parity` to compile the library once, then execute the composed and virtualized DataGrid browser checks.
 

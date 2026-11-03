@@ -8,7 +8,10 @@ if (!["patch", "minor", "major"].includes(bump)) throw new Error("Usage: node sc
 const packagePath = resolve(root, "examples/spfx124-webpart/package.json");
 const lockPath = resolve(root, "examples/spfx124-webpart/package-lock.json");
 const solutionPath = resolve(root, "examples/spfx124-webpart/config/package-solution.json");
-const [pkg, lock, solutionConfig] = await Promise.all([packagePath, lockPath, solutionPath].map(async path => JSON.parse(await readFile(path, "utf8"))));
+const [pkg, lock, solutionConfig, library] = await Promise.all([
+  ...[packagePath, lockPath, solutionPath].map(async path => JSON.parse(await readFile(path, "utf8"))),
+  readFile(resolve(root, "packages/sharepoint-ui/package.json"), "utf8").then(JSON.parse),
+]);
 const next = version => {
   const parts = version.split(".").map(Number);
   if (![3, 4].includes(parts.length) || parts.some(part => !Number.isInteger(part) || part < 0)) throw new Error(`Expected a stable three- or four-part version, received ${version}.`);
@@ -27,7 +30,7 @@ lock.packages[""].version = packageVersion;
 solution.version = next(solution.version);
 for (const feature of solution.features) feature.version = next(feature.version);
 const updates = [[packagePath, pkg], [lockPath, lock], [solutionPath, solutionConfig]];
-console.log(JSON.stringify({ dryRun, bump, componentVersion: packageVersion, solutionVersion: solution.version, featureVersions: solution.features.map(feature => feature.version) }, null, 2));
+console.log(JSON.stringify({ dryRun, bump, libraryVersion: library.version, webPartVersion: packageVersion, solutionVersion: solution.version, featureVersions: solution.features.map(feature => feature.version) }, null, 2));
 if (!dryRun) {
   const staged = [];
   try {

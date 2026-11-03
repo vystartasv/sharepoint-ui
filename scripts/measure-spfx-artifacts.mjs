@@ -6,9 +6,10 @@ const root = resolve(import.meta.dirname, "..");
 const example = resolve(root, "examples/spfx124-webpart");
 const assetDir = resolve(example, "release/assets");
 const solutionDir = resolve(example, "sharepoint/solution");
-const [assetNames, packageJson, solutionConfig, solutionNames] = await Promise.all([
+const [assetNames, webPartPackage, libraryPackage, solutionConfig, solutionNames] = await Promise.all([
   readdir(assetDir),
   readFile(resolve(example, "package.json"), "utf8").then(JSON.parse),
+  readFile(resolve(root, "packages/sharepoint-ui/package.json"), "utf8").then(JSON.parse),
   readFile(resolve(example, "config/package-solution.json"), "utf8").then(JSON.parse),
   readdir(solutionDir),
 ]);
@@ -24,7 +25,8 @@ if (!features?.length) throw new Error("SPFx solution config does not contain an
 
 console.log(JSON.stringify({
   measuredOn: new Date().toISOString().slice(0, 10),
-  componentVersion: packageJson.version,
+  webPartVersion: webPartPackage.version,
+  libraryVersion: libraryPackage.version,
   solutionVersion: solutionConfig.solution.version,
   featureVersions: features.map(feature => feature.version),
   sppkg: { file: packageNames[0], bytes: packageInfo.size },
