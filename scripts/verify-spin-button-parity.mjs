@@ -41,6 +41,8 @@ try {
   const host = name => page.getByTestId(name);
   const input = name => host(name).locator("input:not([hidden])");
   const fluentInput = page.locator("#fluent-form input");
+  assert.equal(await page.locator("#fluent-form button").nth(0).getAttribute("aria-label"), "Increment value", "fallback increment label matches pinned Fluent");
+  assert.equal(await page.locator("#fluent-form button").nth(1).getAttribute("aria-label"), "Decrement value", "fallback decrement label matches pinned Fluent");
   await input("controlled").evaluate(node => node.addEventListener("keydown", event => window.keyDefaults.push(["local", event.key, event.defaultPrevented])));
   await fluentInput.evaluate(node => node.addEventListener("keydown", event => window.keyDefaults.push(["fluent", event.key, event.defaultPrevented])));
   assert.equal(await page.getByRole("spinbutton", { name: "Weight", exact: true }).count(), 1, "visible label names the spinbutton");
@@ -109,7 +111,7 @@ try {
   const native = host("native");
   assert.equal(await native.evaluate(el => el.value), "4", "stepper does not cross max");
   assert.equal(await input("native").getAttribute("aria-valuetext"), "Four items", "explicit aria-valuetext is preserved");
-  assert.equal(await native.locator("button").nth(0).getAttribute("aria-label"), "Increase value");
+  assert.equal(await native.locator("button").nth(0).getAttribute("aria-label"), "Increment value");
   assert.ok(await native.evaluate(el => el.shadowRoot.querySelector("input").getBoundingClientRect().x > el.shadowRoot.querySelector("[part~=buttons]").getBoundingClientRect().x), "RTL places the steppers at the logical end");
   assert.equal(await native.locator("button").nth(0).isDisabled(), true);
   await native.locator("input").fill("2");

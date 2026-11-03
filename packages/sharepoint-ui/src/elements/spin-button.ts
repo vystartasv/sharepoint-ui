@@ -305,8 +305,8 @@ export function defineSpinButton(): void {
         button.innerHTML = `<svg aria-hidden="true" viewBox="0 0 16 16"><path d="${symbol}"/></svg>`;
         return button;
       };
-      const decrement = makeButton("decrement", "Decrease value", "m3.25 5.5 4.75 4.75 4.75-4.75");
-      const increment = makeButton("increment", "Increase value", "m3.25 10.5 4.75-4.75 4.75 4.75");
+      const decrement = makeButton("decrement", "Decrement value", "m3.25 5.5 4.75 4.75 4.75-4.75");
+      const increment = makeButton("increment", "Increment value", "m3.25 10.5 4.75-4.75 4.75 4.75");
       const inputSlot = document.createElement("slot"); inputSlot.name = "input"; inputSlot.part.add("input"); inputSlot.append(input); inputSlot.addEventListener("slotchange", () => this.syncSlots());
       const incrementSlot = document.createElement("slot"); incrementSlot.name = "incrementButton"; incrementSlot.part.add("increment-button-slot"); incrementSlot.append(increment); incrementSlot.addEventListener("slotchange", () => this.syncSlots());
       const decrementSlot = document.createElement("slot"); decrementSlot.name = "decrementButton"; decrementSlot.part.add("decrement-button-slot"); decrementSlot.append(decrement); decrementSlot.addEventListener("slotchange", () => this.syncSlots());
