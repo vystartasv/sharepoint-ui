@@ -35,6 +35,14 @@
   text-align: start;
 }
 
+.hero .copy,
+.hero .copy > *,
+.hero .copy h1,
+.hero .copy .tagline,
+.hero .copy .actions {
+  text-align: start;
+}
+
 .hero h1 {
   max-width: 13ch;
   margin-inline: 0;
