@@ -16,8 +16,8 @@ const adapter = getSharePointFieldAdapter(field);
 
 | SharePoint field | Recipe | Notes |
 | --- | --- | --- |
-| Text | `input`, type `text` | Uses the display name, internal name, description, and required flag. |
-| Integer, Number, Currency | `input`, type `number` | Integer uses step `1`; decimal fields use the configured precision or `any`. |
+| Text | `input`, type `text` | Uses the display name, internal name, description, and required flag; includes `maxLength` when provided. |
+| Integer, Number, Currency | `input`, type `number` | Includes numeric `min`/`max`; integer uses step `1`, decimal fields use configured precision or `any`. |
 | URL | `input`, type `url` | `urlFormat` preserves SharePoint's hyperlink or picture display setting for record views. |
 | Note without rich text | `textarea` | SharePoint's plain-text field stays plain text. |
 | Note with rich text | `rich-text-editor` | Includes the existing `richText` options; explicit SharePoint restrictions win. |
@@ -29,7 +29,7 @@ const adapter = getSharePointFieldAdapter(field);
 | Counter, Computed, Calculated | `read-only` | SharePoint calculates or manages these values. |
 | Other types | `unsupported` | Includes the source `fieldType` and a reason; use a specialized renderer. |
 
-Both SharePoint's PascalCase fields (`TypeAsString`, `InternalName`) and camelCase equivalents are accepted. `FieldTypeKind` numeric values are supported when `TypeAsString` is absent. Hidden, required, read-only, description, choice, and multi-value metadata are retained on the recipe.
+Both SharePoint's PascalCase fields (`TypeAsString`, `InternalName`) and camelCase equivalents are accepted. `FieldTypeKind` numeric values are supported when `TypeAsString` is absent. Hidden, required, read-only, text-length, numeric-bound, description, choice, and multi-value metadata are retained on the recipe.
 
 ## Load the list's field definitions
 
@@ -134,6 +134,8 @@ serializeSharePointFieldValue(amountField, "125.50");                  // { Amou
 serializeSharePointFieldValue(dueDateField, new Date());               // ISO date string
 serializeSharePointFieldValue(linkField, { url: "/sites/ops/guide", description: "Open guide" });
 ```
+
+The helper rejects text values over SharePoint's `MaxLength` and numeric values outside `MinimumValue`/`MaximumValue` (or `Min`/`Max`) when those bounds are present.
 
 Use `null` to clear nullable values. Read-only fields and empty values for required fields are rejected; `false` and `0` are valid values. Numeric strings are parsed as whole values; non-finite numbers and unsafe integers are rejected, and configured `Decimals` precision is enforced (trailing zeroes do not count as extra precision). URL fields accept absolute HTTP(S) or server-relative URLs and serialize to SharePoint's [`SP.FieldUrlValue`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.sharepoint.client.fieldurlvalue?view=sharepoint-csom) shape. Date-only ISO strings are preserved, date-time strings with a timezone keep that offset, and local date-time strings or `Date` objects become ISO UTC strings. The helper does not send the request or replace SharePoint-side validation.
 

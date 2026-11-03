@@ -108,6 +108,8 @@ For a Copilot surface that reads SharePoint data, updates the visible-state cont
 
 For dynamic forms backed by SharePoint list columns, request definitions with `getSharePointFieldMetadataUrl(webUrl, listId)` and map each through `getSharePointFieldAdapter(field)`. Use DatePicker for date-only fields and Input with `type={adapter.inputType}` for date-time fields. Pass `required={adapter.required}`, `disabled={adapter.readOnly}`, and `step={adapter.step}` where relevant. URL adapters also provide `urlFormat` (`hyperlink` or `picture`) for record views. Generic and focused serializers reject empty required values and read-only writes, and enforce configured numeric precision while creating payloads for common scalar, URL, choice, lookup, and person fields. `getSharePointNextPageUrl(webUrl, nextLink)` safely resolves same-origin OData paging links; `getSharePointLookupOptionsUrl(field, sourceWebUrl)` builds lookup requests. The app supplies authorized fetches, people search, permissions, and persistence.
 
+Forward adapter `min`, `max`, and `maxLength` to matching controls when present. The serializers enforce numeric bounds and text lengths too; SharePoint remains the final validator.
+
 ## Build from a component page
 
 1. Copy the React export or custom-element tag and its property/slot table.

@@ -56,6 +56,16 @@ export type SharePointFieldMetadata = SharePointMultiLineField & {
   displayFormat?: string | number;
   Decimals?: string | number;
   decimals?: string | number;
+  MaxLength?: string | number;
+  maxLength?: string | number;
+  MinimumValue?: string | number;
+  minimumValue?: string | number;
+  MaximumValue?: string | number;
+  maximumValue?: string | number;
+  Min?: string | number;
+  min?: string | number;
+  Max?: string | number;
+  max?: string | number;
   LookupList?: string;
   lookupList?: string;
   LookupField?: string;
@@ -79,6 +89,9 @@ export type SharePointFieldAdapter = {
   inputType?: "text" | "number" | "url" | "datetime-local";
   urlFormat?: "hyperlink" | "picture";
   step?: number | "any";
+  min?: number;
+  max?: number;
+  maxLength?: number;
   dateMode?: "date" | "date-time";
   choices?: readonly string[];
   allowFillIn?: boolean;
@@ -129,9 +142,12 @@ export function getSharePointFieldAdapter(field: SharePointFieldMetadata): Share
       const displayFormat = String(field.DisplayFormat ?? field.displayFormat ?? "0").trim().toLowerCase();
       control.urlFormat = displayFormat === "1" || displayFormat === "image" || displayFormat === "picture" ? "picture" : "hyperlink";
     }
+    control.maxLength = getConfiguredMaxLength(field);
     if (control.inputType === "number") {
       const decimalPlaces = getConfiguredDecimalPlaces(field);
       control.step = normalized === "integer" || decimalPlaces === 0 ? 1 : decimalPlaces == null ? "any" : 10 ** -decimalPlaces;
+      control.min = getConfiguredNumber(field.MinimumValue ?? field.minimumValue ?? field.Min ?? field.min);
+      control.max = getConfiguredNumber(field.MaximumValue ?? field.maximumValue ?? field.Max ?? field.max);
     }
     return control;
   }
@@ -284,6 +300,8 @@ export function serializeSharePointFieldValue(field: SharePointFieldMetadata, va
   assertSharePointFieldValueWritable(adapter, value);
   if (["text", "note"].includes(type)) {
     if (value != null && typeof value !== "string") throw new TypeError(`${adapter.label} requires a string value or null.`);
+    const maxLength = getConfiguredMaxLength(field);
+    if (typeof value === "string" && maxLength != null && value.length > maxLength) throw new RangeError(`${adapter.label} allows at most ${maxLength} characters.`);
     return { [adapter.name]: value as string | null };
   }
   if (type === "boolean") {
@@ -301,6 +319,10 @@ export function serializeSharePointFieldValue(field: SharePointFieldMetadata, va
     if (allowedDecimals != null && getNumericDecimalPlaces(precisionSource) > allowedDecimals) {
       throw new RangeError(`${adapter.label} allows at most ${allowedDecimals} decimal places.`);
     }
+    const minimum = getConfiguredNumber(field.MinimumValue ?? field.minimumValue ?? field.Min ?? field.min);
+    const maximum = getConfiguredNumber(field.MaximumValue ?? field.maximumValue ?? field.Max ?? field.max);
+    if (minimum != null && numeric < minimum) throw new RangeError(`${adapter.label} must be at least ${minimum}.`);
+    if (maximum != null && numeric > maximum) throw new RangeError(`${adapter.label} must be at most ${maximum}.`);
     return { [adapter.name]: numeric };
   }
   if (type === "datetime") {
@@ -319,7 +341,8 @@ export function serializeSharePointFieldValue(field: SharePointFieldMetadata, va
     const link = typeof value === "string" ? { url: value, description: value.trim() } : isSharePointUrlValue(value) ? value : undefined;
     if (!link) throw new TypeError(`${adapter.label} requires a URL string, URL value, or null.`);
     const url = link.url.trim();
-    if (url.length > 255) throw new RangeError(`${adapter.label} URL cannot exceed 255 characters.`);
+    const maxLength = Math.min(255, getConfiguredMaxLength(field) ?? 255);
+    if (url.length > maxLength) throw new RangeError(`${adapter.label} URL cannot exceed ${maxLength} characters.`);
     if (url && !isSharePointFieldUrl(url)) throw new TypeError(`${adapter.label} must be an HTTP(S) or server-relative URL.`);
     const description = link.description ?? url;
     if (typeof description !== "string") throw new TypeError(`${adapter.label} URL description must be a string.`);
@@ -381,6 +404,17 @@ function getConfiguredDecimalPlaces(field: SharePointFieldMetadata): number | un
   const decimals = field.Decimals ?? field.decimals;
   const value = typeof decimals === "number" ? decimals : typeof decimals === "string" && /^\d+$/.test(decimals.trim()) ? Number(decimals) : undefined;
   return value != null && Number.isSafeInteger(value) && value >= 0 ? value : undefined;
+}
+
+function getConfiguredMaxLength(field: SharePointFieldMetadata): number | undefined {
+  const value = field.MaxLength ?? field.maxLength;
+  const parsed = typeof value === "number" ? value : typeof value === "string" && /^\d+$/.test(value.trim()) ? Number(value) : undefined;
+  return parsed != null && Number.isSafeInteger(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+function getConfiguredNumber(value: string | number | undefined): number | undefined {
+  const parsed = typeof value === "number" ? value : typeof value === "string" && /^[-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?$/i.test(value.trim()) ? Number(value.trim()) : undefined;
+  return parsed != null && Number.isFinite(parsed) ? parsed : undefined;
 }
 
 function getNumericDecimalPlaces(value: string | number): number {
