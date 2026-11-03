@@ -222,26 +222,10 @@ function useHostProps(props: Record<string, unknown>): Record<string, unknown> {
   const className = props.className;
   return { ...props, className, "data-spui-appearance": props["data-spui-appearance"] ?? context.appearance, "data-spui-base-appearance": props["data-spui-base-appearance"] ?? context.baseAppearance, style, ...(props.lang === undefined && lang ? { lang } : {}), ...(props.dir === undefined && dir ? { dir } : {}) };
 }
-function bridgeCustomElementClick(handler: React.MouseEventHandler<HTMLElement>): React.MouseEventHandler<HTMLElement> {
-  return (event: React.MouseEvent<HTMLElement>) => {
-    const host = event.currentTarget;
-    const sourceEvent = event.nativeEvent;
-    const path = sourceEvent.composedPath();
-    const shadowRoot = host.shadowRoot;
-    const currentTarget = shadowRoot ? [...path].reverse().find((entry): entry is HTMLElement => entry instanceof HTMLElement && entry.getRootNode() === shadowRoot && !(entry instanceof HTMLSlotElement)) ?? host : host;
-    const target = path.find((entry): entry is Element => entry instanceof Element && !(entry instanceof HTMLSlotElement)) ?? host;
-    handler(createReactEventBridge(sourceEvent, sourceEvent, currentTarget, target) as React.MouseEvent<HTMLElement>);
-  };
-}
 function customElementProps(hostProps: Record<string, unknown>): Record<string, unknown> {
-  const { className, onClick, onClickCapture, ...attributes } = hostProps;
-  if (typeof className !== "string" && typeof onClick !== "function" && typeof onClickCapture !== "function") return hostProps;
-  return {
-    ...attributes,
-    ...(className === undefined ? {} : typeof className === "string" ? { class: className } : { className }),
-    ...(onClick === undefined ? {} : { onClick: typeof onClick === "function" ? bridgeCustomElementClick(onClick as React.MouseEventHandler<HTMLElement>) : onClick }),
-    ...(onClickCapture === undefined ? {} : { onClickCapture: typeof onClickCapture === "function" ? bridgeCustomElementClick(onClickCapture as React.MouseEventHandler<HTMLElement>) : onClickCapture }),
-  };
+  if (typeof hostProps.className !== "string") return hostProps;
+  const { className, ...attributes } = hostProps;
+  return { ...attributes, class: className };
 }
 function useCustomElementProps(props: Record<string, unknown>): Record<string, unknown> {
   return customElementProps(useHostProps(props));
@@ -881,7 +865,7 @@ export function Overflow({ children, label, minimumVisible = 0, overflowDirectio
 }
 
 export type CardOnSelectionChangeEvent = React.MouseEvent | React.KeyboardEvent | React.ChangeEvent;
-export type CardProps = Omit<ElementProps, "onClick" | "onClickCapture"> & { onClick?: React.MouseEventHandler<HTMLDivElement>; onClickCapture?: React.MouseEventHandler<HTMLDivElement>; appearance?: CardAppearance; orientation?: CardOrientation; size?: CardSize; focusMode?: CardFocusMode; selected?: boolean; defaultSelected?: boolean; disabled?: boolean; selectionLabel?: string; checkbox?: React.ReactElement<HTMLInputElement>; floatingAction?: React.ReactNode; onSelectionChange?: (event: CardOnSelectionChangeEvent, data: { selected: boolean }) => void };
+export type CardProps = ElementProps & { appearance?: CardAppearance; orientation?: CardOrientation; size?: CardSize; focusMode?: CardFocusMode; selected?: boolean; defaultSelected?: boolean; disabled?: boolean; selectionLabel?: string; checkbox?: React.ReactElement<HTMLInputElement>; floatingAction?: React.ReactNode; onSelectionChange?: (event: CardOnSelectionChangeEvent, data: { selected: boolean }) => void };
 export const Card = /* @__PURE__ */ React.forwardRef<HTMLElement, CardProps>(function Card({ children, appearance = "filled", orientation = "vertical", size = "medium", focusMode, selected, defaultSelected, disabled = false, selectionLabel, checkbox, floatingAction, onSelectionChange, ...props }: CardProps, forwardedRef): React.ReactElement {
   ensureDefined(defineCard);
   const ref = React.useRef<HTMLElement | null>(null);
