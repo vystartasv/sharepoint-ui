@@ -32,7 +32,7 @@ let nextGridId = 0;
 export function defineDataGrid(): void {
   if (customElements.get("spui-data-grid")) return;
   class SpuiDataGrid extends HTMLElement implements SharePointDataGridElement {
-    static observedAttributes = ["aria-label", "label", "focus-mode", "selection-mode", "selection-appearance", "subtle-selection", "auto-fit-columns", "container-width-offset", "row-height", "overscan", "virtualize-columns", "select-label", "select-all-label", "empty-label", "no-results-label", "loading-label", "load-error-label", "edit-error-label", "filterable", "filter-label", "sort-priority-label", "resizable-columns", "resize-label", "reorderable-columns", "reorder-label", "group-by", "empty-group-label", "expand-group-label", "collapse-group-label", "row-label", "edit-hint", "selection-copied-label", "copy-failed-label", "paste-one-label", "paste-many-label", "paste-failed-label"];
+    static observedAttributes = ["aria-label", "label", "focus-mode", "selection-mode", "selection-appearance", "subtle-selection", "auto-fit-columns", "container-width-offset", "row-height", "overscan", "virtualize-columns", "select-label", "select-all-label", "empty-label", "no-results-label", "loading-label", "load-error-label", "edit-error-label", "filterable", "filter-label", "sort-priority-label", "resizable-columns", "resize-label", "reorderable-columns", "reorder-label", "reorder-hint-label", "group-by", "empty-group-label", "expand-group-label", "collapse-group-label", "row-label", "edit-hint", "selection-copied-label", "copy-failed-label", "paste-one-label", "paste-many-label", "paste-failed-label"];
     private data: unknown[] = [];
     private source?: DataGridDataSource;
     private sourceUnsubscribe?: () => void;
@@ -344,7 +344,7 @@ export function defineDataGrid(): void {
         if (missing) {
           this.failedSourceRange = key;
           const error = new Error("loadRange resolved before every requested row was available");
-          if (this.reorderStatus) this.reorderStatus.textContent = this.localizedMessage("load-error-label", "Data could not be loaded: {message}", { message: error.message });
+          if (this.reorderStatus) this.reorderStatus.textContent = this.localizedMessage("load-error-label", "Data could not be loaded.");
           this.viewport?.setAttribute("aria-busy", "false");
           this.dispatchEvent(new CustomEvent("spui-data-load-error", { detail: { error, start, end }, bubbles: true, composed: true }));
           return;
@@ -355,7 +355,7 @@ export function defineDataGrid(): void {
       }, error => {
         if (this.sourceRequest !== request || request.controller.signal.aborted) return;
         this.sourceRequest = undefined; this.failedSourceRange = key;
-        if (this.reorderStatus) this.reorderStatus.textContent = this.localizedMessage("load-error-label", "Data could not be loaded: {message}", { message: error instanceof Error ? error.message : String(error) });
+        if (this.reorderStatus) this.reorderStatus.textContent = this.localizedMessage("load-error-label", "Data could not be loaded.");
         this.viewport?.setAttribute("aria-busy", "false");
         this.dispatchEvent(new CustomEvent("spui-data-load-error", { detail: { error, start, end }, bubbles: true, composed: true }));
       });
@@ -438,7 +438,7 @@ export function defineDataGrid(): void {
           grip.dataset.reorderColumn = column.id;
           grip.draggable = true;
           grip.setAttribute("aria-label", `${this.getAttribute("reorder-label") || "Reorder column"} ${column.label}`);
-          grip.title = `${this.getAttribute("reorder-label") || "Reorder column"} ${column.label}; use Alt+Shift+Arrow keys`;
+          grip.title = this.localizedMessage("reorder-hint-label", "Reorder {column}; use Alt+Shift+Arrow keys", { column: column.label });
           grip.textContent = "⠿";
           cell.append(grip);
         }
@@ -856,7 +856,7 @@ export function defineDataGrid(): void {
       }, reason => {
         if (controller.signal.aborted) return;
         const message = reason instanceof Error ? reason.message : String(reason);
-        if (this.reorderStatus) this.reorderStatus.textContent = this.localizedMessage("copy-failed-label", "Copy failed. {message}", { message });
+        if (this.reorderStatus) this.reorderStatus.textContent = this.localizedMessage("copy-failed-label", "Copy failed.");
         this.dispatchEvent(new CustomEvent("spui-clipboard-error", { detail: { operation: "copy", message }, bubbles: true, composed: true }));
       });
     }
@@ -923,7 +923,7 @@ export function defineDataGrid(): void {
       } catch (reason) {
         if (this.clipboardController?.signal.aborted) return;
         const message = reason instanceof Error ? reason.message : String(reason);
-        if (this.reorderStatus) this.reorderStatus.textContent = this.localizedMessage("paste-failed-label", "Paste failed. {message}", { message });
+        if (this.reorderStatus) this.reorderStatus.textContent = this.localizedMessage("paste-failed-label", "Paste failed.");
         this.dispatchEvent(new CustomEvent("spui-cells-edit-error", { detail: { message, edits }, bubbles: true, composed: true }));
       }
     }

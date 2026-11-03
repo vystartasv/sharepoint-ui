@@ -97,6 +97,7 @@
       "paste-failed-label",
       "paste-many-label",
       "paste-one-label",
+      "reorder-hint-label",
       "reorder-label",
       "reorderable-columns",
       "resizable-columns",
