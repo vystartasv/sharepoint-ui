@@ -67,6 +67,12 @@
           "SharePointUIProvider tokens",
           "CSS custom properties",
           "host className/style"
+        ],
+        "relatedReactApis": [
+          {
+            "name": "scrollToItemStatic / scrollToItemDynamic",
+            "description": "Horizontal scroll helpers read the scroll view’s computed direction; inherited dir=\"rtl\" scrolls from the right-side inline start. The reversed option continues to control index order."
+          }
         ]
       },
       "summary": "Render large horizontal or vertical collections through a bounded accessible viewport, or use browser-window scrolling for vertical page-flow lists, with fixed or measured item sizes, index-based rendering, and imperative scrolling."

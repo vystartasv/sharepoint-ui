@@ -13,6 +13,11 @@ function viewportLength(element: HTMLElement, direction: "vertical" | "horizonta
   return direction === "vertical" ? rect.height : rect.width;
 }
 
+function scrollToHorizontalItem(view: HTMLElement, offset: number, behavior: ScrollBehavior): void {
+  const rtl = view.ownerDocument.defaultView?.getComputedStyle(view).direction === "rtl";
+  view.scrollTo({ left: rtl ? -offset : offset, behavior });
+}
+
 /** Measure a fixed-size viewport and calculate a bounded item window. */
 export function useStaticVirtualizerMeasure<TElement extends HTMLElement = HTMLElement>(props: VirtualizerMeasureProps): {
   virtualizerLength: number; bufferItems: number; bufferSize: number; scrollRef: (element: TElement | null) => void; containerSizeRef: React.MutableRefObject<number>;
@@ -235,7 +240,7 @@ export function scrollToItemStatic({ index, itemSize, totalItems, scrollViewRef,
   if (!view || !Number.isFinite(index) || !Number.isFinite(itemSize) || itemSize <= 0 || totalItems <= 0) return;
   const safeIndex = Math.max(0, Math.min(totalItems - 1, Math.floor(index)));
   const offset = reversed ? Math.max(0, totalItems * itemSize - itemSize * (safeIndex + 1)) : safeIndex * itemSize;
-  if (axis === "horizontal") view.scrollTo({ left: offset, behavior });
+  if (axis === "horizontal") scrollToHorizontalItem(view, offset, behavior);
   else view.scrollTo({ top: offset, behavior });
 }
 
@@ -248,6 +253,6 @@ export function scrollToItemDynamic({ index, itemSizes, totalSize, scrollViewRef
   let offset = 0;
   for (let item = 0; item < safeIndex; item++) offset += Number.isFinite(sizes[item]) ? Math.max(0, sizes[item]) : 0;
   if (reversed) offset = Math.max(0, totalSize - offset - (Number.isFinite(sizes[safeIndex]) ? Math.max(0, sizes[safeIndex]) : 0));
-  if (axis === "horizontal") view.scrollTo({ left: offset, behavior });
+  if (axis === "horizontal") scrollToHorizontalItem(view, offset, behavior);
   else view.scrollTo({ top: offset, behavior });
 }
