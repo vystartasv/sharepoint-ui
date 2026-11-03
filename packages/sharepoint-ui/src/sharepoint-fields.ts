@@ -89,6 +89,8 @@ export type SharePointFieldAdapter = {
 export type SharePointLookupId = number | string;
 export type SharePointLookupValue = SharePointLookupId | readonly SharePointLookupId[] | null;
 export type SharePointLookupUpdate = Record<string, number | null | { results: number[] }>;
+export type SharePointChoiceValue = string | readonly string[] | null;
+export type SharePointChoiceUpdate = Record<string, string | null | { results: string[] }>;
 
 const booleanValue = (value: SharePointBoolean | undefined): boolean => value === true || (typeof value === "string" && value.trim().toLowerCase() === "true");
 
@@ -200,7 +202,36 @@ export function serializeSharePointLookupValue(field: SharePointFieldMetadata, v
   return { [key]: value == null || value === "" ? null : parseLookupId(value) };
 }
 
+/** Serialize SharePoint Choice and MultiChoice values for an item create or update body. */
+export function serializeSharePointChoiceValue(field: SharePointFieldMetadata, value: SharePointChoiceValue): SharePointChoiceUpdate {
+  const adapter = getSharePointFieldAdapter(field);
+  const type = adapter.fieldType.replace(/^SP\.Field/, "").toLowerCase();
+  const multiple = type === "multichoice";
+  if (!["choice", "outcomechoice", "multichoice"].includes(type)) {
+    throw new TypeError("Only SharePoint Choice and MultiChoice fields can be serialized as choice values.");
+  }
+  if (!adapter.name) throw new TypeError("The SharePoint field must include InternalName.");
+  const choices = field.Choices ?? field.choices ?? [];
+  const allowFillIn = booleanValue(field.FillInChoice ?? field.fillInChoice);
+  const validateChoice = (choice: string): string => {
+    if (choices.length && !choices.includes(choice) && !allowFillIn) throw new RangeError(`“${choice}” is not an allowed value for ${adapter.label}.`);
+    return choice;
+  };
+
+  if (multiple) {
+    if (value == null) return { [adapter.name]: { results: [] } };
+    if (!isChoiceValueArray(value)) throw new TypeError("A MultiChoice field requires an array of selected values.");
+    return { [adapter.name]: { results: [...new Set(value.map(validateChoice))] } };
+  }
+  if (isChoiceValueArray(value)) throw new TypeError("A Choice field accepts one value or null.");
+  return { [adapter.name]: value == null || value === "" ? null : validateChoice(value) };
+}
+
 function isLookupIdArray(value: SharePointLookupValue): value is readonly SharePointLookupId[] {
+  return Array.isArray(value);
+}
+
+function isChoiceValueArray(value: SharePointChoiceValue): value is readonly string[] {
   return Array.isArray(value);
 }
 

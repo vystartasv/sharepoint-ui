@@ -154,7 +154,7 @@ For a people stack with named overflow details, compose `AvatarGroupItem` childr
 
 ## Data and rich text
 
-- For SP list columns, call `getSharePointFieldAdapter(field)` from `@spfx-fast/sharepoint-ui/sharepoint-fields`. It accepts REST/CSOM PascalCase or camelCase metadata and returns a predictable `control`, `label`, `name`, `required`, `readOnly`, choice/date/number details, or an explicit `unsupported` result. Use `getSharePointLookupOptionsUrl(field, sourceWebUrl)` for the source list request, and `serializeSharePointLookupValue(field, ids)` for single/multiple lookup or people ID payloads. The host still performs authorized reads, people search, field validation, and persistence.
+- For SP list columns, call `getSharePointFieldAdapter(field)` from `@spfx-fast/sharepoint-ui/sharepoint-fields`. It accepts REST/CSOM PascalCase or camelCase metadata and returns a predictable `control`, `label`, `name`, `required`, `readOnly`, choice/date/number details, or an explicit `unsupported` result. Use `getSharePointLookupOptionsUrl(field, sourceWebUrl)` for the source list request, `serializeSharePointLookupValue(field, ids)` for lookup/user ID payloads, and `serializeSharePointChoiceValue(field, values)` for validated Choice/MultiChoice payloads. The host still performs authorized reads, people search, other field serialization, and persistence.
 
 - Use `ColorPicker` when users need a theme-aware color choice. Its `value` is `#RRGGBB`, `alpha` is `0`–`1`, and `onValueChange(value, alpha)` receives both values. Pass `colors` for app-specific swatches; tenant accent, success, warning, and danger swatches are included by default. The element submits `#RRGGBB` or `#RRGGBBAA` as a native form value.
 
