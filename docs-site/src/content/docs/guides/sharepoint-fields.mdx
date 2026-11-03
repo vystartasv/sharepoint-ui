@@ -31,6 +31,36 @@ const adapter = getSharePointFieldAdapter(field);
 
 Both SharePoint's PascalCase fields (`TypeAsString`, `InternalName`) and camelCase equivalents are accepted. `FieldTypeKind` numeric values are supported when `TypeAsString` is absent. Hidden, required, read-only, description, choice, and multi-value metadata are retained on the recipe.
 
+## Load the list's field definitions
+
+Use the list GUID and its web URL to request field metadata, including type-specific properties such as choices and lookup sources. The URL is bounded and requests the available field properties so the adapter has enough information to select the right control:
+
+```ts
+import { SPHttpClient } from "@microsoft/sp-http";
+import {
+  getSharePointFieldAdapter,
+  getSharePointFieldMetadataUrl,
+  getSharePointNextPageUrl,
+  type SharePointFieldMetadata
+} from "@spfx-fast/sharepoint-ui/sharepoint-fields";
+
+const webUrl = context.pageContext.web.absoluteUrl;
+const response = await context.spHttpClient.get(
+  getSharePointFieldMetadataUrl(webUrl, listId),
+  SPHttpClient.configurations.v1,
+  { headers: { Accept: "application/json;odata=nometadata" } }
+);
+if (!response.ok) throw new Error(`Field request failed: ${response.status}`);
+const page = await response.json() as {
+  value?: SharePointFieldMetadata[];
+  "@odata.nextLink"?: string;
+};
+const adapters = (page.value ?? []).map(getSharePointFieldAdapter).filter(field => !field.hidden);
+const nextPageUrl = getSharePointNextPageUrl(webUrl, page["@odata.nextLink"]);
+```
+
+If `nextPageUrl` is non-null, request it and append the next page's adapters. Hide columns from the form using `hidden`; disable `readOnly` fields, and use `control` to select the matching library component. SharePoint exposes field definitions through its list `Fields` endpoint; `$select=*` returns the available field properties. See Microsoft's [SharePoint OData query guidance](https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/use-odata-query-operations-in-sharepoint-rest-requests).
+
 ## Load and save lookup selections
 
 SharePoint identifies lookup values by the source list's item ID. The field metadata supplies its `LookupList` and `LookupField`; pass the source list's web URL to create a bounded options request:

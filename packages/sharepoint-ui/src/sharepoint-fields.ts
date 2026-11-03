@@ -164,6 +164,20 @@ export function getSharePointFieldAdapter(field: SharePointFieldMetadata): Share
   return { ...adapter, unsupportedReason: "This SharePoint field type needs a specialized data source or renderer." };
 }
 
+/** Build a bounded REST request for a list's field definitions and their type-specific metadata. */
+export function getSharePointFieldMetadataUrl(listWebUrl: string, listId: string, pageSize = 100): string {
+  if (!Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 500) throw new RangeError("pageSize must be an integer from 1 to 500.");
+  const normalizedListId = listId.trim().replace(/[{}]/g, "");
+  if (!/^[\da-f]{8}-(?:[\da-f]{4}-){3}[\da-f]{12}$/i.test(normalizedListId)) throw new TypeError("listId must be a SharePoint list GUID.");
+
+  const url = new URL(listWebUrl);
+  if (!/^https?:$/.test(url.protocol) || url.username || url.password) throw new TypeError("listWebUrl must be an HTTP(S) SharePoint web URL.");
+  url.pathname = `${url.pathname.replace(/\/+$/, "")}/_api/web/lists(guid'${normalizedListId}')/fields`;
+  url.search = new URLSearchParams({ "$select": "*", "$top": String(pageSize) }).toString();
+  url.hash = "";
+  return url.toString();
+}
+
 /** Build a paged REST URL for options in a lookup field's source list. Pass that list's web URL. */
 export function getSharePointLookupOptionsUrl(field: SharePointFieldMetadata, lookupWebUrl: string, pageSize = 100): string {
   const adapter = getSharePointFieldAdapter(field);
