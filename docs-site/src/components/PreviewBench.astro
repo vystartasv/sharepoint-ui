@@ -79,6 +79,7 @@
   import { getSharePointUIStyleTokens } from "@spfx-fast/sharepoint-ui/appearance";
   import themeCapture from "../data/sharepoint-theme.json";
   import { createPreviewThemeOverrides } from "../utils/preview-theme.js";
+  import { observeDocsPreviewColorScheme } from "../utils/docs-preview-theme.js";
 
   defineAvatar();
   defineBadge();
@@ -89,6 +90,7 @@
 
   const preview = document.querySelector<HTMLElement>(".preview-bench");
   const app = document.querySelector<HTMLElement>("#preview-app");
+  const syncColorScheme = observeDocsPreviewColorScheme(preview, app);
   const accents = ["#007780", "#0f6cbd", "#107c10", "#c239b3"];
   const accentNames = ["SharePoint teal", "Blue", "Green", "Pink"];
   let accentIndex = 0;
@@ -98,6 +100,7 @@
     const overrides = createPreviewThemeOverrides(themeCapture.presets.sharepoint.tokens, accent, accent !== themeCapture.presets.sharepoint.accent);
     Object.entries(getSharePointUIStyleTokens("ios", overrides)).forEach(([name, value]) => preview.style.setProperty(name, value));
     Object.entries(overrides).forEach(([name, value]) => preview.style.setProperty(name, value));
+    syncColorScheme();
   };
   applyPreviewTheme(accents[accentIndex]);
 

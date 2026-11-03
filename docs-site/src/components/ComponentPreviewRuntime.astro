@@ -2,6 +2,7 @@
   import { getSharePointUIStyleTokens } from "@spfx-fast/sharepoint-ui/appearance";
   import themeCapture from "../data/sharepoint-theme.json";
   import { createPreviewThemeOverrides } from "../utils/preview-theme.js";
+  import { observeDocsPreviewColorScheme } from "../utils/docs-preview-theme.js";
   import { registerPreviewElements } from "./preview-elements.generated.js";
 
   const themePresets = themeCapture.presets;
@@ -14,6 +15,7 @@
     const stage = demo.querySelector(".component-demo__stage");
     const status = demo.querySelector(".component-demo__status");
     const tokenReadout = demo.querySelector("[data-preview-tokens]");
+    const syncColorScheme = observeDocsPreviewColorScheme(demo, stage);
     let interactionSummary = "";
 
     const applyTokens = () => {
@@ -36,6 +38,7 @@
         demo.style.setProperty(name, value);
         stage?.style.setProperty(name, value);
       }
+      syncColorScheme();
       if (accent && accent.value !== accentValue) accent.value = accentValue;
       if (tokenReadout) {
         tokenReadout.replaceChildren();
