@@ -12,7 +12,7 @@ const shouldRenderSearch = config.pagefind || config.components.Search !== "@ast
   <div class="docs-header__title"><SiteTitle /></div>
   <div class="docs-header__search">{shouldRenderSearch && <Search />}</div>
   <details class="docs-mobile-nav">
-    <summary aria-label="Open site navigation" title="Open site navigation"><span aria-hidden="true">☰</span></summary>
+    <summary aria-label="Open site navigation" title="Open site navigation"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3 5h14M3 10h14M3 15h14"/></svg></summary>
     <nav aria-label="Site navigation">
       <a href="/sharepoint-ui/catalog/">Browse components</a>
       <a href="/sharepoint-ui/getting-started/">Get started</a>
@@ -79,6 +79,7 @@ const shouldRenderSearch = config.pagefind || config.components.Search !== "@ast
       .docs-header__search { margin-inline-start:auto; }
       .docs-mobile-nav { display:block; position:relative; flex:none; }
       .docs-mobile-nav summary { display:grid; place-items:center; width:2.5rem; height:2.5rem; border:1px solid var(--sl-color-gray-5); border-radius:50%; background:var(--sl-color-bg); color:var(--sl-color-text); box-shadow:var(--sl-shadow-md); cursor:pointer; list-style:none; }
+      .docs-mobile-nav summary svg { width:1.25rem; height:1.25rem; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; }
       .docs-mobile-nav summary::-webkit-details-marker { display:none; }
       .docs-mobile-nav nav { position:fixed; z-index:var(--sl-z-index-menu); inset-block-start:calc(var(--sl-nav-height) - .25rem); inset-inline-end:.75rem; display:grid; min-width:14rem; gap:.2rem; padding:.5rem; border:1px solid var(--sl-color-hairline); border-radius:.8rem; background:var(--sl-color-bg); box-shadow:var(--sl-shadow-md); }
       .docs-mobile-nav a { padding:.7rem .8rem; border-radius:.45rem; color:var(--sl-color-text); text-decoration:none; }
