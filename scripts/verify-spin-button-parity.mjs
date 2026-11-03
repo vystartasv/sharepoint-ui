@@ -43,6 +43,8 @@ try {
   const fluentInput = page.getByTestId("fluent");
   assert.equal(await page.locator("#fluent-form button").nth(0).getAttribute("aria-label"), "Increment value", "fallback increment label matches pinned Fluent");
   assert.equal(await page.locator("#fluent-form button").nth(1).getAttribute("aria-label"), "Decrement value", "fallback decrement label matches pinned Fluent");
+  assert.equal(await host("hold-local").locator("button").nth(0).getAttribute("aria-label"), await page.locator("#fluent-form button").nth(0).getAttribute("aria-label"), "React adapter preserves Fluent's default increment label");
+  assert.equal(await host("hold-local").locator("button").nth(1).getAttribute("aria-label"), await page.locator("#fluent-form button").nth(1).getAttribute("aria-label"), "React adapter preserves Fluent's default decrement label");
   const holdLocal = host("hold-local").locator("button").first();
   const holdFluent = page.locator("#fluent-form button").nth(2);
   await holdLocal.evaluate(button => button.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, button: 0 })));
