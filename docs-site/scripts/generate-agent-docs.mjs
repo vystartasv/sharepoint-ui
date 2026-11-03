@@ -2,6 +2,7 @@ import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import ts from "typescript";
+import { elementAttributesFor } from "./element-source-contracts.mjs";
 
 const siteRoot = resolve(import.meta.dirname, "..");
 const projectRoot = resolve(siteRoot, "..");
@@ -61,39 +62,6 @@ function elementEventsFor(source, fileName) {
     bubbles: delivery(item.bubbles),
     composed: delivery(item.composed),
   })).sort((a, b) => a.name.localeCompare(b.name));
-}
-function elementAttributesFor(source, fileName) {
-  const root = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
-  const classAttributes = new Map();
-  const tagAttributes = {};
-  const readName = node => node && (ts.isIdentifier(node) || ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) ? node.text : undefined;
-  const observedAttributes = node => {
-    const property = node.members?.find(member => ts.isPropertyDeclaration(member) && readName(member.name) === "observedAttributes" && ts.getModifiers(member)?.some(modifier => modifier.kind === ts.SyntaxKind.StaticKeyword));
-    return property && ts.isArrayLiteralExpression(property.initializer)
-      ? property.initializer.elements.map(readName).filter(Boolean)
-      : [];
-  };
-  const readClasses = node => {
-    if ((ts.isClassDeclaration(node) || ts.isClassExpression(node)) && node.name) classAttributes.set(node.name.text, observedAttributes(node));
-    ts.forEachChild(node, readClasses);
-  };
-  readClasses(root);
-  const readDefinitions = node => {
-    if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === "define") {
-      const receiver = node.expression.expression;
-      const isCustomElements = (ts.isIdentifier(receiver) && receiver.text === "customElements") || (ts.isPropertyAccessExpression(receiver) && receiver.name.text === "customElements");
-      const tag = readName(node.arguments[0]);
-      const definition = node.arguments[1];
-      const className = definition && ts.isIdentifier(definition) ? definition.text : undefined;
-      const attrs = definition && (ts.isClassDeclaration(definition) || ts.isClassExpression(definition))
-        ? observedAttributes(definition)
-        : className ? classAttributes.get(className) ?? [] : [];
-      if (isCustomElements && tag && attrs.length) tagAttributes[tag] = [...new Set(attrs)].sort();
-    }
-    ts.forEachChild(node, readDefinitions);
-  };
-  readDefinitions(root);
-  return tagAttributes;
 }
 const modules = new Map();
 const elementModuleEvents = {};

@@ -2,6 +2,7 @@ import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import ts from "typescript";
+import { elementAttributesFor } from "./element-source-contracts.mjs";
 
 const siteRoot = resolve(import.meta.dirname, "..");
 const projectRoot = resolve(siteRoot, "..");
@@ -18,6 +19,12 @@ await copyFile(catalogSource, siteCatalog);
 const catalog = JSON.parse(await readFile(siteCatalog, "utf8"));
 const grouped = new Map();
 for (const component of catalog.components) grouped.set(component.module, [...(grouped.get(component.module) ?? []), component]);
+const observedAttributesByTag = new Map();
+for (const module of grouped.keys()) {
+  const sourcePath = resolve(projectRoot, "packages/sharepoint-ui/src/elements", `${module}.ts`);
+  const source = await readFile(sourcePath, "utf8").catch(() => "");
+  for (const [tag, attributes] of Object.entries(elementAttributesFor(source, sourcePath))) observedAttributesByTag.set(tag, attributes);
+}
 const reactSource = await readFile(resolve(projectRoot, "packages/sharepoint-ui/src/react.tsx"), "utf8");
 const reactAst = ts.createSourceFile("react.tsx", reactSource, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
 const reactTypes = new Map(reactAst.statements.filter(statement => ts.isTypeAliasDeclaration(statement) || ts.isInterfaceDeclaration(statement)).map(statement => [statement.name.text, statement]));
@@ -148,6 +155,51 @@ function slotsTableFor(slots) {
   return `<section class="api-table-section"><h2>Slots</h2><div class="api-table-scroll"><table class="api-table"><thead><tr><th scope="col">Slot</th><th scope="col">What goes here</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
 }
 
+function customElementAttributesTableFor(component) {
+  if (!component.tag?.startsWith("spui-")) return "";
+  const attributes = observedAttributesByTag.get(component.tag) ?? [];
+  if (!attributes.length) return `<section class="api-table-section"><h2>Custom-element attributes</h2><p>This element has no component-specific observed attributes. Standard HTML attributes may still apply.</p></section>`;
+  const descriptions = {
+    "aria-label": "Accessible name announced by assistive technology.",
+    appearance: "Visual treatment applied to the control.",
+    "auto-fit-columns": "Automatically size columns to fit their visible content.",
+    "collapse-group-label": "Text for the action that collapses a group.",
+    "collapse-label": "Text announced for the collapse action.",
+    "container-width-offset": "Adjusts available grid width before column sizing.",
+    disabled: "Prevents user interaction.",
+    dir: "Text direction: left-to-right, right-to-left, or automatic.",
+    "empty-group-label": "Text shown when a group has no rows.",
+    "empty-label": "Text shown when there are no items.",
+    "expand-group-label": "Text for the action that expands a group.",
+    "filter-label": "Accessible label for the filter control.",
+    filterable: "Shows the grid's row filter.",
+    "focus-mode": "Keyboard focus strategy used while navigating the grid.",
+    "group-by": "Column used to group rows.",
+    label: "Visible or accessible label for the element.",
+    "loading-label": "Text shown and announced while rows are loading.",
+    name: "Form field name used when submitting a value.",
+    "no-results-label": "Text shown when filtering finds no matches.",
+    overscan: "Extra rows rendered just outside the visible area for smooth scrolling.",
+    placeholder: "Hint shown while the value is empty.",
+    readonly: "Prevents editing while keeping the value available.",
+    "reorderable-columns": "Allows users to change the column order.",
+    required: "Marks the control as required.",
+    "resizable-columns": "Allows users to change column widths.",
+    "row-height": "Height used for each grid row.",
+    size: "Control size preset.",
+    "sort-priority-label": "Accessible text describing a column's sort priority.",
+    "subtle-selection": "Uses a quieter visual treatment for selected rows.",
+    value: "Current value or selected item, depending on the component."
+  };
+  const rows = attributes.map(attribute => {
+    const propertyName = attribute.replace(/-([a-z])/g, (_, character) => character.toUpperCase());
+    const words = attribute.replaceAll("-", " ");
+    const description = descriptions[attribute] ?? propertyDescriptions[propertyName] ?? `Sets the ${words} for this component.`;
+    return `<tr><th scope="row"><code>${escapeHtml(attribute)}</code></th><td>${escapeHtml(description)}</td></tr>`;
+  }).join("\n");
+  return `<section class="api-table-section"><h2>Custom-element attributes</h2><p>These are the attributes this element observes. Set them in HTML or update them with <code>setAttribute()</code>; pass objects and callbacks as JavaScript properties.</p><details><summary>Show ${attributes.length} observed attributes</summary><div class="api-table-scroll"><table class="api-table"><thead><tr><th scope="col">Attribute</th><th scope="col">What it does</th></tr></thead><tbody>${rows}</tbody></table></div></details></section>`;
+}
+
 function exampleFor(component) {
   const compositions = {
     label: { tag: "div", markup: '<div class="preview-field"><label for="preview-project-code">Project code <span aria-hidden="true">*</span></label><input id="preview-project-code" required value="OPS-204" /></div>' },
@@ -248,6 +300,7 @@ for (const [module, entries] of familyIndex) {
     const callbacks = entry.api?.callbackProps?.length ? entry.api.callbackProps.map(prop => `<code>${escapeHtml(prop)}</code>`).join(", ") : "None declared";
     const properties = propertyTableFor(entry);
     const slotTable = slotsTableFor(entry.api?.slots);
+    const attributeTable = customElementAttributesTableFor(entry);
     const useRichTextPlayground = entry.react === "RichTextEditor";
     const richTextFieldNote = useRichTextPlayground ? `\n\nThe toolbar follows the destination field: compatible-rich and FullHtml modes expose font family, size, text color, and highlight color; plain and restricted fields hide unsupported formatting. Values are sanitized HTML, and SharePoint can normalize content when it saves it. The editor does not reproduce every native SharePoint form control or classic-only command. Microsoft documents enhanced rich text's supported formatting in its [rich-text list-column guide](https://support.microsoft.com/en-us/sharepoint/lists/data-and-lists/edit-a-rich-text-list-column).\n` : "";
     const previewImport = useRichTextPlayground
@@ -312,7 +365,7 @@ for (const [module, entries] of familyIndex) {
     const agentSlice = `/sharepoint-ui/agents/components/${slugFor(module)}/${slug}.json`;
     const eventSlice = entry.tag?.startsWith("spui-") ? ` Custom-element events are in the [${escapeHtml(module)} event inventory](/sharepoint-ui/agents/events/${slugFor(module)}.json); it is module-scoped.` : "";
     const agentPath = `\n> **Building with an agent?** Follow the [component conventions](/sharepoint-ui/guides/component-patterns/), then use the [quickstart](/sharepoint-ui/agents/QUICKSTART.md) and this component’s [API slice](${agentSlice}).${eventSlice}\n`;
-    const page = `---\ntitle: ${quote(name)}\ndescription: ${quote(entry.summary ?? firstSummary)}\n---\n\n${previewImport}\n\n${previewRuntime}\n\n${entry.summary ?? ""}${richTextFieldNote}\n${agentPath}\n${preview}\n${reactUsage}\n${properties}\n${slotTable}\n<div class="api-entry">\n  <p class="api-meta"><span>${react}</span><span>${reactRoot}</span><span>${customElement}</span></p>\n  <p><strong>Callbacks:</strong> ${callbacks}</p>\n  <p><strong>Styling:</strong> ${styling}</p>\n  ${signature}\n  ${relatedApis}\n</div>\n${customExample}${relatedPreview}\n`;
+    const page = `---\ntitle: ${quote(name)}\ndescription: ${quote(entry.summary ?? firstSummary)}\n---\n\n${previewImport}\n\n${previewRuntime}\n\n${entry.summary ?? ""}${richTextFieldNote}\n${agentPath}\n${preview}\n${reactUsage}\n${properties}\n${slotTable}\n${attributeTable}\n<div class="api-entry">\n  <p class="api-meta"><span>${react}</span><span>${reactRoot}</span><span>${customElement}</span></p>\n  <p><strong>Callbacks:</strong> ${callbacks}</p>\n  <p><strong>Styling:</strong> ${styling}</p>\n  ${signature}\n  ${relatedApis}\n</div>\n${customExample}${relatedPreview}\n`;
     await writeFile(join(familyDir, `${slug}.mdx`), page);
     items.push(`- [${name}](${pagePath})`);
     catalogLinks.push(`- [${name}](${pagePath}) — ${entry.summary ?? titleFor(module)}`);
