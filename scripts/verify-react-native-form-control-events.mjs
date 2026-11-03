@@ -6,13 +6,15 @@ import { build } from "esbuild";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
-const components = ["Input", "TextArea", "Checkbox", "Select", "SpinButton", "Slider", "ComboBox", "Dropdown", "SearchBox", "FileUpload"];
+const components = ["Input", "TextArea", "Checkbox", "Select", "DatePicker", "RadioGroup", "ColorPicker", "ColorArea", "ColorSlider", "AlphaSlider", "SpinButton", "Slider", "ComboBox", "Dropdown", "SearchBox", "FileUpload"];
 const imports = components.join(",");
 const elements = [
   '<Input data-testid="input" aria-label="Input" required {...events("input")} />',
   '<TextArea data-testid="textarea" aria-label="Text area" required {...events("textarea")} />',
   '<Checkbox data-testid="checkbox" aria-label="Checkbox" required {...events("checkbox")} />',
   '<Select data-testid="select" aria-label="Select" required {...events("select")}><option value="">Choose</option><option value="a">A</option></Select>',
+  '<DatePicker data-testid="date-picker" label="Date" required {...events("date-picker")} />',
+  '<ColorPicker data-testid="color-picker" label="Color" required {...events("color-picker")} />',
   '<SpinButton data-testid="spin" aria-label="Spin" required {...events("spin")} />',
   '<Slider data-testid="slider" aria-label="Slider" {...events("slider")} />',
   '<ComboBox data-testid="combo" aria-label="Combo" {...events("combo")}><Option value="a">A</Option></ComboBox>',
@@ -22,7 +24,7 @@ const elements = [
 ];
 const bundle = await build({
   stdin: {
-    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{${imports},Option}from"${resolve(root, "packages/sharepoint-ui/src/react.tsx")}";window.events=[];window.expectedRoots={};window.eventsFor=id=>({onClickCapture:event=>window.events.push([id,"click","capture",event.target.tagName,event.currentTarget.tagName]),onClick:event=>window.events.push([id,"click","bubble",event.target.tagName,event.currentTarget.tagName]),onFocusCapture:event=>window.events.push([id,"focus","capture",event.target.tagName,event.currentTarget.tagName]),onFocus:event=>window.events.push([id,"focus","bubble",event.target.tagName,event.currentTarget.tagName]),onInvalidCapture:event=>window.events.push([id,"invalid","capture",event.target.tagName,event.currentTarget.tagName]),onInvalid:event=>window.events.push([id,"invalid","bubble",event.target.tagName,event.currentTarget.tagName])});const events=window.eventsFor;createRoot(document.querySelector("#root")).render(<>${elements.join("")}</>);`,
+    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{${imports},Radio,Option}from"${resolve(root, "packages/sharepoint-ui/src/react.tsx")}";window.events=[];window.expectedRoots={};window.validationResults={};window.eventsFor=id=>({onClickCapture:event=>window.events.push([id,"click","capture",event.target.tagName,event.currentTarget.tagName]),onClick:event=>window.events.push([id,"click","bubble",event.target.tagName,event.currentTarget.tagName]),onFocusCapture:event=>window.events.push([id,"focus","capture",event.target.tagName,event.currentTarget.tagName]),onFocus:event=>window.events.push([id,"focus","bubble",event.target.tagName,event.currentTarget.tagName]),onInvalidCapture:event=>window.events.push([id,"invalid","capture",event.target.tagName,event.currentTarget.tagName]),onInvalid:event=>window.events.push([id,"invalid","bubble",event.target.tagName,event.currentTarget.tagName])});const events=window.eventsFor;createRoot(document.querySelector("#root")).render(<form id="controls">${elements.join("")}<RadioGroup data-testid="radio-group" label="Choice" required {...events("radio-group")}><Radio value="a" label="A"/><Radio value="b" label="B"/></RadioGroup><ColorArea data-testid="color-area" aria-label="Area" {...events("color-area")}/><ColorSlider data-testid="color-slider" channel="hue" {...events("color-slider")}/><AlphaSlider data-testid="alpha-slider" {...events("alpha-slider")}/></form>);`,
     resolveDir: root,
     sourcefile: "react-native-form-control-events.tsx",
     loader: "tsx",
@@ -48,28 +50,36 @@ try {
   page.on("pageerror", error => errors.push(error.message));
   await page.goto(`http://127.0.0.1:${server.address().port}`);
   await page.waitForFunction(() => document.querySelector("[data-testid=input]")?.shadowRoot?.querySelector("input"));
-  for (const id of ["input", "textarea", "checkbox", "select", "spin", "slider", "combo", "dropdown", "search", "upload"]) {
+  for (const id of ["input", "textarea", "checkbox", "select", "date-picker", "radio-group", "color-picker", "color-area", "color-slider", "alpha-slider", "spin", "slider", "combo", "dropdown", "search", "upload"]) {
     await page.getByTestId(id).evaluate(host => {
-      const control = host.shadowRoot?.querySelector(host.dataset.testid === "upload" ? ".drop" : "input,textarea,select,button");
+      const rootSelector = { upload: ".drop", "color-picker": ".hex", "color-area": ".area", "color-slider": ".track", "alpha-slider": ".track" }[host.dataset.testid];
+      const control = host.shadowRoot?.querySelector(rootSelector ?? "input,textarea,select,button");
       if (!control) throw new Error(`Missing native root for ${host.dataset.testid}`);
-      window.expectedRoots[host.dataset.testid] = control.tagName;
-      control.dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true }));
-      control.dispatchEvent(new FocusEvent("focusin", { bubbles: true, composed: true }));
-      host.dispatchEvent(new Event("invalid", { cancelable: true }));
+      const currentTarget = host.dataset.testid === "date-picker" ? host.shadowRoot.querySelector(".control") : host.dataset.testid === "radio-group" ? host.parentElement : host.dataset.testid === "color-picker" ? host.shadowRoot.querySelector(".picker") : control;
+      window.expectedRoots[host.dataset.testid] = { target: control.tagName, currentTarget: currentTarget.tagName };
+      if (typeof host.reportValidity === "function" && host.dataset.testid !== "color-picker") {
+        window.validationResults[host.dataset.testid] = host.reportValidity();
+        control.dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true }));
+      } else {
+        control.dispatchEvent(new FocusEvent("focusin", { bubbles: true, composed: true }));
+        host.dispatchEvent(new Event("invalid", { cancelable: true }));
+        control.dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true }));
+      }
     });
   }
-  const { recorded, expectedRoots } = await page.evaluate(() => ({ recorded: window.events, expectedRoots: window.expectedRoots }));
-  for (const id of ["input", "textarea", "checkbox", "select", "spin", "slider", "combo", "dropdown", "search", "upload"]) {
+  const { recorded, expectedRoots, validationResults } = await page.evaluate(() => ({ recorded: window.events, expectedRoots: window.expectedRoots, validationResults: window.validationResults }));
+  for (const id of ["input", "textarea", "checkbox", "select", "date-picker", "radio-group", "color-picker", "color-area", "color-slider", "alpha-slider", "spin", "slider", "combo", "dropdown", "search", "upload"]) {
     const rows = recorded.filter(([component]) => component === id);
-    assert.equal(rows.length, 6, `${id} invokes each React handler once`);
+    assert.equal(rows.length, 6, `${id} invokes each React handler once: ${JSON.stringify(rows)}`);
     for (const type of ["click", "focus", "invalid"]) {
       const pair = rows.filter(([, eventType]) => eventType === type);
       assert.deepEqual(pair.map(([, , phase]) => phase), ["capture", "bubble"], `${id} preserves ${type} phases`);
-      assert.ok(pair.every(([, , , target, currentTarget]) => target === currentTarget && currentTarget === expectedRoots[id]), `${id} targets the inner native control`);
+      assert.ok(pair.every(([, , , target, currentTarget]) => target === expectedRoots[id].target && currentTarget === expectedRoots[id].currentTarget), `${id} targets the Fluent-like inner event root`);
     }
   }
+  for (const id of ["input", "textarea", "checkbox", "date-picker", "radio-group"]) assert.equal(validationResults[id], false, `${id} native validity reports the required empty value`);
   assert.deepEqual(errors, [], "no browser errors");
-  console.log(JSON.stringify({ status: "passed", controls: components.length, events: ["click", "focus", "invalid"], targetAndCurrentTarget: true, callbacksNotDuplicated: true, noBrowserErrors: true }, null, 2));
+  console.log(JSON.stringify({ status: "passed", controls: components.length, events: ["click", "focus", "invalid"], nativeValidation: Object.keys(validationResults), targetAndCurrentTarget: true, callbacksNotDuplicated: true, noBrowserErrors: true }, null, 2));
 } finally {
   await browser?.close();
   server.close();

@@ -307,7 +307,7 @@ function withoutNativeControlEventProps(props: Record<string, unknown>): Record<
 function nativeControlHostProps(props: Record<string, unknown>): Record<string, unknown> {
   return useCustomElementProps(withoutNativeControlEventProps(props));
 }
-function useNativeControlEvents<T extends Element>(ref: React.RefObject<HTMLElement | null>, selector: string, onClick?: React.MouseEventHandler<T>, onClickCapture?: React.MouseEventHandler<T>, events?: NativeRootEventProps<T>): void {
+function useNativeControlEvents<T extends Element>(ref: React.RefObject<HTMLElement | null>, selector: string, onClick?: React.MouseEventHandler<T>, onClickCapture?: React.MouseEventHandler<T>, events?: NativeRootEventProps<T>, invalidTargetSelector?: string, currentTargetRef?: React.RefObject<T | null>): void {
   const handlers = { ...events, onClick, onClickCapture } as Record<string, unknown>;
   const handlersRef = React.useRef(handlers);
   React.useLayoutEffect(() => { handlersRef.current = handlers; });
@@ -327,8 +327,8 @@ function useNativeControlEvents<T extends Element>(ref: React.RefObject<HTMLElem
         const hostInvalid = binding.kind === "invalid" && event.target === host;
         const control = nativeControl ?? (hostInvalid ? shadowRoot.querySelector(selector) : null);
         if (!control) return;
-        const target = hostInvalid ? control : path.find((entry): entry is Element => entry instanceof Element && !(entry instanceof HTMLSlotElement)) ?? control;
-        const bridged = createReactEventBridge(event, event, control as T, target);
+        const target = hostInvalid ? shadowRoot.querySelector(invalidTargetSelector ?? selector) ?? control : path.find((entry): entry is Element => entry instanceof Element && !(entry instanceof HTMLSlotElement)) ?? control;
+        const bridged = createReactEventBridge(event, event, currentTargetRef?.current ?? control as T, target);
         if (binding.kind === "focus") Object.assign(bridged, { type: event.type === "focusin" ? "focus" : "blur" });
         if (binding.kind === "change") Object.assign(bridged, { type: "change" });
         const handler = handlersRef.current[binding.prop] as ((event: React.SyntheticEvent<T>) => void) | undefined;
@@ -338,32 +338,33 @@ function useNativeControlEvents<T extends Element>(ref: React.RefObject<HTMLElem
       removeListeners.push(() => host.removeEventListener(binding.eventName, listener, binding.capture));
     }
     const control = shadowRoot.querySelector(selector);
-    if (control && (hasMouseTransitions || hasPointerTransitions)) {
+    const transitionRoot = currentTargetRef?.current ?? control;
+    if (control && transitionRoot && (hasMouseTransitions || hasPointerTransitions)) {
       const transition = (event: MouseEvent | PointerEvent): void => {
         const isPointer = event.type.startsWith("pointer");
-        if (isComposedDescendant(control, event.relatedTarget)) return;
+        if (isComposedDescendant(transitionRoot, event.relatedTarget)) return;
         const isEntering = event.type === "mouseover" || event.type === "pointerover";
         const handlerName = isPointer ? isEntering ? "onPointerEnter" : "onPointerLeave" : isEntering ? "onMouseEnter" : "onMouseLeave";
         const handler = handlersRef.current[handlerName] as ((event: React.SyntheticEvent<T>) => void) | undefined;
         if (!handler) return;
         const target = event.composedPath().find((entry): entry is Element => entry instanceof Element && !(entry instanceof HTMLSlotElement)) ?? control;
-        const bridged = createReactEventBridge(event, event, control as T, target);
+        const bridged = createReactEventBridge(event, event, transitionRoot as T, target);
         Object.assign(bridged, { type: isPointer ? isEntering ? "pointerenter" : "pointerleave" : isEntering ? "mouseenter" : "mouseleave" });
         handler(bridged);
       };
       if (hasMouseTransitions) {
-        control.addEventListener("mouseover", transition as EventListener);
-        control.addEventListener("mouseout", transition as EventListener);
+        transitionRoot.addEventListener("mouseover", transition as EventListener);
+        transitionRoot.addEventListener("mouseout", transition as EventListener);
       }
       if (hasPointerTransitions) {
-        control.addEventListener("pointerover", transition as EventListener);
-        control.addEventListener("pointerout", transition as EventListener);
+        transitionRoot.addEventListener("pointerover", transition as EventListener);
+        transitionRoot.addEventListener("pointerout", transition as EventListener);
       }
       removeListeners.push(() => {
-        control.removeEventListener("mouseover", transition as EventListener);
-        control.removeEventListener("mouseout", transition as EventListener);
-        control.removeEventListener("pointerover", transition as EventListener);
-        control.removeEventListener("pointerout", transition as EventListener);
+        transitionRoot.removeEventListener("mouseover", transition as EventListener);
+        transitionRoot.removeEventListener("mouseout", transition as EventListener);
+        transitionRoot.removeEventListener("pointerover", transition as EventListener);
+        transitionRoot.removeEventListener("pointerout", transition as EventListener);
       });
     }
     return () => { for (const remove of removeListeners) remove(); };
@@ -1291,7 +1292,7 @@ export const RadioGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, RadioGro
   const ref = React.useRef<HTMLElement>(null)
   const callbackRoot = React.useRef<HTMLDivElement>(null);
   useExposeHostRef(ref, forwardedRef);;
-  useNativeControlEvents(ref, "fieldset", props.onClick, props.onClickCapture, props);
+  useNativeControlEvents(ref, 'input[type="radio"]', props.onClick, props.onClickCapture, props, undefined, callbackRoot);
   ensureDefined(defineRadioGroup);
   useSpuiEvent(ref, "spui-change", (detail, event) => {
     const nextValue = String(detail.value ?? "");
@@ -1387,12 +1388,13 @@ export const Slider = /* @__PURE__ */ React.forwardRef<HTMLElement, SliderProps>
   return React.createElement("spui-slider", nativeControlHostProps({ ...props, ref, label, value, "default-value": defaultValue, min, max, step, size, vertical, name, disabled, "aria-valuetext": valueText }), inputSlot, rail == null ? null : React.createElement("span", { slot: "rail", "aria-hidden": true }, rail), thumb == null ? null : React.createElement("span", { slot: "thumb", "aria-hidden": true }, thumb));
 });
 
-export type DatePickerProps = ElementProps & { label?: string; value?: string; defaultValue?: string; min?: string; max?: string; name?: string; form?: string; placeholder?: string; required?: boolean; disabled?: boolean; readOnly?: boolean; calendarLabel?: string; previousMonthLabel?: string; nextMonthLabel?: string; invalidDateMessage?: string; requiredMessage?: string; onValueChange?: (value: string) => void };
+export type DatePickerProps = NativeClickHostProps<HTMLDivElement> & { label?: string; value?: string; defaultValue?: string; min?: string; max?: string; name?: string; form?: string; placeholder?: string; required?: boolean; disabled?: boolean; readOnly?: boolean; calendarLabel?: string; previousMonthLabel?: string; nextMonthLabel?: string; invalidDateMessage?: string; requiredMessage?: string; onValueChange?: (value: string) => void };
 
 export const DatePicker = /* @__PURE__ */ React.forwardRef<HTMLElement, DatePickerProps>(function DatePicker(inputProps: DatePickerProps, forwardedRef): React.ReactElement {
   const { label, value, defaultValue, min, max, name, placeholder, required, disabled, readOnly, calendarLabel, previousMonthLabel, nextMonthLabel, invalidDateMessage, requiredMessage, onValueChange, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true });
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
+  useNativeControlEvents(ref, ".control", props.onClick, props.onClickCapture, props, "input");
   const context = React.useContext(UIContext);
   ensureDefined(defineDatePicker);
   useSpuiEvent(ref, "spui-change", detail => { const next = String(detail.value ?? ""); if (value !== undefined && ref.current) (ref.current as HTMLElement & { value: string }).value = value; onValueChange?.(next); });
@@ -1402,7 +1404,7 @@ export const DatePicker = /* @__PURE__ */ React.forwardRef<HTMLElement, DatePick
     if (value !== undefined) element.value = value;
     else if (defaultValue !== undefined) element.defaultValue = defaultValue;
   }, [value, defaultValue]);
-  return React.createElement("spui-date-picker", useCustomElementProps({ ...props, ref, label, min, max, name, placeholder, required, disabled, "read-only": readOnly, "calendar-label": calendarLabel ?? context.strings.datePickerCalendar, "previous-month-label": previousMonthLabel ?? context.strings.datePickerPreviousMonth, "next-month-label": nextMonthLabel ?? context.strings.datePickerNextMonth, "invalid-date-message": invalidDateMessage ?? context.strings.datePickerInvalid, "required-message": requiredMessage ?? context.strings.datePickerRequired }));
+  return React.createElement("spui-date-picker", nativeControlHostProps({ ...props, ref, label, min, max, name, placeholder, required, disabled, "read-only": readOnly, "calendar-label": calendarLabel ?? context.strings.datePickerCalendar, "previous-month-label": previousMonthLabel ?? context.strings.datePickerPreviousMonth, "next-month-label": nextMonthLabel ?? context.strings.datePickerNextMonth, "invalid-date-message": invalidDateMessage ?? context.strings.datePickerInvalid, "required-message": requiredMessage ?? context.strings.datePickerRequired }));
 });
 
 export type ComboboxPositioning = "above" | "below" | "above-start" | "above-end" | "below-start" | "below-end" | { position?: "above" | "below"; align?: "start" | "center" | "end" };
@@ -5514,12 +5516,13 @@ type FluentEventData<TChangeEvent extends Event | React.SyntheticEvent> =
   | { color: ColorPickerHsvColor; event: SharePointUIEvent; type: undefined }
   | { color: ColorPickerHsvColor; event: TChangeEvent; type: "change" };
 export type ColorPickerOnColorChangeData = FluentEventData<React.ChangeEvent<HTMLInputElement>>;
-export type ColorPickerProps = Omit<ElementProps, "color"> & { label?: string; name?: string; form?: string; color?: ColorPickerHsvColor; defaultColor?: ColorPickerHsvColor; value?: string; defaultValue?: string; alpha?: number; defaultAlpha?: number; colors?: readonly string[]; format?: ColorPickerFormat; onColorChange?: (event: SharePointUIEvent, data: ColorPickerOnColorChangeData) => void; onValueChange?: (value: string, alpha: number) => void; onFormatChange?: (format: ColorPickerFormat) => void; size?: ColorPickerSize; shape?: ColorPickerShape; readOnly?: boolean; required?: boolean; children?: React.ReactNode };
+export type ColorPickerProps = Omit<NativeClickHostProps<HTMLDivElement>, "color"> & { label?: string; name?: string; form?: string; color?: ColorPickerHsvColor; defaultColor?: ColorPickerHsvColor; value?: string; defaultValue?: string; alpha?: number; defaultAlpha?: number; colors?: readonly string[]; format?: ColorPickerFormat; onColorChange?: (event: SharePointUIEvent, data: ColorPickerOnColorChangeData) => void; onValueChange?: (value: string, alpha: number) => void; onFormatChange?: (format: ColorPickerFormat) => void; size?: ColorPickerSize; shape?: ColorPickerShape; readOnly?: boolean; required?: boolean; children?: React.ReactNode };
 
 export const ColorPicker = /* @__PURE__ */ React.forwardRef<HTMLElement, ColorPickerProps>(function ColorPicker(inputProps: ColorPickerProps, forwardedRef): React.ReactElement {
   const { children, label, color, defaultColor, value, defaultValue, alpha, defaultAlpha, colors, format, onColorChange, onValueChange, onFormatChange, size = "medium", shape = "rounded", readOnly, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true, supportsSize: true });
   const ref = React.useRef<HTMLElement & { color?: ColorPickerHsvColor; defaultColor?: ColorPickerHsvColor; format?: ColorPickerFormat }>(null)
   useExposeHostRef(ref, forwardedRef);;
+  useNativeControlEvents(ref as React.RefObject<HTMLElement | null>, ".picker", props.onClick, props.onClickCapture, props, ".hex");
   const context = React.useContext(UIContext);
   ensureDefined(defineColorPicker);
   useSpuiEvent(ref, "spui-change", onValueChange || onColorChange ? (detail, event) => {
@@ -5548,7 +5551,7 @@ export const ColorPicker = /* @__PURE__ */ React.forwardRef<HTMLElement, ColorPi
     if (colors) element.colors = [...colors];
     if (format !== undefined) element.format = format;
   }, [color, defaultColor, value, defaultValue, alpha, defaultAlpha, colors, format]);
-  return React.createElement("spui-color-picker", useCustomElementProps({ ...props, ref, label, value: undefined, "default-value": undefined, "default-color": undefined, alpha: undefined, "default-alpha": undefined, colors: undefined, size, shape, "color-format": format, "read-only": readOnly || undefined, "color-input-label": context.strings.colorChoose, "hex-input-label": context.strings.colorHex, "hue-label": context.strings.colorHue, "area-label": context.strings.colorArea, "area-value-text": context.strings.colorAreaValue, "format-label": context.strings.colorFormat, "rgb-label": context.strings.colorRgb, "red-label": context.strings.colorRed, "green-label": context.strings.colorGreen, "blue-label": context.strings.colorBlue, "alpha-label": context.strings.colorOpacity, "swatches-label": context.strings.colorSwatches, "swatch-label": context.strings.colorSwatch, "invalid-message": context.strings.colorInvalid }), children);
+  return React.createElement("spui-color-picker", nativeControlHostProps({ ...props, ref, label, value: undefined, "default-value": undefined, "default-color": undefined, alpha: undefined, "default-alpha": undefined, colors: undefined, size, shape, "color-format": format, "read-only": readOnly || undefined, "color-input-label": context.strings.colorChoose, "hex-input-label": context.strings.colorHex, "hue-label": context.strings.colorHue, "area-label": context.strings.colorArea, "area-value-text": context.strings.colorAreaValue, "format-label": context.strings.colorFormat, "red-label": context.strings.colorRed, "green-label": context.strings.colorGreen, "blue-label": context.strings.colorBlue, "alpha-label": context.strings.colorOpacity, "swatches-label": context.strings.colorSwatches, "swatch-label": context.strings.colorSwatch, "invalid-message": context.strings.colorInvalid }), children);
 });
 
 export type ColorAreaChangeData =
@@ -5556,13 +5559,14 @@ export type ColorAreaChangeData =
   | { color: ColorPickerHsvColor; event: React.SyntheticEvent | PointerEvent; type: "change" };
 export type ColorControlChangeData = FluentEventData<React.ChangeEvent<HTMLInputElement>>;
 export type ColorControlChangeHandler = (event: SharePointUIEvent, data: ColorControlChangeData) => void;
-export type ColorAreaProps = Omit<ElementProps, "color" | "onChange"> & { color?: ColorPickerHsvColor; defaultColor?: ColorPickerHsvColor; inputX?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; inputY?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; thumb?: React.ReactNode; shape?: ColorPickerShape; onChange?: (event: SharePointUIEvent, data: ColorAreaChangeData) => void; children?: React.ReactNode };
-export type ColorSliderProps = Omit<ElementProps, "color" | "onChange"> & { color?: ColorPickerHsvColor; defaultColor?: ColorPickerHsvColor; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; rail?: React.ReactNode; thumb?: React.ReactNode; channel?: ColorSliderChannel; vertical?: boolean; shape?: ColorPickerShape; onChange?: ColorControlChangeHandler };
+export type ColorAreaProps = Omit<NativeClickHostProps<HTMLDivElement>, "color" | "onChange"> & { color?: ColorPickerHsvColor; defaultColor?: ColorPickerHsvColor; inputX?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; inputY?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; thumb?: React.ReactNode; shape?: ColorPickerShape; onChange?: (event: SharePointUIEvent, data: ColorAreaChangeData) => void; children?: React.ReactNode };
+export type ColorSliderProps = Omit<NativeClickHostProps<HTMLDivElement>, "color" | "onChange"> & { color?: ColorPickerHsvColor; defaultColor?: ColorPickerHsvColor; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; rail?: React.ReactNode; thumb?: React.ReactNode; channel?: ColorSliderChannel; vertical?: boolean; shape?: ColorPickerShape; onChange?: ColorControlChangeHandler };
 export type AlphaSliderProps = Omit<ColorSliderProps, "channel"> & { transparency?: boolean };
 
 export const ColorArea = /* @__PURE__ */ React.forwardRef<HTMLElement, ColorAreaProps>(function ColorArea({ children, color, defaultColor, inputX, inputY, thumb, shape, onChange, ...props }: ColorAreaProps, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
+  useNativeControlEvents(ref, ".area", props.onClick, props.onClickCapture, props);
   ensureDefined(defineColorArea);
   useSpuiEvent(ref, "spui-color-change", (rawDetail, event) => {
     const detail = rawDetail as SpuiEventDetail & { event?: Event };
@@ -5582,13 +5586,14 @@ export const ColorArea = /* @__PURE__ */ React.forwardRef<HTMLElement, ColorArea
   const inputSlot = (input: ColorAreaProps["inputX"], slot: "inputX" | "inputY"): React.ReactNode => input == null ? null : React.isValidElement(input)
     ? React.cloneElement(input as React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>>, { slot } as React.InputHTMLAttributes<HTMLInputElement> & { slot: string })
     : React.createElement("input", { ...input, slot });
-  return React.createElement("spui-color-area", useCustomElementProps({ ...props, ref, color: undefined, defaultColor: undefined, shape, slot: "area" }), inputSlot(inputX, "inputX"), inputSlot(inputY, "inputY"), thumb == null ? null : React.createElement("span", { slot: "thumb", "aria-hidden": true }, thumb), children);
+  return React.createElement("spui-color-area", nativeControlHostProps({ ...props, ref, color: undefined, defaultColor: undefined, shape, slot: "area" }), inputSlot(inputX, "inputX"), inputSlot(inputY, "inputY"), thumb == null ? null : React.createElement("span", { slot: "thumb", "aria-hidden": true }, thumb), children);
 });
 
 export const ColorSlider = /* @__PURE__ */ React.forwardRef<HTMLElement, ColorSliderProps>(function ColorSlider({ channel = "hue", vertical, color, defaultColor, input, rail, thumb, shape, onChange, ...props }: ColorSliderProps, forwardedRef): React.ReactElement {
   const context = React.useContext(UIContext);
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
+  useNativeControlEvents(ref, ".track", props.onClick, props.onClickCapture, props);
   ensureDefined(defineColorSlider);
   useSpuiEvent(ref, "spui-color-change", (rawDetail, event) => {
     const detail = rawDetail as SpuiEventDetail & { event?: Event };
@@ -5609,13 +5614,14 @@ export const ColorSlider = /* @__PURE__ */ React.forwardRef<HTMLElement, ColorSl
   const thumbSlot = thumb == null ? null : React.isValidElement(thumb)
     ? React.cloneElement(thumb as React.ReactElement<{ slot?: string }>, { slot: "thumb" })
     : React.createElement("span", { slot: "thumb", "aria-hidden": true }, thumb);
-  return React.createElement("spui-color-slider", useCustomElementProps({ ...props, ref, color: undefined, defaultColor: undefined, channel, shape, vertical: vertical || undefined, slot: "sliders", "aria-label": props["aria-label"] || (channel === "hue" ? context.strings.colorHue : channel === "saturation" ? context.strings.colorSaturation : context.strings.colorValue) }), inputSlot, railSlot, thumbSlot);
+  return React.createElement("spui-color-slider", nativeControlHostProps({ ...props, ref, color: undefined, defaultColor: undefined, channel, shape, vertical: vertical || undefined, slot: "sliders", "aria-label": props["aria-label"] || (channel === "hue" ? context.strings.colorHue : channel === "saturation" ? context.strings.colorSaturation : context.strings.colorValue) }), inputSlot, railSlot, thumbSlot);
 });
 
 export const AlphaSlider = /* @__PURE__ */ React.forwardRef<HTMLElement, AlphaSliderProps>(function AlphaSlider({ transparency, vertical, color, defaultColor, shape, onChange, ...props }: AlphaSliderProps, forwardedRef): React.ReactElement {
   const context = React.useContext(UIContext);
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
+  useNativeControlEvents(ref, ".track", props.onClick, props.onClickCapture, props);
   ensureDefined(defineAlphaSlider);
   useSpuiEvent(ref, "spui-color-change", (rawDetail, event) => {
     const detail = rawDetail as SpuiEventDetail & { event?: Event };
@@ -5627,7 +5633,7 @@ export const AlphaSlider = /* @__PURE__ */ React.forwardRef<HTMLElement, AlphaSl
     onChange?.(changeEvent, { color: detail.color, event: changeEvent, type: "change" });
   });
   React.useLayoutEffect(() => { const element = ref.current as (HTMLElement & { color?: ColorPickerHsvColor; defaultColor?: ColorPickerHsvColor }) | null; if (!element) return; if (color) element.color = color; if (defaultColor) element.defaultColor = defaultColor; }, [color, defaultColor]);
-  return React.createElement("spui-alpha-slider", useCustomElementProps({ ...props, ref, color: undefined, defaultColor: undefined, shape, transparency: transparency || undefined, vertical: vertical || undefined, slot: "alpha", "aria-label": props["aria-label"] || context.strings.colorOpacity }));
+  return React.createElement("spui-alpha-slider", nativeControlHostProps({ ...props, ref, color: undefined, defaultColor: undefined, shape, transparency: transparency || undefined, vertical: vertical || undefined, slot: "alpha", "aria-label": props["aria-label"] || context.strings.colorOpacity }));
 });
 
 export type SwatchPickerSelection = { selectedValue: string; selectedColor: string; selectedValues: string[]; selectedColors: string[]; selectionMode: "single" | "multiple" };
