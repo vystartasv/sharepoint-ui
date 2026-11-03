@@ -1045,8 +1045,11 @@ export type { CardAppearance, CardFocusMode, CardOrientation, CardSize };
 
 export const CardHeader = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { image?: React.ReactNode; header?: React.ReactNode; description?: React.ReactNode; action?: React.ReactNode }>(function CardHeader({ image, header, description, action, children, ...props }: ElementProps & { image?: React.ReactNode; header?: React.ReactNode; description?: React.ReactNode; action?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineCardHeader);
+  const ref = React.useRef<HTMLElement | null>(null);
+  useExposeHostRef(ref, forwardedRef);
+  useNativeControlEvents(ref, ".layout", props.onClick, props.onClickCapture, props as NativeRootEventProps<HTMLElement>);
   const headerContent = header ?? children;
-  return React.createElement("spui-card-header", useCustomElementProps({ ...props, ref: forwardedRef }),
+  return React.createElement("spui-card-header", nativeControlHostProps({ ...props, ref }),
     image == null ? null : React.createElement("span", { slot: "image" }, image),
     headerContent == null ? null : React.createElement("span", { slot: "header" }, headerContent),
     description == null ? null : React.createElement("span", { slot: "description" }, description),
@@ -1061,7 +1064,10 @@ export const CardFooter = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementP
 
 export const CardPreview = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { logo?: React.ReactNode }>(function CardPreview({ logo, children, ...props }: ElementProps & { logo?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineCardPreview);
-  return React.createElement("spui-card-preview", useCustomElementProps({ ...props, ref: forwardedRef }), children,
+  const ref = React.useRef<HTMLElement | null>(null);
+  useExposeHostRef(ref, forwardedRef);
+  useNativeControlEvents(ref, ".preview", props.onClick, props.onClickCapture, props as NativeRootEventProps<HTMLElement>);
+  return React.createElement("spui-card-preview", nativeControlHostProps({ ...props, ref }), children,
     logo == null ? null : React.createElement("span", { slot: "logo" }, logo));
 });
 
