@@ -4,7 +4,7 @@ export function defineCombobox(): void {
   if (customElements.get("spui-combobox")) return;
   class SpuiCombobox extends HTMLElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "value", "selected-value", "selected-options", "default-selected-options", "multiselect", "disabled", "required", "name", "placeholder", "allow-freeform", "read-only", "button-trigger", "open", "default-open", "clearable", "clear-label", "disable-auto-focus", "appearance", "size", "positioning", "inline-popup", "no-results", "remove-selected-label", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid"];
+    static observedAttributes = ["label", "value", "selected-value", "selected-options", "default-selected-options", "multiselect", "disabled", "required", "name", "placeholder", "allow-freeform", "read-only", "button-trigger", "open", "default-open", "clearable", "clear-label", "disable-auto-focus", "appearance", "size", "positioning", "inline-popup", "no-results", "remove-selected-label", "selected-label", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid"];
     private internals: ElementInternals | undefined;
     private observer: MutationObserver | undefined;
     private readonly instanceId = crypto.randomUUID();
@@ -151,6 +151,7 @@ export function defineCombobox(): void {
       else if (name === "appearance" || name === "size" || name === "positioning") { /* Host selectors update the shadow theme without rebuilding focused controls. */ }
       else if (name === "disable-auto-focus") this.updateOptions();
       else if (name === "expand-icon") this.syncExpandIcon();
+      else if (name === "selected-label") this.shadowRoot?.querySelector<HTMLElement>(".selected")?.setAttribute("aria-label", value ?? "Selected options");
       else if (name === "open" || name === "default-open") {
         if (this.hasAttribute("open") || this.hasAttribute("default-open")) this.openList();
         else this.closeList();
@@ -569,7 +570,7 @@ export function defineCombobox(): void {
       label.part.add("label");
       const wrapper = document.createElement("div");
       wrapper.className = "control";
-      const selected = document.createElement("div"); selected.className = "selected"; selected.hidden = true; selected.setAttribute("aria-label", "Selected options");
+      const selected = document.createElement("div"); selected.className = "selected"; selected.hidden = true; selected.setAttribute("aria-label", this.getAttribute("selected-label") ?? "Selected options");
       const input = document.createElement("input");
       input.id = id + "-input";
       input.type = "text";

@@ -1959,6 +1959,9 @@
       "category": "forms",
       "api": {
         "reactSignature": "inputProps: ComboBoxProps",
+        "relatedReactApis": [
+          { "name": "ComboBoxProps.selectedLabel", "description": "In multiselect mode, names the selected-options group; defaults to SharePointUIProvider.strings.selectedOptionsLabel." }
+        ],
         "callbackProps": [
           "onValueChange",
           "onOptionSelect",
@@ -3449,6 +3452,9 @@
       "category": "form",
       "api": {
         "reactSignature": "{ children, label, selectedLabel, selectedValues, defaultSelectedValues, inputValue, open, defaultOpen, inline = false, noPopover = false, onOpenChange, onOptionSelect, onInputValueChange, onChange, ...props }: TagPickerProps",
+        "relatedReactApis": [
+          { "name": "TagPickerProps.selectedLabel", "description": "Names the selected-options group; defaults to SharePointUIProvider.strings.selectedOptionsLabel." }
+        ],
         "callbackProps": [
           "onOpenChange",
           "onOptionSelect",
