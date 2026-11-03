@@ -12,9 +12,9 @@ const bundle = await build({
     contents: `
       import * as React from "react";
       import { createRoot } from "react-dom/client";
-      import { Breadcrumb, DataGridSelectionCell, Hamburger, MenuBar, SharePointUIProvider, SplitButton, SplitNavItem, TableResizeHandle, Toolbar, VirtualList, Virtualizer, DataGrid } from "${resolve("packages/sharepoint-ui/src/react.tsx")}";
+      import { Breadcrumb, DataGridSelectionCell, Hamburger, MenuBar, SharePointUIProvider, SplitButton, SplitNavItem, TableResizeHandle, Toolbar, VirtualList, Virtualizer, DataGrid, TagPicker, TagPickerOption } from "${resolve("packages/sharepoint-ui/src/react.tsx")}";
       function App() {
-        return <SharePointUIProvider lang="lt" strings={{ toolbarLabel: "Įrankių juosta", breadcrumbLabel: "Naršymo kelias", menuBarLabel: "Meniu juosta", splitButtonMenuLabel: "Daugiau parinkčių", navigationToggle: "Perjungti navigaciją", splitNavItemActionLabel: "Daugiau veiksmų", virtualizerLabel: "Elementai", dataGridSelectRow: "Pasirinkti eilutę", tableResizeHandle: "Keisti stulpelio dydį", dataGridLabel: "Duomenų tinklelis", dataGridFilterLabel: "Ieškoti eilučių", dataGridSelectAll: "Pasirinkti visas eilutes", dataGridRowLabel: "eilutė", dataGridResizeLabel: "Keisti stulpelio dydį", dataGridReorderLabel: "Perkelti stulpelį", dataGridEmptyLabel: "Nėra įrašų" }}>
+        return <SharePointUIProvider lang="lt" strings={{ toolbarLabel: "Įrankių juosta", breadcrumbLabel: "Naršymo kelias", menuBarLabel: "Meniu juosta", splitButtonMenuLabel: "Daugiau parinkčių", navigationToggle: "Perjungti navigaciją", splitNavItemActionLabel: "Daugiau veiksmų", virtualizerLabel: "Elementai", dataGridSelectRow: "Pasirinkti eilutę", tableResizeHandle: "Keisti stulpelio dydį", dataGridLabel: "Duomenų tinklelis", dataGridFilterLabel: "Ieškoti eilučių", dataGridSelectAll: "Pasirinkti visas eilutes", dataGridRowLabel: "eilutė", dataGridResizeLabel: "Keisti stulpelio dydį", dataGridReorderLabel: "Perkelti stulpelį", dataGridEmptyLabel: "Nėra įrašų", tagPickerSelected: "Pasirinktos parinktys" }}>
           <Toolbar data-testid="localized-toolbar" />
           <Toolbar data-testid="override-toolbar" label="Custom toolbar" />
           <Toolbar data-testid="aria-toolbar" aria-label="Custom toolbar aria" />
@@ -34,6 +34,8 @@ const bundle = await build({
           <Virtualizer data-testid="localized-virtualizer" numItems={1} itemSize={40} virtualizerLength={1}>{() => "row"}</Virtualizer>
           <DataGridSelectionCell data-testid="localized-selection-cell" />
           <DataGridSelectionCell data-testid="override-selection-cell" label="Custom row selection" />
+          <TagPicker data-testid="localized-tag-picker" label="People" defaultSelectedValues={["ava"]}><TagPickerOption value="ava">Ava Lovelace</TagPickerOption></TagPicker>
+          <TagPicker data-testid="override-tag-picker" label="People" selectedLabel="Custom selected options" defaultSelectedValues={["ava"]}><TagPickerOption value="ava">Ava Lovelace</TagPickerOption></TagPicker>
           <TableResizeHandle data-testid="localized-resize-handle" /><DataGrid data-testid="localized-data-grid" filterable selectionMode="multiple" resizableColumns reorderableColumns columns={[{ id: "name", label: "Name" }]} items={[{ id: "one", name: "Ada" }]} getRowId={item => item.id} />
           <TableResizeHandle data-testid="override-resize-handle" label="Custom resize" />
         </SharePointUIProvider>;
@@ -88,6 +90,8 @@ try {
   assert.equal(await page.getByTestId("override-selection-cell").locator("input").getAttribute("aria-label"), "Custom row selection");
   assert.equal(await page.getByTestId("localized-resize-handle").getAttribute("label"), "Keisti stulpelio dydį");
   assert.equal(await page.getByTestId("override-resize-handle").getAttribute("label"), "Custom resize");
+  assert.equal(await page.getByTestId("localized-tag-picker").evaluate(element => element.shadowRoot.querySelector(".selected").getAttribute("aria-label")), "Pasirinktos parinktys", "TagPicker selected options group uses provider localization");
+  assert.equal(await page.getByTestId("override-tag-picker").evaluate(element => element.shadowRoot.querySelector(".selected").getAttribute("aria-label")), "Custom selected options", "TagPicker selectedLabel overrides provider strings");
   const localizedGrid = page.getByTestId("localized-data-grid");
   assert.equal(await localizedGrid.getByRole("grid").getAttribute("aria-label"), "Duomenų tinklelis");
   assert.equal(await localizedGrid.getByRole("searchbox").getAttribute("aria-label"), "Ieškoti eilučių");
@@ -96,7 +100,7 @@ try {
   assert.equal(await localizedGrid.getByRole("button", { name: "Perkelti stulpelį Name" }).count(), 1);
   assert.equal(await localizedGrid.getByRole("separator", { name: "Keisti stulpelio dydį Name" }).count(), 1);
   assert.deepEqual(errors, []);
-  console.log(JSON.stringify({ status: "passed", localizedDefaults: ["Toolbar", "Breadcrumb", "MenuBar", "SplitButton", "Hamburger", "SplitNavItem", "VirtualList", "Virtualizer", "DataGridSelectionCell", "TableResizeHandle"], explicitLabelOverrides: true, ariaLabelOverrides: true, pageErrors: errors }));
+  console.log(JSON.stringify({ status: "passed", localizedDefaults: ["Toolbar", "Breadcrumb", "MenuBar", "SplitButton", "Hamburger", "SplitNavItem", "VirtualList", "Virtualizer", "DataGridSelectionCell", "TableResizeHandle", "TagPicker"], explicitLabelOverrides: true, ariaLabelOverrides: true, pageErrors: errors }));
 } finally {
   await browser?.close();
   await new Promise(done => server.close(done));

@@ -3448,7 +3448,7 @@
       "module": "tag-picker",
       "category": "form",
       "api": {
-        "reactSignature": "{ children, label, selectedValues, defaultSelectedValues, inputValue, open, defaultOpen, inline = false, noPopover = false, onOpenChange, onOptionSelect, onInputValueChange, onChange, ...props }: TagPickerProps",
+        "reactSignature": "{ children, label, selectedLabel, selectedValues, defaultSelectedValues, inputValue, open, defaultOpen, inline = false, noPopover = false, onOpenChange, onOptionSelect, onInputValueChange, onChange, ...props }: TagPickerProps",
         "callbackProps": [
           "onOpenChange",
           "onOptionSelect",

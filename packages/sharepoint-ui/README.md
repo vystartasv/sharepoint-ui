@@ -525,7 +525,7 @@ import { InteractionTag, InteractionTagPrimary, InteractionTagSecondary } from "
 </InteractionTag>
 ```
 
-`TagPicker` combines search, multi-selection, removable chips, keyboard navigation, and form submission. Keep its option values stable, control the selected value array, and supply a label (or `aria-label`). Compose `TagPickerControl`, `TagPickerGroup`, and `TagPickerInput` to customize the selected-value area, and `TagPickerList`/`TagPickerOptionGroup` to organize results while retaining the same picker state engine. `inline` keeps the open results in the regular document layer; `noPopover` keeps them visible for static or embedded result layouts. The default uses the browser top layer so SharePoint sections can’t clip the list.
+`TagPicker` combines search, multi-selection, removable chips, keyboard navigation, and form submission. Keep its option values stable, control the selected value array, and supply a label (or `aria-label`). Set `selectedLabel` or `SharePointUIProvider`'s `tagPickerSelected` string to localize the accessible name of the selected-options group. Compose `TagPickerControl`, `TagPickerGroup`, and `TagPickerInput` to customize the selected-value area, and `TagPickerList`/`TagPickerOptionGroup` to organize results while retaining the same picker state engine. `inline` keeps the open results in the regular document layer; `noPopover` keeps them visible for static or embedded result layouts. The default uses the browser top layer so SharePoint sections can’t clip the list.
 
 ```tsx
 import { TagPicker, TagPickerControl, TagPickerGroup, TagPickerInput, TagPickerList, TagPickerOption, TagPickerOptionGroup } from "@vilius/sharepoint-ui/react";
