@@ -44,6 +44,8 @@ const DROP_CONTENT = new Set(["SCRIPT", "STYLE", "IFRAME", "OBJECT", "EMBED", "T
 const HTML_STYLE_PROPERTIES = new Set(["background-color", "color", "direction", "font-family", "font-size", "font-style", "font-weight", "letter-spacing", "line-height", "list-style-type", "margin-block-end", "margin-block-start", "margin-inline-end", "margin-inline-start", "text-align", "text-decoration", "text-indent", "text-transform", "vertical-align", "white-space"]);
 const RICH_STYLE_PROPERTIES = new Set(["background-color", "color", "font-family", "font-size", "font-style", "font-weight", "text-align", "text-decoration"]);
 const FONT_SIZE_PX: Record<string, string> = { "1": "10px", "2": "12px", "3": "16px", "4": "18px", "5": "24px", "6": "32px", "7": "48px" };
+type TextSelectionPoint = { offset: number; path: number[]; nodeOffset: number; text?: string; tag?: string };
+type TextSelectionSnapshot = { anchor: TextSelectionPoint; focus: TextSelectionPoint };
 function safeHref(value: string): boolean {
   if (/[\u0000-\u001f\u007f]/.test(value)) return false;
   try { return ["http:", "https:", "mailto:"].includes(new URL(value.trim(), document.baseURI).protocol); }
@@ -271,23 +273,99 @@ export function defineRichTextEditor(): void {
       const value = cleanHtml(html, this.contentMode, this.allowHyperlinks);
       if (this.contentMode === "plain") { if (this.editor.textContent !== value) this.editor.textContent = value; return value; }
       if (value === html) return value;
+      const selection = this.captureTextSelection();
       const cell = this.selectedCell();
       const tableIndex = cell ? [...this.editor.querySelectorAll("table")].indexOf(cell.closest("table")!) : -1;
       const rowIndex = cell?.closest("tr")?.rowIndex ?? -1;
       const cellIndex = cell?.cellIndex ?? -1;
       this.editor.innerHTML = value;
+      if (selection) this.restoreTextSelection(selection);
       const restoredCell = tableIndex >= 0 && rowIndex >= 0 && cellIndex >= 0
         ? this.editor.querySelectorAll("table")[tableIndex]?.rows[rowIndex]?.cells[cellIndex]
         : undefined;
-      this.savedCell = restoredCell;
-      if (restoredCell) {
+      this.savedCell = restoredCell ?? this.selectedCell();
+      if (!selection && restoredCell) {
         const range = document.createRange();
         range.selectNodeContents(restoredCell);
         range.collapse(true);
         this.savedRange = range;
-      } else this.savedRange = undefined;
+      } else if (!selection) this.savedRange = undefined;
       this.syncTableActions();
       return value;
+    }
+    private captureTextSelection(): TextSelectionSnapshot | undefined {
+      const selection = this.selection();
+      const anchorNode = selection?.anchorNode;
+      const focusNode = selection?.focusNode;
+      if (anchorNode && focusNode && this.editor.contains(anchorNode) && this.editor.contains(focusNode)) {
+        return { anchor: this.selectionPoint(anchorNode, selection!.anchorOffset), focus: this.selectionPoint(focusNode, selection!.focusOffset) };
+      }
+      const range = this.savedRange;
+      if (!range || !this.editor.contains(range.commonAncestorContainer)) return undefined;
+      return { anchor: this.selectionPoint(range.startContainer, range.startOffset), focus: this.selectionPoint(range.endContainer, range.endOffset) };
+    }
+    private selectionPoint(node: Node, nodeOffset: number): TextSelectionPoint {
+      const path: number[] = [];
+      for (let current: Node = node; current !== this.editor;) {
+        const parent = current.parentNode;
+        if (!parent) break;
+        path.unshift(Array.from(parent.childNodes).findIndex(child => child === current));
+        current = parent;
+      }
+      return {
+        offset: this.textOffset(node, nodeOffset), path, nodeOffset,
+        ...(node.nodeType === Node.TEXT_NODE ? { text: node.textContent ?? "" } : {}),
+        ...(node instanceof Element ? { tag: node.tagName } : {})
+      };
+    }
+    private textOffset(node: Node, offset: number): number {
+      const range = document.createRange();
+      range.selectNodeContents(this.editor);
+      range.setEnd(node, offset);
+      return range.toString().length;
+    }
+    private textPoint(offset: number): { node: Node; offset: number } {
+      const walker = document.createTreeWalker(this.editor, NodeFilter.SHOW_TEXT);
+      let remaining = Math.max(0, offset);
+      let last: Node | undefined;
+      while (walker.nextNode()) {
+        const node = walker.currentNode;
+        const length = node.textContent?.length ?? 0;
+        last = node;
+        if (remaining <= length) return { node, offset: remaining };
+        remaining -= length;
+      }
+      return last ? { node: last, offset: last.textContent?.length ?? 0 } : { node: this.editor, offset: 0 };
+    }
+    private restoreTextSelection(snapshot: TextSelectionSnapshot): void {
+      const anchor = this.restoreSelectionPoint(snapshot.anchor);
+      const focus = this.restoreSelectionPoint(snapshot.focus);
+      const selection = this.selection();
+      if (selection?.setBaseAndExtent) {
+        selection.setBaseAndExtent(anchor.node, anchor.offset, focus.node, focus.offset);
+        this.savedRange = selection.rangeCount ? selection.getRangeAt(0).cloneRange() : undefined;
+        return;
+      }
+      const range = document.createRange();
+      const forward = snapshot.anchor.offset <= snapshot.focus.offset;
+      const start = forward ? anchor : focus;
+      const end = forward ? focus : anchor;
+      range.setStart(start.node, start.offset);
+      range.setEnd(end.node, end.offset);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+      this.savedRange = range.cloneRange();
+    }
+    private restoreSelectionPoint(point: TextSelectionPoint): { node: Node; offset: number } {
+      let node: Node | undefined = this.editor;
+      for (const index of point.path) node = node?.childNodes[index];
+      if (node && point.text !== undefined && node.nodeType === Node.TEXT_NODE && node.textContent === point.text) {
+        return { node, offset: Math.min(point.nodeOffset, point.text.length) };
+      }
+      if (node && point.text === undefined && node instanceof Element && node.tagName === point.tag && point.nodeOffset <= node.childNodes.length) {
+        return { node, offset: point.nodeOffset };
+      }
+      return this.textPoint(point.offset);
     }
     private selectedCell(): HTMLTableCellElement | undefined {
       const node = this.savedRange?.startContainer;
