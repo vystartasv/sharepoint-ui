@@ -1,6 +1,6 @@
 # SharePoint UI
 
-A framework-independent, host-aware UI library for SharePoint Framework. Custom elements own rendering and behavior; optional React wrappers register only the elements used. React is not required by the core.
+A lightweight, React-optional UI library for SPFx task surfaces. Use the same SharePoint-themed components on pages and inside SPFx 1.24 Copilot conversations, with small custom-element imports and a buildable Copilot example that reads and updates real list data. [Open the Copilot example](examples/spfx124-copilot-ux/) or [try its interactive preview](https://vystartasv.github.io/sharepoint-ui/guides/copilot-ux/).
 
 ## Build
 
@@ -16,7 +16,7 @@ Before packaging a new tenant checkpoint, run `npm run version:spfx:patch` to ad
 
 For a repeatable checkpoint, preview version changes with `npm run version:spfx:dry-run`, then bump and run `npm run build:spfx:measured`. It builds once and reports the hashed web-part bundle's raw/gzip/Brotli sizes plus the `.sppkg` size. Measure selected component imports with `npm run measure:component -- DataGrid DataGridBody DataGridCell`. Run `npm run verify:data-grid-parity` to compile the library once, then execute the composed and virtualized DataGrid browser checks.
 
-The demo uses React 18.3.1, SPFx 1.24.0, Node 22, TypeScript 5.8, and the Heft build rig. It includes buttons, text inputs, checkboxes, switches, text areas, cards, badges, message bars, and spinners, with a live LTR/RTL and locale toggle.
+The SharePoint page demo uses React 18.3.1, SPFx 1.24.0, Node 22, TypeScript 5.8, and the Heft build rig. The separate Copilot UX example targets SPFx 1.24.1 and shows the newer conversation surface: [read and update SharePoint list items in Copilot](examples/spfx124-copilot-ux/). SPFx 1.24 made these Copilot UX components generally available.
 
 ## A focused payload advantage
 
