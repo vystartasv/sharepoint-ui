@@ -44,6 +44,10 @@
           "description": "Receives sanitized HTML after edits. With a controlled value prop, update that prop from this callback; the editor preserves its live selection while React applies the committed value."
         },
         {
+          "name": "RichTextEditor mobile selection",
+          "description": "On touch devices, a sustained press releases typing focus so native text selection can start. Formatting controls use the saved range without refocusing the editor; tap the text again to resume typing."
+        },
+        {
           "name": "RichTextEditorProps.onImageUploadError",
           "description": "Receives the failed image filename and error when the application-managed upload fails or returns an unsafe URL."
         },
