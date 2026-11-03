@@ -35,9 +35,10 @@ for (const [module, entries] of familyIndex) {
     const customElement = entry.tag ? `**Custom element:** \`<${entry.tag}>\`` : "**Custom element:** Not supplied";
     const slots = entry.api?.slots?.length ? entry.api.slots.map(slot => `\`${slot}\``).join(", ") : "None declared";
     const callbacks = entry.api?.callbackProps?.length ? entry.api.callbackProps.map(prop => `\`${prop}\``).join(", ") : "None declared";
+    const relatedApis = entry.api?.relatedReactApis?.length ? entry.api.relatedReactApis.map(api => `<p><strong><code>${api.name}</code>:</strong> ${api.description}</p>`).join("\n  ") : "";
     const signature = entry.api?.reactSignature ? `\n<details>\n<summary>React API signature</summary>\n\n\`\`\`tsx\n${entry.api.reactSignature}\n\`\`\`\n\n</details>` : "";
     const styling = entry.api?.styling?.length ? entry.api.styling.map(item => `\`${item}\``).join(", ") : "Use the provider theme and element CSS parts.";
-    return `### ${entry.react ?? entry.tag ?? titleFor(entry.module)}\n\n${entry.summary ?? ""}\n\n<div class="api-entry">\n  <p class="api-meta"><span>${react}</span><span>${customElement}</span></p>\n  <p><strong>Slots:</strong> ${slots}</p>\n  <p><strong>Callbacks:</strong> ${callbacks}</p>\n  <p><strong>Styling:</strong> ${styling}</p>\n  ${signature}\n</div>`;
+    return `### ${entry.react ?? entry.tag ?? titleFor(entry.module)}\n\n${entry.summary ?? ""}\n\n<div class="api-entry">\n  <p class="api-meta"><span>${react}</span><span>${customElement}</span></p>\n  <p><strong>Slots:</strong> ${slots}</p>\n  <p><strong>Callbacks:</strong> ${callbacks}</p>\n  <p><strong>Styling:</strong> ${styling}</p>\n  ${signature}\n  ${relatedApis}\n</div>`;
   });
   const page = `---\ntitle: ${quote(titleFor(module))}\ndescription: ${quote(firstSummary)}\n---\n\n${sections.join("\n\n") }\n`;
   await writeFile(join(output, `${module}.mdx`), page);

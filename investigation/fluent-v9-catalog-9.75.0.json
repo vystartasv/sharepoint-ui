@@ -451,9 +451,13 @@
         "Skeleton",
         "SkeletonItem"
       ],
+      "supportingExports": [
+        "SkeletonContextProvider",
+        "useSkeletonContext"
+      ],
       "localStatus": "partial",
       "purpose": "Represent loading content with a stable structural placeholder.",
-      "coverageNote": "A local implementation exists, but family-level behavior, accessibility, theme, composition, documentation, and performance parity are not yet complete."
+      "coverageNote": "Skeleton and SkeletonItem support Fluent animation, appearance, size, shape, and slot attributes; React also exposes SkeletonContextProvider and useSkeletonContext, and SkeletonItem inherits provider values with item props taking precedence. Skeleton preserves the Fluent progressbar/aria-busy semantics, while SkeletonItem remains a generic div. Numeric width and height values resolve to pixels. A side-by-side Chromium fixture compares provider values, accessibility attributes, and rendered item geometry with Fluent 9.75.0; local Skeleton and native custom-element composition are covered. Cross-browser motion/theme rendering, screen-reader treatment, tenant, documentation, and family performance parity remain open."
     },
     {
       "family": "slider",

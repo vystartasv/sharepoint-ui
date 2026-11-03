@@ -2758,7 +2758,11 @@
       "module": "skeleton",
       "category": "feedback",
       "api": {
-        "reactSignature": "{ shape = \"text\", width, height, animated = true, animation, appearance = \"opaque\", size, children, ...props }: ElementProps & { shape?: SkeletonShape; width?: string; height?: string; animated?: boolean; animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; children?: React.ReactNode }",
+        "reactSignature": "{ shape = \"text\", width, height, animated = true, animation, appearance = \"opaque\", size, children, ...props }: ElementProps & { shape?: SkeletonShape; width?: string | number; height?: string | number; animated?: boolean; animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; children?: React.ReactNode }",
+        "relatedReactApis": [
+          { "name": "SkeletonContextProvider", "description": "Supplies animation, appearance, size, and shape defaults to nested SkeletonItem components." },
+          { "name": "useSkeletonContext", "description": "Reads the nearest SkeletonContextProvider value." }
+        ],
         "callbackProps": [],
         "slots": [],
         "styling": [
@@ -2778,7 +2782,7 @@
       "module": "skeleton",
       "category": "feedback",
       "api": {
-        "reactSignature": "{ animation, appearance, size = 16, shape = \"rectangle\", ...props }: ElementProps & { animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; shape?: \"rectangle\" | \"square\" | \"circle\" }",
+        "reactSignature": "{ animation, appearance, size, shape, ...props }: ElementProps & { animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; shape?: \"rectangle\" | \"square\" | \"circle\" }",
         "callbackProps": [],
         "slots": [],
         "styling": [

@@ -32,10 +32,10 @@ const localNameEquivalents = { card: { Card: "SharePointCard" }, toolbar: { Tool
 const normalize = value => value.toLowerCase().replace(/[^a-z0-9]/g, "");
 const localNames = new Set([
   ...local.components.map(component => component.react),
-  ...[...reactSource.matchAll(/export function ([A-Za-z_$][\w$]*)\s*(?:<[^>\n]+>)?\s*\(/g)].map(([, name]) => name),
+  ...[...reactSource.matchAll(/export (?:const|function) ([A-Za-z_$][\w$]*)\b/g)].map(([, name]) => name),
 ].map(normalize));
-const rows = baseline.families.map(({ family, componentExamples = [] }) => {
-  const expected = [...new Set([...componentExamples, ...(aliases[family] ?? [])])];
+const rows = baseline.families.map(({ family, componentExamples = [], supportingExports = [] }) => {
+  const expected = [...new Set([...componentExamples, ...(aliases[family] ?? []), ...supportingExports])];
   const equivalents = localNameEquivalents[family] ?? {};
   const missing = expected.filter(name => !localNames.has(normalize(name)) && !localNames.has(normalize(equivalents[name] ?? "")));
   return { family, expected, missing };

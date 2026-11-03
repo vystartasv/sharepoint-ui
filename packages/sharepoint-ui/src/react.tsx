@@ -6298,14 +6298,23 @@ export function useToastController(toasterId?: string): ToastControllerValue {
   return controller;
 }
 
-export const Skeleton = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { shape?: SkeletonShape; width?: string; height?: string; animated?: boolean; animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; children?: React.ReactNode }>(function Skeleton({ shape = "text", width, height, animated = true, animation, appearance = "opaque", size, children, ...props }: ElementProps & { shape?: SkeletonShape; width?: string; height?: string; animated?: boolean; animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export type SkeletonContextValue = { animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; shape?: SkeletonShape };
+const SkeletonContext = React.createContext<SkeletonContextValue | undefined>(undefined);
+export const SkeletonContextProvider = SkeletonContext.Provider;
+export function useSkeletonContext(): SkeletonContextValue {
+  return React.useContext(SkeletonContext) ?? {};
+}
+
+export const Skeleton = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { shape?: SkeletonShape; width?: string | number; height?: string | number; animated?: boolean; animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; children?: React.ReactNode }>(function Skeleton({ shape = "text", width, height, animated = true, animation, appearance = "opaque", size, children, ...props }: ElementProps & { shape?: SkeletonShape; width?: string | number; height?: string | number; animated?: boolean; animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineSkeleton);
-  return React.createElement("spui-skeleton", useCustomElementProps({ ...props, ref: forwardedRef, shape, width, height, animated, animation, appearance, size }), children);
+  const value: SkeletonContextValue = { animation: animated ? animation ?? "wave" : "none", appearance, size, shape };
+  return React.createElement(SkeletonContext.Provider, { value }, React.createElement("spui-skeleton", useCustomElementProps({ ...props, ref: forwardedRef, shape, width, height, animated, animation, appearance, size }), children));
 });
 
-export const SkeletonItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; shape?: "rectangle" | "square" | "circle" }>(function SkeletonItem({ animation, appearance, size = 16, shape = "rectangle", ...props }: ElementProps & { animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; shape?: "rectangle" | "square" | "circle" }, forwardedRef): React.ReactElement {
+export const SkeletonItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; shape?: "rectangle" | "square" | "circle" }>(function SkeletonItem({ animation, appearance, size, shape, ...props }: ElementProps & { animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; shape?: "rectangle" | "square" | "circle" }, forwardedRef): React.ReactElement {
   ensureDefined(defineSkeletonItem);
-  return React.createElement("spui-skeleton-item", useCustomElementProps({ ...props, ref: forwardedRef, animation, appearance, size, shape }));
+  const context = useSkeletonContext();
+  return React.createElement("spui-skeleton-item", useCustomElementProps({ ...props, ref: forwardedRef, animation: animation ?? context.animation, appearance: appearance ?? context.appearance, size: size ?? context.size ?? 16, shape: shape ?? context.shape ?? "rectangle" }));
 });
 
 export type LinkProps = ElementProps & { href?: string; target?: string; rel?: string; download?: string | boolean; hrefLang?: string; hreflang?: string; media?: string; ping?: string; type?: string; referrerPolicy?: string; title?: string; appearance?: "default" | "subtle"; underline?: "always" | "hover" | "none"; disabled?: boolean; disabledFocusable?: boolean; inline?: boolean; as?: "a" | "button" | "span"; children?: React.ReactNode };
