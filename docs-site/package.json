@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@astrojs/starlight": "0.42.8",
-    "@spfx-fast/sharepoint-ui": "0.4.0",
+    "@spfx-fast/sharepoint-ui": "0.4.1",
     "astro": "7.2.10"
   }
 }
