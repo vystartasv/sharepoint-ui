@@ -38,6 +38,16 @@ try {
   assert.equal(await select("controlled").evaluate(el => getComputedStyle(el).minHeight), "40px");
   assert.equal(await host("controlled").getAttribute("appearance"), "underline");
   assert.equal(await host("controlled").locator("select").getAttribute("autocomplete"), "off", "top-level autoComplete is forwarded to the native select");
+  await host("controlled").evaluate(el => el.setAttribute("tabindex", "2"));
+  assert.deepEqual(await host("controlled").evaluate(el => ({ host: el.tabIndex, control: el.shadowRoot.querySelector("select").tabIndex })), { host: -1, control: 2 }, "tabIndex configures the native select without adding a duplicate host tab stop");
+  await host("controlled").evaluate(el => el.removeAttribute("tabindex"));
+  assert.equal(await host("controlled").locator("select").evaluate(el => el.tabIndex), 0, "removing host tabIndex restores the native select default");
+  await host("controlled").evaluate(el => el.setAttribute("autofocus", ""));
+  assert.equal(await host("controlled").evaluate(el => el.shadowRoot.activeElement === el.shadowRoot.querySelector("select")), true, "autofocus focuses the native select control");
+  await host("controlled").evaluate(el => { el.removeAttribute("autofocus"); el.blur(); el.focus(); });
+  assert.equal(await host("controlled").evaluate(el => el.shadowRoot.activeElement === el.shadowRoot.querySelector("select")), true, "the custom-element focus method delegates to the native select");
+  await host("controlled").evaluate(el => el.blur());
+  assert.equal(await host("controlled").evaluate(el => el.shadowRoot.activeElement === null), true, "the custom-element blur method delegates to the native select");
   assert.equal(await host("controlled").locator('[slot="icon"]').getAttribute("aria-hidden"), "true", "custom React icon is a decorative select slot");
   assert.equal(await host("controlled").locator('[slot="icon"]').getByTestId("custom-icon").count(), 1);
   const replacement = host("replacement");
@@ -102,7 +112,7 @@ try {
   assert.equal(await native.evaluate(el => el.value), "x", "form reset restores the selected default");
   assert.equal(await resetGrouped.evaluate(el => el.value), "Text fallback", "form reset restores a selected option nested in optgroup");
   assert.deepEqual(errors, []);
-  console.log(JSON.stringify({ status: "passed", nativeLabelsAndKeyboardControl: true, callbackEventAndData: true, controlledAndDefaultValues: true, sizesAndAppearances: true, nativeFormAndReset: true, externalFormOwner: true, multipleSelectionFormValues: true, pageErrors: errors.length }));
+  console.log(JSON.stringify({ status: "passed", nativeLabelsAndKeyboardControl: true, nativeFocusAttributes: true, nativeFocusMethods: true, callbackEventAndData: true, controlledAndDefaultValues: true, sizesAndAppearances: true, nativeFormAndReset: true, externalFormOwner: true, multipleSelectionFormValues: true, pageErrors: errors.length }));
 } finally {
   await browser?.close();
   await new Promise((done, reject) => server.close(error => error ? reject(error) : done()));

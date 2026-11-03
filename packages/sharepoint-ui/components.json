@@ -1896,7 +1896,7 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Choose a value from a fixed native option list with browser keyboard behavior."
+      "summary": "Choose a value from a fixed native option list with browser keyboard behavior, configurable native focus, and tab order."
     },
     {
       "react": "RadioGroup",

@@ -8,7 +8,7 @@ export function defineSelect(): void {
   if (customElements.get("spui-select")) return;
   class SpuiSelect extends HTMLElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "value", "default-value", "auto-complete", "appearance", "size", "disabled", "required", "name", "multiple", "form", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid"];
+    static observedAttributes = ["label", "value", "default-value", "auto-complete", "autofocus", "tabindex", "appearance", "size", "disabled", "required", "name", "multiple", "form", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid"];
     private internals: ElementInternals | undefined;
     private observer: MutationObserver | undefined;
     private currentValue: string | undefined;
@@ -16,6 +16,10 @@ export function defineSelect(): void {
     private formDisabled = false;
     private slotSelectDefaults?: NativeFormControlDefaults;
     private initialSelectedValues: Set<string> | undefined;
+    private requestedTabIndex: number | undefined;
+    private slotSelectTabIndex: number | undefined;
+    private slotSelectTabIndexCaptured = false;
+    private normalizingTabIndex = false;
 
     get form(): HTMLFormElement | null { return this.internals?.form ?? null; }
 
@@ -45,6 +49,7 @@ export function defineSelect(): void {
 
     connectedCallback(): void {
       this.render();
+      if (this.hasAttribute("autofocus")) this.getSelect()?.focus();
       this.observer = new MutationObserver(records => {
         if (records.some(record => !this.boundSelect?.contains(record.target))) this.syncOptions();
       });
@@ -54,9 +59,12 @@ export function defineSelect(): void {
     disconnectedCallback(): void { this.observer?.disconnect(); }
 
     attributeChangedCallback(name: string, _oldValue: string | null, value: string | null): void {
-      if (!this.isConnected) return;
+      if (name === "tabindex" && !this.normalizingTabIndex) this.requestedTabIndex = value === null ? undefined : Number(value);
+      if (this.normalizingTabIndex || !this.isConnected) return;
       const select = this.getSelect();
       if (!select) return;
+      if (name === "tabindex") { this.syncTabIndex(select); return; }
+      if (name === "autofocus") { if (value !== null) select.focus(); return; }
       if (name === "value") this.currentValue = value ?? "";
       if (name === "default-value" && this.currentValue === undefined && this.getAttribute("value") === null) this.currentValue = value ?? "";
       if (name === "label") {
@@ -75,6 +83,8 @@ export function defineSelect(): void {
       this.syncFormValue(select);
     }
 
+    focus(options?: FocusOptions): void { this.getSelect()?.focus(options); }
+    blur(): void { this.getSelect()?.blur(); }
     get value(): string { return this.currentValue ?? this.getAttribute("value") ?? this.getSelect()?.value ?? ""; }
     set value(value: string) {
       this.currentValue = value;
@@ -108,6 +118,20 @@ export function defineSelect(): void {
         : select.value;
       this.internals?.setFormValue(value);
       try { this.internals?.setValidity(select.validity.valid ? {} : { valueMissing: select.validity.valueMissing }, select.validationMessage, select); } catch { /* Older engines can omit custom-element validity anchors. */ }
+    }
+
+    private syncTabIndex(select: HTMLSelectElement): void {
+      const fallback = select.classList.contains("select-fallback");
+      if (!fallback && !this.slotSelectTabIndexCaptured) {
+        this.slotSelectTabIndex = select.tabIndex;
+        this.slotSelectTabIndexCaptured = true;
+      }
+      select.tabIndex = this.requestedTabIndex ?? (fallback ? 0 : this.slotSelectTabIndex ?? select.tabIndex);
+      if (this.requestedTabIndex !== undefined && this.requestedTabIndex !== -1 && this.getAttribute("tabindex") !== "-1") {
+        this.normalizingTabIndex = true;
+        this.setAttribute("tabindex", "-1");
+        this.normalizingTabIndex = false;
+      }
     }
 
     private syncOptions(): void {
@@ -154,6 +178,7 @@ export function defineSelect(): void {
         if (this.getAttribute("label") && !select.hasAttribute("aria-label") && !select.hasAttribute("aria-labelledby")) select.setAttribute("aria-label", this.getAttribute("label")!);
         if (this.currentValue !== undefined || this.hasAttribute("value") || this.hasAttribute("default-value")) select.value = this.currentValue ?? this.getAttribute("value") ?? this.getAttribute("default-value") ?? "";
       }
+      this.syncTabIndex(select);
       if (this.boundSelect !== select) {
         this.boundSelect?.removeEventListener("change", this.handleSelectChange);
         select.addEventListener("change", this.handleSelectChange);
