@@ -611,17 +611,18 @@ export function Title3(props: TextPresetProps): React.ReactElement { return text
 
 export type LabelRequiredSlotProps = React.HTMLAttributes<HTMLSpanElement> & { children?: React.ReactNode };
 export type LabelRequired = boolean | React.ReactNode | LabelRequiredSlotProps;
+export type LabelProps = React.LabelHTMLAttributes<HTMLLabelElement> & { size?: LabelSize; weight?: LabelWeight; required?: LabelRequired; disabled?: boolean };
 
-export function Label({ htmlFor, size = "medium", weight = "regular", required = false, disabled = false, children, style, ...props }: React.LabelHTMLAttributes<HTMLLabelElement> & { size?: LabelSize; weight?: LabelWeight; required?: LabelRequired; disabled?: boolean }): React.ReactElement {
+export const Label = /* @__PURE__ */ React.forwardRef<HTMLLabelElement, LabelProps>(function Label({ htmlFor, size = "medium", weight = "regular", required = false, disabled = false, children, style, ...props }: LabelProps, forwardedRef): React.ReactElement {
   if (typeof document !== "undefined") ensureLabelStyles(document);
   const labelStyle = { ...getLabelStyle(size, disabled, weight), ...style } as React.CSSProperties;
-  const hostProps = useHostProps({ ...props, className: ["spui-label", props.className].filter(Boolean).join(" "), htmlFor, style: labelStyle, "data-size": size, "data-disabled": String(disabled) });
+  const hostProps = useHostProps({ ...props, ref: forwardedRef, className: ["spui-label", props.className].filter(Boolean).join(" "), htmlFor, style: labelStyle, "data-size": size, "data-disabled": String(disabled) });
   const requiredStyle = { color: disabled ? "var(--spui-ui-foreground-disabled,var(--spui-semantic-disabled-text,var(--colorNeutralForegroundDisabled,#bdbdbd)))" : "var(--spui-label-required-color,var(--colorPaletteRedForeground3,var(--spui-semantic-error-text,#c50f1f)))", paddingInlineStart: "var(--spui-label-required-gap,var(--spacingHorizontalXS,4px))" } as React.CSSProperties;
   const slotProps = required && typeof required === "object" && !Array.isArray(required) && !React.isValidElement(required) && !("$$typeof" in required) ? required as LabelRequiredSlotProps : undefined;
   const requiredContent: React.ReactNode = required === true ? "*" : slotProps ? slotProps.children : required as React.ReactNode;
   const requiredMarker = !required ? null : React.createElement("span", { ...slotProps, "aria-hidden": slotProps?.["aria-hidden"] ?? true, className: ["spui-label-required", slotProps?.className].filter(Boolean).join(" "), style: { ...requiredStyle, ...slotProps?.style } }, requiredContent);
   return React.createElement("label", hostProps as React.LabelHTMLAttributes<HTMLLabelElement>, children, requiredMarker);
-}
+});
 
 export type InfoButtonPopoverProps = { label?: string; placement?: InfoPlacement; arrow?: boolean; trapFocus?: boolean };
 
