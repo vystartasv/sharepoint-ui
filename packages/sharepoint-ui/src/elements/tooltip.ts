@@ -1,4 +1,5 @@
 import { getFloatingPosition, type FloatingAlign, type FloatingPlacement } from "./floating-position.js";
+import { getDirectionFromLanguage } from "./shared.js";
 
 const nextId = (() => { let value = 0; return () => `spui-tooltip-${++value}`; })();
 let activeTooltip: { element: HTMLElement; close: () => void } | undefined;
@@ -55,6 +56,19 @@ function parentElement(element: Element): Element | null {
   if (element.parentElement) return element.parentElement;
   const root = element.getRootNode();
   return root instanceof ShadowRoot ? root.host : null;
+}
+
+function getLayoutDirection(element: Element): "ltr" | "rtl" {
+  let explicitDirection: Element | undefined;
+  let language: Element | undefined;
+  for (let current: Element | null = element; current; current = parentElement(current)) {
+    if (!explicitDirection && current.hasAttribute("dir")) explicitDirection = current;
+    if (!language && (current.hasAttribute("lang") || current.hasAttribute("xml:lang"))) language = current;
+  }
+  if (explicitDirection) return explicitDirection.ownerDocument.defaultView?.getComputedStyle(explicitDirection).direction === "rtl" ? "rtl" : "ltr";
+  const derived = getDirectionFromLanguage(language?.getAttribute("lang") ?? language?.getAttribute("xml:lang"));
+  if (derived) return derived;
+  return element.ownerDocument.defaultView?.getComputedStyle(element).direction === "rtl" ? "rtl" : "ltr";
 }
 
 function intersectRects(rects: BoundaryEdges[]): BoundaryEdges | undefined {
@@ -289,7 +303,7 @@ export function defineTooltip(): void {
       const targetContext = target && "contextElement" in target ? target.contextElement : target && "nodeType" in target ? target : undefined;
       const targetRect = target?.getBoundingClientRect();
       const anchor = targetRect ?? trigger!.getBoundingClientRect();
-      const direction = (targetContext && getComputedStyle(targetContext).direction) || (trigger && getComputedStyle(trigger).direction) || getComputedStyle(this).direction;
+      const direction = getLayoutDirection(targetContext ?? trigger ?? this);
       const rtl = direction === "rtl";
       const [requested, align, rawPosition] = this.getRequestedPosition(rtl ? "rtl" : "ltr");
       const configuredOffset = options?.offset;
