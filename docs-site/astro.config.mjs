@@ -40,6 +40,8 @@ export default defineConfig({
   integrations: [starlight({
     title: "SharePoint UI",
     description: "Theme-aware components and reusable views for SharePoint Framework 1.24.",
+    // The content catch-all emits src/content/docs/404.md; avoid injecting a duplicate route.
+    disable404Route: true,
     head: [{
       tag: "script",
       content: `try { if (localStorage.getItem("starlight-theme") === null) localStorage.setItem("starlight-theme", "light"); } catch {}`,
