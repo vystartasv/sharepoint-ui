@@ -2,12 +2,18 @@ import { base, syncHostAccessibleName } from "./shared.js";
 
 export type RichTextEditorLink = { href: string; text?: string; title?: string; openInNewTab?: boolean };
 export type RichTextEditorLinkPicker = (currentLink: RichTextEditorLink | null) => Promise<RichTextEditorLink | null>;
-export type SharePointMultiLineField = { richText?: boolean; restrictedMode?: boolean; richTextMode?: string; allowHyperlink?: boolean; RichText?: boolean; RestrictedMode?: boolean; RichTextMode?: string; AllowHyperlink?: boolean };
+type SharePointBoolean = boolean | string;
+export type SharePointMultiLineField = { richText?: SharePointBoolean; restrictedMode?: SharePointBoolean; richTextMode?: string; allowHyperlink?: SharePointBoolean; RichText?: SharePointBoolean; RestrictedMode?: SharePointBoolean; RichTextMode?: string; AllowHyperlink?: SharePointBoolean };
 export function getRichTextEditorFieldOptions(field: SharePointMultiLineField): { contentMode: "plain" | "restricted" | "rich" | "html"; allowHyperlink: boolean } {
-  const richText = field.RichText ?? field.richText ?? false;
-  const restricted = field.RestrictedMode ?? field.restrictedMode ?? false;
+  const asBoolean = (value: SharePointBoolean | undefined): boolean | undefined => value === undefined ? undefined : value === true || (typeof value === "string" && value.trim().toLowerCase() === "true");
+  const richText = asBoolean(field.RichText ?? field.richText);
+  const restricted = asBoolean(field.RestrictedMode ?? field.restrictedMode) ?? false;
   const richTextMode = field.RichTextMode ?? field.richTextMode;
-  return { contentMode: !richText ? "plain" : restricted ? "restricted" : richTextMode?.toLowerCase() === "fullhtml" ? "html" : "rich", allowHyperlink: Boolean(richText && !restricted && (field.AllowHyperlink ?? field.allowHyperlink)) };
+  const mode = richTextMode?.trim().toLowerCase();
+  const contentMode = richText === false ? "plain" : restricted ? "restricted" : mode === "fullhtml" ? "html" : mode === "compatible" || richText === true ? "rich" : "html";
+  const compatible = mode === "compatible" || (mode === undefined && richText === true);
+  const allowHyperlink = contentMode === "html" ? true : contentMode === "rich" && compatible && asBoolean(field.AllowHyperlink ?? field.allowHyperlink) === true;
+  return { contentMode, allowHyperlink };
 }
 
 export interface SharePointRichTextEditorElement extends HTMLElement {

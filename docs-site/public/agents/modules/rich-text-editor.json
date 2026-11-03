@@ -17,6 +17,14 @@
         "reactSignature": "inputProps: RichTextEditorProps",
         "relatedReactApis": [
           {
+            "name": "RichTextEditorProps.contentMode",
+            "description": "Choose plain, restricted, rich, or sanitized html output to match the destination field. Omit it for unconstrained sanitized html; use getRichTextEditorFieldOptions(field) to map SharePoint Note settings."
+          },
+          {
+            "name": "getRichTextEditorFieldOptions(field)",
+            "description": "Maps SharePoint RichText, RestrictedMode, RichTextMode, and AllowHyperlink metadata to editor capabilities. Explicit restrictions are preserved; missing restrictions default to sanitized html."
+          },
+          {
             "name": "RichTextEditorProps.editorLabel",
             "description": "Accessible name used when no aria-label or visible label is supplied; defaults to SharePointUIProvider.strings.richTextEditorLabel."
           },

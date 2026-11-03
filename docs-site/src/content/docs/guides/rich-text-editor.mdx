@@ -51,14 +51,15 @@ Use the editor's sanitized `onValueChange` value with your normal SPFx persisten
 
 ## Match the SharePoint field
 
-When no mode is supplied, the editor uses sanitized `html` mode so an unconstrained host can retain the richest supported content. For SharePoint, pass the field metadata helper to keep editing aligned with the destination. It maps SharePoint settings to the closest editing surface:
+When no mode is supplied, the editor uses sanitized `html` mode so an unconstrained host can retain the richest supported content. For SharePoint, pass the field metadata helper to keep editing aligned with the destination. Explicit field restrictions take priority; if the metadata does not include a restriction, the helper leaves the editor in `html` mode instead of silently flattening content to text. It maps SharePoint settings to the closest editing surface:
 
 | SharePoint field settings | Editor mode | What users can save |
 | --- | --- | --- |
 | `RichText: false` | `plain` | Plain text only |
-| `RestrictedMode: true` | `restricted` | Basic formatting; paste becomes plain text; no tables, images, or hyperlinks |
-| `RichText: true`, `RichTextMode: "Compatible"` (or omitted) | `rich` | Toolbar formatting and tables; hyperlinks only when `AllowHyperlink` is true |
-| `RichText: true`, `RichTextMode: "FullHtml"` | `html` | Broader semantic HTML and safe inline formatting, still sanitized |
+| `RichText: true`, `RestrictedMode: true` | `restricted` | Basic formatting; paste becomes plain text; no tables, images, or hyperlinks |
+| `RichText: true`, `RestrictedMode: false`, `RichTextMode: "Compatible"` (or omitted) | `rich` | Rich formatting, tables, and images when an upload callback is supplied; hyperlinks appear only when `AllowHyperlink` is true |
+| `RichText: true`, `RestrictedMode: false`, `RichTextMode: "FullHtml"` | `html` | Broad semantic HTML, safe inline formatting, tables, and links, still sanitized |
+| No relevant settings supplied | `html` | Maximum supported editing for an unconstrained host; output is still sanitized |
 
 ```tsx
 import {
@@ -68,6 +69,7 @@ import {
 } from "@spfx-fast/sharepoint-ui/react";
 
 // Load these settings with the field metadata your SPFx data layer already uses.
+// The helper accepts SharePoint booleans as booleans or "TRUE"/"FALSE" strings.
 const field: SharePointMultiLineField = {
   RichText: true,
   RestrictedMode: false,
@@ -78,7 +80,7 @@ const field: SharePointMultiLineField = {
 <RichTextEditor label="Project notes" {...getRichTextEditorFieldOptions(field)} />
 ```
 
-The helper accepts SharePoint's PascalCase metadata and camelCase equivalents. Plain mode emits plain text. Other modes emit sanitized HTML; `html` accepts additional semantic elements and safe text styles (such as color, font, and alignment) while still removing scripts, embedded objects, unsafe URLs, and unsupported attributes. Set `contentMode="plain"`, `"restricted"`, or `"rich"` explicitly when a non-SharePoint host imposes those limits.
+The helper accepts SharePoint's PascalCase metadata and camelCase equivalents. `AllowHyperlink` controls links in Compatible mode; FullHtml mode allows safe links independently. Plain mode emits plain text. Other modes emit sanitized HTML; `html` accepts additional semantic elements and safe text styles (such as color, font, and alignment) while still removing scripts, embedded objects, unsafe URLs, and unsupported attributes. Set `contentMode="plain"`, `"restricted"`, or `"rich"` explicitly when a non-SharePoint host imposes those limits.
 
 ## Load the editor only when needed
 
