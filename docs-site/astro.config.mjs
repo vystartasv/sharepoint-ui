@@ -18,7 +18,7 @@ const componentSidebar = [...componentsByModule.entries()].sort(([a], [b]) => a.
   label: titleFor(module),
   collapsed: true,
   items: components.map(component => {
-    const name = component.react ?? titleFor(component.tag?.replace(/^spui-/, "") ?? component.module);
+    const name = component.react?.replace(/([a-z0-9])([A-Z])/g, "$1 $2") ?? titleFor(component.tag?.replace(/^spui-/, "") ?? component.module);
     return { label: name, link: `/components/${module}/${slugFor(component.react ?? component.tag ?? name)}/` };
   }),
 }));
@@ -36,8 +36,8 @@ export default defineConfig({
     social: [{ icon: "github", label: "GitHub", href: "https://github.com/vystartasv/sharepoint-ui" }],
     customCss: ["./src/styles/custom.css"],
     sidebar: [
-      { label: "Start here", items: ["index", "getting-started", "catalog"] },
-      { label: "Guides", items: ["guides/spfx", "guides/theming-and-direction", "guides/custom-elements", "guides/rich-text-editor", "guides/agent-workflow"] },
+      { label: "Start here", items: ["index", "getting-started", "catalog", { label: "Rich text editor", link: "/components/rich-text-editor/rich-text-editor/" }] },
+      { label: "Guides", items: ["guides/spfx", "guides/theming-and-direction", "guides/custom-elements", { label: "Save rich text in SharePoint", link: "/guides/rich-text-editor/" }, "guides/agent-workflow"] },
       { label: "Component catalog", collapsed: true, items: componentSidebar },
     ],
   })],

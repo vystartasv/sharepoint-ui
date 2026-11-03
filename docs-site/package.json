@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "node scripts/generate-catalog.mjs && astro dev",
     "build": "node scripts/generate-catalog.mjs && astro build",
     "preview": "astro preview"
   },

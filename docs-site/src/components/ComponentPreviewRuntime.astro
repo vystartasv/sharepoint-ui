@@ -1,9 +1,8 @@
 <script>
-  import { defineSharePointUIElements, getSharePointUIStyleTokens } from "@spfx-fast/sharepoint-ui";
+  import { getSharePointUIStyleTokens } from "@spfx-fast/sharepoint-ui/appearance";
+  import { registerPreviewElements } from "./preview-elements.generated.js";
 
-  defineSharePointUIElements();
-
-  document.querySelectorAll("[data-component-demo]").forEach((demo) => {
+  document.querySelectorAll("[data-component-demo]").forEach(async (demo) => {
     const appearance = demo.querySelector("[data-preview-appearance]");
     const accent = demo.querySelector("[data-preview-accent]");
     const stage = demo.querySelector(".component-demo__stage");
@@ -22,6 +21,7 @@
     appearance?.addEventListener("change", applyTokens);
     accent?.addEventListener("input", applyTokens);
     applyTokens();
+    applyTokens();
 
     for (const type of ["click", "input", "change"]) {
       stage?.addEventListener(type, (event) => {
@@ -30,6 +30,24 @@
         const value = target?.value ?? target?.checked;
         if (status) status.textContent = value === undefined ? `${label} ${type === "click" ? "activated" : "updated"}.` : `${label} value: ${value}`;
       });
+    }
+    try {
+      await registerPreviewElements(demo);
+      const virtualList = stage?.querySelector("spui-virtual-list");
+      if (virtualList && "items" in virtualList) {
+        virtualList.items = [
+          { title: "Quarterly access review", owner: "Vilius Petrauskas" },
+          { title: "Site launch checklist", owner: "Maria Chen" },
+          { title: "Workspace permissions", owner: "Daniel Morgan" },
+          { title: "Content migration plan", owner: "Aisha Khan" },
+          { title: "Service health report", owner: "Lukas Novak" },
+          { title: "Policy acknowledgement", owner: "Sofia Rossi" },
+        ];
+        virtualList.renderItem = (item) => `${item.title} · ${item.owner}`;
+      }
+    } catch (error) {
+      if (status) status.textContent = `${demo.dataset.label ?? "Component"} preview could not be loaded.`;
+      console.error("SharePoint UI preview failed to load", error);
     }
   });
 </script>

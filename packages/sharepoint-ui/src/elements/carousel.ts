@@ -417,7 +417,7 @@ export function defineCarousel(): void {
     }
 
     attributeChangedCallback(name: string): void {
-      if (!this.isConnected) return;
+      if (!this.isConnected || !this.controls) return;
       if ((name === "selected-index" || name === "active-index") && this.hasAttribute("controlled")) this.setIndex(Number(this.getAttribute(name)), false);
       else if ((name === "default-selected-index" || name === "default-active-index") && !this.interacted) this.setIndex(Number(this.getAttribute(name) ?? this.getAttribute("default-selected-index")), false);
       this.syncLabels(); this.syncSlides();
