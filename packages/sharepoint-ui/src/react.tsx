@@ -3419,6 +3419,7 @@ export function AvatarGroupPopover({ children, count, indicator, label, triggerL
   const context = React.useContext(UIContext);
   const size = React.useContext(AvatarGroupSizeContext);
   const itemCount = count ?? React.Children.count(children);
+  const resolvedLabel = label ?? context.strings.people ?? "More people";
   const triggerText = (triggerLabel ?? context.strings.showMorePeople ?? "Show more people ({count})").replace("{count}", String(itemCount));
   const showCount = indicator ?? (size < 24 ? "icon" : "count");
   const defaultTriggerContent = showCount === "icon"
@@ -3442,12 +3443,13 @@ export function AvatarGroupPopover({ children, count, indicator, label, triggerL
     : React.createElement("ul", { ...contentProps, role: contentProps.role ?? "list" }, React.createElement(AvatarGroupOverflowContext.Provider, { value: true }, listChildren));
   const surfaceElement = React.isValidElement(popoverSurface) ? popoverSurface as React.ReactElement<React.HTMLAttributes<HTMLDivElement>> : undefined;
   const surfaceProps = (surfaceElement ? surfaceElement.props : popoverSurface ?? {}) as React.HTMLAttributes<HTMLDivElement>;
+  const surfaceLabel = surfaceProps["aria-label"] ?? resolvedLabel;
   const surfaceContent = surfaceElement
-    ? React.cloneElement(surfaceElement, { "aria-label": surfaceProps["aria-label"] ?? "Overflow", tabIndex: surfaceProps.tabIndex ?? 0, children: listContent })
-    : React.createElement(PopoverSurface, { ...surfaceProps, "aria-label": surfaceProps["aria-label"] ?? "Overflow", tabIndex: surfaceProps.tabIndex ?? 0 }, listContent);
+    ? React.cloneElement(surfaceElement, { "aria-label": surfaceLabel, tabIndex: surfaceProps.tabIndex ?? 0, children: listContent })
+    : React.createElement(PopoverSurface, { ...surfaceProps, "aria-label": surfaceLabel, tabIndex: surfaceProps.tabIndex ?? 0 }, listContent);
   return React.createElement(Popover, {
     ...props,
-    label: label ?? context.strings.people ?? "More people",
+    label: resolvedLabel,
     placement,
     open,
     trapFocus: true,
