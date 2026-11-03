@@ -1,8 +1,12 @@
 import { base, syncHostAccessibleName } from "./shared.js";
 
+export type RichTextEditorLink = { href: string; text?: string; title?: string; openInNewTab?: boolean };
+export type RichTextEditorLinkPicker = (currentLink: RichTextEditorLink | null) => Promise<RichTextEditorLink | null>;
+
 export interface SharePointRichTextEditorElement extends HTMLElement {
   value: string;
   uploadImage?: (file: File) => Promise<string>;
+  linkPicker?: RichTextEditorLinkPicker;
   readonly form: HTMLFormElement | null;
   readonly validity: ValidityState | undefined;
   readonly validationMessage: string;
@@ -58,7 +62,7 @@ export function defineRichTextEditor(): void {
   if (customElements.get("spui-rich-text-editor")) return;
   class SpuiRichTextEditor extends HTMLElement implements SharePointRichTextEditorElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "editor-label", "placeholder", "disabled", "read-only", "required", "required-message", "value", "name", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "bold-label", "italic-label", "underline-label", "bullet-list-label", "number-list-label", "link-label", "undo-label", "redo-label", "insert-table-label", "insert-image-label", "image-input-label", "insert-row-above-label", "insert-row-below-label", "insert-column-before-label", "insert-column-after-label", "delete-row-label", "delete-column-label", "delete-table-label", "toolbar-label", "link-prompt", "link-dialog-label", "link-text-label", "link-title-label", "link-apply-label", "link-remove-label", "link-cancel-label", "link-new-tab-label", "link-invalid-message"];
+    static observedAttributes = ["label", "editor-label", "placeholder", "disabled", "read-only", "required", "required-message", "value", "name", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "bold-label", "italic-label", "underline-label", "bullet-list-label", "number-list-label", "link-label", "undo-label", "redo-label", "insert-table-label", "insert-image-label", "image-input-label", "insert-row-above-label", "insert-row-below-label", "insert-column-before-label", "insert-column-after-label", "delete-row-label", "delete-column-label", "delete-table-label", "toolbar-label", "link-prompt", "link-dialog-label", "link-text-label", "link-title-label", "link-apply-label", "link-remove-label", "link-cancel-label", "link-new-tab-label", "link-invalid-message", "link-picker-label", "link-picker-loading-label", "link-picker-error-message"];
     private editor!: HTMLDivElement;
     private internals: ElementInternals | undefined;
     private formDisabled = false;
@@ -69,6 +73,12 @@ export function defineRichTextEditor(): void {
     private imageUploader?: (file: File) => Promise<string>;
     get uploadImage(): ((file: File) => Promise<string>) | undefined { return this.imageUploader; }
     set uploadImage(value: ((file: File) => Promise<string>) | undefined) { this.imageUploader = value; this.syncImageButton(); }
+    private linkPickerValue?: RichTextEditorLinkPicker;
+    private linkPickerButton?: HTMLButtonElement;
+    private pickingLink = false;
+    private linkEditorVersion = 0;
+    get linkPicker(): RichTextEditorLinkPicker | undefined { return this.linkPickerValue; }
+    set linkPicker(value: RichTextEditorLinkPicker | undefined) { this.linkPickerValue = value; this.syncLinkPickerButton(); }
     private imageInput?: HTMLInputElement;
     private linkForm?: HTMLFormElement;
     private linkUrlInput?: HTMLInputElement;
@@ -134,10 +144,20 @@ export function defineRichTextEditor(): void {
         this.linkForm.querySelectorAll<HTMLInputElement | HTMLButtonElement>("input,button").forEach(control => { control.disabled = readOnly; });
       }
       this.syncImageButton();
+      this.syncLinkPickerButton();
     }
     private syncImageButton(): void {
       const button = this.shadowRoot?.querySelector<HTMLButtonElement>('[data-command="insertImage"]');
       if (button) button.disabled = this.formDisabled || this.hasAttribute("disabled") || this.hasAttribute("read-only") || !this.imageUploader || this.uploadingImage;
+    }
+    private syncLinkPickerButton(): void {
+      if (this.linkPickerButton) {
+        this.linkPickerButton.hidden = !this.linkPickerValue;
+        this.linkPickerButton.disabled = this.formDisabled || this.hasAttribute("disabled") || this.hasAttribute("read-only") || this.pickingLink;
+        this.linkPickerButton.textContent = this.pickingLink
+          ? this.getAttribute("link-picker-loading-label") ?? "Opening picker…"
+          : this.getAttribute("link-picker-label") ?? "Browse SharePoint";
+      }
     }
     private syncForm(): void { const value = this.value; this.pendingValue = value; this.internals?.setFormValue(value || null); const active = this.willValidate; const missing = active && this.hasAttribute("required") && !this.editor?.textContent?.trim(); const customError = active && Boolean(this.customError); const flags: ValidityStateFlags = { ...(missing ? { valueMissing: true } : {}), ...(customError ? { customError: true } : {}) }; const message = customError ? this.customError : missing ? this.getAttribute("required-message") ?? "Enter some text." : ""; try { this.internals?.setValidity(flags, message); } catch { /* Engines without form association remain editable. */ } }
     private sanitizeEditor(): void {
@@ -306,16 +326,51 @@ export function defineRichTextEditor(): void {
       this.linkError!.hidden = true;
       this.linkUrlInput!.removeAttribute("aria-invalid");
       this.linkForm.hidden = false;
+      this.linkEditorVersion++;
       this.linkUrlInput!.focus();
       this.linkUrlInput!.select();
     }
     private closeLinkEditor(restoreEditor: boolean): void {
       if (!this.linkForm) return;
       this.linkForm.hidden = true;
+      this.linkEditorVersion++;
       this.linkError!.hidden = true;
       this.linkUrlInput!.removeAttribute("aria-invalid");
       if (restoreEditor) this.restoreSelection();
       else this.shadowRoot?.querySelector<HTMLButtonElement>('button[data-command="createLink"]')?.focus();
+    }
+    private async browseLink(): Promise<void> {
+      const picker = this.linkPickerValue;
+      if (!picker || this.pickingLink || this.formDisabled || this.hasAttribute("disabled") || this.hasAttribute("read-only")) return;
+      const version = this.linkEditorVersion;
+      const existing = this.linkAtRange(this.savedRange);
+      const currentLink: RichTextEditorLink | null = existing ? {
+        href: existing.getAttribute("href") ?? "",
+        text: this.linkTextInput?.value ?? existing.textContent ?? "",
+        title: this.linkTitleInput?.value ?? existing.getAttribute("title") ?? "",
+        openInNewTab: this.linkNewTabInput?.checked ?? existing.getAttribute("target") === "_blank",
+      } : null;
+      this.pickingLink = true;
+      this.linkError!.hidden = true;
+      this.syncLinkPickerButton();
+      try {
+        const result = await picker(currentLink);
+        if (!result || version !== this.linkEditorVersion || this.linkForm?.hidden) return;
+        if (typeof result.href !== "string" || !safeHref(result.href)) throw new Error(this.getAttribute("link-invalid-message") ?? "Enter a valid HTTP, HTTPS, or mailto link.");
+        this.linkUrlInput!.value = result.href;
+        if (typeof result.text === "string") this.linkTextInput!.value = result.text;
+        if (typeof result.title === "string") this.linkTitleInput!.value = result.title.slice(0, 512);
+        if (typeof result.openInNewTab === "boolean") this.linkNewTabInput!.checked = result.openInNewTab;
+        this.linkTextInput!.focus();
+      } catch (error) {
+        if (version !== this.linkEditorVersion || this.linkForm?.hidden) return;
+        this.linkError!.textContent = this.getAttribute("link-picker-error-message") ?? "Unable to open the SharePoint link picker.";
+        this.linkError!.hidden = false;
+        this.dispatchEvent(new CustomEvent("spui-link-picker-error", { detail: { error }, bubbles: true, composed: true }));
+      } finally {
+        this.pickingLink = false;
+        this.syncLinkPickerButton();
+      }
     }
     private applyLink(): void {
       const href = this.linkUrlInput!.value.trim();
@@ -412,11 +467,12 @@ export function defineRichTextEditor(): void {
       this.linkError = document.createElement("div"); this.linkError.className = "link-error"; this.linkError.part.add("link-error"); this.linkError.id = `rich-text-link-error-${crypto.randomUUID()}`; this.linkError.setAttribute("role", "alert"); this.linkError.hidden = true; linkForm.append(this.linkError);
       this.linkUrlInput.setAttribute("aria-describedby", this.linkError.id);
       const linkActions = document.createElement("div"); linkActions.className = "link-actions";
-      const makeLinkAction = (action: "apply" | "remove" | "cancel", attribute: string, fallback: string, onClick: () => void): HTMLButtonElement => {
+      const makeLinkAction = (action: "apply" | "remove" | "cancel" | "browse", attribute: string, fallback: string, onClick: () => void): HTMLButtonElement => {
         const button = document.createElement("button"); button.type = action === "apply" ? "submit" : "button"; button.dataset.linkAction = action; button.dataset.labelAttribute = attribute; button.part.add(`link-${action}`); button.textContent = this.getAttribute(attribute) ?? fallback; button.addEventListener("click", onClick); linkActions.append(button); return button;
       };
       makeLinkAction("apply", "link-apply-label", "Apply link", () => {});
       this.linkRemoveButton = makeLinkAction("remove", "link-remove-label", "Remove link", () => this.removeLink());
+      this.linkPickerButton = makeLinkAction("browse", "link-picker-label", "Browse SharePoint", () => { void this.browseLink(); });
       makeLinkAction("cancel", "link-cancel-label", "Cancel", () => this.closeLinkEditor(false));
       linkForm.append(linkActions);
       linkForm.addEventListener("submit", event => { event.preventDefault(); this.applyLink(); });
@@ -482,7 +538,7 @@ export function defineRichTextEditor(): void {
           const attribute = field.dataset.labelAttribute!;
           if (field.firstChild) field.firstChild.textContent = this.getAttribute(attribute) ?? fieldFallbacks[attribute] ?? "";
         });
-        const actionFallbacks: Record<string, string> = { "link-apply-label": "Apply link", "link-remove-label": "Remove link", "link-cancel-label": "Cancel" };
+        const actionFallbacks: Record<string, string> = { "link-apply-label": "Apply link", "link-remove-label": "Remove link", "link-cancel-label": "Cancel", "link-picker-label": "Browse SharePoint" };
         this.linkForm.querySelectorAll<HTMLButtonElement>("button[data-label-attribute]").forEach(button => {
           const attribute = button.dataset.labelAttribute!;
           button.textContent = this.getAttribute(attribute) ?? actionFallbacks[attribute] ?? "";
@@ -490,6 +546,7 @@ export function defineRichTextEditor(): void {
         const newTabText = this.linkForm.querySelector<HTMLElement>(".link-new-tab span");
         if (newTabText) newTabText.textContent = this.getAttribute("link-new-tab-label") ?? "Open in new tab";
       }
+      this.syncLinkPickerButton();
       this.syncTableActions();
     }
   }

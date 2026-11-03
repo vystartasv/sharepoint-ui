@@ -2257,14 +2257,24 @@
             "description": "Receives the failed image filename and error when the application-managed upload fails or returns an unsafe URL."
           },
           {
+            "name": "RichTextEditorProps.linkPicker",
+            "description": "Opens the host application's SharePoint picker with the current link, then fills the editor for review before the user applies it. Return null to cancel."
+          },
+          {
+            "name": "RichTextEditorProps.onLinkPickerError",
+            "description": "Receives an error when the host-provided SharePoint link picker fails."
+          },
+          {
             "name": "SharePointUIProvider.strings.richTextLink*",
-            "description": "Customize the link editor's accessible name, field labels, action labels, and invalid-URL message for the active language."
+            "description": "Customize the link editor's accessible name, field labels, action labels, picker states, and validation messages for the active language."
           }
         ],
         "callbackProps": [
           "onValueChange",
           "onImageUpload",
-          "onImageUploadError"
+          "onImageUploadError",
+          "linkPicker",
+          "onLinkPickerError"
         ],
         "slots": [],
         "styling": [
@@ -2275,9 +2285,9 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Edit sanitized rich HTML with controlled or uncontrolled form values, formatting history, table editing, an accessible link editor with safe new-tab links, and application-managed durable image upload for SharePoint persistence.",
+      "summary": "Edit sanitized rich HTML with controlled or uncontrolled form values, formatting history, table editing, a safe link editor with an optional host-provided SharePoint picker, and application-managed durable image upload.",
       "highValueAdditions": [
-        "Add a host-provided SharePoint page and file picker for inserting internal links."
+        "Preview SharePoint page titles and destination details before inserting internal links."
       ]
     },
     {
