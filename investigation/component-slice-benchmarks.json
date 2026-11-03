@@ -11070,5 +11070,14 @@
       "reactAdapter": { "rawBytes": 92637, "gzipBytes": 21729, "brotliBytes": 19127, "includedModules": 6, "reactExternalized": true }
     },
     "limits": "Minified tree-shaken JavaScript slices only; excludes CSS, React runtime, image transfer, rendering time, and SharePoint host costs."
+  },
+  "overflowCompactDensityCheckpoint": {
+    "measuredOn": "2026-11-03",
+    "command": "npm run measure:component -- Overflow",
+    "componentSlices": {
+      "customElement": { "rawBytes": 9417, "gzipBytes": 3118, "brotliBytes": 2759, "includedModules": 3 },
+      "reactAdapter": { "rawBytes": 113731, "gzipBytes": 28693, "brotliBytes": 24939, "includedModules": 7, "reactExternalized": true }
+    },
+    "limits": "Minified tree-shaken JavaScript only; excludes CSS, React runtime, persistent storage behavior, and SharePoint host cost. The React hook is only retained when imported."
   }
 }

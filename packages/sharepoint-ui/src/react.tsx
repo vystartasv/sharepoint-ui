@@ -89,8 +89,8 @@ import { defineInfoButton, type InfoPlacement } from "./elements/info.js";
 import { defineCarousel, defineCarouselCard, defineCarouselNav, defineCarouselNavButton, defineCarouselNavImageButton, defineCarouselButton, defineCarouselAutoplayButton, defineCarouselNavContainer, defineCarouselSlider, defineCarouselViewport, type CarouselAlign, type CarouselAppearance, type CarouselIndexChangeData, type CarouselMotion } from "./elements/carousel.js";
 export type { CarouselIndexChangeData } from "./elements/carousel.js";
 export type { CarouselAlign, CarouselAppearance, CarouselMotion } from "./elements/carousel.js";
-import { defineOverflow, defineOverflowItem, defineOverflowDivider, type OverflowAxis, type OverflowState } from "./elements/overflow.js";
-export type { OverflowAxis, OverflowState } from "./elements/overflow.js";
+import { defineOverflow, defineOverflowItem, defineOverflowDivider, type OverflowAxis, type OverflowDensity, type OverflowState } from "./elements/overflow.js";
+export type { OverflowAxis, OverflowDensity, OverflowState } from "./elements/overflow.js";
 import { defineSwatchPicker as defineNativeSwatchPicker } from "./elements/swatch-picker.js";
 import { createTableColumn as createNativeTableColumn, defineTable as defineNativeTable } from "./elements/table.js";
 import { getSharePointUIStyleTokens, type SharePointUIAppearance, type SharePointUIBaseAppearance, type SharePointUIDensity, type SharePointUIStyleTokens } from "./appearance.js";
@@ -978,7 +978,7 @@ export function useOverflowMenu<TElement extends HTMLElement = HTMLElement>(id?:
   return { ref, overflowCount, isOverflowing: hasOverflow };
 }
 
-export function Overflow({ children, label, minimumVisible = 0, overflowDirection = "end", overflowAxis = "horizontal", hasHiddenItems = false, overflowContent, padding = 10, onOverflowChange, onOverflowItemSelect, ...props }: ElementProps & { children?: React.ReactNode; label?: string; minimumVisible?: number; overflowDirection?: "start" | "end"; overflowAxis?: OverflowAxis; hasHiddenItems?: boolean; overflowContent?: React.ReactNode; padding?: number; onOverflowChange?: (event: null, data: OverflowState) => void; onOverflowItemSelect?: (id: string) => void }): React.ReactElement {
+export function Overflow({ children, label, minimumVisible = 0, overflowDirection = "end", overflowAxis = "horizontal", density = "comfortable", hasHiddenItems = false, overflowContent, padding = 10, onOverflowChange, onOverflowItemSelect, ...props }: ElementProps & { children?: React.ReactNode; label?: string; minimumVisible?: number; overflowDirection?: "start" | "end"; overflowAxis?: OverflowAxis; density?: OverflowDensity; hasHiddenItems?: boolean; overflowContent?: React.ReactNode; padding?: number; onOverflowChange?: (event: null, data: OverflowState) => void; onOverflowItemSelect?: (id: string) => void }): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null);
   const [overflowIds, setOverflowIds] = React.useState<string[]>([]);
   const [overflowState, setOverflowState] = React.useState<OverflowState>(emptyOverflowContext);
@@ -1058,7 +1058,7 @@ export function Overflow({ children, label, minimumVisible = 0, overflowDirectio
   });
   const trigger = React.createElement(Button, { appearance: "subtle", size: "small", iconOnly: true, "aria-label": menuLabel }, React.createElement("span", { "aria-hidden": true }, "⋯"));
   const menu = React.createElement(Menu, { label: label || strings.overflowDescription, trigger, onSelect: value => onOverflowItemSelect?.(value) }, ...menuItems, overflowContent);
-  const host = React.createElement("spui-overflow", useCustomElementProps({ ...props, ref, "aria-label": label || strings.overflowDescription, "minimum-visible": minimumVisible, "overflow-direction": overflowDirection, "overflow-axis": overflowAxis, "has-hidden-items": hasHiddenItems || undefined, padding }), children, React.createElement("div", { slot: "overflow-trigger", hidden: overflowIds.length === 0 && !hasHiddenItems }, menu));
+  const host = React.createElement("spui-overflow", useCustomElementProps({ ...props, ref, "aria-label": label || strings.overflowDescription, "minimum-visible": minimumVisible, "overflow-direction": overflowDirection, "overflow-axis": overflowAxis, density, "has-hidden-items": hasHiddenItems || undefined, padding }), children, React.createElement("div", { slot: "overflow-trigger", hidden: overflowIds.length === 0 && !hasHiddenItems }, menu));
   return React.createElement(OverflowProvider, { value: contextValue }, host);
 }
 
@@ -6085,6 +6085,31 @@ export type SwatchPaletteStore = {
   save: (palette: SavedSwatchPalette) => Promise<void>;
   remove: (id: string) => Promise<void>;
 };
+
+/** Load and persist a user's compact command-shelf choice in this browser. Use a site/app-scoped key. */
+export function useStoredOverflowCompactMode(storageKey: string, defaultCompact = false): { compact: boolean; ready: boolean; setCompact: (compact: boolean) => void; toggleCompact: () => void } {
+  const key = `spfx-fast:overflow-compact:${storageKey}`;
+  const [compact, setCompactState] = React.useState(defaultCompact);
+  const [ready, setReady] = React.useState(false);
+  React.useEffect(() => {
+    const read = (value: string | null) => {
+      if (value === "true" || value === "false") setCompactState(value === "true");
+      else setCompactState(defaultCompact);
+    };
+    try { read(globalThis.localStorage?.getItem(key) ?? null); } catch { setCompactState(defaultCompact); }
+    setReady(true);
+    const onStorage = (event: StorageEvent) => { if (event.key === key) read(event.newValue); };
+    globalThis.addEventListener?.("storage", onStorage);
+    return () => globalThis.removeEventListener?.("storage", onStorage);
+  }, [key, defaultCompact]);
+  const setCompact = React.useCallback((value: boolean) => {
+    setCompactState(value);
+    try { globalThis.localStorage?.setItem(key, String(value)); } catch { /* Keep the current-session choice if storage is unavailable. */ }
+  }, [key]);
+  const toggleCompact = React.useCallback(() => setCompact(!compact), [compact, setCompact]);
+  return { compact, ready, setCompact, toggleCompact };
+}
+
 export function useSavedSwatchPalettes(store: SwatchPaletteStore): {
   palettes: readonly SavedSwatchPalette[];
   loading: boolean;

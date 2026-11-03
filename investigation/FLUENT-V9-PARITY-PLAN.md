@@ -604,7 +604,7 @@ These additions improve common SharePoint work beyond the baseline catalog. They
 | Nav | Support avatar/picture and icon slots, plus an explicit full-width expanded rail mode | Makes agent-built SharePoint app navigation look like a real workspace and remain discoverable | Implemented in native and React APIs; desktop full-width expansion works with the existing collapse rail |
 | Drawer | Add persistent non-modal behavior with explicit dismissal policy | Keeps supporting panes available without blocking the page while preserving predictable focus and dismissal | Implemented and locally verified |
 | Carousel | Add an optional thumbnail-preview strip for image-focused galleries, with roving keyboard focus and localized accessible labels | Lets users navigate media collections by visual preview without making ordinary SharePoint records heavier | Implemented as `CarouselNav appearance="thumbnails"` with existing `CarouselNavImageButton` controls; image loads remain caller-owned |
-| Overflow | Add persisted compact-mode preference for responsive command shelves | Lets a SharePoint workspace retain a user's density preference across visits | Queued |
+| Overflow | Add persisted compact-mode preference for responsive command shelves | Lets a SharePoint workspace retain a user's density preference across visits | Implemented with `density="compact"` and React `useStoredOverflowCompactMode`; custom-element consumers can persist the density through their app's storage |
 | SwatchPicker | Provide persistence for reusable named palettes and derive built-in presets from tenant palette tokens; multi-select is baseline | Lets design tools reuse brand palettes while tenant colors stay current and persistence remains in the app's existing data layer | Implemented `useSavedSwatchPalettes`, `SwatchPaletteStore`, framework-neutral `getSharePointThemeColorPresets`, and React `SharePointThemeSwatches` |
 
 ## Gates for each component family
@@ -637,6 +637,10 @@ These additions improve common SharePoint work beyond the baseline catalog. They
 - [FAST Element component model](https://fast.design/docs/3.x/introduction/)
 - [Apple HIG color guidance](https://developer.apple.com/design/human-interface-guidelines/color)
 - [Apple UIKit adaptive system colors](https://developer.apple.com/documentation/uikit/ui-element-colors)
+
+### Overflow compact density and persisted preference — SPFx 1.24 production build
+
+Added `density="compact"` to the responsive Overflow shelf and `useStoredOverflowCompactMode(storageKey)` for React apps to retain a site/app-scoped choice in browser storage. Compact spacing inherits the normal theme and keeps token-sized controls at least 44px tall on coarse-pointer devices; explicit component sizes remain in effect. The custom-element API remains framework-neutral; those consumers use their app's preferred persistence. The generated Overflow page now has an interactive compact toggle, and the agent quickstart includes a copyable React composition. The library, docs (319 static pages), and SPFx 1.24 production build/package pass without invoking test suites. Overflow slices: custom elements 9,417 raw / 3,118 gzip / 2,759 Brotli bytes; React adapter 113,731 / 28,693 / 24,939 bytes across 7 retained modules with React externalized. These are tree-shaken JavaScript estimates, not full host or storage costs.
 
 ### Field composition and validation checkpoint — SPFx package 1.0.0.99
 

@@ -69,6 +69,25 @@ export function RequestActions({ openRequest, photoUrl }: { openRequest: () => v
 
 `Tooltip` uses its children as the trigger and its `content` as the tooltip. `Persona` accepts identity text directly and an optional composed `Avatar`. Other components follow the same import, provider, children, and host-styling rules; use their own page for their specific props, slots, and callback signatures. For Tooltip controlled visibility, use `open` with `onOpenChange`; `visible` and `onVisibleChange` remain compatibility aliases.
 
+For a responsive command shelf, let `Overflow` move lower-priority actions into its menu. `useStoredOverflowCompactMode` remembers a per-browser compact spacing choice; include the app and site in its key so separate workspaces do not share a setting:
+
+```tsx
+import { Button, Overflow, OverflowItem, ToggleButton, useStoredOverflowCompactMode } from "@spfx-fast/sharepoint-ui/react";
+
+function RequestCommands({ siteId }: { siteId: string }) {
+  const { compact, setCompact } = useStoredOverflowCompactMode(`requests:${siteId}`);
+  return <>
+    <ToggleButton pressed={compact} onPressedChange={setCompact}>Compact commands</ToggleButton>
+    <Overflow label="Request actions" density={compact ? "compact" : "comfortable"}>
+      <OverflowItem id="open" priority={2}><Button>Open</Button></OverflowItem>
+      <OverflowItem id="share" priority={1}><Button>Share</Button></OverflowItem>
+    </Overflow>
+  </>;
+}
+```
+
+For custom elements, set `density="compact"` on `<spui-overflow>` and persist the toggle with the app's preferred storage. Token-sized controls remain at least 44px tall on coarse-pointer devices; explicit component sizes stay in effect.
+
 ## Another framework or plain HTML
 
 Import only the component’s leaf factory, register it once, then use its documented custom-element tag:

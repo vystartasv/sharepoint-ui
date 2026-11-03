@@ -13,7 +13,13 @@
       "module": "overflow",
       "category": "actions",
       "api": {
-        "reactSignature": "{ children, label, minimumVisible = 0, overflowDirection = \"end\", overflowAxis = \"horizontal\", hasHiddenItems = false, overflowContent, padding = 10, onOverflowChange, onOverflowItemSelect, ...props }: ElementProps & { children?: React.ReactNode; label?: string; minimumVisible?: number; overflowDirection?: \"start\" | \"end\"; overflowAxis?: OverflowAxis; hasHiddenItems?: boolean; overflowContent?: React.ReactNode; padding?: number; onOverflowChange?: (event: null, data: OverflowState) => void; onOverflowItemSelect?: (id: string) => void }",
+        "reactSignature": "{ children, label, minimumVisible = 0, overflowDirection = \"end\", overflowAxis = \"horizontal\", density = \"comfortable\", hasHiddenItems = false, overflowContent, padding = 10, onOverflowChange, onOverflowItemSelect, ...props }: ElementProps & { children?: React.ReactNode; label?: string; minimumVisible?: number; overflowDirection?: \"start\" | \"end\"; overflowAxis?: OverflowAxis; density?: OverflowDensity; hasHiddenItems?: boolean; overflowContent?: React.ReactNode; padding?: number; onOverflowChange?: (event: null, data: OverflowState) => void; onOverflowItemSelect?: (id: string) => void }",
+        "relatedReactApis": [
+          {
+            "name": "useStoredOverflowCompactMode(storageKey, defaultCompact?)",
+            "description": "Persist this browser's compact command-shelf choice; use the returned compact value as Overflow density and setCompact or toggleCompact from a ToggleButton. Scope storageKey to the app and SharePoint site. Custom-element consumers can set density=compact directly and persist it with their own preference store."
+          }
+        ],
         "callbackProps": [
           "onOverflowChange",
           "onOverflowItemSelect"
@@ -29,10 +35,8 @@
           "named ::part hooks"
         ]
       },
-      "summary": "Keep priority actions visible as space changes and render the overflowed actions through the existing Menu primitives without cloning or moving controls.",
-      "highValueAdditions": [
-        "Add a priority-aware responsive command shelf with group labels and persisted compact mode."
-      ]
+      "summary": "Keep priority actions visible as space changes, move the rest into a menu, and let a stored user preference switch the shelf to compact spacing.",
+      "highValueAdditions": []
     },
     {
       "react": "OverflowProvider",

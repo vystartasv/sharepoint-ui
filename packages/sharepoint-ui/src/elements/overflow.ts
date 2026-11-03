@@ -2,6 +2,7 @@ import { base } from "./shared.js";
 
 export type OverflowState = { hasOverflow: boolean; itemVisibility: Record<string, boolean>; groupVisibility: Record<string, "visible" | "hidden" | "overflow"> };
 export type OverflowAxis = "horizontal" | "vertical";
+export type OverflowDensity = "comfortable" | "compact";
 type OverflowEventDetail = OverflowState & { visibleIds: string[]; overflowIds: string[] };
 
 export function defineOverflowItem(): void {
@@ -25,7 +26,7 @@ export function defineOverflow(): void {
   if (customElements.get("spui-overflow")) return;
   defineOverflowItem(); defineOverflowDivider();
   class SpuiOverflow extends HTMLElement {
-    static observedAttributes = ["aria-label", "minimum-visible", "overflow-direction", "overflow-axis", "has-hidden-items", "padding"];
+    static observedAttributes = ["aria-label", "minimum-visible", "overflow-direction", "overflow-axis", "has-hidden-items", "padding", "density"];
     private itemSlot!: HTMLSlotElement;
     private triggerSlot!: HTMLSlotElement;
     private row!: HTMLDivElement;
@@ -67,7 +68,7 @@ export function defineOverflow(): void {
     private render(): void {
       const shadow = this.attachShadow({ mode: "open" });
       const style = document.createElement("style");
-      style.textContent = `${base}:host{display:block;min-width:0;max-width:100%}.row{display:flex;align-items:center;flex-wrap:nowrap;gap:var(--spui-overflow-gap,var(--spui-toolbar-gap,6px));min-width:0;max-width:100%;overflow:hidden}.row:dir(rtl){direction:rtl}:host([overflow-axis=vertical]) .row{height:100%;flex-direction:column;align-items:stretch}:host([overflow-axis=vertical]) ::slotted([slot=overflow-trigger]){margin-inline-start:0;margin-block-start:auto;align-self:flex-end}::slotted([slot=overflow-trigger]){display:inline-flex;flex:none;margin-inline-start:auto}::slotted([slot=overflow-trigger][hidden]){display:none!important}::slotted(spui-overflow-divider[hidden]){display:none!important}@media(forced-colors:active){.row{forced-color-adjust:auto}}`;
+      style.textContent = `${base}:host{display:block;min-width:0;max-width:100%}:host([density=compact]){--spui-control-height:28px;--spui-control-padding-inline:10px;--spui-overflow-gap:4px}.row{display:flex;align-items:center;flex-wrap:nowrap;gap:var(--spui-overflow-gap,var(--spui-toolbar-gap,6px));min-width:0;max-width:100%;overflow:hidden}.row:dir(rtl){direction:rtl}:host([overflow-axis=vertical]) .row{height:100%;flex-direction:column;align-items:stretch}:host([overflow-axis=vertical]) ::slotted([slot=overflow-trigger]){margin-inline-start:0;margin-block-start:auto;align-self:flex-end}::slotted([slot=overflow-trigger]){display:inline-flex;flex:none;margin-inline-start:auto}::slotted([slot=overflow-trigger][hidden]){display:none!important}::slotted(spui-overflow-divider[hidden]){display:none!important}@media(pointer:coarse){:host([density=compact]){--spui-control-height:max(44px,var(--spui-touch-target-min,44px))}}@media(forced-colors:active){.row{forced-color-adjust:auto}}`;
       this.row = document.createElement("div"); this.row.className = "row"; this.row.setAttribute("part", "control");
       this.itemSlot = document.createElement("slot");
       this.triggerSlot = document.createElement("slot"); this.triggerSlot.name = "overflow-trigger";

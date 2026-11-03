@@ -80,6 +80,7 @@
       stage?.addEventListener(type, (event) => {
         const target = event.target;
         if (type === "click") {
+          if (event.composedPath().some(node => node instanceof HTMLElement && node.hasAttribute("data-overflow-density-toggle"))) return;
           const toastDismissButton = event.composedPath().find(node => node instanceof HTMLElement && node.hasAttribute("data-preview-toast-dismiss"));
           const toast = toastDismissButton instanceof HTMLElement ? toastDismissButton.closest("spui-toast") : null;
           if (toast && "dismiss" in toast) {
@@ -109,6 +110,14 @@
         item.hidden = !overflowIds.has(item.getAttribute("data-overflow-menu-id"));
       });
       if (status) status.textContent = overflowIds.size ? `${overflowIds.size} action${overflowIds.size === 1 ? "" : "s"} moved to More actions.` : "All project actions fit in the toolbar.";
+    });
+    stage?.addEventListener("spui-pressed-change", event => {
+      const toggle = event.target;
+      if (!(toggle instanceof HTMLElement) || !toggle.hasAttribute("data-overflow-density-toggle")) return;
+      const compact = Boolean(event.detail?.pressed);
+      stage.querySelector("spui-overflow")?.setAttribute("density", compact ? "compact" : "comfortable");
+      interactionSummary = compact ? " · Compact command spacing" : " · Comfortable command spacing";
+      updateStatus(toggle);
     });
     stage?.addEventListener("spui-selection-change", (event) => {
       const detail = event.detail ?? {};
