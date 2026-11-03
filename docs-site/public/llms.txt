@@ -51,6 +51,7 @@
 - [rich-text-editor JSON slice](https://vystartasv.github.io/sharepoint-ui/agents/modules/rich-text-editor.json)
 - [search JSON slice](https://vystartasv.github.io/sharepoint-ui/agents/modules/search.json)
 - [select JSON slice](https://vystartasv.github.io/sharepoint-ui/agents/modules/select.json)
+- [sharepoint-fields JSON slice](https://vystartasv.github.io/sharepoint-ui/agents/modules/sharepoint-fields.json)
 - [skeleton JSON slice](https://vystartasv.github.io/sharepoint-ui/agents/modules/skeleton.json)
 - [slider JSON slice](https://vystartasv.github.io/sharepoint-ui/agents/modules/slider.json)
 - [spin-button JSON slice](https://vystartasv.github.io/sharepoint-ui/agents/modules/spin-button.json)

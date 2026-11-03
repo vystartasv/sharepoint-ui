@@ -17,7 +17,7 @@ await mkdir(resolve(siteRoot, "public"), { recursive: true });
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
 const catalog = JSON.parse(await readFile(catalogPath, "utf8"));
-const slug = value => value.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+const slug = value => (value === "SharePointField" ? "sharepoint-field" : value.replace(/([a-z0-9])([A-Z])/g, "$1-$2")).toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
 function elementEventsFor(source, fileName) {
   const root = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
   const events = new Map();

@@ -39,11 +39,11 @@ const previewRuntime = [
 ].join("\n");
 await writeFile(resolve(siteRoot, "src/components/preview-elements.generated.js"), previewRuntime);
 
-const titleFor = value => value.split("-").map(part => part === "ui" ? "UI" : part[0].toUpperCase() + part.slice(1)).join(" ");
+const titleFor = value => value.split("-").map(part => part.toLowerCase() === "ui" ? "UI" : part.toLowerCase() === "sharepoint" ? "SharePoint" : part[0].toUpperCase() + part.slice(1)).join(" ");
 const quote = value => JSON.stringify(String(value ?? ""));
 const escapeHtml = value => String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("{", "&#123;").replaceAll("}", "&#125;");
-const slugFor = value => value.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
-const titleForComponent = component => component.react?.replace(/([a-z0-9])([A-Z])/g, "$1 $2") ?? titleFor(component.tag?.replace(/^spui-/, "") ?? component.module);
+const slugFor = value => (value === "SharePointField" ? "sharepoint-field" : value.replace(/([a-z0-9])([A-Z])/g, "$1-$2")).toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+const titleForComponent = component => component.react === "SharePointField" ? "SharePoint Field" : component.react?.replace(/([a-z0-9])([A-Z])/g, "$1 $2") ?? titleFor(component.tag?.replace(/^spui-/, "") ?? component.module);
 const familyPreviewTags = {
   accordion: "spui-accordion", avatar: "spui-avatar-group", carousel: "spui-carousel", "data-grid": "spui-data-grid",
   field: "spui-field", "field-composition": "spui-field", image: "img", label: "label", listbox: "spui-listbox", overflow: "spui-overflow", popover: "spui-popover", "radio-group": "spui-radio-group", tabs: "spui-tabs", text: "spui-text", toast: "spui-toast", tree: "spui-tree", "virtual-list": "spui-virtual-list",
@@ -64,6 +64,7 @@ const propertyDescriptions = {
   alt: "Alternative text announced for an image.", autoComplete: "Browser autofill behavior for this field.", checked: "Whether this option is selected.", children: "Content rendered inside the component.", color: "Color or palette choice for this item.", columns: "Column definitions shown in the data view.", content: "Content shown inside the component's surface.", dataSource: "Source that supplies rows or options as needed.", defaultChecked: "Initial selected state when the control manages its own state.", defaultOpen: "Initial open state when the component manages its own state.", defaultSelected: "Initial selection when the component manages its own state.", defaultValue: "Initial value when the component manages its own state.", description: "Supporting text shown with the main label.", density: "Controls the spacing preset used by the component.", disabled: "Prevents interaction and communicates that the control is unavailable.", editable: "Whether the value can be changed by the user.", expanded: "Whether the section or item is expanded.", fit: "How media is sized inside its available space.", form: "ID of the form this control belongs to.", height: "Height of the component or its viewport.", hidden: "Whether the component is hidden.", hint: "Help text shown alongside the control.", href: "Destination opened by this link.", icon: "Icon displayed with the component.", id: "Unique HTML identifier for this element.", image: "Image displayed by this component.", input: "Native input control or input settings used by this component.", indicator: "Custom visual mark shown for the control's state.", label: "Accessible label, usually shown next to the control.", labelPosition: "Where the label appears relative to its control.", layout: "How child items are arranged.", loading: "Whether to show a loading state.", max: "Largest value the control accepts.", min: "Smallest value the control accepts.", mountNode: "Element where the popup or floating surface is mounted.", multiple: "Whether more than one value can be selected.", name: "Form field name used when submitting a form.", onChange: "Called when the user changes the value.", onClick: "Called when the user activates the component.", onDismiss: "Called when the user dismisses the component.", onOpenChange: "Called when the component opens or closes.", onValueChange: "Called with the new value when it changes.", open: "Whether the component is currently open.", orientation: "Direction in which options are arranged.", placeholder: "Hint shown while the value is empty.", placement: "Preferred position for a popup or floating surface.", readOnly: "Shows the value without allowing it to be edited.", required: "Requires a value before the form can be submitted.", rows: "Row data or number of visible rows, depending on the component.", selected: "Whether this item is selected.", selectedValues: "Currently selected values in a controlled group.", shape: "Shape used for the component.", size: "Size preset used by the component.", sortState: "Current column sorting state.", src: "Source URL for the image or media.", step: "Amount added or removed when the value changes.", style: "Inline CSS styles for this element.", value: "Current value; supplying it lets the parent control the component.", variant: "Component variant that selects a behavior or visual treatment.", width: "Width of the component or its viewport.",
   contentMode: "Matches the editing tools and saved value to the field: plain text, restricted formatting, rich text, or broader sanitized HTML.", allowHyperlink: "Allows safe HTTP, HTTPS, and mailto links when the target field supports hyperlinks.",
   fullWidth: "Expands the navigation to fill its desktop layout area; pair with collapsible to let users switch to a compact rail.",
+  field: "SharePoint field metadata that selects the matching control and applies the field's rules.", options: "Host-loaded choices for Lookup and User fields; Choice values come from field metadata.", onValueChange: "Receives the edited value in the shape expected by the SharePoint field serializer.", renderUnsupported: "Custom renderer for field types that do not have a built-in control mapping.", addChoiceLabel: "Localized label for adding a fill-in MultiChoice value.", emptyOptionLabel: "Localized prompt shown before the user chooses a value.", validationMessage: "Validation feedback shown with the field.",
 };
 const slotDescriptions = {
   action: "Action control shown with the component.", actions: "Action controls shown with the component.", avatar: "Avatar content displayed for this person or group.", body: "Main content of the surface.", content: "Content shown inside the component.", default: "Main content placed inside the component.", footer: "Content or actions shown at the bottom.", header: "Heading and supporting content shown at the top.", icon: "Icon displayed next to the label or content.", image: "Image displayed in this region.", indicator: "Visual mark showing the control's state.", input: "Native form input used by the component.", label: "Visible label for the control.", leading: "Content shown before the main label.", media: "Image or media displayed with the content.", overflow: "Items shown when the main row does not fit.", preview: "Preview content shown with the item.", secondary: "Secondary action or supporting content.", status: "Status text or badge shown with the item.", title: "Visible title for the component.", trigger: "Control the user activates to open or reveal the component.",
@@ -160,6 +161,12 @@ function exampleFor(component) {
     tabs: { tag: "spui-tabs", attrs: 'value="overview"', markup: '<spui-tabs value="overview"><spui-tab-list><spui-tab value="overview">Overview</spui-tab><spui-tab value="activity">Activity</spui-tab></spui-tab-list><spui-tab-panel value="overview">Workspace overview and key details.</spui-tab-panel></spui-tabs>' },
     "avatar-group-primitives": { tag: "spui-avatar-group-popover", attrs: 'count="2" label="Other reviewers" trigger-label="View {count} more reviewers"', markup: '<spui-avatar-group-popover count="2" label="Other reviewers" trigger-label="View {count} more reviewers"><li>Maria Chen</li><li>Daniel Morgan</li></spui-avatar-group-popover>' },
   };
+  if (component.react === "SharePointField") return {
+    tag: "div",
+    markup: '<div class="sharepoint-field-preview"><spui-field label="Request title" value="Quarterly access review" required></spui-field><spui-select label="Status" value="In progress"><option value="In progress">In progress</option><option value="Approved">Approved</option><option value="Needs changes">Needs changes</option></spui-select><spui-rich-text-editor label="Review notes" content-mode="rich" value="&lt;p&gt;Ready for team review.&lt;/p&gt;"></spui-rich-text-editor></div>',
+    content: "",
+    related: true,
+  };
   if (component.react === "Field") return { tag: "spui-field", attrs: 'label="Project code" required value="OPS-204"', content: "", related: false };
   if (component.react === "InfoLabel") return { tag: "div", markup: '<div class="preview-info-label"><label for="preview-owner">Project owner</label><spui-info-button label="About project owner" info="The person responsible for keeping this project current." placement="right"></spui-info-button></div><input id="preview-owner" value="Maria Chen" />', related: true };
   if (component.react === "ToastTrigger") return { tag: "spui-toast", markup: '<spui-toast toast-id="preview-toast-trigger" intent="success" timeout="-1"><spui-toast-title>Changes saved</spui-toast-title><spui-toast-body>Your project details are up to date.</spui-toast-body><spui-toast-footer slot="action"><spui-button appearance="secondary" data-preview-toast-dismiss>Undo</spui-button></spui-toast-footer></spui-toast>', related: true };
@@ -248,8 +255,30 @@ for (const [module, entries] of familyIndex) {
     const previewRuntime = useRichTextPlayground ? "" : "<ComponentPreviewRuntime />";
     const styling = entry.api?.styling?.length ? entry.api.styling.map(item => `<code>${escapeHtml(item)}</code>`).join(", ") : "Use the provider theme and element CSS parts.";
     const signature = entry.api?.reactSignature ? `\n<details>\n<summary>React API signature</summary>\n\n\`\`\`tsx\n${entry.api.reactSignature}\n\`\`\`\n\n</details>` : "";
+    const reactUsage = entry.react === "SharePointField" ? [
+      "## Use SharePoint metadata in a form",
+      "",
+      "```tsx",
+      'import { SharePointField } from "@spfx-fast/sharepoint-ui/react";',
+      "",
+      "{fields.map(field => {",
+      '  const name = field.InternalName ?? field.internalName ?? "";',
+      "  return <SharePointField",
+      "    key={name}",
+      "    field={field}",
+      "    value={values[name]}",
+      "    options={lookupOptions[name]} // host-loaded Lookup/User options",
+      "    onValueChange={value => setValues(current => ({ ...current, [name]: value }))}",
+      "  />;",
+      "})}",
+      "```",
+      "",
+      "Load options and save values through the host's authorized SharePoint services. See the [complete SharePoint field guide](/sharepoint-ui/guides/sharepoint-fields/) for metadata loading, lookup paging, and PATCH serialization.",
+    ].join("\n") : "";
     const relatedApis = entry.api?.relatedReactApis?.length ? entry.api.relatedReactApis.map(api => `<p><strong><code>${escapeHtml(api.name)}</code>:</strong> ${escapeHtml(api.description)}</p>`).join("\n") : "";
-    const previewNote = example.related
+    const previewNote = entry.react === "SharePointField"
+      ? "These interactive controls show the kinds of field SharePointField composes. The React renderer chooses the control from SharePoint metadata; preview values are illustrative."
+      : example.related
       ? `The ${titleFor(module)} example is assembled so this API can be seen in its working context.`
       : !entry.tag?.startsWith("spui-")
       ? renderless.has(entry.react)
@@ -264,7 +293,7 @@ for (const [module, entries] of familyIndex) {
     const agentSlice = `/sharepoint-ui/agents/components/${slugFor(module)}/${slug}.json`;
     const eventSlice = entry.tag?.startsWith("spui-") ? ` Custom-element events are in the [${escapeHtml(module)} event inventory](/sharepoint-ui/agents/events/${slugFor(module)}.json); it is module-scoped.` : "";
     const agentPath = `\n> **Building with an agent?** Follow the [component conventions](/sharepoint-ui/guides/component-patterns/), then use the [quickstart](/sharepoint-ui/agents/QUICKSTART.md) and this component’s [API slice](${agentSlice}).${eventSlice}\n`;
-    const page = `---\ntitle: ${quote(name)}\ndescription: ${quote(entry.summary ?? firstSummary)}\n---\n\n${previewImport}\n\n${previewRuntime}\n\n${entry.summary ?? ""}\n${agentPath}\n${preview}\n${properties}\n${slotTable}\n<div class="api-entry">\n  <p class="api-meta"><span>${react}</span><span>${reactRoot}</span><span>${customElement}</span></p>\n  <p><strong>Callbacks:</strong> ${callbacks}</p>\n  <p><strong>Styling:</strong> ${styling}</p>\n  ${signature}\n  ${relatedApis}\n</div>\n${customExample}${relatedPreview}\n`;
+    const page = `---\ntitle: ${quote(name)}\ndescription: ${quote(entry.summary ?? firstSummary)}\n---\n\n${previewImport}\n\n${previewRuntime}\n\n${entry.summary ?? ""}\n${agentPath}\n${preview}\n${reactUsage}\n${properties}\n${slotTable}\n<div class="api-entry">\n  <p class="api-meta"><span>${react}</span><span>${reactRoot}</span><span>${customElement}</span></p>\n  <p><strong>Callbacks:</strong> ${callbacks}</p>\n  <p><strong>Styling:</strong> ${styling}</p>\n  ${signature}\n  ${relatedApis}\n</div>\n${customExample}${relatedPreview}\n`;
     await writeFile(join(familyDir, `${slug}.mdx`), page);
     items.push(`- [${name}](${pagePath})`);
     catalogLinks.push(`- [${name}](${pagePath}) — ${entry.summary ?? titleFor(module)}`);

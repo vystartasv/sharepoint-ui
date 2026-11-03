@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "sharepoint-fields",
+  "elementEventInventory": {
+    "url": "https://vystartasv.github.io/sharepoint-ui/agents/events/sharepoint-fields.json",
+    "scope": "source module; composed child tags may also emit listed events"
+  },
+  "components": [
+    {
+      "react": "SharePointField",
+      "reactOnly": true,
+      "module": "sharepoint-fields",
+      "category": "forms",
+      "summary": "Render a SharePoint list field from its metadata with the matching accessible library control.",
+      "api": {
+        "reactSignature": "{ field, value, defaultValue, options: providedOptions, onValueChange, disabled = false, hint, validationMessage, renderUnsupported, addChoiceLabel = \"Add another choice\", emptyOptionLabel = \"Select an option\", className, style, ...hostProps }: SharePointFieldProps",
+        "callbackProps": [
+          "onValueChange"
+        ],
+        "slots": [],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "Field label, hint, and validation states",
+          "id, ARIA, data attributes, className, and style"
+        ]
+      }
+    }
+  ]
+}

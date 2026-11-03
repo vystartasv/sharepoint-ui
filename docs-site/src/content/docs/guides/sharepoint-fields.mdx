@@ -159,7 +159,7 @@ Only supplied values are included, so omitted fields remain untouched in a PATCH
 
 ## Render a metadata-driven form
 
-`SharePointField` chooses the matching library control, applies the field label and description, and maps its value callback to one `onValueChange` shape. It handles text, numeric, URL, plain and rich Note, Choice, MultiChoice, Boolean, DateTime, Lookup, and User fields. This convenience renderer is React-only; `getSharePointFieldAdapter()` remains framework-independent for custom-element and other-framework forms. The form can stay driven by SharePoint metadata:
+[`SharePointField`](/sharepoint-ui/components/sharepoint-fields/sharepoint-field/) chooses the matching library control, applies the field label and description, and maps its value callback to one `onValueChange` shape. It handles text, numeric, URL, plain and rich Note, Choice, MultiChoice, Boolean, DateTime, Lookup, and User fields. This convenience renderer is React-only; `getSharePointFieldAdapter()` remains framework-independent for custom-element and other-framework forms. The form can stay driven by SharePoint metadata:
 
 ```tsx
 import { useState } from "react";
