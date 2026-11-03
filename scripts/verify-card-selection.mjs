@@ -7,7 +7,7 @@ import { build } from "esbuild";
 import ts from "typescript";
 
 const typeFixturePath = resolve("packages/sharepoint-ui/src/.card-selection-event-type-contract.tsx");
-const typeFixture = `import { Card, type CardProps, type CardOnSelectionChangeEvent } from "./react.js"; type Assert<T extends true> = T; type EventOf<T> = NonNullable<T> extends (event: infer E, ...args: any[]) => unknown ? E : never; type EventMatches = Assert<EventOf<CardProps["onSelectionChange"]> extends CardOnSelectionChangeEvent ? true : false>; const example = <Card onClick={event => { const currentTarget: HTMLDivElement = event.currentTarget; const align: string = event.currentTarget.align; void [currentTarget, align]; }} onClickCapture={event => { const currentTarget: HTMLDivElement = event.currentTarget; void currentTarget; }} onSelectionChange={(event, data) => { const typedEvent: CardOnSelectionChangeEvent = event; const target: Element = event.currentTarget; const selected: boolean = data.selected; const nativeEvent: Event = event.nativeEvent; void [typedEvent, target, selected, nativeEvent]; }} />;`;
+const typeFixture = `import { Card, type CardProps, type CardOnSelectionChangeEvent } from "./react.js"; type Assert<T extends true> = T; type EventOf<T> = NonNullable<T> extends (event: infer E, ...args: any[]) => unknown ? E : never; type EventMatches = Assert<EventOf<CardProps["onSelectionChange"]> extends CardOnSelectionChangeEvent ? true : false>; const example = <Card onClick={event => { const currentTarget: HTMLElement = event.currentTarget; void currentTarget; }} onClickCapture={event => { const currentTarget: HTMLElement = event.currentTarget; void currentTarget; }} onSelectionChange={(event, data) => { const typedEvent: CardOnSelectionChangeEvent = event; const target: Element = event.currentTarget; const selected: boolean = data.selected; const nativeEvent: Event = event.nativeEvent; void [typedEvent, target, selected, nativeEvent]; }} />;`;
 const originalReadFile = ts.sys.readFile;
 const originalGetSourceFile = ts.createCompilerHost({}).getSourceFile;
 const typeOptions = { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.NodeNext, moduleResolution: ts.ModuleResolutionKind.NodeNext, jsx: ts.JsxEmit.ReactJSX, strict: true, skipLibCheck: true, noEmit: true };
@@ -205,8 +205,8 @@ try {
   assert.equal(await page.getByTestId("interactive-inferred").getAttribute("focus-mode"), "no-tab", "interactive React Cards default to no-tab focus behavior");
   assert.equal(await page.getByTestId("interactive-inferred").getAttribute("tabindex"), "0");
   await page.getByTestId("interactive-inferred").click();
-  assert.deepEqual(await page.evaluate(() => window.cardClickEvents[0]), { target: "DIV", currentTarget: "DIV", nativeEventType: "click" }, "Card onClick targets its native Fluent-like root slot");
-  assert.deepEqual(await page.evaluate(() => window.cardCaptureEvents[0]), { target: "DIV", currentTarget: "DIV", nativeEventType: "click" }, "Card onClickCapture targets its native root slot");
+  assert.deepEqual(await page.evaluate(() => window.cardClickEvents[0]), { target: "SPUI-CARD", currentTarget: "SPUI-CARD", nativeEventType: "click" }, "Card onClick receives the custom-element root event");
+  assert.deepEqual(await page.evaluate(() => window.cardCaptureEvents[0]), { target: "SPUI-CARD", currentTarget: "SPUI-CARD", nativeEventType: "click" }, "Card onClickCapture receives the custom-element root event");
   assert.deepEqual(errors, [], "page has no runtime errors");
 
   const selectionDispatch = await page.evaluate(() => {
