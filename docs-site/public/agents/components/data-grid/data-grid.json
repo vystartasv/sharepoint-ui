@@ -30,6 +30,7 @@
         "onMultiSortChange",
         "onFilterValueChange",
         "onCellEdit",
+        "onCellEditError",
         "validateCellEdit",
         "getRowHeight",
         "onCellsEdit",
@@ -47,7 +48,7 @@
       "editing": {
         "columnOptions": "editable?: boolean; editType?: text | number | date",
         "activation": "Enter, F2, or double-click",
-        "commit": "Enter or focus leaving the editor; async onCellEdit errors keep the editor open",
+        "commit": "Enter or focus leaving the editor; async onCellEdit errors keep the editor open and call onCellEditError",
         "cancel": "Escape",
         "validation": "validateCellEdit returns an accessible error message",
         "persistence": "Callback receives row id, column id, previous value, new value, and item. The host owns SharePoint persistence and should supply refreshed items after save."

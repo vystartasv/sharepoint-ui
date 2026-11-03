@@ -3,6 +3,7 @@
 ## Current implementation checkpoint — 2026-11-03
 
 - All 51 Fluent v9 named component families are present in the local catalog (243 entries). The current named-API report finds no missing exports; the own-prop and native-prop inventories also show no candidate gaps in their audited contracts. These results cover API presence and selected signatures, not runtime parity.
+- React and custom-element DataGrid APIs expose `onCellEditError` with the same typed row/value/error payload as `spui-cell-edit-error`; generated human and agent docs list the callback and its purpose.
 - `SharePointUIProvider` now derives inherited `dir` from its BCP 47 `lang` unless a local or ancestor `dir` was explicitly set. Shared custom-element styles resolve common RTL language/script tags and preserve any host `dir`; Tree, Tooltip logical placement, and Toaster start/end positioning use the same language resolver. This closes language-to-direction propagation for these entry paths, not the full RTL review across every component.
 - Framework-neutral Tree now follows the React name precedence: an explicit `aria-label` wins over the component's `label` fallback, keeping custom-element and React accessible names predictable.
 - Link's nested visited-color token now has balanced CSS syntax, so browser engines can apply the themed `:visited` fallback.

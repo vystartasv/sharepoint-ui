@@ -22,6 +22,7 @@ export interface SharePointDataGridElement extends HTMLElement {
   onDataSourceSelectionChange?: DataGridSourceSelectionHandler;
   getRowHeight?: DataGridRowHeightGetter;
   onCellsEdit?: DataGridCellsEditHandler;
+  onCellEditError?: (error: DataGridCellEditError) => void;
 }
 declare global { interface HTMLElementTagNameMap { "spui-data-grid": SharePointDataGridElement; } }
 type GridRow = HTMLDivElement & { spuiItem?: unknown; spuiKey?: string; spuiType?: "item" | "group" | "loading" };
@@ -98,6 +99,7 @@ export function defineDataGrid(): void {
     private readonly editedValues = new Map<string, DataGridEditValue>();
     private editingCell?: { rowId: string; columnId: string; draft: string; error?: string; saving?: boolean };
     private editCallback?: (edit: DataGridCellEdit) => void | Promise<void>;
+    private editErrorCallback?: (error: DataGridCellEditError) => void;
     private cellsEditCallback?: DataGridCellsEditHandler;
     private dataSourceGroupToggleCallback?: (groupKey: string, expanded: boolean) => void;
     private dataSourceSelectionCallback?: DataGridSourceSelectionHandler;
@@ -185,6 +187,8 @@ export function defineDataGrid(): void {
     set collapsedGroupKeys(value: readonly string[]) { this.collapsedGroups = new Set(value ?? []); this.paint(true); }
     get onCellEdit(): ((edit: DataGridCellEdit) => void | Promise<void>) | undefined { return this.editCallback; }
     set onCellEdit(value: ((edit: DataGridCellEdit) => void | Promise<void>) | undefined) { this.editCallback = value; }
+    get onCellEditError(): ((error: DataGridCellEditError) => void) | undefined { return this.editErrorCallback; }
+    set onCellEditError(value: ((error: DataGridCellEditError) => void) | undefined) { this.editErrorCallback = value; }
     get validateCellEdit(): ((edit: DataGridCellEdit) => string | undefined) | undefined { return this.editValidator; }
     set validateCellEdit(value: ((edit: DataGridCellEdit) => string | undefined) | undefined) { this.editValidator = value; }
     get onCellsEdit(): DataGridCellsEditHandler | undefined { return this.cellsEditCallback; }
@@ -798,6 +802,7 @@ export function defineDataGrid(): void {
         const message = reason instanceof Error ? reason.message : String(reason || "The value could not be saved.");
         editing.error = this.getAttribute("edit-error-label") || "The value could not be saved.";
         if (input) { input.disabled = false; input.removeAttribute("aria-busy"); }
+        this.editErrorCallback?.({ item: edit.item, rowId: edit.rowId, columnId: edit.columnId, previousValue: edit.previousValue, value: edit.value, error: message });
         this.dispatchEvent(new CustomEvent<DataGridCellEditError>("spui-cell-edit-error", { detail: { item: edit.item, rowId: edit.rowId, columnId: edit.columnId, previousValue: edit.previousValue, value: edit.value, error: message }, bubbles: true, composed: true }));
         this.showEditError(editing);
       }
