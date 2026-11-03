@@ -1,0 +1,68 @@
+---
+import config from "virtual:starlight/user-config";
+import Search from "virtual:starlight/components/Search";
+import SiteTitle from "virtual:starlight/components/SiteTitle";
+import SocialIcons from "virtual:starlight/components/SocialIcons";
+import LanguageSelect from "virtual:starlight/components/LanguageSelect";
+
+const shouldRenderSearch = config.pagefind || config.components.Search !== "@astrojs/starlight/components/Search.astro";
+---
+
+<div class="docs-header">
+  <div class="docs-header__title"><SiteTitle /></div>
+  <div class="docs-header__search">{shouldRenderSearch && <Search />}</div>
+  <div class="docs-header__right">
+    <div class="docs-header__social"><SocialIcons /></div>
+    <button class="docs-theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme" title="Switch to dark theme">
+      <svg data-sun viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="3.5"/><path d="M10 1.5v2m0 13v2m8.5-8.5h-2m-13 0h-2m14.51-6.01-1.42 1.42M5.41 14.59l-1.42 1.42m12.02 0-1.42-1.42M5.41 5.41 3.99 3.99"/></svg>
+      <svg data-moon viewBox="0 0 20 20" aria-hidden="true" hidden><path d="M16.8 12.1A7.4 7.4 0 0 1 7.9 3.2 7.5 7.5 0 1 0 16.8 12.1Z"/></svg>
+    </button>
+    <LanguageSelect />
+  </div>
+</div>
+
+<script is:inline>
+  (() => {
+    const update = () => {
+      const dark = document.documentElement.dataset.theme === "dark";
+      document.querySelectorAll("[data-theme-toggle]").forEach(button => {
+        const label = dark ? "Switch to light theme" : "Switch to dark theme";
+        button.setAttribute("aria-label", label);
+        button.setAttribute("title", label);
+        button.querySelector("[data-sun]").hidden = dark;
+        button.querySelector("[data-moon]").hidden = !dark;
+      });
+    };
+    document.addEventListener("click", event => {
+      if (!(event.target instanceof Element) || !event.target.closest("[data-theme-toggle]")) return;
+      const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      try { localStorage.setItem("starlight-theme", next); } catch {}
+      document.documentElement.dataset.theme = next;
+      window.StarlightThemeProvider?.updatePickers(next);
+      update();
+    });
+    new MutationObserver(update).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    update();
+  })();
+</script>
+
+<style>
+  @layer starlight.core {
+    .docs-header { display:flex; gap:var(--sl-nav-gap); justify-content:space-between; align-items:center; height:100%; }
+    .docs-header__title { min-width:0; overflow:clip; padding:.25rem; margin:-.25rem; }
+    .docs-header__search { display:flex; }
+    .docs-header__right { display:flex; align-items:center; gap:.75rem; }
+    .docs-header__social { display:none; }
+    .docs-theme-toggle { display:grid; place-items:center; flex:none; width:2.5rem; height:2.5rem; padding:.55rem; border:1px solid var(--sl-color-gray-5); border-radius:50%; background:var(--sl-color-bg); color:var(--sl-color-text); cursor:pointer; }
+    .docs-theme-toggle:hover { background:var(--sl-color-gray-6); }
+    .docs-theme-toggle:focus-visible { outline:2px solid var(--sl-color-accent); outline-offset:2px; }
+    .docs-theme-toggle svg { width:1.2rem; height:1.2rem; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+    .docs-theme-toggle svg[hidden] { display:none; }
+    @media (min-width:50rem) {
+      .docs-header { display:grid; grid-template-columns:minmax(0,1fr) auto auto; }
+      .docs-header__right { gap:1rem; }
+      .docs-header__social { display:flex; align-items:center; gap:1rem; }
+      .docs-header__social::after { content:""; height:2rem; border-inline-end:1px solid var(--sl-color-gray-5); }
+    }
+  }
+</style>

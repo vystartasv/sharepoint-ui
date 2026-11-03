@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { brotliCompressSync, gzipSync } from "node:zlib";
 import { build } from "esbuild";
 
@@ -41,10 +41,19 @@ console.log(Button, Input, Card, Tag);`,
 
 const sharePointFieldCases = [
   {
-    name: "SharePointField custom element (no React)",
+    name: "SharePointField custom element (all controls bundled)",
     resolveDir: root,
     sourcefile: "sharepoint-field-element.ts",
     loader: "ts",
+    source: `import { defineSharePointField } from "@spfx-fast/sharepoint-ui/elements/sharepoint-fields";
+defineSharePointField();`,
+  },
+  {
+    name: "SharePointField custom element (lazy control chunks)",
+    resolveDir: root,
+    sourcefile: "sharepoint-field-element.ts",
+    loader: "ts",
+    splitting: true,
     source: `import { defineSharePointField } from "@spfx-fast/sharepoint-ui/elements/sharepoint-fields";
 defineSharePointField();`,
   },
@@ -70,16 +79,74 @@ async function measure(item) {
     platform: "browser",
     target: "es2022",
     external: ["react", "react-dom"],
+    ...(item.splitting ? { splitting: true, outdir: resolve(root, ".benchmark") } : {}),
     logLevel: "silent",
   });
-  const bytes = result.outputFiles[0].contents;
-  const output = Object.values(result.metafile.outputs)[0];
+  const outputs = Object.entries(result.metafile.outputs);
+  const entry = outputs.find(([, output]) => output.entryPoint);
+  const entryPath = entry?.[0];
+  const entryFile = result.outputFiles.find(file => entryPath && resolve(file.path) === resolve(entryPath));
+  const inputs = [...new Map(outputs.flatMap(([, output]) => Object.entries(output.inputs)).filter(([, input]) => input.bytesInOutput > 0)).entries()];
+  const largestModules = inputs.sort(([, left], [, right]) => right.bytesInOutput - left.bytesInOutput).slice(0, 6).map(([path, input]) => ({ path, bytes: input.bytesInOutput }));
+  const outputFiles = new Map(result.outputFiles.map(file => [resolve(file.path), file]));
+  const outputMetadata = new Map(outputs.map(([path, output]) => [resolve(path), output]));
+  const totalGzipBytes = result.outputFiles.reduce((total, file) => total + gzipSync(file.contents).length, 0);
+  const totalBrotliBytes = result.outputFiles.reduce((total, file) => total + brotliCompressSync(file.contents).length, 0);
+  const lazyFieldPayloads = item.splitting ? [
+    { fieldMix: "Common fields: text, choice, Boolean, MultiChoice", modules: ["sharepoint-field-basic-controls.js"] },
+    { fieldMix: "Rich-text Note", modules: ["rich-text-editor.js"] },
+    { fieldMix: "Lookup or User", modules: ["combobox.js"] },
+    { fieldMix: "Date or date-time", modules: ["date-picker.js"] },
+    { fieldMix: "Mixed form using all four groups", modules: ["sharepoint-field-basic-controls.js", "rich-text-editor.js", "combobox.js", "date-picker.js"] },
+  ].map(({ fieldMix, modules }) => {
+    const files = new Set();
+    const includeStaticDependencies = path => {
+      const absolutePath = resolve(path);
+      if (files.has(absolutePath)) return;
+      const metadata = outputMetadata.get(absolutePath);
+      if (!metadata) return;
+      files.add(absolutePath);
+      for (const imported of metadata.imports) {
+        if (imported.external || imported.kind === "dynamic-import") continue;
+        const relativeToOutput = resolve(dirname(absolutePath), imported.path);
+        const dependency = outputMetadata.has(relativeToOutput) ? relativeToOutput : resolve(root, imported.path);
+        includeStaticDependencies(dependency);
+      }
+    };
+    if (entryPath) includeStaticDependencies(entryPath);
+    for (const moduleName of modules) {
+      const chunk = outputs.find(([, output]) => Object.keys(output.inputs).some(path => path.endsWith(moduleName)));
+      if (chunk) includeStaticDependencies(chunk[0]);
+    }
+    const payloadFiles = [...files].map(path => outputFiles.get(path)).filter(Boolean);
+    return {
+      fieldMix,
+      rawBytes: payloadFiles.reduce((total, file) => total + file.contents.length, 0),
+      gzipBytes: payloadFiles.reduce((total, file) => total + gzipSync(file.contents).length, 0),
+      brotliBytes: payloadFiles.reduce((total, file) => total + brotliCompressSync(file.contents).length, 0),
+      emittedFiles: payloadFiles.length,
+    };
+  }) : undefined;
   return {
     implementation: item.name,
-    rawBytes: bytes.length,
-    gzipBytes: gzipSync(bytes).length,
-    brotliBytes: brotliCompressSync(bytes).length,
-    includedModules: Object.values(output.inputs).filter(input => input.bytesInOutput > 0).length,
+    rawBytes: result.outputFiles.reduce((total, file) => total + file.contents.length, 0),
+    gzipBytes: totalGzipBytes,
+    brotliBytes: totalBrotliBytes,
+    includedModules: inputs.length,
+    ...(item.splitting ? {
+      initialGzipBytes: entryFile ? gzipSync(entryFile.contents).length : 0,
+      initialRawBytes: entryFile?.contents.length ?? 0,
+      lazyChunkCount: result.outputFiles.length - 1,
+      lazyChunksGzipBytes: totalGzipBytes - (entryFile ? gzipSync(entryFile.contents).length : 0),
+      payloadsByFieldMix: lazyFieldPayloads,
+      lazyChunks: outputs.filter(([path]) => path !== entryPath).map(([path]) => ({
+        path: path.split("/").at(-1),
+        gzipBytes: outputFiles.has(resolve(path)) ? gzipSync(outputFiles.get(resolve(path)).contents).length : 0,
+        modules: Object.keys(result.metafile.outputs[path].inputs).map(modulePath => modulePath.split("/").slice(-2).join("/")),
+        imports: result.metafile.outputs[path].imports.filter(item => !item.external).map(item => ({ path: item.path.split("/").at(-1), kind: item.kind })),
+      })),
+    } : {}),
+    ...(item.name.startsWith("SharePointField") ? { largestModules } : {}),
   };
 }
 

@@ -36,6 +36,10 @@
           "description": "Accessible name used when no aria-label or visible label is supplied; defaults to SharePointUIProvider.strings.richTextEditorLabel."
         },
         {
+          "name": "RichTextEditorProps color labels",
+          "description": "SharePointUIProvider.strings.richTextTextColor, richTextHighlightColor, richTextFontFamily, and richTextFontSize localize color and font controls. These are available for compatible-rich and FullHtml fields; restricted/plain fields hide them. Safe inline font/color styles are sanitized before values are emitted."
+        },
+        {
           "name": "RichTextEditorProps.onValueChange",
           "description": "Receives sanitized HTML after edits. With a controlled value prop, update that prop from this callback; the editor preserves its live selection while React applies the committed value."
         },
@@ -76,7 +80,7 @@
       ],
       "reactRefType": "HTMLElement"
     },
-    "summary": "Edit sanitized HTML with paragraph, heading, quote, and preformatted styles; inline formatting; lists; undo/redo; tables; safe links; and application-managed image upload. SharePoint field metadata selects plain, restricted, compatible-rich, or FullHtml behavior.",
+    "summary": "Edit sanitized content with block styles, font family and size, text and highlight colors where the SharePoint field permits them, lists, tables, safe links, and host-managed images. Field metadata selects plain, restricted, compatible-rich, or FullHtml behavior.",
     "highValueAdditions": [
       "Preview SharePoint page titles and destination details before inserting internal links."
     ]

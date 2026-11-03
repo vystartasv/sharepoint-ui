@@ -42,6 +42,8 @@ const HTML_ONLY = new Set(["MAIN", "SECTION", "ARTICLE", "HEADER", "FOOTER", "AS
 const RESTRICTED = new Set(["P", "DIV", "SPAN", "BR", "STRONG", "B", "EM", "I", "U", "S", "STRIKE", "DEL", "INS", "UL", "OL", "LI", "H1", "H2", "H3", "H4", "H5", "H6", "BLOCKQUOTE", "PRE", "SUP", "SUB", "CODE"]);
 const DROP_CONTENT = new Set(["SCRIPT", "STYLE", "IFRAME", "OBJECT", "EMBED", "TEMPLATE"]);
 const HTML_STYLE_PROPERTIES = new Set(["background-color", "color", "direction", "font-family", "font-size", "font-style", "font-weight", "letter-spacing", "line-height", "list-style-type", "margin-block-end", "margin-block-start", "margin-inline-end", "margin-inline-start", "text-align", "text-decoration", "text-indent", "text-transform", "vertical-align", "white-space"]);
+const RICH_STYLE_PROPERTIES = new Set(["background-color", "color", "font-family", "font-size", "font-style", "font-weight", "text-align", "text-decoration"]);
+const FONT_SIZE_PX: Record<string, string> = { "1": "10px", "2": "12px", "3": "16px", "4": "18px", "5": "24px", "6": "32px", "7": "48px" };
 function safeHref(value: string): boolean {
   if (/[\u0000-\u001f\u007f]/.test(value)) return false;
   try { return ["http:", "https:", "mailto:"].includes(new URL(value.trim(), document.baseURI).protocol); }
@@ -71,12 +73,27 @@ function cleanHtml(html: string, mode: "plain" | "restricted" | "rich" | "html" 
       if (child.nodeType === Node.ELEMENT_NODE) {
         const element = child as HTMLElement;
         if (DROP_CONTENT.has(element.tagName)) { child.remove(); continue; }
+        if (element.tagName === "FONT" && (mode === "rich" || mode === "html")) {
+          const span = doc.createElement("span");
+          const face = element.getAttribute("face")?.trim();
+          const color = element.getAttribute("color")?.trim();
+          const size = element.getAttribute("size")?.trim();
+          if (face && (typeof CSS === "undefined" || CSS.supports("font-family", face))) span.style.fontFamily = face;
+          if (color && (typeof CSS === "undefined" || CSS.supports("color", color))) span.style.color = color;
+          if (size && FONT_SIZE_PX[size]) span.style.fontSize = FONT_SIZE_PX[size];
+          if (element.hasAttribute("style")) span.setAttribute("style", [span.getAttribute("style"), element.getAttribute("style")].filter(Boolean).join(";"));
+          span.append(...[...element.childNodes]);
+          child.replaceWith(span);
+          clean(span);
+          continue;
+        }
         if (!allowedTags.has(element.tagName) || (element.tagName === "A" && !allowHyperlink)) { clean(element); child.replaceWith(...[...child.childNodes]); continue; }
         for (const attr of [...element.attributes]) {
-          if (attr.name === "style" && mode === "html") {
+          if (attr.name === "style" && (mode === "html" || mode === "rich")) {
+            const allowedStyles = mode === "html" ? HTML_STYLE_PROPERTIES : RICH_STYLE_PROPERTIES;
             const safeStyles = [...element.style].filter(property => {
               const value = element.style.getPropertyValue(property).trim();
-              return HTML_STYLE_PROPERTIES.has(property) && !/(?:url|expression|@import|javascript:|var\s*\()/i.test(value) && (typeof CSS === "undefined" || CSS.supports(property, value));
+              return allowedStyles.has(property) && !/(?:url|expression|@import|javascript:|var\s*\()/i.test(value) && (typeof CSS === "undefined" || CSS.supports(property, value));
             }).map(property => `${property}: ${element.style.getPropertyValue(property).trim()}`).join("; ");
             if (safeStyles) element.setAttribute("style", safeStyles); else element.removeAttribute("style");
             continue;
@@ -106,7 +123,7 @@ export function defineRichTextEditor(): void {
   if (customElements.get("spui-rich-text-editor")) return;
   class SpuiRichTextEditor extends HTMLElement implements SharePointRichTextEditorElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "editor-label", "placeholder", "content-mode", "allow-hyperlink", "disabled", "read-only", "required", "required-message", "value", "name", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "bold-label", "italic-label", "underline-label", "strike-label", "clear-formatting-label", "format-block-label", "paragraph-label", "heading-1-label", "heading-2-label", "heading-3-label", "blockquote-label", "preformatted-label", "bullet-list-label", "number-list-label", "link-label", "undo-label", "redo-label", "insert-table-label", "insert-image-label", "image-input-label", "insert-row-above-label", "insert-row-below-label", "insert-column-before-label", "insert-column-after-label", "delete-row-label", "delete-column-label", "delete-table-label", "toolbar-label", "link-prompt", "link-dialog-label", "link-text-label", "link-title-label", "link-apply-label", "link-remove-label", "link-cancel-label", "link-new-tab-label", "link-invalid-message", "link-picker-label", "link-picker-loading-label", "link-picker-error-message"];
+    static observedAttributes = ["label", "editor-label", "placeholder", "content-mode", "allow-hyperlink", "disabled", "read-only", "required", "required-message", "value", "name", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "bold-label", "italic-label", "underline-label", "strike-label", "clear-formatting-label", "format-block-label", "font-family-label", "font-size-label", "paragraph-label", "heading-1-label", "heading-2-label", "heading-3-label", "blockquote-label", "preformatted-label", "bullet-list-label", "number-list-label", "link-label", "text-color-label", "highlight-color-label", "undo-label", "redo-label", "insert-table-label", "insert-image-label", "image-input-label", "insert-row-above-label", "insert-row-below-label", "insert-column-before-label", "insert-column-after-label", "delete-row-label", "delete-column-label", "delete-table-label", "toolbar-label", "link-prompt", "link-dialog-label", "link-text-label", "link-title-label", "link-apply-label", "link-remove-label", "link-cancel-label", "link-new-tab-label", "link-invalid-message", "link-picker-label", "link-picker-loading-label", "link-picker-error-message"];
     private editor!: HTMLDivElement;
     private internals: ElementInternals | undefined;
     private formDisabled = false;
@@ -186,7 +203,7 @@ export function defineRichTextEditor(): void {
       this.editor.contentEditable = readOnly ? "false" : this.contentMode === "plain" ? "plaintext-only" : "true";
       this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only")));
       this.editor.setAttribute("aria-disabled", String(disabled));
-      this.shadowRoot?.querySelectorAll<HTMLButtonElement | HTMLSelectElement>("[role=toolbar] button,[role=toolbar] select").forEach(control => { control.disabled = readOnly; });
+      this.shadowRoot?.querySelectorAll<HTMLButtonElement | HTMLSelectElement | HTMLInputElement>("[role=toolbar] button,[role=toolbar] select,[role=toolbar] input[type=color]").forEach(control => { control.disabled = readOnly; });
       if (this.linkForm) {
         if (readOnly) this.linkForm.hidden = true;
         this.linkForm.querySelectorAll<HTMLInputElement | HTMLButtonElement>("input,button").forEach(control => { control.disabled = readOnly; });
@@ -200,7 +217,11 @@ export function defineRichTextEditor(): void {
       this.syncToolbarGroups();
     }
     private syncToolbarGroups(): void {
-      this.shadowRoot?.querySelectorAll<HTMLElement>(".toolbar-group:not(.toolbar-group--table)").forEach(group => { group.hidden = !group.querySelector("button:not([hidden])"); });
+      this.shadowRoot?.querySelectorAll<HTMLElement>(".toolbar-group:not(.toolbar-group--table):not(.toolbar-group--color):not(.toolbar-group--fonts)").forEach(group => { group.hidden = !group.querySelector("button:not([hidden])"); });
+      const colorGroup = this.shadowRoot?.querySelector<HTMLElement>(".toolbar-group--color");
+      if (colorGroup) colorGroup.hidden = !["rich", "html"].includes(this.contentMode);
+      const fontGroup = this.shadowRoot?.querySelector<HTMLElement>(".toolbar-group--fonts");
+      if (fontGroup) fontGroup.hidden = !["rich", "html"].includes(this.contentMode);
     }
     private syncContentMode(): void {
       const toolbar = this.shadowRoot?.querySelector<HTMLElement>('[role="toolbar"]');
@@ -210,6 +231,10 @@ export function defineRichTextEditor(): void {
           const command = button.dataset.command;
           button.hidden = (this.contentMode === "restricted" && (command === "insertTable" || command === "insertImage" || button.hasAttribute("data-table-command"))) || (command === "createLink" && !this.allowHyperlinks);
         });
+        const colorGroup = toolbar.querySelector<HTMLElement>(".toolbar-group--color");
+        if (colorGroup) colorGroup.hidden = !["rich", "html"].includes(this.contentMode);
+        const fontGroup = toolbar.querySelector<HTMLElement>(".toolbar-group--fonts");
+        if (fontGroup) fontGroup.hidden = !["rich", "html"].includes(this.contentMode);
       }
       if (this.editor) this.editor.style.whiteSpace = this.contentMode === "plain" ? "pre-wrap" : "";
       this.syncDisabled(); this.syncTableActions(); this.syncToolbarGroups();
@@ -294,6 +319,15 @@ export function defineRichTextEditor(): void {
           format.value = [...format.options].some(option => option.value === block) ? block : "P";
         } catch { format.value = "P"; }
       }
+      const node = this.selection()?.anchorNode;
+      const element = node instanceof Element ? node : node?.parentElement;
+      if (element && this.editor.contains(element)) {
+        const computed = this.editor.ownerDocument.defaultView?.getComputedStyle(element);
+        const family = toolbar.querySelector<HTMLSelectElement>('select[data-command="fontFamily"]');
+        const size = toolbar.querySelector<HTMLSelectElement>('select[data-command="fontSize"]');
+        if (family && computed) family.value = [...family.options].some(option => option.value === computed.fontFamily) ? computed.fontFamily : "";
+        if (size && computed) size.value = Object.entries(FONT_SIZE_PX).find(([, px]) => px === computed.fontSize)?.[0] ?? "";
+      }
     }
     private onEditorClick = (event: MouseEvent): void => {
       const cell = event.composedPath().find((node): node is HTMLTableCellElement => node instanceof HTMLTableCellElement && this.editor.contains(node));
@@ -319,6 +353,23 @@ export function defineRichTextEditor(): void {
       if (!selection || !this.savedRange || !this.editor.contains(this.savedRange.commonAncestorContainer)) return;
       selection.removeAllRanges();
       selection.addRange(this.savedRange);
+    }
+    private applyInlineStyle(property: "color" | "background-color" | "font-family" | "font-size", value: string): void {
+      this.restoreSelection();
+      const selection = this.selection();
+      if (!selection?.rangeCount) return;
+      const range = selection.getRangeAt(0);
+      if (range.collapsed || !this.editor.contains(range.commonAncestorContainer)) return;
+      const command = property === "color" ? "foreColor" : property === "background-color" ? "hiliteColor" : property === "font-family" ? "fontName" : "fontSize";
+      const document = this.editor.ownerDocument;
+      document.execCommand("styleWithCSS", false, "true");
+      const applied = document.execCommand(command, false, value);
+      if (command === "hiliteColor" && !applied) document.execCommand("backColor", false, value);
+      this.onSelectionChange();
+      this.sanitizeEditor();
+      this.syncForm();
+      this.onSelectionChange();
+      this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
     }
     private editTable(command: string): void {
       const cell = this.selectedCell();
@@ -374,14 +425,15 @@ export function defineRichTextEditor(): void {
       this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
     }
     private command(command: string, value?: string): void {
-      if ((this.contentMode === "plain" && !["undo", "redo"].includes(command)) || (this.contentMode === "restricted" && ["insertTable", "insertImage", "insertRowAbove", "insertRowBelow", "insertColumnBefore", "insertColumnAfter", "deleteRow", "deleteColumn", "deleteTable"].includes(command)) || (command === "createLink" && !this.allowHyperlinks)) return;
+      if ((this.contentMode === "plain" && !["undo", "redo"].includes(command)) || (this.contentMode === "restricted" && ["insertTable", "insertImage", "insertRowAbove", "insertRowBelow", "insertColumnBefore", "insertColumnAfter", "deleteRow", "deleteColumn", "deleteTable", "foreColor", "hiliteColor", "fontFamily", "fontSize"].includes(command)) || (command === "createLink" && !this.allowHyperlinks)) return;
       if (command === "formatBlock" && !["P", "H1", "H2", "H3", "BLOCKQUOTE", "PRE"].includes(value?.toUpperCase() ?? "")) return;
       if (command === "insertImage") { this.imageInput?.click(); return; }
       if (["insertRowAbove", "insertRowBelow", "insertColumnBefore", "insertColumnAfter", "deleteRow", "deleteColumn", "deleteTable"].includes(command)) { this.editTable(command); return; }
       if (command === "createLink") { this.openLinkEditor(); return; }
       this.restoreSelection();
       if (command === "insertTable") value = '<table><caption><br></caption><thead><tr><th scope="col"><br></th><th scope="col"><br></th></tr></thead><tbody><tr><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td></tr></tbody></table><p><br></p>';
-      this.editor.ownerDocument.execCommand(command === "insertTable" ? "insertHTML" : command, false, command === "formatBlock" ? `<${value?.toLowerCase() ?? "p"}>` : value);
+      const applied = this.editor.ownerDocument.execCommand(command === "insertTable" ? "insertHTML" : command, false, command === "formatBlock" ? `<${value?.toLowerCase() ?? "p"}>` : value);
+      if (command === "hiliteColor" && !applied) this.editor.ownerDocument.execCommand("backColor", false, value);
       this.sanitizeEditor();
       this.syncForm();
       this.onSelectionChange();
@@ -543,6 +595,16 @@ export function defineRichTextEditor(): void {
       }
       format.addEventListener("change", () => this.command("formatBlock", format.value));
       toolbar.append(format);
+      const fontGroup = document.createElement("div"); fontGroup.className = "toolbar-group toolbar-group--fonts";
+      const addFontSelect = (command: string, labelAttribute: string, fallback: string, options: Array<[string, string]>): void => {
+        const select = document.createElement("select"); select.className = "toolbar-format toolbar-font-select"; select.dataset.command = command; select.dataset.labelAttribute = labelAttribute; select.setAttribute("aria-label", this.getAttribute(labelAttribute) ?? fallback);
+        for (const [value, text] of options) { const option = document.createElement("option"); option.value = value; option.textContent = text; if (!value) { option.disabled = true; option.selected = true; } select.append(option); }
+        select.addEventListener("change", () => this.applyInlineStyle(command === "fontFamily" ? "font-family" : "font-size", select.value));
+        fontGroup.append(select);
+      };
+      addFontSelect("fontFamily", "font-family-label", "Font family", [["", "Font family"], ["Arial", "Arial"], ["Calibri", "Calibri"], ["Georgia", "Georgia"], ["Segoe UI", "Segoe UI"], ["Tahoma", "Tahoma"], ["Times New Roman", "Times New Roman"], ["Verdana", "Verdana"]]);
+      addFontSelect("fontSize", "font-size-label", "Font size", [["", "Font size"], ["1", "10 px"], ["2", "12 px"], ["3", "16 px"], ["4", "18 px"], ["5", "24 px"], ["6", "32 px"], ["7", "48 px"]]);
+      toolbar.append(fontGroup);
       const actions: Array<[string,string,string?,string?,string?]> = [["Bold","bold"],["Italic","italic"],["Underline","underline"],["Strikethrough","strikeThrough",undefined,undefined,"strike-label"],["Bulleted list","insertUnorderedList",undefined,"• List"],["Numbered list","insertOrderedList",undefined,"1. List"],["Clear formatting","removeFormat",undefined,undefined,"clear-formatting-label"],["Undo","undo"],["Redo","redo"],["Insert table","insertTable"],["Insert image","insertImage",undefined,undefined,"insert-image-label"],["Insert row above","insertRowAbove",undefined,undefined,"insert-row-above-label"],["Insert row below","insertRowBelow",undefined,undefined,"insert-row-below-label"],["Insert column before","insertColumnBefore",undefined,undefined,"insert-column-before-label"],["Insert column after","insertColumnAfter",undefined,undefined,"insert-column-after-label"],["Delete row","deleteRow",undefined,undefined,"delete-row-label"],["Delete column","deleteColumn",undefined,undefined,"delete-column-label"],["Delete table","deleteTable",undefined,undefined,"delete-table-label"],["Link","createLink"]];
       const toolbarGroups = new Map<string, HTMLDivElement>();
       for (const [title, command, value, , labelAttribute] of actions) {
@@ -561,6 +623,15 @@ export function defineRichTextEditor(): void {
         button.addEventListener("mousedown", event => event.preventDefault()); button.addEventListener("click", () => this.command(command, value));
         group.append(button);
       }
+      const colorGroup = document.createElement("div"); colorGroup.className = "toolbar-group toolbar-group--color";
+      for (const [attribute, fallback, command, color] of [["text-color-label", "Text color", "foreColor", "#323130"], ["highlight-color-label", "Highlight color", "hiliteColor", "#fff2cc"]]) {
+        const field = document.createElement("label"); field.className = "toolbar-color"; field.dataset.labelAttribute = attribute; field.append(document.createTextNode(this.getAttribute(attribute) ?? fallback));
+        const input = document.createElement("input"); input.type = "color"; input.value = color; input.dataset.command = command; input.dataset.labelAttribute = attribute; input.part.add(command === "foreColor" ? "text-color" : "highlight-color"); input.setAttribute("aria-label", this.getAttribute(attribute) ?? fallback);
+        input.addEventListener("mousedown", this.onSelectionChange);
+        input.addEventListener("change", () => this.command(command, input.value));
+        field.append(input); colorGroup.append(field);
+      }
+      toolbar.append(colorGroup);
       this.imageInput = document.createElement("input"); this.imageInput.type = "file"; this.imageInput.accept = "image/*"; this.imageInput.hidden = true; this.imageInput.setAttribute("aria-label", this.getAttribute("image-input-label") ?? "Choose image"); this.imageInput.addEventListener("change", () => { const file = this.imageInput?.files?.[0]; if (file) void this.insertUploadedImage(file); this.imageInput!.value = ""; }); toolbar.append(this.imageInput);
       const linkForm = document.createElement("form"); this.linkForm = linkForm; linkForm.className = "link-editor"; linkForm.part.add("link-editor"); linkForm.hidden = true; linkForm.setAttribute("aria-label", this.getAttribute("link-dialog-label") ?? "Edit link");
       const makeLinkField = (attribute: string, fallback: string, type = "text"): HTMLInputElement => {
@@ -587,12 +658,12 @@ export function defineRichTextEditor(): void {
       linkForm.append(linkActions);
       linkForm.addEventListener("submit", event => { event.preventDefault(); this.applyLink(); });
       linkForm.addEventListener("keydown", event => { if ((event as KeyboardEvent).key === "Escape") { event.preventDefault(); event.stopPropagation(); this.closeLinkEditor(false); } });
-      toolbar.querySelectorAll<HTMLElement>("button[data-command],select[data-command]").forEach((control,index) => { control.tabIndex = index === 0 ? 0 : -1; });
-      toolbar.addEventListener("focusin", event => { const active = event.target; toolbar.querySelectorAll<HTMLElement>("button[data-command],select[data-command]").forEach(control => { control.tabIndex = control === active ? 0 : -1; }); });
+      toolbar.querySelectorAll<HTMLElement>("button[data-command],select[data-command],input[type=color][data-command]").forEach((control,index) => { control.tabIndex = index === 0 ? 0 : -1; });
+      toolbar.addEventListener("focusin", event => { const active = event.target; toolbar.querySelectorAll<HTMLElement>("button[data-command],select[data-command],input[type=color][data-command]").forEach(control => { control.tabIndex = control === active ? 0 : -1; }); });
       toolbar.addEventListener("keydown", event => {
         const key = (event as KeyboardEvent).key;
-        if (event.target instanceof HTMLSelectElement && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(key)) return;
-        const controls = [...toolbar.querySelectorAll<HTMLElement>("button[data-command]:not(:disabled):not([hidden]),select[data-command]:not(:disabled):not([hidden])")];
+        if ((event.target instanceof HTMLSelectElement || event.target instanceof HTMLInputElement) && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(key)) return;
+        const controls = [...toolbar.querySelectorAll<HTMLElement>("button[data-command]:not(:disabled):not([hidden]),select[data-command]:not(:disabled):not([hidden]),input[type=color][data-command]:not(:disabled):not([hidden])")];
         const current = controls.indexOf(event.target as HTMLElement);
         const rtl = getComputedStyle(this).direction === "rtl";
         const step = key === "ArrowRight" ? (rtl ? -1 : 1) : key === "ArrowLeft" ? (rtl ? 1 : -1) : 0;
@@ -627,8 +698,9 @@ export function defineRichTextEditor(): void {
         this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
       });
       this.editor.addEventListener("blur", () => { this.sanitizeEditor(); this.syncForm(); this.dispatchEvent(new CustomEvent("spui-change", { detail: { value: this.value }, bubbles: true, composed: true })); });
-      const style = document.createElement("style"); style.textContent = `${base}:host{display:grid;gap:6px}label{font-weight:600;color:var(--spui-ui-muted,var(--spui-semantic-body-text,inherit))}[role=toolbar]{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:6px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface,#fff)}[role=toolbar][hidden],button[hidden]{display:none}.toolbar-group{display:flex;flex:0 1 auto;flex-wrap:wrap;align-items:center;gap:2px;min-width:0;padding-inline-start:6px;border-inline-start:1px solid var(--spui-ui-stroke,#c8c8c8)}.toolbar-group[hidden]{display:none}button{box-sizing:border-box;display:inline-grid;place-items:center;flex:none;width:36px;min-width:36px;min-height:36px;padding:0;border:0;border-radius:var(--spui-control-radius,4px);background:transparent;color:var(--spui-ui-text,inherit);font:inherit;cursor:pointer}.toolbar-format{box-sizing:border-box;max-width:172px;min-width:116px;min-height:36px;padding:0 8px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit}.toolbar-format:hover{background:var(--spui-ui-surface-hover,#eee)}button svg{display:block;width:18px;height:18px}button:hover:not(:disabled){background:var(--spui-ui-surface-hover,#eee)}button[aria-pressed=true]{background:color-mix(in srgb,var(--spui-ui-accent,#0078d4) 14%,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,var(--spui-semantic-body-text,#323130))}button:disabled{opacity:.42;cursor:not-allowed}button:focus-visible,select:focus-visible,[role=textbox]:focus-visible,input:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}[role=textbox]{min-height:120px;box-sizing:border-box;padding:10px 12px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit;line-height:1.5;overflow:auto;caret-color:var(--spui-focus-ring,var(--spui-ui-accent,#005a9e))}[role=textbox]:empty:before{content:attr(data-placeholder);color:var(--spui-ui-muted,#666);pointer-events:none}table{border-collapse:collapse;max-width:100%;margin-block:8px}caption{text-align:start;font-weight:600}td,th{min-width:56px;padding:6px 9px;border:1px solid var(--spui-ui-stroke,#c8c8c8);text-align:start}th{background:var(--spui-ui-surface-hover,#f5f5f5);font-weight:600}a{color:var(--spui-semantic-link,#0f6cbd)}@media(pointer:coarse){[role=toolbar] button{width:44px;min-width:44px;min-height:44px}[role=toolbar] select{min-height:44px}}@media(forced-colors:active){select{border:1px solid ButtonText;background:Field;color:FieldText}button{border:1px solid ButtonText}button[aria-pressed=true]{color:Highlight;border-color:Highlight}td,th{border-color:CanvasText}}`;
+      const style = document.createElement("style"); style.textContent = `${base}:host{display:grid;min-width:0;max-width:100%;container-type:inline-size;gap:6px}label{font-weight:600;color:var(--spui-ui-muted,var(--spui-semantic-body-text,inherit))}[role=toolbar]{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:6px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface,#fff)}[role=toolbar][hidden],button[hidden]{display:none}.toolbar-group{display:flex;flex:0 1 auto;flex-wrap:wrap;align-items:center;gap:2px;min-width:0;padding-inline-start:6px;border-inline-start:1px solid var(--spui-ui-stroke,#c8c8c8)}.toolbar-group[hidden]{display:none}button{box-sizing:border-box;display:inline-grid;place-items:center;flex:none;width:36px;min-width:36px;min-height:36px;padding:0;border:0;border-radius:var(--spui-control-radius,4px);background:transparent;color:var(--spui-ui-text,inherit);font:inherit;cursor:pointer}.toolbar-format{box-sizing:border-box;max-width:172px;min-width:116px;min-height:36px;padding:0 8px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit}.toolbar-format:hover{background:var(--spui-ui-surface-hover,#eee)}button svg{display:block;width:18px;height:18px}button:hover:not(:disabled){background:var(--spui-ui-surface-hover,#eee)}button[aria-pressed=true]{background:color-mix(in srgb,var(--spui-ui-accent,#0078d4) 14%,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,var(--spui-semantic-body-text,#323130))}button:disabled{opacity:.42;cursor:not-allowed}button:focus-visible,select:focus-visible,[role=textbox]:focus-visible,input:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}[role=textbox]{min-width:0;min-height:150px;box-sizing:border-box;padding:10px 12px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit;line-height:1.5;overflow:auto;caret-color:var(--spui-focus-ring,var(--spui-ui-accent,#005a9e))}[role=textbox]:empty:before{content:attr(data-placeholder);color:var(--spui-ui-muted,#666);pointer-events:none}table{border-collapse:collapse;max-width:100%;margin-block:8px}caption{text-align:start;font-weight:600}td,th{min-width:56px;padding:6px 9px;border:1px solid var(--spui-ui-stroke,#c8c8c8);text-align:start}th{background:var(--spui-ui-surface-hover,#f5f5f5);font-weight:600}a{color:var(--spui-semantic-link,#0f6cbd)}@media(pointer:coarse){[role=toolbar] button{width:44px;min-width:44px;min-height:44px}[role=toolbar] select{min-height:44px}}@container (max-width: 64rem){[role=toolbar]{display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch;gap:6px;padding:8px}.toolbar-format{width:100%;max-width:none;min-width:0;min-height:40px}.toolbar-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(44px,1fr));gap:4px;min-width:0;padding:6px 0 0;border-inline-start:0;border-block-start:1px solid var(--spui-ui-stroke,#c8c8c8)}.toolbar-group button{width:100%;min-width:44px;min-height:44px}.toolbar-group--table{grid-template-columns:repeat(auto-fit,minmax(44px,1fr))}[role=textbox]{min-height:12rem;overflow-wrap:anywhere}table{display:block;overflow-x:auto}}@media(forced-colors:active){select{border:1px solid ButtonText;background:Field;color:FieldText}button{border:1px solid ButtonText}button[aria-pressed=true]{color:Highlight;border-color:Highlight}td,th{border-color:CanvasText}}`;
       style.textContent += `.link-editor{display:flex;flex-wrap:wrap;align-items:end;gap:8px;padding:8px;border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface-hover,var(--spui-ui-surface,#fff))}.link-editor[hidden]{display:none}.link-field{display:grid;flex:1 1 150px;gap:4px;min-width:0;color:var(--spui-ui-text,inherit);font-size:13px}.link-field input{box-sizing:border-box;width:100%;min-width:0;min-height:32px;padding:5px 8px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#8a8886));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit)}.link-actions{display:flex;flex-wrap:wrap;gap:4px}.link-actions button{border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,4px);background:var(--spui-ui-surface,#fff)}.link-actions [data-link-action=apply]{border-color:transparent;background:var(--spui-semantic-primary-button-background,var(--spui-ui-accent,#0078d4));color:var(--spui-ui-accent-text,#fff)}.link-error{flex:1 0 100%;color:var(--spui-ui-danger,var(--spui-semantic-error-text,#c50f1f));font-size:13px}`;
+      style.textContent += `.toolbar-group--fonts{gap:4px}.toolbar-font-select{width:100%;min-width:0}.toolbar-group--color{gap:6px;padding-inline:8px}.toolbar-color{display:grid;justify-items:center;gap:2px;min-width:54px;font-size:10px;font-weight:500}.toolbar-color input{box-sizing:border-box;width:38px;height:32px;min-height:32px;padding:2px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));cursor:pointer}.toolbar-color input:disabled{opacity:.42;cursor:not-allowed}@container (max-width:64rem){.toolbar-group--fonts{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar-font-select{width:100%;min-width:0;max-width:none;min-height:44px}.toolbar-group--color{grid-template-columns:repeat(2,minmax(64px,1fr))}.toolbar-color{min-width:0}.toolbar-color input{width:44px;height:40px;min-height:40px}}`;
       style.textContent += `.link-new-tab{display:inline-flex;flex:1 0 100%;align-items:center;gap:8px;color:var(--spui-ui-text,inherit);font-size:13px}.link-new-tab input{width:16px;height:16px;min-height:16px;margin:0;accent-color:var(--spui-ui-accent,#0078d4)}`;
       style.textContent += `.link-picker-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}`;
       shadow.replaceChildren(style,label,toolbar,linkForm,this.editor);
@@ -657,6 +729,13 @@ export function defineRichTextEditor(): void {
         const labels: Record<string, [string, string]> = { P: ["paragraph-label", "Paragraph"], H1: ["heading-1-label", "Heading 1"], H2: ["heading-2-label", "Heading 2"], H3: ["heading-3-label", "Heading 3"], BLOCKQUOTE: ["blockquote-label", "Quote"], PRE: ["preformatted-label", "Preformatted"] };
         format.querySelectorAll<HTMLOptionElement>("option").forEach(option => { const [attribute, fallback] = labels[option.value]; option.textContent = this.getAttribute(attribute) ?? fallback; });
       }
+      toolbar.querySelectorAll<HTMLSelectElement>(".toolbar-font-select").forEach(select => select.setAttribute("aria-label", this.getAttribute(select.dataset.labelAttribute ?? "") ?? (select.dataset.command === "fontFamily" ? "Font family" : "Font size")));
+      toolbar.querySelectorAll<HTMLInputElement>('.toolbar-group--color input[type="color"]').forEach(input => {
+        const text = this.getAttribute(input.dataset.labelAttribute ?? "") ?? (input.dataset.command === "foreColor" ? "Text color" : "Highlight color");
+        input.setAttribute("aria-label", text);
+        const field = input.closest("label");
+        if (field?.firstChild?.nodeType === Node.TEXT_NODE) field.firstChild.textContent = text;
+      });
       if (this.linkForm) {
         this.linkForm.setAttribute("aria-label", this.getAttribute("link-dialog-label") ?? "Edit link");
         const fieldFallbacks: Record<string, string> = { "link-prompt": "Link URL", "link-text-label": "Display text", "link-title-label": "Title" };

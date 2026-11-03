@@ -44,8 +44,9 @@ export default defineConfig({
     disable404Route: true,
     head: [{
       tag: "script",
-      content: `try { if (localStorage.getItem("starlight-theme") === null) localStorage.setItem("starlight-theme", "light"); } catch {}`,
+      content: `try { const key = "starlight-theme"; const saved = localStorage.getItem(key); if (saved !== "light" && saved !== "dark") localStorage.setItem(key, matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); } catch {}`,
     }],
+    components: { Header: "./src/components/DocsHeader.astro" },
     social: [{ icon: "github", label: "GitHub", href: "https://github.com/vystartasv/sharepoint-ui" }],
     customCss: ["./src/styles/custom.css"],
     sidebar: [

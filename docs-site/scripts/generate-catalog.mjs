@@ -249,6 +249,7 @@ for (const [module, entries] of familyIndex) {
     const properties = propertyTableFor(entry);
     const slotTable = slotsTableFor(entry.api?.slots);
     const useRichTextPlayground = entry.react === "RichTextEditor";
+    const richTextFieldNote = useRichTextPlayground ? `\n\nThe toolbar follows the destination field: compatible-rich and FullHtml modes expose font family, size, text color, and highlight color; plain and restricted fields hide unsupported formatting. Values are sanitized HTML, and SharePoint can normalize content when it saves it. The editor does not reproduce every native SharePoint form control or classic-only command. Microsoft documents enhanced rich text's supported formatting in its [rich-text list-column guide](https://support.microsoft.com/en-us/sharepoint/lists/data-and-lists/edit-a-rich-text-list-column).\n` : "";
     const previewImport = useRichTextPlayground
       ? 'import RichTextEditorPlayground from "../../../../components/RichTextEditorPlayground.astro";'
       : 'import ComponentPreviewRuntime from "../../../../components/ComponentPreviewRuntime.astro";';
@@ -311,7 +312,7 @@ for (const [module, entries] of familyIndex) {
     const agentSlice = `/sharepoint-ui/agents/components/${slugFor(module)}/${slug}.json`;
     const eventSlice = entry.tag?.startsWith("spui-") ? ` Custom-element events are in the [${escapeHtml(module)} event inventory](/sharepoint-ui/agents/events/${slugFor(module)}.json); it is module-scoped.` : "";
     const agentPath = `\n> **Building with an agent?** Follow the [component conventions](/sharepoint-ui/guides/component-patterns/), then use the [quickstart](/sharepoint-ui/agents/QUICKSTART.md) and this component’s [API slice](${agentSlice}).${eventSlice}\n`;
-    const page = `---\ntitle: ${quote(name)}\ndescription: ${quote(entry.summary ?? firstSummary)}\n---\n\n${previewImport}\n\n${previewRuntime}\n\n${entry.summary ?? ""}\n${agentPath}\n${preview}\n${reactUsage}\n${properties}\n${slotTable}\n<div class="api-entry">\n  <p class="api-meta"><span>${react}</span><span>${reactRoot}</span><span>${customElement}</span></p>\n  <p><strong>Callbacks:</strong> ${callbacks}</p>\n  <p><strong>Styling:</strong> ${styling}</p>\n  ${signature}\n  ${relatedApis}\n</div>\n${customExample}${relatedPreview}\n`;
+    const page = `---\ntitle: ${quote(name)}\ndescription: ${quote(entry.summary ?? firstSummary)}\n---\n\n${previewImport}\n\n${previewRuntime}\n\n${entry.summary ?? ""}${richTextFieldNote}\n${agentPath}\n${preview}\n${reactUsage}\n${properties}\n${slotTable}\n<div class="api-entry">\n  <p class="api-meta"><span>${react}</span><span>${reactRoot}</span><span>${customElement}</span></p>\n  <p><strong>Callbacks:</strong> ${callbacks}</p>\n  <p><strong>Styling:</strong> ${styling}</p>\n  ${signature}\n  ${relatedApis}\n</div>\n${customExample}${relatedPreview}\n`;
     await writeFile(join(familyDir, `${slug}.mdx`), page);
     items.push(`- [${name}](${pagePath})`);
     catalogLinks.push(`- [${name}](${pagePath}) — ${entry.summary ?? titleFor(module)}`);
