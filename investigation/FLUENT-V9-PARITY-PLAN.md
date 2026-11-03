@@ -240,6 +240,10 @@ React `RichTextEditorProps` also now accepts the native `form` association attri
 
 React `SwatchPicker` had no `aria-label` fallback from `SharePointUIProvider`, and `EmptySwatch` retained an English accessible name even inside a localized subtree. The picker now uses the existing `colorSwatches` string when no explicit label is supplied; the add-color control uses new optional `colorAdd` text, with an English default. The focused Arabic browser verifier confirms both host and internal button names; explicit user labels continue to take precedence. `verify:swatch-picker`, `parity:check`, and `git diff --check` pass. Other generated labels and provider-free custom-element defaults still need a systematic inventory.
 
+### Persona presence labels from provider strings — 2026-11-03
+
+React `Persona` previously used the custom element's English status label unless each instance supplied `presenceLabel`. The provider string contract now accepts translations for available, busy, do-not-disturb, away, offline, and unknown; explicit per-Persona labels keep precedence. The component-pattern guide documents the provider path. TypeScript build passes; no tests were added or run. Provider-free custom elements continue to accept `presence-label` directly.
+
 ### RichTextEditor image-picker localization — local Chromium, 2026-11-02
 
 The React toolbar's image insertion button already used provider strings, but its hidden file input retained the English accessible name `Choose image`. Added optional `richTextChooseImage` provider text and an `image-input-label` custom-element attribute; the native engine updates the input label both on first render and when the attribute changes. The Arabic RichTextEditor verifier checks the localized name and a live language update. This closes that editor label gap; localization inventory for all components and browser/tenant coverage remain open.

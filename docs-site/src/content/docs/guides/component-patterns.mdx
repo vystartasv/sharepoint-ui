@@ -31,6 +31,14 @@ export function RequestActions({ openRequest, photoUrl }: { openRequest: () => v
 
 The React adapter registers the elements it uses. In React, import from `/react`; do not also call a custom-element factory. Put `SharePointUIProvider` around the whole view to inherit SharePoint theme tokens, font, language, direction, and localized strings.
 
+Pass translated labels through `strings` when your app owns the translations. This includes Persona presence names; an explicit `presenceLabel` still overrides the provider value.
+
+```tsx
+<SharePointUIProvider lang="ar" strings={{ presenceAvailable: "متاح" }}>
+  <Persona name={person.name} presence="available" />
+</SharePointUIProvider>
+```
+
 ## What carries across components
 
 | Pattern | Shared behavior |
