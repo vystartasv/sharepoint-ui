@@ -54,6 +54,14 @@ function safeHref(value: string): boolean {
 function safeImageSrc(value: string): boolean {
   try { return ["http:", "https:"].includes(new URL(value.trim(), document.baseURI).protocol); } catch { return false; }
 }
+function safeLanguageTag(value: string): boolean {
+  const tag = value.trim();
+  if (!tag || tag.length > 128) return false;
+  if (typeof Intl !== "undefined" && typeof Intl.getCanonicalLocales === "function") {
+    try { return Intl.getCanonicalLocales(tag).length === 1; } catch { return false; }
+  }
+  return /^[a-z]{2,8}(?:-[a-z0-9]{1,8})*$/i.test(tag);
+}
 function plainText(html: string): string {
   const doc = new DOMParser().parseFromString(html, "text/html");
   doc.body.querySelectorAll([...DROP_CONTENT].join(",")).forEach(element => element.remove());
@@ -107,7 +115,9 @@ function cleanHtml(html: string, mode: "plain" | "restricted" | "rich" | "html" 
           const span = ["TD", "TH"].includes(element.tagName) && ["colspan", "rowspan"].includes(attr.name) && /^\d{1,2}$/.test(attr.value) && Number(attr.value) > 0;
           const scope = element.tagName === "TH" && attr.name === "scope" && ["row", "col", "rowgroup", "colgroup"].includes(attr.value);
           const image = element.tagName === "IMG" && ((attr.name === "src" && safeImageSrc(attr.value)) || attr.name === "alt" || ((attr.name === "width" || attr.name === "height") && /^\d{1,4}$/.test(attr.value)));
-          if (!link && !linkTitle && !linkTarget && !linkRel && !span && !scope && !image) element.removeAttribute(attr.name);
+          const direction = attr.name === "dir" && ["ltr", "rtl", "auto"].includes(attr.value.trim().toLowerCase());
+          const language = attr.name === "lang" && safeLanguageTag(attr.value);
+          if (!link && !linkTitle && !linkTarget && !linkRel && !span && !scope && !image && !direction && !language) element.removeAttribute(attr.name);
         }
         if (element.tagName === "A") {
           if (element.hasAttribute("href") && element.getAttribute("target") === "_blank") element.setAttribute("rel", "noopener noreferrer");
