@@ -2275,9 +2275,9 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Edit sanitized rich HTML with controlled or uncontrolled form values, formatting history, table editing, an accessible link editor, and application-managed durable image upload for SharePoint persistence.",
+      "summary": "Edit sanitized rich HTML with controlled or uncontrolled form values, formatting history, table editing, an accessible link editor with safe new-tab links, and application-managed durable image upload for SharePoint persistence.",
       "highValueAdditions": [
-        "Add an open-in-new-tab option that preserves target and rel=noopener noreferrer through sanitization."
+        "Add a host-provided SharePoint page and file picker for inserting internal links."
       ]
     },
     {
