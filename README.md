@@ -1,6 +1,6 @@
 # SharePoint UI
 
-A lightweight, React-optional UI library for SPFx task surfaces. Use the same SharePoint-themed components on pages and inside SPFx 1.24 Copilot conversations, with small custom-element imports and a buildable Copilot example that reads and updates real list data. [Open the Copilot example](examples/spfx124-copilot-ux/) or [try its interactive preview](https://vystartasv.github.io/sharepoint-ui/guides/copilot-ux/).
+The low-payload UI kit for SPFx task surfaces: tenant-themed components for SharePoint pages and SPFx 1.24 Copilot UX, with no-React custom elements and a working real-list example. [Open the Copilot example](examples/spfx124-copilot-ux/) or [try its interactive preview](https://vystartasv.github.io/sharepoint-ui/guides/copilot-ux/).
 
 ## Build
 
@@ -20,7 +20,7 @@ The SharePoint page demo uses React 18.3.1, SPFx 1.24.0, Node 22, TypeScript 5.8
 
 ## A focused payload advantage
 
-The framework-free custom-element path keeps small SharePoint and Copilot surfaces lightweight. In a minified, tree-shaken comparison of Button, Input, Card, and Tag imports, the custom-element bundle was 11.6 KB gzip versus 44.4 KB for Fluent UI React 9.75. The React adapters measured 23.6 KB. These are component JavaScript slices, not complete-app or render-speed benchmarks. Reproduce the comparison with `npm run benchmark:no-react-payload`; see the [payload benchmark notes](docs-site/src/content/docs/guides/payload.mdx).
+The framework-free custom-element path is our performance specialty. A minified, tree-shaken four-component slice (Button, Input, Card, Tag) measured 11,560 gzip bytes, 74% less JavaScript than the equivalent Fluent UI React 9.75 imports (44,411 bytes); the React adapters measured 23,591 bytes. This is a component-payload comparison, not a complete-app or render-speed claim. Reproduce it with `npm run benchmark:no-react-payload`; see the [payload benchmark notes](docs-site/src/content/docs/guides/payload.mdx).
 
 
 ## Use selected components

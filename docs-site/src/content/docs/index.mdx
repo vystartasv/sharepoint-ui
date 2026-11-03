@@ -3,7 +3,7 @@ title: SharePoint UI
 description: Framework-independent components for SharePoint Framework 1.24, with React adapters, theme inheritance, and a searchable API catalog.
 template: splash
 hero:
-  tagline: SPFx-native work surfaces for SharePoint pages and Microsoft 365 Copilot. Keep the tenant theme, choose React or custom elements, and ship only the pieces you use.
+  tagline: The low-payload component kit for SharePoint pages and SPFx Copilot UX. Inherit the tenant theme, use React or no framework, and ship only the pieces you need.
   actions:
     - text: Browse components
       link: /sharepoint-ui/catalog/
@@ -58,7 +58,7 @@ The catalog covers 243 named exports across 62 modules, including the named comp
 
 ## Why use this for SharePoint?
 
-Fluent UI is a strong general-purpose system. Choose SharePoint UI when a SharePoint task needs tenant-native components in both page and Copilot surfaces, direct custom-element imports without React, and an example wired to real list data and Copilot context. The measurable edge today is payload: four custom-element imports compress to 11.3 KiB, compared with 43.4 KiB for the equivalent Fluent UI React 9.75 imports. [See the benchmark and its limits](/sharepoint-ui/guides/payload/).
+Fluent UI is a strong general-purpose system. Choose SharePoint UI when you need low-payload, tenant-themed task surfaces that can be used without React in SPFx Copilot UX and SharePoint pages. Our reproducible four-component slice was 11,560 gzip bytes, 74% less than the equivalent Fluent UI React 9.75 imports at 44,411 bytes; the repository also includes a real-list Copilot example and interactive preview. This is our measurable specialty, not a complete-app or render-speed claim. [See the benchmark and its limits](/sharepoint-ui/guides/payload/).
 
 <div class="sharepoint-advantages">
   <section><h3>Fits the tenant</h3><p>Inherit the site palette and font, map locale to RTL, and keep each view inside its SharePoint section.</p></section>
