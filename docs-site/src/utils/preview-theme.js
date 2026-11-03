@@ -11,6 +11,27 @@ export function createPreviewThemeOverrides(capturedTokens, accent, derive = fal
   };
   if (derive) {
     const darker = `color-mix(in srgb, ${accent} 78%, black)`;
+    const canvas = `color-mix(in srgb, ${accent} 7%, white)`;
+    const surface = `color-mix(in srgb, ${accent} 2%, white)`;
+    const surfaceHover = `color-mix(in srgb, ${accent} 12%, white)`;
+    const border = `color-mix(in srgb, ${accent} 24%, #d1d1d1)`;
+    Object.assign(overrides, {
+      "--spui-semantic-body-background": canvas,
+      "--spui-semantic-card-background": surface,
+      "--spui-semantic-body-divider": border,
+      "--spui-semantic-button-background-hovered": surfaceHover,
+      "--spui-ui-canvas": canvas,
+      "--spui-ui-surface": surface,
+      "--spui-ui-surface-alt": canvas,
+      "--spui-ui-surface-hover": surfaceHover,
+      "--spui-ui-stroke": border,
+      "--spui-ui-border-subtle": `color-mix(in srgb, ${accent} 14%, #e5e5e5)`,
+      "--spui-selection-background": `color-mix(in srgb, ${accent} 15%, white)`,
+      "--colorNeutralBackground1": surface,
+      "--colorNeutralBackground1Hover": surfaceHover,
+      "--colorNeutralBackground2": canvas,
+      "--colorNeutralStroke2": border,
+    });
     overrides["--spui-semantic-primary-button-background-hovered"] = `color-mix(in srgb, ${accent} 86%, black)`;
     overrides["--spui-semantic-primary-button-text"] = "#ffffff";
     overrides["--spui-semantic-input-focus-border-alt"] = accent;
