@@ -1,4 +1,4 @@
-import { base, syncHostAccessibleName } from "./shared.js";
+import { base, stopHostAccessibleNameSync, syncHostAccessibleName } from "./shared.js";
 
 export type ButtonAppearance = "primary" | "secondary" | "outline" | "subtle" | "transparent";
 export type ButtonSize = "small" | "medium" | "large";
@@ -48,15 +48,12 @@ export function defineButton(): void {
     get form(): HTMLFormElement | null { return this.internals.form; }
     connectedCallback() { this.render(); }
     formDisabledCallback(disabled: boolean) { this.formDisabled = disabled; this.render(); }
-    disconnectedCallback() { this.formSubmitter?.remove(); this.formSubmitter = undefined; }
+    disconnectedCallback() { stopHostAccessibleNameSync(this); this.formSubmitter?.remove(); this.formSubmitter = undefined; }
     attributeChangedCallback(name: string) {
       if (!this.isConnected) return;
       if (name === "aria-label" || name === "aria-labelledby") {
         const button = this.shadowRoot?.querySelector<HTMLElement>("button,a");
-        if (button) {
-          if (this.hasAttribute("aria-label") || this.hasAttribute("aria-labelledby")) syncHostAccessibleName(this, button);
-          else { button.removeAttribute("aria-label"); button.removeAttribute("aria-labelledby"); }
-        }
+        if (button) syncHostAccessibleName(this, button);
         return;
       }
       if (["aria-description", "aria-describedby", "aria-pressed", "aria-expanded", "aria-haspopup", "aria-controls", "title"].includes(name)) {

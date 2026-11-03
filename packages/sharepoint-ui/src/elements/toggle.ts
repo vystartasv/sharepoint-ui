@@ -1,4 +1,4 @@
-import { base, rememberNativeFormControlDefaults, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, stopHostAccessibleNameSync, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
 
 type CheckedState = boolean | "mixed";
 
@@ -165,6 +165,8 @@ function defineToggle(name: "spui-checkbox" | "spui-switch", type: "checkbox" | 
       }
       this.syncInputSlot();
     }
+
+    disconnectedCallback(): void { stopHostAccessibleNameSync(this); }
 
     attributeChangedCallback(name: string): void {
       const input = this.getInput();

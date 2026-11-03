@@ -1,4 +1,4 @@
-import { base, rememberNativeFormControlDefaults, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, stopHostAccessibleNameSync, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
 
 export type InputSize = "small" | "medium" | "large";
 export type InputAppearance = "outline" | "underline" | "filled-darker" | "filled-lighter" | "filled-darker-shadow" | "filled-lighter-shadow";
@@ -67,6 +67,8 @@ export function defineInput(): void {
       }
       this.syncForm(input);
     }
+
+    disconnectedCallback(): void { stopHostAccessibleNameSync(this); }
 
     attributeChangedCallback(name: string, _oldValue: string | null, value: string | null): void {
       if (!this.isConnected || !this.shadowRoot) return;

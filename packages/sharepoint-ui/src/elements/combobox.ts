@@ -1,4 +1,4 @@
-import { base, rememberNativeFormControlDefaults, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, stopHostAccessibleNameSync, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
 
 export function defineCombobox(): void {
   if (customElements.get("spui-combobox")) return;
@@ -89,7 +89,7 @@ export function defineCombobox(): void {
       this.syncFormState();
     }
 
-    disconnectedCallback(): void { this.observer?.disconnect(); this.removeEventListener("click", this.onSlottedControlClick); this.removeEventListener("keydown", this.onSlottedTriggerKeyDown); this.boundInput?.removeEventListener("input", this.handleInput); this.boundInput?.removeEventListener("click", this.handleInputClick); this.boundInput?.removeEventListener("keydown", this.handleInputKeyDown); this.boundInput?.removeEventListener("blur", this.handleInputBlur); }
+    disconnectedCallback(): void { this.observer?.disconnect(); stopHostAccessibleNameSync(this); this.removeEventListener("click", this.onSlottedControlClick); this.removeEventListener("keydown", this.onSlottedTriggerKeyDown); this.boundInput?.removeEventListener("input", this.handleInput); this.boundInput?.removeEventListener("click", this.handleInputClick); this.boundInput?.removeEventListener("keydown", this.handleInputKeyDown); this.boundInput?.removeEventListener("blur", this.handleInputBlur); }
 
     private getInput(): HTMLInputElement | null {
       const assigned = this.inputSlot?.assignedElements({ flatten: true }).find((element): element is HTMLInputElement => element instanceof HTMLInputElement);

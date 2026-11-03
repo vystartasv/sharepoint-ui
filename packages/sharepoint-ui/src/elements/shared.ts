@@ -13,17 +13,41 @@ export type NativeFormControlDefaults = {
   defaultChecked: boolean;
 };
 
+type AccessibleNameSyncState = { control: HTMLElement; originalLabel: string | null; originalLabelledBy: string | null; observer?: MutationObserver };
+const accessibleNameSyncStates = new WeakMap<HTMLElement, AccessibleNameSyncState>();
+
+export function stopHostAccessibleNameSync(host: HTMLElement): void {
+  accessibleNameSyncStates.get(host)?.observer?.disconnect();
+}
+
 export function syncHostAccessibleName(host: HTMLElement, control: HTMLElement): void {
   const label = host.getAttribute("aria-label");
   const labelledBy = host.getAttribute("aria-labelledby");
   const root = control.getRootNode();
   const inShadowRoot = host.shadowRoot?.contains(control) ?? false;
   if (!inShadowRoot) return;
-  if (label === null && labelledBy === null) return;
+  let state = accessibleNameSyncStates.get(host);
+  if (state?.control !== control) {
+    state?.observer?.disconnect();
+    state = {
+      control,
+      originalLabel: control.getAttribute("aria-label") === label ? null : control.getAttribute("aria-label"),
+      originalLabelledBy: control.getAttribute("aria-labelledby") === labelledBy ? null : control.getAttribute("aria-labelledby"),
+    };
+    accessibleNameSyncStates.set(host, state);
+  }
+  if (label === null && labelledBy === null) {
+    stopHostAccessibleNameSync(host);
+    if (state.originalLabel === null) control.removeAttribute("aria-label"); else control.setAttribute("aria-label", state.originalLabel);
+    if (state.originalLabelledBy === null) control.removeAttribute("aria-labelledby"); else control.setAttribute("aria-labelledby", state.originalLabelledBy);
+    accessibleNameSyncStates.delete(host);
+    return;
+  }
   if (labelledBy !== null && inShadowRoot) {
     const ids = labelledBy.trim().split(/\s+/).filter(Boolean);
     const localRoot = root as ShadowRoot;
     if (ids.length && ids.every(id => localRoot.getElementById(id))) {
+      stopHostAccessibleNameSync(host);
       control.removeAttribute("aria-label");
       control.setAttribute("aria-labelledby", labelledBy);
       return;
@@ -35,8 +59,18 @@ export function syncHostAccessibleName(host: HTMLElement, control: HTMLElement):
     }).filter(Boolean).join(" ");
     control.removeAttribute("aria-labelledby");
     if (resolved) control.setAttribute("aria-label", resolved); else control.removeAttribute("aria-label");
+    const observer = state.observer ?? new MutationObserver(() => syncHostAccessibleName(host, control));
+    state.observer = observer;
+    observer.disconnect();
+    const targets = ids.map(id => scope.getElementById(id) ?? host.ownerDocument.getElementById(id));
+    for (const target of targets) if (target) observer.observe(target, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ["aria-label", "aria-labelledby", "title"] });
+    if (targets.some(target => !target)) {
+      observer.observe(scope, { subtree: true, childList: true, attributes: true, attributeFilter: ["id"] });
+      if (scope !== host.ownerDocument) observer.observe(host.ownerDocument.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ["id"] });
+    }
     return;
   }
+  stopHostAccessibleNameSync(host);
   if (labelledBy !== null) control.setAttribute("aria-labelledby", labelledBy); else control.removeAttribute("aria-labelledby");
   if (labelledBy === null && label !== null) control.setAttribute("aria-label", label); else control.removeAttribute("aria-label");
 }

@@ -1,4 +1,4 @@
-import { base, syncHostAccessibleName } from "./shared.js";
+import { base, stopHostAccessibleNameSync, syncHostAccessibleName } from "./shared.js";
 
 export type SearchSize = "small" | "medium" | "large";
 export type SearchAppearance = "outline" | "underline" | "filled-darker" | "filled-lighter" | "filled-darker-shadow" | "filled-lighter-shadow";
@@ -25,6 +25,8 @@ export function defineSearchBox(): void {
       if (!this.#dirty) this.#value = this.getAttribute("value") ?? "";
       this.render();
     }
+
+    disconnectedCallback(): void { stopHostAccessibleNameSync(this); }
 
     attributeChangedCallback(name: string, _oldValue: string | null, value: string | null): void {
       if (!this.isConnected || !this.shadowRoot?.querySelector("input")) return;

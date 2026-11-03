@@ -1,4 +1,4 @@
-import { base, rememberNativeFormControlDefaults, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, stopHostAccessibleNameSync, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
 
 export function defineSlider(): void {
   if (customElements.get("spui-slider")) return;
@@ -21,6 +21,7 @@ export function defineSlider(): void {
     }
 
     connectedCallback(): void { this.render(); }
+    disconnectedCallback(): void { stopHostAccessibleNameSync(this); }
 
     attributeChangedCallback(name: string, _oldValue: string | null, value: string | null): void {
       if (!this.isConnected) return;

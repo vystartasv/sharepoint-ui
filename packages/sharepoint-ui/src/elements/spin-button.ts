@@ -1,4 +1,4 @@
-import { base, rememberNativeFormControlDefaults, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, stopHostAccessibleNameSync, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
 
 export type SpinButtonAppearance = "outline" | "underline" | "filled-darker" | "filled-lighter";
 export type SpinButtonSize = "small" | "medium";
@@ -32,7 +32,7 @@ export function defineSpinButton(): void {
     }
 
     connectedCallback(): void { this.render(); }
-    disconnectedCallback(): void { this.clearHeldStep(); }
+    disconnectedCallback(): void { stopHostAccessibleNameSync(this); this.clearHeldStep(); }
 
     attributeChangedCallback(name: string, _oldValue: string | null, value: string | null): void {
       if (!this.isConnected) return;

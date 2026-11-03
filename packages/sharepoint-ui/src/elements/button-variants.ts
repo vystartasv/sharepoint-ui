@@ -1,5 +1,5 @@
 import { buttonControlCss } from "./button.js";
-import { base } from "./shared.js";
+import { base, stopHostAccessibleNameSync, syncHostAccessibleName } from "./shared.js";
 export type { ButtonAppearance, ButtonShape, ButtonSize } from "./button.js";
 
 const forward = ["aria-label", "aria-labelledby", "aria-describedby", "aria-description", "title"];
@@ -65,6 +65,7 @@ export function defineMenuButton(): void {
   class SpuiMenuButton extends HTMLElement {
     static observedAttributes = ["appearance", "size", "shape", "disabled", "disabled-focusable", "type", "tabindex", "aria-label", "aria-labelledby", "aria-describedby", "aria-haspopup", "aria-controls", "aria-expanded", "title"];
     connectedCallback(): void { if (!this.shadowRoot) this.render(); else this.sync(); }
+    disconnectedCallback(): void { stopHostAccessibleNameSync(this); }
     attributeChangedCallback(): void { if (this.isConnected) this.sync(); }
     private render(): void {
       const shadow = this.attachShadow({ mode: "open", delegatesFocus: true });
@@ -93,7 +94,8 @@ export function defineMenuButton(): void {
       const disabled = this.hasAttribute("disabled"); const disabledFocusable = disabled && this.hasAttribute("disabled-focusable");
       button.disabled = disabled && !disabledFocusable; disabledFocusable ? button.setAttribute("aria-disabled", "true") : button.removeAttribute("aria-disabled");
       if (this.hasAttribute("tabindex")) button.setAttribute("tabindex", this.getAttribute("tabindex")!); else button.removeAttribute("tabindex");
-      for (const name of ["aria-label", "aria-labelledby", "aria-describedby", "aria-haspopup", "aria-controls", "aria-expanded", "title"]) { const value = this.getAttribute(name); value === null ? button.removeAttribute(name) : button.setAttribute(name, value); }
+      for (const name of ["aria-label", "aria-describedby", "aria-haspopup", "aria-controls", "aria-expanded", "title"]) { const value = this.getAttribute(name); value === null ? button.removeAttribute(name) : button.setAttribute(name, value); }
+      syncHostAccessibleName(this, button);
       if (!this.hasAttribute("aria-label") && !this.hasAttribute("aria-labelledby")) { const text = this.textContent?.trim(); if (text) button.setAttribute("aria-label", text); }
     }
   }

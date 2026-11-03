@@ -1,4 +1,4 @@
-import { base, syncHostAccessibleName } from "./shared.js";
+import { base, stopHostAccessibleNameSync, syncHostAccessibleName } from "./shared.js";
 
 function radioOptionLabel(option: Element, fallback: string): string {
   const text = [...option.childNodes].filter(node => !(node instanceof Element && ["input", "indicator", "label"].includes(node.getAttribute("slot") ?? ""))).map(node => node.textContent ?? "").join("").trim();
@@ -105,7 +105,7 @@ export function defineRadioGroup(): void {
       this.observer.observe(this, { childList: true, subtree: true, characterData: true, attributes: true });
     }
 
-    disconnectedCallback(): void { this.observer?.disconnect(); }
+    disconnectedCallback(): void { this.observer?.disconnect(); stopHostAccessibleNameSync(this); }
 
     attributeChangedCallback(name: string, _oldValue: string | null, value: string | null): void {
       if (!this.isConnected) return;

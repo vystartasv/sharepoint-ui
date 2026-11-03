@@ -516,6 +516,8 @@ function isReactElement(value: unknown): value is React.ReactElement { return Re
 
 export const SplitButton = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children: React.ReactNode; menuItems: React.ReactNode; menuLabel?: string; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after"; menuIcon?: React.ReactNode; onClick?: React.MouseEventHandler<HTMLElement>; primaryActionButton?: React.ReactElement | Partial<React.ComponentProps<typeof Button>>; menuButton?: React.ReactElement | Partial<React.ComponentProps<typeof MenuButton>> }>(function SplitButton({ children, menuItems, menuLabel, appearance = "primary", size = "medium", shape = "rounded", disabled, disabledFocusable = false, icon, iconPosition = "before", menuIcon, onClick, primaryActionButton, menuButton, ...props }: ElementProps & { children: React.ReactNode; menuItems: React.ReactNode; menuLabel?: string; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after"; menuIcon?: React.ReactNode; onClick?: React.MouseEventHandler<HTMLElement>; primaryActionButton?: React.ReactElement | Partial<React.ComponentProps<typeof Button>>; menuButton?: React.ReactElement | Partial<React.ComponentProps<typeof MenuButton>> }, forwardedRef): React.ReactElement {
   ensureDefined(defineSplitButton);
+  const splitButtonRef = React.useRef<HTMLElement | null>(null);
+  useExposeHostRef(splitButtonRef, forwardedRef);
   const strings = React.useContext(UIContext).strings;
   const resolvedMenuLabel = menuLabel ?? strings.splitButtonMenuLabel ?? "More options";
   const groupLabel = typeof children === "string" ? `${children} actions` : "Actions";
@@ -526,6 +528,37 @@ export const SplitButton = /* @__PURE__ */ React.forwardRef<HTMLElement, Element
   const primaryLabelledBy = typeof primaryButtonProps?.["aria-labelledby"] === "string" ? primaryButtonProps["aria-labelledby"] : "";
   const primaryLabelledName = typeof document === "undefined" ? "" : primaryLabelledBy.split(/\s+/).filter(Boolean).map(id => document.getElementById(id)?.getAttribute("aria-label") || document.getElementById(id)?.textContent?.trim() || "").filter(Boolean).join(" ");
   const primaryAccessibleName = primaryLabelledName || (typeof primaryButtonProps?.["aria-label"] === "string" ? primaryButtonProps["aria-label"] : getVisibleText(primaryButtonProps?.children ?? children));
+  React.useLayoutEffect(() => {
+    if (!primaryLabelledBy || hasMenuButtonName || menuLabel) return;
+    const host = splitButtonRef.current;
+    if (!host) return;
+    const syncName = (): void => {
+      const resolved = primaryLabelledBy.split(/\s+/).filter(Boolean).map(id => {
+        const target = host.ownerDocument.getElementById(id);
+        return target?.getAttribute("aria-label") || target?.textContent?.trim() || "";
+      }).filter(Boolean).join(" ");
+      if (!resolved) return;
+      const primary = host.querySelector<HTMLElement>('[slot="primary"]');
+      if (primary && primary.getAttribute("aria-label") !== resolved) primary.setAttribute("aria-label", resolved);
+      const menu = host.querySelector<HTMLElement>("spui-menu");
+      const trigger = menu?.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')?.assignedElements().find((element): element is HTMLElement => element instanceof HTMLElement);
+      if (trigger && trigger.getAttribute("aria-label") !== resolved) trigger.setAttribute("aria-label", resolved);
+    };
+    const ids = primaryLabelledBy.split(/\s+/).filter(Boolean);
+    let observedTargets: (Element | null)[] = [];
+    const observer = new MutationObserver(() => { syncName(); syncObservedTargets(); });
+    const syncObservedTargets = (): void => {
+      const targets = ids.map(id => host.ownerDocument.getElementById(id));
+      if (targets.every((target, index) => target === observedTargets[index])) return;
+      observer.disconnect();
+      for (const target of targets) if (target) observer.observe(target, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ["aria-label", "aria-labelledby", "title"] });
+      if (targets.some(target => !target)) observer.observe(host.ownerDocument.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ["id"] });
+      observedTargets = targets;
+    };
+    syncName();
+    syncObservedTargets();
+    return () => observer.disconnect();
+  }, [hasMenuButtonName, menuLabel, primaryLabelledBy, primaryLabelledName]);
   const triggerDefaults = { ...(!hasMenuButtonName ? { "aria-label": (menuLabel ?? primaryAccessibleName) || resolvedMenuLabel } : {}), disabled, disabledFocusable, iconOnly: true, size, shape, appearance: "secondary" as const };
   const trigger = isReactElement(menuButton)
     ? React.cloneElement(menuButton as React.ReactElement<any>, { ...triggerDefaults, ...menuButton.props })
@@ -534,7 +567,7 @@ export const SplitButton = /* @__PURE__ */ React.forwardRef<HTMLElement, Element
   const primary = isReactElement(primaryActionButton)
     ? React.cloneElement(primaryActionButton as React.ReactElement<any>, { ...primaryDefaults, ...primaryActionButton.props, slot: "primary" })
     : primaryActionButton ? React.createElement(Button, { ...primaryDefaults, ...(primaryActionButton as React.ComponentProps<typeof Button>), slot: "primary" }, (primaryActionButton as React.ComponentProps<typeof Button>).children ?? children) : React.createElement(Button, primaryDefaults, children);
-  return React.createElement("spui-split-button", useCustomElementProps({ ref: forwardedRef, ...props, role: "group", "aria-label": props["aria-label"] ?? groupLabel }),
+  return React.createElement("spui-split-button", useCustomElementProps({ ref: splitButtonRef, ...props, role: "group", "aria-label": props["aria-label"] ?? groupLabel }),
     primary,
     React.createElement(Menu, { slot: "menu", trigger, label: resolvedMenuLabel }, menuItems));
 });

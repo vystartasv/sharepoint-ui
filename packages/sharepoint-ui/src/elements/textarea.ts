@@ -1,4 +1,4 @@
-import { base, rememberNativeFormControlDefaults, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, stopHostAccessibleNameSync, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
 
 export function defineTextArea(): void {
   if (customElements.get("spui-textarea")) return;
@@ -47,6 +47,8 @@ export function defineTextArea(): void {
       }
       this.syncTextareaSlot();
     }
+    disconnectedCallback(): void { stopHostAccessibleNameSync(this); }
+
     attributeChangedCallback(name: string) {
       const input = this.input(); if (!input) return;
       if (name === "value" || name === "default-value") {

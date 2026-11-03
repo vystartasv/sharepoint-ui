@@ -1,4 +1,4 @@
-import { base, rememberNativeFormControlDefaults, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, stopHostAccessibleNameSync, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
 
 export type SelectAppearance = "outline" | "underline" | "filled-darker" | "filled-lighter";
 export type SelectSize = "small" | "medium" | "large";
@@ -56,7 +56,7 @@ export function defineSelect(): void {
       this.observer.observe(this, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["value", "label", "disabled", "selected"] });
     }
 
-    disconnectedCallback(): void { this.observer?.disconnect(); }
+    disconnectedCallback(): void { this.observer?.disconnect(); stopHostAccessibleNameSync(this); }
 
     attributeChangedCallback(name: string, _oldValue: string | null, value: string | null): void {
       if (name === "tabindex" && !this.normalizingTabIndex) this.requestedTabIndex = value === null ? undefined : Number(value);

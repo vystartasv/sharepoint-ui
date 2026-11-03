@@ -63,10 +63,10 @@ const server = createServer((request, response) => {
 });
 await new Promise(done => server.listen(0, "127.0.0.1", done));
 const require = createRequire(import.meta.url);
-const { chromium } = require("/Users/vilius/.t3/projects/spfx-research/node_modules/playwright");
+const { chromium, webkit } = require("/Users/vilius/.t3/projects/spfx-research/node_modules/playwright");
 let browser;
 try {
-  browser = await chromium.launch({ headless: true });
+  browser = await (process.env.SPUI_BROWSER === "webkit" ? webkit : chromium).launch({ headless: true });
   const page = await browser.newPage();
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
@@ -87,8 +87,41 @@ try {
       : false);
     assert.equal(resolved, true, `${name} resolves an external aria-labelledby reference into its shadow control`);
   }
+  const labelledControlIndexes = [...labelledControlNames].map(name => componentNames.indexOf(name));
+  await page.evaluate(() => { document.getElementById("form-control-label").textContent = "Updated form control name"; });
+  await page.waitForFunction(indexes => indexes.every(index => {
+    const host = document.querySelector(`[data-form-check="${index}"]`);
+    return host?.shadowRoot && [...host.shadowRoot.querySelectorAll("input,select,textarea,button,fieldset,[role=combobox]")].some(control => control.getAttribute("aria-label") === "Updated form control name");
+  }), labelledControlIndexes);
+  for (const name of labelledControlNames) {
+    const host = page.locator(`[data-form-check="${componentNames.indexOf(name)}"]`);
+    const resolved = await host.evaluate(element => element.shadowRoot
+      ? [...element.shadowRoot.querySelectorAll("input,select,textarea,button,fieldset,[role=combobox]")].some(control => control.getAttribute("aria-label") === "Updated form control name")
+      : false);
+    assert.equal(resolved, true, `${name} tracks changes to external aria-labelledby text`);
+  }
+  await page.evaluate(indexes => indexes.forEach(index => document.querySelector(`[data-form-check="${index}"]`).removeAttribute("aria-labelledby")), labelledControlIndexes);
+  await page.waitForFunction(indexes => indexes.every(index => {
+    const host = document.querySelector(`[data-form-check="${index}"]`);
+    return host?.shadowRoot && [...host.shadowRoot.querySelectorAll("input,select,textarea,button,fieldset,[role=combobox]")].every(control => control.getAttribute("aria-label") !== "Updated form control name" && control.getAttribute("aria-labelledby") !== "form-control-label");
+  }), labelledControlIndexes);
+  for (const name of labelledControlNames) {
+    const host = page.locator(`[data-form-check="${componentNames.indexOf(name)}"]`);
+    const staleName = await host.evaluate(element => element.shadowRoot
+      ? [...element.shadowRoot.querySelectorAll("input,select,textarea,button,fieldset,[role=combobox]")].some(control => control.getAttribute("aria-label") === "Updated form control name" || control.getAttribute("aria-labelledby") === "form-control-label")
+      : false);
+    assert.equal(staleName, false, `${name} removes a stale external accessible name when aria-labelledby is removed`);
+  }
+  const inputHost = page.locator(`[data-form-check="${componentNames.indexOf("Input")}"]`);
+  await inputHost.evaluate(host => {
+    host.setAttribute("aria-labelledby", "late-form-control-label");
+    const label = document.createElement("span"); label.id = "late-form-control-label"; label.textContent = "Late form label"; document.body.append(label);
+  });
+  await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-label") === "Late form label", componentNames.indexOf("Input"));
+  await page.evaluate(() => { document.getElementById("late-form-control-label").textContent = "Updated late form label"; });
+  await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-label") === "Updated late form label", componentNames.indexOf("Input"));
   assert.deepEqual(errors, [], "form-associated controls render without browser errors");
-  console.log(`Verified form prop types and external form ownership for ${componentNames.length} React controls.`);
+  console.log(`Verified form prop types and external form ownership for ${componentNames.length} React controls, plus dynamic external labels for ${labelledControlNames.size} controls.`);
 } finally {
   await browser?.close();
   await new Promise((done, reject) => server.close(error => error ? reject(error) : done()));
