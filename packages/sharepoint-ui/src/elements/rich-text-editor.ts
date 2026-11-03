@@ -744,7 +744,7 @@ export function defineRichTextEditor(): void {
         const src = await this.imageUploader(file);
         if (!safeImageSrc(src)) throw new Error("Image upload must return an HTTP or HTTPS URL.");
         this.restoreSelection();
-        const image = document.createElement("img"); image.src = new URL(src, document.baseURI).href; image.alt = file.name.replace(/\\.[^.]*$/, "").slice(0, 200);
+        const image = document.createElement("img"); image.src = new URL(src, document.baseURI).href; image.alt = file.name.replace(/\.[^.]*$/, "").slice(0, 200);
         const selection = this.selection(); const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
         if (range && this.editor.contains(range.commonAncestorContainer)) { range.deleteContents(); range.insertNode(image); range.setStartAfter(image); range.collapse(true); selection!.removeAllRanges(); selection!.addRange(range); }
         else this.editor.append(image);
