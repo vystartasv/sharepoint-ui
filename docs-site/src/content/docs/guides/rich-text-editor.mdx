@@ -1,0 +1,48 @@
+---
+title: Rich text editor
+description: Connect RichTextEditor to your SharePoint page and file picker, then persist its sanitized HTML.
+---
+
+`RichTextEditor` owns editing, formatting, link validation, and HTML sanitization. Your SPFx web part owns SharePoint access: provide a picker callback and save the emitted HTML through your existing list or page data service.
+
+## Connect your picker
+
+Adapt the picker already used by your web part. Return `null` when the user cancels. Otherwise return the destination URL and any display metadata; the editor fills its link form and waits for the user to select **Apply link**.
+
+```tsx
+import * as React from "react";
+import {
+  RichTextEditor,
+  type RichTextEditorLinkPicker,
+} from "@spfx-fast/sharepoint-ui/react";
+
+const linkPicker: RichTextEditorLinkPicker = async current => {
+  const selected = await openSharePointPageOrFilePicker({
+    initialUrl: current?.href,
+  });
+
+  return selected
+    ? { href: selected.url, text: selected.name, title: selected.name }
+    : null;
+};
+
+function NotesEditor() {
+  const [html, setHtml] = React.useState("");
+
+  return (
+    <RichTextEditor
+      label="Notes"
+      value={html}
+      onValueChange={setHtml}
+      linkPicker={linkPicker}
+      onLinkPickerError={error => console.error("Link picker failed", error)}
+    />
+  );
+}
+```
+
+`openSharePointPageOrFilePicker` represents the picker supplied by your host application; this package does not add a picker dependency or make tenant requests. The callback receives the current link when editing one. Its result must use an allowed `http:`, `https:`, or `mailto:` URL. Unsafe results are rejected, and picker failures are reported through `onLinkPickerError`.
+
+## Save the value
+
+Use the editor's sanitized `onValueChange` value with your normal SPFx persistence path. Provide loading, saved, and error feedback in the web part. Read back important writes where the workflow requires confirmation. To render saved content, pass it back through `RichTextEditor` or another sanitizer-aware renderer; do not inject it with raw `innerHTML`.

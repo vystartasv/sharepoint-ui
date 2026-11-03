@@ -167,6 +167,19 @@ For a people stack with named overflow details, compose `AvatarGroupItem` childr
 - Use `Rating` for a labelled star score. `value` is controlled; `defaultValue` initializes an uncontrolled rating. Use `step={0.5}` for half stars, set `max` for the scale, and provide `itemLabel` when the radio option labels need custom localization.
 - For framework-neutral `spui-virtual-list`, assign `items`, `renderItem`, and `itemKey` after importing `defineVirtualList`. Set `axis="horizontal"` or its `axis` property, `item-size`/`itemSize` for the estimated width or height, and `measure-items`/`measureItems` to track rendered sizes. `row-height` remains the vertical compatibility alias. Set `--spui-list-width` for a horizontal viewport; direction follows inherited `dir`, including logical RTL scrolling. Use `scrollToIndex(index, "start" | "center" | "end", behavior)` for programmatic navigation.
 - `RichTextEditor` emits allowlist-normalized HTML. Store it in a SharePoint rich-text field and render it back through the editor or another sanitizer-aware view; do not inject saved HTML with raw `innerHTML`. After inserting a table, click a cell to enable row/column insertion and deletion; table removal is available from any selected cell. Editing controls disable for merged cells so row/column changes cannot corrupt their spans. Localize the toolbar through `SharePointUIProvider.strings` (for example, `richTextInsertRowBelow` and `richTextDeleteTable`).
+- Connect the editor's `linkPicker` to the SPFx app's existing page/file picker; this keeps tenant-specific picker dependencies out of the UI package. Return `null` on cancel, otherwise map the selected item's absolute URL and optional label into `RichTextEditorLink`. The editor validates the URL and leaves it for review before Apply.
+
+```tsx
+import { RichTextEditor, type RichTextEditorLink } from "@spfx-fast/sharepoint-ui/react";
+
+const linkPicker = async (current: RichTextEditorLink | null) => {
+  const selected = await pageFilePicker.open({ initialUrl: current?.href });
+  return selected ? { href: selected.url, text: selected.name, title: selected.name } : null;
+};
+
+<RichTextEditor value={html} onValueChange={setHtml} linkPicker={linkPicker}
+  onLinkPickerError={error => console.error("SharePoint link picker failed", error)} />
+```
 - Persist through `SPHttpClient` in the web part. Include loading, saved, and error states, and verify important writes by reading the item back.
 
 ## Before handing off a web part
