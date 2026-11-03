@@ -1909,7 +1909,9 @@
           "defaultValue",
           "options",
           "onValueChange",
-          "renderUnsupported"
+          "renderUnsupported",
+          "latitudeLabel",
+          "longitudeLabel"
         ],
         "customElementEvents": [
           "spui-field-value-change"
@@ -1921,6 +1923,8 @@
         "empty-option-label",
         "field",
         "hint",
+        "latitude-label",
+        "longitude-label",
         "validation-message",
         "value"
       ]
@@ -3109,6 +3113,8 @@
         "link-remove-label",
         "link-text-label",
         "link-title-label",
+        "more-formatting-label",
+        "more-options-label",
         "name",
         "number-list-label",
         "paragraph-label",

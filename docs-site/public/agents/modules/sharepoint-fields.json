@@ -30,7 +30,9 @@
           "defaultValue",
           "options",
           "onValueChange",
-          "renderUnsupported"
+          "renderUnsupported",
+          "latitudeLabel",
+          "longitudeLabel"
         ],
         "customElementEvents": [
           "spui-field-value-change"
@@ -42,6 +44,8 @@
         "empty-option-label",
         "field",
         "hint",
+        "latitude-label",
+        "longitude-label",
         "validation-message",
         "value"
       ]

@@ -76,7 +76,7 @@ export type SharePointFieldMetadata = SharePointMultiLineField & {
   termSetId?: string;
 };
 
-export type SharePointFieldControl = "input" | "textarea" | "rich-text-editor" | "select" | "radio-group" | "checkbox" | "multi-choice" | "date-picker" | "combobox" | "taxonomy" | "read-only" | "unsupported";
+export type SharePointFieldControl = "input" | "textarea" | "rich-text-editor" | "select" | "radio-group" | "checkbox" | "multi-choice" | "date-picker" | "combobox" | "taxonomy" | "geolocation" | "read-only" | "unsupported";
 
 export type SharePointFieldAdapter = {
   control: SharePointFieldControl;
@@ -113,17 +113,19 @@ export type SharePointTaxonomyTermValue = { label: string; termGuid: string; wss
 export type SharePointTaxonomyRestTermValue = { Label: string; TermGuid: string; WssId?: number };
 export type SharePointTaxonomyRestValueCollection = { results: readonly (SharePointTaxonomyTermValue | SharePointTaxonomyRestTermValue)[] } | { Results: readonly (SharePointTaxonomyTermValue | SharePointTaxonomyRestTermValue)[] };
 export type SharePointTaxonomyValue = SharePointTaxonomyTermValue | SharePointTaxonomyRestTermValue | SharePointTaxonomyRestValueCollection | readonly (SharePointTaxonomyTermValue | SharePointTaxonomyRestTermValue)[] | string | null;
-export type SharePointFieldValue = string | number | boolean | Date | SharePointUrlValue | SharePointTaxonomyTermValue | SharePointTaxonomyRestTermValue | SharePointTaxonomyRestValueCollection | readonly string[] | readonly SharePointLookupId[] | readonly (SharePointTaxonomyTermValue | SharePointTaxonomyRestTermValue)[] | null;
+export type SharePointGeolocationValue = { latitude?: number; longitude?: number };
+export type SharePointGeolocationRestValue = { Latitude: number; Longitude: number; Altitude?: number; Measure?: number };
+export type SharePointFieldValue = string | number | boolean | Date | SharePointUrlValue | SharePointTaxonomyTermValue | SharePointTaxonomyRestTermValue | SharePointTaxonomyRestValueCollection | SharePointGeolocationValue | SharePointGeolocationRestValue | readonly string[] | readonly SharePointLookupId[] | readonly (SharePointTaxonomyTermValue | SharePointTaxonomyRestTermValue)[] | null;
 export type SharePointFieldValues = Readonly<Record<string, SharePointFieldValue | undefined>>;
 export type SharePointTaxonomyFieldFormValue = { FieldName: string; FieldValue: string };
-export type SharePointFieldUpdateValue = string | number | boolean | null | { results: Array<string | number> } | { __metadata: { type: "SP.FieldUrlValue" }; Url: string; Description: string };
+export type SharePointFieldUpdateValue = string | number | boolean | null | { results: Array<string | number> } | { __metadata: { type: "SP.FieldUrlValue" }; Url: string; Description: string } | { __metadata: { type: "SP.FieldGeolocationValue" }; Latitude: number; Longitude: number };
 export type SharePointFieldUpdate = Record<string, SharePointFieldUpdateValue>;
 
 const booleanValue = (value: SharePointBoolean | undefined): boolean => value === true || (typeof value === "string" && value.trim().toLowerCase() === "true");
 
 const fieldTypeNames: Record<number, string> = {
   1: "Integer", 2: "Text", 3: "Note", 4: "DateTime", 5: "Counter", 6: "Choice", 7: "Lookup", 8: "Boolean",
-  9: "Number", 10: "Currency", 11: "URL", 12: "Computed", 15: "MultiChoice", 17: "Calculated", 20: "User", 32: "OutcomeChoice"
+  9: "Number", 10: "Currency", 11: "URL", 12: "Computed", 15: "MultiChoice", 17: "Calculated", 20: "User", 31: "Geolocation", 32: "OutcomeChoice"
 };
 
 /** Map SharePoint REST/CSOM field metadata to a control recipe without importing any UI component code. */
@@ -163,6 +165,7 @@ export function getSharePointFieldAdapter(field: SharePointFieldMetadata): Share
   if (normalized === "taxonomyfieldtype" || normalized === "taxonomyfieldtypemulti") {
     return { ...finish("taxonomy"), multiple: normalized.endsWith("multi") || booleanValue(field.AllowMultipleValues ?? field.allowMultipleValues), termSetId: field.TermSetId ?? field.termSetId };
   }
+  if (normalized === "geolocation") return finish("geolocation");
   if (normalized === "note") {
     const richText = getRichTextEditorFieldOptions(field);
     return richText.contentMode === "plain" ? finish("textarea") : { ...finish("rich-text-editor"), richText };
@@ -243,6 +246,34 @@ export function normalizeSharePointTaxonomyValue(field: SharePointFieldMetadata,
 
   if (!adapter.multiple && terms.length > 1) throw new TypeError(`${adapter.label} accepts only one selected term.`);
   return adapter.multiple ? terms : terms[0] ?? null;
+}
+
+/** Normalize a REST geolocation value or WKT POINT into latitude/longitude coordinates. */
+export function normalizeSharePointGeolocationValue(field: SharePointFieldMetadata, value: unknown): SharePointGeolocationValue | null {
+  const adapter = getSharePointFieldAdapter(field);
+  if (adapter.control !== "geolocation") throw new TypeError(`${adapter.label} is not a SharePoint geolocation field.`);
+  if (value == null || value === "") return null;
+  if (typeof value === "string") {
+    const point = /^\s*POINT\s*\(\s*([-+\d.e]+)\s+([-+\d.e]+)\s*\)\s*$/i.exec(value);
+    if (!point) throw new TypeError(`${adapter.label} must be a WKT POINT or coordinate object.`);
+    const latitude = Number(point[2]);
+    const longitude = Number(point[1]);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) throw new TypeError(`${adapter.label} contains invalid coordinates.`);
+    return { latitude, longitude };
+  }
+  if (typeof value !== "object" || Array.isArray(value)) throw new TypeError(`${adapter.label} must be a coordinate object.`);
+  const coordinates = value as Record<string, unknown>;
+  const latitude = coordinates.latitude ?? coordinates.Latitude;
+  const longitude = coordinates.longitude ?? coordinates.Longitude;
+  const parse = (coordinate: unknown): number | undefined => {
+    if (coordinate == null || coordinate === "") return undefined;
+    const number = typeof coordinate === "number" ? coordinate : typeof coordinate === "string" ? Number(coordinate) : NaN;
+    return Number.isFinite(number) ? number : undefined;
+  };
+  const lat = parse(latitude);
+  const lon = parse(longitude);
+  if (lat === undefined && lon === undefined) return null;
+  return { latitude: lat, longitude: lon };
 }
 
 /** Build a bounded REST request for a list's field definitions and their type-specific metadata. */
@@ -362,6 +393,16 @@ export function serializeSharePointFieldValue(field: SharePointFieldMetadata, va
 
   if (type === "taxonomyfieldtype" || type === "taxonomyfieldtypemulti") {
     throw new TypeError(`${adapter.label} is a managed-metadata field; use serializeSharePointTaxonomyFieldFormValue() with ValidateUpdateListItem.`);
+  }
+  if (type === "geolocation") {
+    const location = normalizeSharePointGeolocationValue(field, value);
+    assertSharePointFieldValueWritable(adapter, location);
+    if (location == null) return { [adapter.name]: null };
+    const { latitude, longitude } = location;
+    if (latitude == null || longitude == null) throw new TypeError(`${adapter.label} requires both latitude and longitude.`);
+    if (latitude < -90 || latitude > 90) throw new RangeError(`${adapter.label} latitude must be between -90 and 90.`);
+    if (longitude < -180 || longitude > 180) throw new RangeError(`${adapter.label} longitude must be between -180 and 180.`);
+    return { [adapter.name]: { __metadata: { type: "SP.FieldGeolocationValue" }, Latitude: latitude, Longitude: longitude } };
   }
 
   if (["lookup", "lookupmulti", "user", "usermulti"].includes(type)) {
@@ -513,7 +554,12 @@ function isEmptySharePointFieldValue(value: SharePointFieldValue): boolean {
   if (value == null) return true;
   if (typeof value === "string") return value.trim() === "";
   if (Array.isArray(value)) return value.length === 0;
+  if (isSharePointGeolocationValue(value)) return value.latitude == null && value.longitude == null;
   return isSharePointUrlValue(value) && value.url.trim() === "";
+}
+
+function isSharePointGeolocationValue(value: SharePointFieldValue): value is SharePointGeolocationValue {
+  return typeof value === "object" && value !== null && !Array.isArray(value) && ("latitude" in value || "longitude" in value);
 }
 
 function assertSharePointFieldValueWritable(adapter: SharePointFieldAdapter, value: SharePointFieldValue): void {

@@ -1508,7 +1508,9 @@
           "defaultValue",
           "options",
           "onValueChange",
-          "renderUnsupported"
+          "renderUnsupported",
+          "latitudeLabel",
+          "longitudeLabel"
         ],
         "customElementEvents": [
           "spui-field-value-change"

@@ -36,7 +36,7 @@ import { defineDatePicker } from "./elements/date-picker.js";
 import { defineCombobox } from "./elements/combobox.js";
 import { defineRichTextEditor, getRichTextEditorFieldOptions, type RichTextEditorImageUploader, type RichTextEditorLinkPicker, type SharePointMultiLineField } from "./elements/rich-text-editor.js";
 export { getRichTextEditorFieldOptions, type SharePointMultiLineField, type RichTextEditorImageUploadResult, type RichTextEditorImageUploader, type RichTextEditorLink, type RichTextEditorLinkPicker } from "./elements/rich-text-editor.js";
-import { getSharePointFieldAdapter, normalizeSharePointTaxonomyValue, type SharePointFieldMetadata, type SharePointTaxonomyTermValue, type SharePointFieldValue } from "./sharepoint-fields.js";
+import { getSharePointFieldAdapter, normalizeSharePointGeolocationValue, normalizeSharePointTaxonomyValue, type SharePointFieldMetadata, type SharePointGeolocationValue, type SharePointTaxonomyTermValue, type SharePointFieldValue } from "./sharepoint-fields.js";
 import { defineAlert } from "./elements/alert.js";
 import { defineSkeleton, defineSkeletonItem, type SkeletonAnimation, type SkeletonAppearance, type SkeletonItemSize, type SkeletonShape } from "./elements/skeleton.js";
 import { defineLink } from "./elements/link.js";
@@ -7217,17 +7217,19 @@ export type SharePointFieldProps = Omit<React.HTMLAttributes<HTMLDivElement>, "c
   renderUnsupported?: (field: SharePointFieldMetadata, reason: string) => React.ReactNode;
   addChoiceLabel?: string;
   emptyOptionLabel?: string;
+  latitudeLabel?: string;
+  longitudeLabel?: string;
 };
 
 /** Render a SharePoint field recipe using the library's matching form control. */
-export function SharePointField({ field, value, defaultValue, options: providedOptions, onValueChange, disabled = false, hint, validationMessage, renderUnsupported, addChoiceLabel = "Add another choice", emptyOptionLabel = "Select an option", className, style, ...hostProps }: SharePointFieldProps): React.ReactElement | null {
+export function SharePointField({ field, value, defaultValue, options: providedOptions, onValueChange, disabled = false, hint, validationMessage, renderUnsupported, addChoiceLabel = "Add another choice", emptyOptionLabel = "Select an option", latitudeLabel = "Latitude", longitudeLabel = "Longitude", className, style, ...hostProps }: SharePointFieldProps): React.ReactElement | null {
   const adapter = getSharePointFieldAdapter(field);
   const [internalValue, setInternalValue] = React.useState<SharePointFieldValue | undefined>(defaultValue);
   const [fillInValue, setFillInValue] = React.useState("");
   if (adapter.hidden) return null;
 
   const rawValue = value === undefined ? internalValue : value;
-  const currentValue = adapter.control === "taxonomy" ? normalizeSharePointTaxonomyValue(field, rawValue) : rawValue;
+  const currentValue = adapter.control === "taxonomy" ? normalizeSharePointTaxonomyValue(field, rawValue) : adapter.control === "geolocation" ? normalizeSharePointGeolocationValue(field, rawValue) : rawValue;
   const updateValue = (next: SharePointFieldValue): void => {
     if (value === undefined) setInternalValue(next);
     onValueChange?.(next);
@@ -7327,6 +7329,16 @@ export function SharePointField({ field, value, defaultValue, options: providedO
           {taxonomyOptions.map(option => <Option key={String(option.value)} value={String(option.value)} text={option.label} disabled={option.disabled}>{option.label}</Option>)}
         </ComboBox>;
       }
+      break;
+    }
+    case "geolocation": {
+      const location = currentValue as SharePointGeolocationValue | null;
+      control = <fieldset role="group" aria-label={label} aria-required={adapter.required || undefined} disabled={controlDisabled} style={{ minWidth: 0, margin: 0, padding: 0, border: 0 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,12rem),1fr))", gap: "var(--spui-field-gap,12px)" }}>
+          <Field label={latitudeLabel} required={adapter.required} disabled={controlDisabled}><Input type="number" min={-90} max={90} step="any" value={location?.latitude ?? ""} onValueChange={raw => updateValue({ ...location, latitude: raw.trim() ? Number(raw) : undefined })} /></Field>
+          <Field label={longitudeLabel} required={adapter.required} disabled={controlDisabled}><Input type="number" min={-180} max={180} step="any" value={location?.longitude ?? ""} onValueChange={raw => updateValue({ ...location, longitude: raw.trim() ? Number(raw) : undefined })} /></Field>
+        </div>
+      </fieldset>;
       break;
     }
     case "read-only":

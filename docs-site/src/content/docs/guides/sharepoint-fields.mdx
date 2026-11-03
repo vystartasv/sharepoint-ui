@@ -27,6 +27,7 @@ const adapter = getSharePointFieldAdapter(field);
 | DateTime | `date-picker` or `input` | Date-only fields use `date-picker`; fields with time enabled use `input` with `inputType: "datetime-local"` so hours and minutes are editable. |
 | Lookup, User | `combobox` | `multiple` follows field metadata. Lookup fields can expose `lookupSource` when SharePoint supplied its source-list metadata. |
 | Managed metadata (`TaxonomyFieldType`, `TaxonomyFieldTypeMulti`) | `taxonomy` | Single terms use `ComboBox`; multi-term fields use `TagPicker`. The adapter exposes `termSetId`; the host supplies authorized, localized term options. |
+| Geolocation | `geolocation` | Uses latitude and longitude controls; values normalize to `{ latitude, longitude }` and serialize as `SP.FieldGeolocationValue`. |
 | Counter, Computed, Calculated | `read-only` | SharePoint calculates or manages these values. |
 | Other types | `unsupported` | Includes the source `fieldType` and a reason; use a specialized renderer. |
 
@@ -182,11 +183,13 @@ serializeSharePointFieldValue(approvedField, true);                    // { Appr
 serializeSharePointFieldValue(amountField, "125.50");                  // { Amount: 125.5 }
 serializeSharePointFieldValue(dueDateField, new Date());               // ISO date string
 serializeSharePointFieldValue(linkField, { url: "/sites/ops/guide", description: "Open guide" });
+serializeSharePointFieldValue(locationField, { latitude: 51.5072, longitude: -0.1276 });
+// { Location: { __metadata: { type: "SP.FieldGeolocationValue" }, Latitude: 51.5072, Longitude: -0.1276 } }
 ```
 
 The helper rejects text values over SharePoint's `MaxLength` and numeric values outside `MinimumValue`/`MaximumValue` (or `Min`/`Max`) when those bounds are present.
 
-Use `null` to clear nullable values. Read-only fields and empty values for required fields are rejected; `false` and `0` are valid values. Numeric strings are parsed as whole values; non-finite numbers and unsafe integers are rejected, and configured `Decimals` precision is enforced (trailing zeroes do not count as extra precision). URL fields accept absolute HTTP(S) or server-relative URLs and serialize to SharePoint's [`SP.FieldUrlValue`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.sharepoint.client.fieldurlvalue?view=sharepoint-csom) shape. Date-only ISO strings are preserved, date-time strings with a timezone keep that offset, and local date-time strings or `Date` objects become ISO UTC strings. The helper does not send the request or replace SharePoint-side validation.
+Use `null` to clear nullable values. Read-only fields and empty values for required fields are rejected; `false` and `0` are valid values. Numeric strings are parsed as whole values; non-finite numbers and unsafe integers are rejected, and configured `Decimals` precision is enforced (trailing zeroes do not count as extra precision). URL fields accept absolute HTTP(S) or server-relative URLs and serialize to SharePoint's [`SP.FieldUrlValue`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.sharepoint.client.fieldurlvalue?view=sharepoint-csom) shape. Geolocation accepts decimal degrees in `{ latitude, longitude }` order or a SharePoint coordinate object; WKT `POINT` input is normalized from longitude/latitude order. Latitude and longitude bounds are validated before serialization. Date-only ISO strings are preserved, date-time strings with a timezone keep that offset, and local date-time strings or `Date` objects become ISO UTC strings. The helper does not send the request or replace SharePoint-side validation.
 
 ## Serialize one form patch
 
@@ -208,7 +211,7 @@ Only supplied values are included, so omitted fields remain untouched in a PATCH
 
 ## Render a metadata-driven form
 
-[`SharePointField`](/sharepoint-ui/components/sharepoint-fields/sharepoint-field/) chooses the matching library control, applies the field label and description, and maps changes to one value shape. It handles text, numeric, URL, plain and rich Note, Choice, MultiChoice, Boolean, DateTime, Lookup, User, and managed-metadata fields. Use the React adapter or the framework-free `<spui-sharepoint-field>` custom element; both use the same SharePoint metadata adapter. For taxonomy fields, load localized options from the term set and save with `serializeSharePointTaxonomyFieldFormValue()` as described above. The form can stay driven by SharePoint metadata:
+[`SharePointField`](/sharepoint-ui/components/sharepoint-fields/sharepoint-field/) chooses the matching library control, applies the field label and description, and maps changes to one value shape. It handles text, numeric, URL, geolocation, plain and rich Note, Choice, MultiChoice, Boolean, DateTime, Lookup, User, and managed-metadata fields. Geolocation values are `{ latitude, longitude }`; set `latitudeLabel` and `longitudeLabel` when the visible labels need localization. Use the React adapter or the framework-free `<spui-sharepoint-field>` custom element; both use the same SharePoint metadata adapter. For taxonomy fields, load localized options from the term set and save with `serializeSharePointTaxonomyFieldFormValue()` as described above. The form can stay driven by SharePoint metadata:
 
 ```tsx
 import { useState } from "react";

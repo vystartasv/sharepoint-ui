@@ -1,7 +1,9 @@
 import {
   getSharePointFieldAdapter,
+  normalizeSharePointGeolocationValue,
   normalizeSharePointTaxonomyValue,
   type SharePointFieldMetadata,
+  type SharePointGeolocationValue,
   type SharePointTaxonomyTermValue,
   type SharePointFieldValue,
 } from "../sharepoint-fields.js";
@@ -100,7 +102,7 @@ export function defineSharePointField(): void {
   defineSharePointFieldBasicControls();
 
   class SpuiSharePointField extends HTMLElement {
-    static observedAttributes = ["field", "value", "disabled", "hint", "validation-message", "empty-option-label", "add-choice-label"];
+    static observedAttributes = ["field", "value", "disabled", "hint", "validation-message", "empty-option-label", "add-choice-label", "latitude-label", "longitude-label"];
     private fieldValue?: SharePointFieldMetadata;
     private currentValue?: SharePointFieldValue;
     private initialValue?: SharePointFieldValue;
@@ -167,7 +169,7 @@ export function defineSharePointField(): void {
         this.removeAttribute("aria-busy");
         const options = this.hasProvidedOptions ? this.currentOptions : (adapter.choices ?? []).map(value => ({ value, label: value }));
         const label = adapter.label || adapter.name || adapter.fieldType;
-        const value = adapter.control === "taxonomy" ? normalizeSharePointTaxonomyValue(field, this.currentValue) : this.currentValue;
+        const value = adapter.control === "taxonomy" ? normalizeSharePointTaxonomyValue(field, this.currentValue) : adapter.control === "geolocation" ? normalizeSharePointGeolocationValue(field, this.currentValue) : this.currentValue;
         const terms = taxonomyTerms(value);
         const fieldOptions = [...options];
         if (adapter.control === "taxonomy") for (const term of terms) if (!fieldOptions.some(option => String(option.value).toLowerCase() === term.termGuid.toLowerCase())) fieldOptions.push({ value: term.termGuid, label: term.label, wssId: term.wssId });
@@ -336,6 +338,31 @@ export function defineSharePointField(): void {
             }
             break;
           }
+          case "geolocation": {
+            const location = value as SharePointGeolocationValue | null;
+            const group = document.createElement("fieldset") as FieldControl;
+            group.setAttribute("role", "group");
+            group.setAttribute("data-spui-geolocation", "");
+            const legend = document.createElement("legend");
+            legend.textContent = label;
+            const grid = document.createElement("div");
+            grid.style.display = "grid";
+            grid.style.gridTemplateColumns = "repeat(auto-fit,minmax(min(100%,12rem),1fr))";
+            grid.style.gap = "var(--spui-field-gap,12px)";
+            for (const [coordinate, coordinateLabel, min, max] of [["latitude", this.getAttribute("latitude-label") ?? "Latitude", -90, 90], ["longitude", this.getAttribute("longitude-label") ?? "Longitude", -180, 180]] as const) {
+              const input = setBasics(document.createElement("spui-input") as FieldControl);
+              input.setAttribute("type", "number");
+              input.setAttribute("min", String(min));
+              input.setAttribute("max", String(max));
+              input.setAttribute("step", "any");
+              input.setAttribute("data-spui-coordinate", coordinate);
+              input.value = location?.[coordinate] == null ? "" : String(location[coordinate]);
+              grid.append(createFormField(input, { label: coordinateLabel, required: adapter.required, disabled: controlDisabled }));
+            }
+            group.append(legend, grid);
+            control = group;
+            break;
+          }
           case "read-only": {
             const readonly = setBasics(document.createElement("spui-input") as FieldControl);
             readonly.setAttribute("type", "text"); readonly.setAttribute("read-only", ""); readonly.value = valueText;
@@ -354,7 +381,7 @@ export function defineSharePointField(): void {
         const wrapper = createFormField(control, {
           id: this.id ? `${this.id}-field` : undefined,
           className: this.getAttribute("class") ?? undefined,
-          label: adapter.control === "multi-choice" || (adapter.control === "taxonomy" && adapter.multiple) ? undefined : label,
+          label: adapter.control === "multi-choice" || (adapter.control === "taxonomy" && adapter.multiple) || adapter.control === "geolocation" ? undefined : label,
           hint: this.getAttribute("hint") ?? adapter.description,
           validationMessage: this.getAttribute("validation-message") ?? undefined,
           required: adapter.required,
@@ -378,7 +405,13 @@ export function defineSharePointField(): void {
       const first = wrapper?.firstElementChild;
       const control = (first?.localName === "fieldset" ? first : first?.nextElementSibling) as FieldControl | null | undefined;
       if (!control) return;
-      if (control.localName === "fieldset") {
+      if (control.localName === "fieldset" && control.hasAttribute("data-spui-geolocation") && this.fieldValue) {
+        const location = normalizeSharePointGeolocationValue(this.fieldValue, this.currentValue);
+        control.querySelectorAll<FieldControl>("spui-input[data-spui-coordinate]").forEach(input => {
+          const coordinate = input.getAttribute("data-spui-coordinate") as "latitude" | "longitude";
+          input.value = location?.[coordinate] == null ? "" : String(location[coordinate]);
+        });
+      } else if (control.localName === "fieldset") {
         const selected = new Set(Array.isArray(this.currentValue) ? this.currentValue.map(String) : []);
         control.querySelectorAll<FieldControl>("spui-checkbox").forEach(checkbox => { checkbox.checked = selected.has(checkbox.getAttribute("value") ?? ""); });
       } else if (control.localName === "spui-checkbox") control.checked = this.currentValue === true || this.currentValue === "true";
@@ -414,6 +447,14 @@ export function defineSharePointField(): void {
       this.addEventListener("spui-input", event => {
         const target = event.target as HTMLElement | null;
         if (target?.localName === "spui-tag-picker") return;
+        const coordinate = target?.getAttribute("data-spui-coordinate");
+        if (coordinate && this.fieldValue && (coordinate === "latitude" || coordinate === "longitude")) {
+          const value = (event as FieldChange).detail?.value;
+          if (value === undefined) return;
+          const current = normalizeSharePointGeolocationValue(this.fieldValue, this.currentValue) ?? {};
+          this.acceptValue({ ...current, [coordinate]: value.trim() ? Number(value) : undefined });
+          return;
+        }
         if ((target?.localName === "spui-combobox" && !target.hasAttribute("allow-freeform")) || (target?.localName === "spui-input" && target.closest("fieldset"))) return;
         const value = (event as FieldChange).detail?.value;
         if (value !== undefined) this.acceptValue(value);
