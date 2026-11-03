@@ -1,2 +1,2 @@
-import type { SharePointTheme, FluentThemeTokens } from "@vilius/sharepoint-ui";
+import type { SharePointTheme, FluentThemeTokens } from "@spfx-fast/sharepoint-ui";
 export interface I<%= componentName.pascal %>Props { theme?: SharePointTheme; fluentTokens?: FluentThemeTokens; description: string; locale: string; rtl: boolean; strings: { CardEyebrow: string; CardTitle: string; CardSubtitle: string; CardDescription: string; CardStatus: string; CardDetails: string; MarkReviewed: string; Reviewed: string; }; }

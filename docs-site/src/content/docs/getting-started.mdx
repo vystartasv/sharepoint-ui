@@ -10,7 +10,7 @@ The package is prepared for its first public npm release. This install command w
 :::
 
 ```sh
-npm install @vilius/sharepoint-ui
+npm install @spfx-fast/sharepoint-ui
 ```
 
 React consumers can import the adapter. Framework-neutral consumers can import only the custom-element factory they need.
@@ -18,7 +18,7 @@ React consumers can import the adapter. Framework-neutral consumers can import o
 ## React in SPFx
 
 ```tsx
-import { SharePointUIProvider, Button, TextField } from "@vilius/sharepoint-ui/react";
+import { SharePointUIProvider, Button, TextField } from "@spfx-fast/sharepoint-ui/react";
 
 export function RequestForm() {
   return (
@@ -35,7 +35,7 @@ Use the SPFx locale instead of hard-coding direction. Arabic and other right-to-
 ## Custom elements
 
 ```ts
-import { defineButton } from "@vilius/sharepoint-ui/elements/button";
+import { defineButton } from "@spfx-fast/sharepoint-ui/elements/button";
 
 defineButton();
 ```

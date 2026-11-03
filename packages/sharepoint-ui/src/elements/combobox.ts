@@ -7,6 +7,11 @@ export function defineCombobox(): void {
     static observedAttributes = ["label", "value", "selected-value", "selected-options", "default-selected-options", "multiselect", "disabled", "required", "name", "placeholder", "allow-freeform", "read-only", "button-trigger", "open", "default-open", "clearable", "clear-label", "disable-auto-focus", "appearance", "size", "positioning", "inline-popup", "no-results", "remove-selected-label", "selected-label", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid"];
     private internals: ElementInternals | undefined;
     private observer: MutationObserver | undefined;
+    private positionEvents?: AbortController;
+    private positionObserver?: ResizeObserver;
+    private observedPositionAnchor?: HTMLElement;
+    private observedPositionListbox?: HTMLElement;
+    private positionFrame?: number;
     private readonly instanceId = crypto.randomUUID();
     private currentValue = "";
     private selectedValueState = "";
@@ -21,6 +26,7 @@ export function defineCombobox(): void {
     private inputSlot?: HTMLSlotElement;
     private fallbackInput?: HTMLInputElement;
     private boundInput?: HTMLInputElement;
+    private listboxElementValue?: HTMLElement;
     private formDisabled = false;
     private slotInputDefaults?: NativeFormControlDefaults;
     private readonly handleInput = (event: Event): void => {
@@ -83,13 +89,22 @@ export function defineCombobox(): void {
       if (this.hasAttribute("open") || this.hasAttribute("default-open")) this.openList();
       this.observer = new MutationObserver(records => {
         const listbox = this.getListbox();
-        if (records.some(record => !listbox?.contains(record.target))) this.updateOptions();
+        const trigger = this.getTrigger();
+        if (records.some(record => !listbox?.contains(record.target) && !trigger?.contains(record.target))) this.updateOptions();
       });
       this.observer.observe(this, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["value", "label", "disabled"] });
       this.syncFormState();
     }
 
-    disconnectedCallback(): void { this.observer?.disconnect(); stopHostAccessibleNameSync(this); this.removeEventListener("click", this.onSlottedControlClick); this.removeEventListener("keydown", this.onSlottedTriggerKeyDown); this.boundInput?.removeEventListener("input", this.handleInput); this.boundInput?.removeEventListener("click", this.handleInputClick); this.boundInput?.removeEventListener("keydown", this.handleInputKeyDown); this.boundInput?.removeEventListener("blur", this.handleInputBlur); }
+    disconnectedCallback(): void { this.observer?.disconnect(); this.positionEvents?.abort(); this.positionEvents = undefined; this.stopPositionObserver(); stopHostAccessibleNameSync(this); this.removeEventListener("click", this.onSlottedControlClick); this.removeEventListener("keydown", this.onSlottedTriggerKeyDown); this.boundInput?.removeEventListener("input", this.handleInput); this.boundInput?.removeEventListener("click", this.handleInputClick); this.boundInput?.removeEventListener("keydown", this.handleInputKeyDown); this.boundInput?.removeEventListener("blur", this.handleInputBlur); }
+
+    get listboxElement(): HTMLElement | undefined { return this.listboxElementValue; }
+    set listboxElement(value: HTMLElement | null | undefined) {
+      const next = value ?? undefined;
+      if (this.listboxElementValue === next) return;
+      this.listboxElementValue = next;
+      if (this.isConnected) this.updateOptions();
+    }
 
     private getInput(): HTMLInputElement | null {
       const assigned = this.inputSlot?.assignedElements({ flatten: true }).find((element): element is HTMLInputElement => element instanceof HTMLInputElement);
@@ -263,6 +278,7 @@ export function defineCombobox(): void {
     }
 
     private getListbox(): HTMLElement | null {
+      if (this.listboxElementValue) return this.listboxElementValue;
       const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="listbox"]');
       const assigned = slot?.assignedElements({ flatten: true }).find(element => element instanceof HTMLElement) as HTMLElement | undefined;
       return assigned ?? slot?.querySelector<HTMLElement>("[role=listbox]") ?? null;
@@ -275,7 +291,7 @@ export function defineCombobox(): void {
       const list = this.getListbox();
       if (!input || !list) return;
       const trigger = this.hasAttribute("button-trigger") ? this.getTrigger() : input;
-      const triggerValue = this.shadowRoot?.querySelector<HTMLElement>(".trigger-value");
+      const triggerValue = this.getTrigger()?.querySelector<HTMLElement>(".trigger-value") ?? this.shadowRoot?.querySelector<HTMLElement>(".trigger-value");
       if (triggerValue) triggerValue.textContent = this.currentValue || this.getAttribute("placeholder") || "";
       if (trigger) {
         trigger.setAttribute("role", "combobox");
@@ -290,6 +306,7 @@ export function defineCombobox(): void {
         else if (explicitLabelledBy !== null) { trigger.removeAttribute("aria-label"); trigger.setAttribute("aria-labelledby", explicitLabelledBy); }
         else if (label && trigger.getRootNode() !== this.shadowRoot) { trigger.removeAttribute("aria-labelledby"); trigger.setAttribute("aria-label", label.textContent?.trim() ?? ""); }
         else { trigger.removeAttribute("aria-label"); if (label) trigger.setAttribute("aria-labelledby", label.id); else trigger.removeAttribute("aria-labelledby"); }
+        if (trigger !== input) syncHostAccessibleName(this, input);
         syncHostAccessibleName(this, trigger);
         const invalid = this.getAttribute("aria-invalid");
         if (invalid === null) trigger.removeAttribute("aria-invalid"); else trigger.setAttribute("aria-invalid", invalid);
@@ -299,12 +316,12 @@ export function defineCombobox(): void {
         else { trigger.removeAttribute("aria-disabled"); if (trigger instanceof HTMLButtonElement) trigger.disabled = false; }
       }
       if (!list.id) list.id = `listbox-${this.instanceId}`;
-      list.setAttribute("role", "listbox");
+      list.setAttribute("role", this.hasAttribute("multiselect") ? "menu" : "listbox");
       if (list.slot === "listbox") {
         const defaults: Record<string, string> = {
           position: "absolute", "z-index": "var(--spui-layer-dropdown,20)", top: "calc(100% + 4px)", "inset-inline": "0",
           "box-sizing": "border-box", "max-height": "240px", overflow: "auto", margin: "0", padding: "4px",
-          "list-style": "none", border: "1px solid var(--spui-ui-stroke,#d1d1d1)",
+          "list-style": "none", border: "1px solid var(--spui-ui-stroke,#d1d1d1)", color: "var(--spui-ui-text,inherit)", font: "inherit",
           "border-radius": "var(--spui-card-radius,8px)", background: "var(--spui-ui-surface,#fff)",
           "box-shadow": "var(--spui-card-shadow,0 4px 14px #0002)"
         };
@@ -317,16 +334,97 @@ export function defineCombobox(): void {
         if (input.getRootNode() === list.getRootNode()) input.setAttribute("aria-controls", list.id);
         else input.removeAttribute("aria-controls");
       }
-      if (this.hasAttribute("multiselect")) list.setAttribute("aria-multiselectable", "true"); else list.removeAttribute("aria-multiselectable");
-      const active = this.shadowRoot?.querySelector<HTMLElement>(`[data-option-index="${this.activeIndex}"]`);
+      list.removeAttribute("aria-multiselectable");
+      const active = list.querySelector<HTMLElement>(`[data-option-index="${this.activeIndex}"]`);
       if (this.open && active) trigger?.setAttribute("aria-activedescendant", active.id); else trigger?.removeAttribute("aria-activedescendant");
-      for (const option of list.querySelectorAll<HTMLElement>("[role=option]")) {
+      for (const option of list.querySelectorAll<HTMLElement>("[role=option], [role=menuitemcheckbox]")) {
         const activeOption = this.open && Number(option.dataset.optionIndex) === this.activeIndex;
+        const selectedOption = option.getAttribute("aria-selected") === "true" || option.getAttribute("aria-checked") === "true";
         option.dataset.active = String(activeOption);
-        if (list.slot === "listbox") option.style.background = activeOption || option.getAttribute("aria-selected") === "true" ? "var(--spui-ui-surface-hover,var(--spui-ui-canvas,#f5f5f5))" : "";
+        if (list.slot === "listbox") option.style.background = activeOption || selectedOption ? "var(--spui-ui-surface-hover,var(--spui-ui-canvas,#f5f5f5))" : "";
       }
       list.hidden = !this.open;
+      this.syncPositionListeners();
+      this.positionListbox();
     }
+
+    private syncPositionListeners(): void {
+      const shouldListen = this.open && Boolean(this.listboxElementValue) && !this.hasAttribute("inline-popup");
+      if (!shouldListen) {
+        this.positionEvents?.abort();
+        this.positionEvents = undefined;
+        this.stopPositionObserver();
+        return;
+      }
+      if (!this.positionEvents) {
+        this.positionEvents = new AbortController();
+        const options = { signal: this.positionEvents.signal };
+        window.addEventListener("resize", this.schedulePositionListbox, options);
+        window.addEventListener("scroll", this.schedulePositionListbox, { ...options, capture: true });
+      }
+      if (typeof ResizeObserver === "undefined") return;
+      this.positionObserver ??= new ResizeObserver(this.schedulePositionListbox);
+      const anchor = this.hasAttribute("button-trigger") ? this.getTrigger() : this.getInput();
+      const list = this.listboxElementValue;
+      if (anchor !== this.observedPositionAnchor) {
+        if (this.observedPositionAnchor) this.positionObserver.unobserve(this.observedPositionAnchor);
+        this.observedPositionAnchor = anchor ?? undefined;
+        if (anchor) this.positionObserver.observe(anchor);
+      }
+      if (list !== this.observedPositionListbox) {
+        if (this.observedPositionListbox) this.positionObserver.unobserve(this.observedPositionListbox);
+        this.observedPositionListbox = list;
+        if (list) this.positionObserver.observe(list);
+      }
+    }
+
+    private stopPositionObserver(): void {
+      this.positionObserver?.disconnect();
+      this.observedPositionAnchor = undefined;
+      this.observedPositionListbox = undefined;
+      if (this.positionFrame !== undefined) cancelAnimationFrame(this.positionFrame);
+      this.positionFrame = undefined;
+    }
+
+    private schedulePositionListbox = (): void => {
+      if (this.positionFrame !== undefined) return;
+      this.positionFrame = requestAnimationFrame(() => {
+        this.positionFrame = undefined;
+        this.positionListbox();
+      });
+    };
+
+    private positionListbox = (): void => {
+      const list = this.listboxElementValue;
+      if (!list || this.hasAttribute("inline-popup")) return;
+      const anchor = this.hasAttribute("button-trigger") ? this.getTrigger() : this.getInput();
+      if (!anchor) return;
+      const rect = anchor.getBoundingClientRect();
+      const viewportWidth = this.ownerDocument.documentElement.clientWidth || window.innerWidth;
+      const viewportHeight = this.ownerDocument.documentElement.clientHeight || window.innerHeight;
+      const margin = 8;
+      const gap = 4;
+      const maxWidth = Math.max(0, viewportWidth - margin * 2);
+      const width = Math.min(Math.max(rect.width, 0), maxWidth);
+      const left = Math.max(margin, Math.min(rect.left, viewportWidth - width - margin));
+      const below = Math.max(0, viewportHeight - rect.bottom - margin - gap);
+      const above = Math.max(0, rect.top - margin - gap);
+      const requested = this.getAttribute("positioning")?.startsWith("above") ? "above" : this.getAttribute("positioning")?.startsWith("below") ? "below" : undefined;
+      const naturalHeight = Math.min(240, Math.max(list.scrollHeight, 0));
+      const side = requested ?? (below < naturalHeight && above > below ? "above" : "below");
+      const available = side === "above" ? above : below;
+      const maxHeight = Math.min(240, available);
+      list.style.position = "fixed";
+      list.style.insetInline = "auto";
+      list.style.left = `${left}px`;
+      list.style.right = "auto";
+      list.style.width = `${width}px`;
+      list.style.maxWidth = `calc(100vw - ${margin * 2}px)`;
+      list.style.maxHeight = `${maxHeight}px`;
+      list.style.top = side === "above" ? "auto" : `${rect.bottom + gap}px`;
+      list.style.bottom = side === "above" ? `${Math.max(margin, viewportHeight - rect.top + gap)}px` : "auto";
+      list.style.zIndex = "var(--spui-layer-dropdown,20)";
+    };
 
     private updateOptions(): void {
       const list = this.getListbox();
@@ -355,10 +453,15 @@ export function defineCombobox(): void {
         const item = document.createElement("div");
         item.id = `option-${this.instanceId}-${index}`;
         item.dataset.optionIndex = String(index);
-        item.setAttribute("role", "option");
         const value = option.getAttribute("value") ?? "";
         const selected = this.hasAttribute("multiselect") ? this.selectedOptionsState.includes(value) : value === this.selectedValue;
-        item.setAttribute("aria-selected", String(selected));
+        if (this.hasAttribute("multiselect")) {
+          item.setAttribute("role", "menuitemcheckbox");
+          item.setAttribute("aria-checked", String(selected));
+        } else {
+          item.setAttribute("role", "option");
+          item.setAttribute("aria-selected", String(selected));
+        }
         const disabled = option.hasAttribute("disabled") || Boolean(group?.hasAttribute("disabled"));
         if (disabled) item.setAttribute("aria-disabled", "true");
         if (this.hasAttribute("multiselect")) {
@@ -374,7 +477,7 @@ export function defineCombobox(): void {
         const text = document.createElement("span"); text.textContent = (option.getAttribute("label") ?? option.textContent ?? "").trim(); item.append(text);
         item.addEventListener("pointerdown", event => event.preventDefault());
         item.addEventListener("pointerenter", () => { if (list.slot === "listbox" && !disabled) item.style.background = "var(--spui-ui-surface-hover,var(--spui-ui-canvas,#f5f5f5))"; });
-        item.addEventListener("pointerleave", () => { if (list.slot === "listbox" && item.dataset.active !== "true" && item.getAttribute("aria-selected") !== "true") item.style.background = ""; });
+        item.addEventListener("pointerleave", () => { if (list.slot === "listbox" && item.dataset.active !== "true" && item.getAttribute("aria-selected") !== "true" && item.getAttribute("aria-checked") !== "true") item.style.background = ""; });
         item.addEventListener("click", event => { if (!disabled) this.selectOption(option.getAttribute("value") ?? "", event); });
         (groupContainer ?? list).append(item);
       });
@@ -480,7 +583,7 @@ export function defineCombobox(): void {
       if (previousOption !== nextOption) this.dispatchEvent(new CustomEvent("spui-active-option-change", { detail: { event: sourceEvent, type: sourceEvent ? "change" : undefined, previousOption, nextOption, id: nextOption ?? "", previousId: previousOption }, bubbles: true, composed: true }));
     }
 
-    private scrollActiveIntoView(): void { this.shadowRoot?.querySelector<HTMLElement>(`[data-option-index="${this.activeIndex}"]`)?.scrollIntoView({ block: "nearest" }); }
+    private scrollActiveIntoView(): void { this.getListbox()?.querySelector<HTMLElement>(`[data-option-index="${this.activeIndex}"]`)?.scrollIntoView({ block: "nearest" }); }
 
     private selectOption(value: string, sourceEvent?: Event): void {
       const option = this.optionElements().find(item => item.getAttribute("value") === value);

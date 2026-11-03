@@ -22,7 +22,7 @@ export type ImageOptions = {
 
 type ImageStyleOptions = Pick<ImageOptions, "fit" | "shape" | "block" | "bordered" | "shadow"> & { width?: number | string; height?: number | string };
 
-export function getImageStyle({ fit = "none", shape = "square", block, bordered, shadow, width, height }: ImageStyleOptions): Record<string, string> {
+export function getImageStyle({ fit = "default", shape = "square", block, bordered, shadow, width, height }: ImageStyleOptions): Record<string, string> {
   const fitFill = fit !== "default" && width == null && height == null;
   return {
     display: block ? "block" : "inline-block",

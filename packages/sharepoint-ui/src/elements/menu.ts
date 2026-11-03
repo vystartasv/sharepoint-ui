@@ -294,7 +294,11 @@ export function defineMenu(): void {
   class SpuiMenu extends HTMLElement {
     static observedAttributes = ["open", "default-open", "motion", "label", "placement", "positioning", "position-offset", "context-menu", "open-on-context", "open-on-hover", "hover-delay", "close-on-scroll", "persist-on-item-click", "inline"];
     private events?: AbortController;
+    private surfaceEvents?: AbortController;
     private panel?: HTMLElement & { showPopover?: () => void; hidePopover?: () => void };
+    private internalPanel?: HTMLElement & { showPopover?: () => void; hidePopover?: () => void };
+    private externalPanel?: HTMLElement & { showPopover?: () => void; hidePopover?: () => void };
+    private parentElementOverride?: SpuiMenu;
     private trigger?: HTMLElement;
     private triggerState?: { haspopup: string | null; controls: string | null; expanded: string | null };
     private isOpen = false;
@@ -307,6 +311,28 @@ export function defineMenu(): void {
     get open(): boolean { return this.isOpen; }
     set open(value: boolean) { this.setOpen(Boolean(value)); }
     get menuTrigger(): HTMLElement | undefined { return this.trigger; }
+    set menuSurface(value: HTMLElement | null | undefined) {
+      const previousPanel = this.panel;
+      this.externalPanel = value as (HTMLElement & { showPopover?: () => void; hidePopover?: () => void }) | null ?? undefined;
+      this.panel = this.externalPanel ?? this.internalPanel;
+      if (previousPanel && previousPanel !== this.panel) {
+        previousPanel.hidePopover?.();
+        previousPanel.hidden = true;
+      }
+      if (this.panel) {
+        this.panel.id ||= nextId();
+        this.panel.setAttribute("role", "menu");
+        this.panel.setAttribute("aria-orientation", "vertical");
+        this.panel.setAttribute("popover", "manual");
+        this.panel.addEventListener("toggle", this.onNativeToggle as EventListener);
+      }
+      this.bindSurfaceEvents();
+      if (this.isConnected) { this.syncLabel(); this.syncVisibility(); }
+      this.syncTrigger();
+    }
+    get menuSurface(): HTMLElement | null { return this.externalPanel ?? null; }
+    set parentMenuElement(value: SpuiMenu | null | undefined) { this.parentElementOverride = value ?? undefined; }
+    get parentMenuElement(): SpuiMenu | undefined { return this.parentElementOverride; }
 
     connectedCallback(): void {
       this.style.display ||= "contents";
@@ -329,7 +355,9 @@ export function defineMenu(): void {
       window.addEventListener("resize", this.position, options);
       window.addEventListener("scroll", this.position, { ...options, capture: true });
       this.shadowRoot?.querySelector("slot[name=trigger]")?.addEventListener("slotchange", this.syncTrigger, options);
-      this.panel = this.shadowRoot?.querySelector<HTMLElement>(".surface") as (HTMLElement & { showPopover?: () => void; hidePopover?: () => void }) | undefined;
+      this.internalPanel = this.shadowRoot?.querySelector<HTMLElement>(".surface") as (HTMLElement & { showPopover?: () => void; hidePopover?: () => void }) | undefined;
+      this.panel = this.externalPanel ?? this.internalPanel;
+      this.bindSurfaceEvents();
       if (!this.hasAttribute("placement")) this.setAttribute("placement", this.parentMenu() ? "end" : "bottom");
       this.isOpen = this.hasAttribute("open") || this.hasAttribute("default-open");
       if (this.isOpen) this.toggleAttribute("open", true);
@@ -340,6 +368,7 @@ export function defineMenu(): void {
 
     disconnectedCallback(): void {
       this.events?.abort();
+      this.surfaceEvents?.abort();
       this.clearTypeahead();
       this.clearHoverTimer();
       this.restoreTrigger();
@@ -367,7 +396,23 @@ export function defineMenu(): void {
       panel.append(items);
       panel.addEventListener("toggle", this.onNativeToggle as EventListener);
       shadow.append(style, triggerSlot, panel);
-      this.panel = panel;
+      this.internalPanel = panel;
+      this.panel = this.externalPanel ?? panel;
+    }
+
+    private bindSurfaceEvents(): void {
+      this.surfaceEvents?.abort();
+      this.surfaceEvents = undefined;
+      if (!this.isConnected || !this.externalPanel) return;
+      const events = new AbortController();
+      const options = { signal: events.signal };
+      const listeners: Array<[string, EventListener]> = [["click", this.onClick as EventListener], ["keydown", this.onKeyDown as EventListener], ["spui-select", this.onItemSelect as EventListener], ["pointerover", this.onPointerOver as EventListener], ["pointerout", this.onPointerOut as EventListener], ["mouseover", this.onPanelMouseOver as EventListener]];
+      for (const [type, listener] of listeners) this.externalPanel.addEventListener(type, listener, options);
+      this.externalPanel.addEventListener("spui-select", event => {
+        const selection = event as CustomEvent;
+        this.dispatchEvent(new CustomEvent("spui-select", { bubbles: true, composed: true, detail: selection.detail }));
+      }, options);
+      this.surfaceEvents = events;
     }
 
     private assignedTriggers(): HTMLElement[] { return this.shadowRoot?.querySelector<HTMLSlotElement>("slot[name=trigger]")?.assignedElements({ flatten: true }).filter((node): node is HTMLElement => node instanceof HTMLElement) ?? []; }
@@ -481,11 +526,12 @@ export function defineMenu(): void {
       this.setOpen(true, { event, type: "menuTriggerKeyDown", keyboard: true });
       requestAnimationFrame(() => this.focusItem(0));
     };
-    private items(): HTMLElement[] { return [...this.querySelectorAll<HTMLElement>("spui-menu-item,spui-menu-item-link")]; }
+    private items(): HTMLElement[] { return [...(this.externalPanel ?? this).querySelectorAll<HTMLElement>("spui-menu-item,spui-menu-item-link")]; }
     private menuItems(): HTMLElement[] { return this.items().filter(item => {
       const owner = item.closest("spui-menu");
-      if (owner === this) return item.getAttribute("slot") !== "trigger";
-      return item.getAttribute("slot") === "trigger" && owner?.parentElement?.closest("spui-menu") === this;
+      if (owner === this || !owner && this.externalPanel?.contains(item)) return item.getAttribute("slot") !== "trigger";
+      const ownerMenu = owner as SpuiMenu | null;
+      return item.getAttribute("slot") === "trigger" && (ownerMenu?.parentMenuElement ?? ownerMenu?.parentElement?.closest("spui-menu")) === this;
     }); }
     private focusItem(index: number): void { const items = this.menuItems(); if (!items.length) return; items[(index + items.length) % items.length].focus(); }
     private focusItemAfterOpen(index: number): void { requestAnimationFrame(() => requestAnimationFrame(() => { if (this.isOpen) this.focusItem(index); })); }
@@ -502,7 +548,7 @@ export function defineMenu(): void {
       }
     };
     private onOutsidePointerDown = (event: PointerEvent): void => {
-      if (!this.isOpen || event.composedPath().some(target => target === this || target instanceof Node && (this.contains(target) || this.shadowRoot?.contains(target)))) return;
+      if (!this.isOpen || event.composedPath().some(target => target === this || target === this.panel || target instanceof Node && (this.contains(target) || this.shadowRoot?.contains(target) || this.panel?.contains(target)))) return;
       this.setOpen(false, { event, type: "clickOutside" });
     };
     private hoverDelay(): number { const raw = this.getAttribute("hover-delay"); if (raw === null) return 300; const value = Number(raw); return Number.isFinite(value) ? Math.max(0, Math.min(2000, value)) : 300; }
@@ -514,7 +560,7 @@ export function defineMenu(): void {
     private onPointerOut = (event: PointerEvent): void => {
       if (!this.hasAttribute("open-on-hover") || !this.isOpen || !this.trigger || !event.composedPath().includes(this.trigger)) return;
       const target = event.relatedTarget;
-      if (target instanceof Node && (this.contains(target) || this.shadowRoot?.contains(target))) return;
+      if (target instanceof Node && (this.contains(target) || this.shadowRoot?.contains(target) || this.panel?.contains(target))) return;
       this.clearHoverTimer();
       this.hoverTimer = setTimeout(() => this.setOpen(false, { event, type: "menuTriggerMouseLeave" }), this.hoverDelay());
     };
@@ -524,14 +570,17 @@ export function defineMenu(): void {
     };
     private onMenuEnter = (event: Event): void => {
       const target = event.target;
-      if (!this.isOpen || target === this || target instanceof Node && (this.contains(target) || this.shadowRoot?.contains(target))) return;
-      if (target instanceof Element && target.closest("spui-menu")?.contains(this)) return;
+      const path = event.composedPath();
+      if (!this.isOpen || target === this || path.includes(this.panel!) || target instanceof Node && (this.contains(target) || this.shadowRoot?.contains(target) || this.panel?.contains(target))) return;
+      const targetMenu = path.find((node): node is SpuiMenu => node instanceof HTMLElement && node.localName === "spui-menu");
+      for (let ancestor = this.parentMenu(); ancestor; ancestor = ancestor.parentMenu()) if (ancestor === targetMenu) return;
+      if (targetMenu?.contains(this)) return;
       const nativeEvent = (event as CustomEvent<{ nativeEvent?: Event }>).detail?.nativeEvent;
       if (nativeEvent instanceof MouseEvent) this.setOpen(false, { event: nativeEvent, type: "menuMouseEnter" });
     };
     private onScrollOutside = (event: WheelEvent | TouchEvent): void => {
       if (!(this.hasAttribute("close-on-scroll") || this.contextEnabled()) || !this.isOpen) return;
-      if (!event.composedPath().some(target => target === this || target instanceof Node && (this.contains(target) || this.shadowRoot?.contains(target)))) {
+      if (!event.composedPath().some(target => target === this || target === this.panel || target instanceof Node && (this.contains(target) || this.shadowRoot?.contains(target) || this.panel?.contains(target)))) {
         this.setOpen(false, { event, type: "scrollOutside" });
       }
     };
@@ -577,12 +626,12 @@ export function defineMenu(): void {
       }
     };
     focusFirstItem(): void { this.focusItem(0); }
-    private parentMenu(): SpuiMenu | undefined { return this.parentElement?.closest("spui-menu") as SpuiMenu | undefined; }
+    private parentMenu(): SpuiMenu | undefined { return this.parentElementOverride ?? this.parentElement?.closest("spui-menu") as SpuiMenu | undefined; }
     private onItemSelect = (event: CustomEvent<{ kind?: string; name?: string; checked?: boolean; persistOnClick?: boolean; event?: MouseEvent }>): void => {
       const item = event.target as HTMLElement | null;
       if (item?.getAttribute("kind") === "radio") {
         const name = item.getAttribute("name");
-        if (name) for (const option of this.querySelectorAll<HTMLElement>(`spui-menu-item[kind=radio][name="${CSS.escape(name)}"]`)) option.toggleAttribute("checked", option === item);
+        if (name) for (const option of (this.externalPanel ?? this).querySelectorAll<HTMLElement>(`spui-menu-item[kind=radio][name="${CSS.escape(name)}"]`)) option.toggleAttribute("checked", option === item);
       }
       if (event.detail?.persistOnClick || item?.hasAttribute("persist-on-click") || this.hasAttribute("persist-on-item-click")) return;
       this.setOpen(false, { event: event.detail?.event ?? new MouseEvent("click"), type: "menuItemClick" }); this.focusTrigger();
@@ -597,7 +646,7 @@ export function defineMenu(): void {
       const next = Boolean(value);
       if (next === this.isOpen) return;
       this.isOpen = next;
-      if (!next) for (const child of this.querySelectorAll<SpuiMenu>("spui-menu")) if (child.isOpen) child.setOpen(false, source);
+      if (!next) for (const child of new Set([...this.querySelectorAll<SpuiMenu>("spui-menu"), ...(this.externalPanel?.querySelectorAll<SpuiMenu>("spui-menu") ?? [])])) if (child.isOpen) child.setOpen(false, source);
       if (this.hasAttribute("open") !== next) this.toggleAttribute("open", next);
       this.syncVisibility(); this.emitOpenChange(source);
     }

@@ -34,7 +34,7 @@ const content = `${JSON.stringify({ generatedFrom: "src/elements/*.ts, src/appea
 if (checkOnly) {
   const current = await readFile(outputPath, "utf8").catch(() => "");
   if (current !== content) {
-    console.error("Token index is stale. Run npm run tokens:generate --workspace @vilius/sharepoint-ui.");
+    console.error("Token index is stale. Run npm run tokens:generate --workspace @spfx-fast/sharepoint-ui.");
     process.exitCode = 1;
   } else console.log(`Token index is current (${tokens.length} tokens).`);
 } else {

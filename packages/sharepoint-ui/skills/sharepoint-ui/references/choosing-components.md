@@ -17,4 +17,4 @@
 - Brief feedback: mount one `Toaster` near the app root and call `dispatchToast` from `useToastController()`. Use persistent `Alert`/`MessageBar` content as well when the user must be able to return to the information later.
 - Confirmation: `Dialog`.
 
-Import React adapters from `@vilius/sharepoint-ui/react`. For non-React use, import the matching leaf module, call its `define*()` function once, and use the tag from `components.json`; `Label` is the exception because its factory returns a native `<label>`. Check the source catalog before substituting a native element for a missing library family.
+Import React adapters from `@spfx-fast/sharepoint-ui/react`. For non-React use, import the matching leaf module, call its `define*()` function once, and use the tag from `components.json`; `Label` is the exception because its factory returns a native `<label>`. Check the source catalog before substituting a native element for a missing library family.

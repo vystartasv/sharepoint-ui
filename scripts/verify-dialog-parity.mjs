@@ -6,7 +6,7 @@ import { build } from "esbuild";
 import ts from "typescript";
 
 const typeFixturePath = resolve("packages/sharepoint-ui/src/.dialog-open-change-type-contract.tsx");
-const typeFixture = `import * as React from "react"; import { Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, DialogTrigger, type DialogOpenChangeEvent, type DialogOnOpenChangeData } from "./react.js"; const surfaceRef = React.createRef<HTMLDivElement>(); const surface = <DialogSurface ref={surfaceRef} onClick={event => { const currentTarget: HTMLDivElement = event.currentTarget; void currentTarget; }} />; const titleRef = React.createRef<HTMLHeadingElement>(); const title = <DialogTitle ref={titleRef} onClick={event => { const currentTarget: HTMLHeadingElement = event.currentTarget; void currentTarget; }} />; const contentRef = React.createRef<HTMLElement>(); const content = <DialogContent as="section" ref={contentRef} onClick={event => { const target: HTMLDivElement = event.currentTarget; void target; }} />; const body = <DialogBody as="article" />; const actionsRef = React.createRef<HTMLDivElement>(); const actions = <DialogActions ref={actionsRef} position="start" fluid onClick={event => { const target: HTMLDivElement = event.currentTarget; void target; }} />; const triggerRef = React.createRef<HTMLElement>(); const trigger = <DialogTrigger ref={triggerRef}>{props => <button {...props}>Open</button>}</DialogTrigger>; const example = <Dialog onOpenChange={(event, data) => { const typedEvent: DialogOpenChangeEvent = event; const target: HTMLElement = event.currentTarget; const open: boolean = data.open; const eventType: DialogOnOpenChangeData["type"] = data.type; void [typedEvent, target, open, eventType, surface, title, content, body, actions, trigger]; }} />;`;
+const typeFixture = `import * as React from "react"; import { Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, DialogTrigger, type DialogOpenChangeEvent, type DialogOnOpenChangeData } from "./react.js"; const mountNode = document.createElement("div"); const surfaceRef = React.createRef<HTMLDivElement>(); const surface = <DialogSurface ref={surfaceRef} mountNode={mountNode} onClick={event => { const currentTarget: HTMLDivElement = event.currentTarget; void currentTarget; }} />; const objectMountSurface = <DialogSurface mountNode={{ element: mountNode, className: "ignored-with-element" }} />; const titleRef = React.createRef<HTMLHeadingElement>(); const title = <DialogTitle ref={titleRef} onClick={event => { const currentTarget: HTMLHeadingElement = event.currentTarget; void currentTarget; }} />; const contentRef = React.createRef<HTMLElement>(); const content = <DialogContent as="section" ref={contentRef} onClick={event => { const target: HTMLDivElement = event.currentTarget; void target; }} />; const body = <DialogBody as="article" />; const actionsRef = React.createRef<HTMLDivElement>(); const actions = <DialogActions ref={actionsRef} position="start" fluid onClick={event => { const target: HTMLDivElement = event.currentTarget; void target; }} />; const triggerRef = React.createRef<HTMLElement>(); const trigger = <DialogTrigger ref={triggerRef}>{props => <button {...props}>Open</button>}</DialogTrigger>; const example = <Dialog onOpenChange={(event, data) => { const typedEvent: DialogOpenChangeEvent = event; const target: HTMLElement = event.currentTarget; const open: boolean = data.open; const eventType: DialogOnOpenChangeData["type"] = data.type; void [typedEvent, target, open, eventType, surface, objectMountSurface, title, content, body, actions, trigger]; }} />;`;
 const originalFileExists = ts.sys.fileExists;
 const originalReadFile = ts.sys.readFile;
 const originalGetSourceFile = ts.createCompilerHost({}).getSourceFile;
@@ -22,7 +22,7 @@ const bundle = await build({
   stdin: {
     contents: `import * as React from "react";
       import { createRoot } from "react-dom/client";
-      import { Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, DialogTrigger, Input } from "${resolve("packages/sharepoint-ui/src/react.tsx")}";
+      import { Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, DialogTrigger, Input, SharePointUIProvider } from "${resolve("packages/sharepoint-ui/src/react.tsx")}";
       import { defineDialog } from "${resolve("packages/sharepoint-ui/src/elements/dialog.ts")}";
       defineDialog();
       function Motion({ visible, slot, unmountOnExit, children }) { return !visible && unmountOnExit ? null : <div slot={slot} data-motion={slot} data-visible={String(visible)}>{children}</div>; }
@@ -32,6 +32,7 @@ const bundle = await build({
         const [fallbackOpen, setFallbackOpen] = React.useState(false);
         const [enhancedOpen, setEnhancedOpen] = React.useState(false);
         const [changes, setChanges] = React.useState([]);
+        const mountedDialogRef = React.useRef(null);
         const surfaceRef = React.useRef(null);
         const titleRef = React.useRef(null);
         const contentRef = React.useRef(null);
@@ -44,8 +45,13 @@ const bundle = await build({
         window.bodyRef = bodyRef;
         window.actionsRef = actionsRef;
         window.keyboardTriggerRef = keyboardTriggerRef;
+        window.mountedDialogRef = mountedDialogRef;
         return <>
           <button data-testid="outside">Outside control</button>
+          <SharePointUIProvider fluentTokens={{ "--portal-theme-check": "#4f46e5" }}><Dialog ref={mountedDialogRef} data-testid="mounted-dialog" onOpenChange={(event, data) => window.mountOpenChanges.push({ open: data.open, type: data.type })}><DialogTrigger><button data-testid="mounted-trigger">Open mounted dialog</button></DialogTrigger><DialogSurface mountNode={document.getElementById("mount-target")}><DialogTitle>Mounted target</DialogTitle><DialogBody>Custom target content</DialogBody></DialogSurface></Dialog></SharePointUIProvider>
+          <Dialog data-testid="object-mounted-dialog"><DialogTrigger><button data-testid="object-mounted-trigger">Open object mounted dialog</button></DialogTrigger><DialogSurface mountNode={{ element: document.getElementById("object-mount-target") }}><DialogTitle>Object mounted target</DialogTitle></DialogSurface></Dialog>
+          <Dialog data-testid="class-mounted-dialog"><DialogTrigger><button data-testid="class-mounted-trigger">Open class mounted dialog</button></DialogTrigger><DialogSurface mountNode={{ className: "dialog-portal-class" }}><DialogTitle>Class mounted target</DialogTitle></DialogSurface></Dialog>
+          <Dialog data-testid="null-mounted-dialog"><DialogTrigger><button data-testid="null-mounted-trigger">Open null mounted dialog</button></DialogTrigger><DialogSurface mountNode={null}><DialogTitle>Null mounted target</DialogTitle></DialogSurface></Dialog>
           <Dialog data-testid="alert" defaultOpen modalType="alert" onOpenChange={(event,data) => window.alertOpenChanges.push({open:data.open,type:data.type,currentTarget:event.currentTarget.tagName})}><DialogTrigger><button data-testid="alert-reopen">Reopen alert</button></DialogTrigger><DialogSurface><DialogTitle>Important update</DialogTitle><DialogActions data-testid="alert-actions" position="start" fluid><DialogTrigger action="close"><button data-testid="alert-action">Acknowledge</button></DialogTrigger></DialogActions></DialogSurface></Dialog>
           <Dialog data-testid="non-modal" modalType="non-modal" onOpenChange={(event,data) => window.nonModalOpenChanges.push({open:data.open,type:data.type})}><DialogTrigger><button data-testid="non-modal-trigger">Open non-modal</button></DialogTrigger><DialogSurface backdrop={{ appearance: "dimmed" }}><DialogTitle>Non-modal dialog</DialogTitle><DialogBody>Non-modal content</DialogBody></DialogSurface></Dialog>
           <Dialog data-testid="composed" open={open} closeLabel="Dismiss composed dialog" surfaceMotion={Motion} onOpenChange={(event,data) => { window.dialogOpenChanges.push({open:data.open,type:data.type,eventType:event.type,sameEvent:event===data.event,currentTarget:event.currentTarget.tagName,nativeEventType:event.nativeEvent.type}); setOpen(data.open); setChanges(current => [...current, data.open]); }}><DialogTrigger><button data-testid="trigger">Open composed dialog</button></DialogTrigger><DialogTrigger disableButtonEnhancement><button data-testid="plain-trigger">Open without enhancement</button></DialogTrigger><DialogSurface id="composed-surface" className="surface-root" ref={surfaceRef} onClick={event => window.surfaceClicks.push([event.currentTarget.tagName,event.target.tagName])} onKeyDown={event => { if (event.key === "Escape") { if (window.preventDialogEscape) event.preventDefault(); window.surfaceEscapeEvents.push({ target: event.target.tagName, currentTarget: event.currentTarget.tagName, prevented: event.defaultPrevented, nativePrevented: event.nativeEvent.defaultPrevented }); } }} backdrop={{ appearance: "dimmed" }} backdropMotion={Motion}><DialogContent id="content-root" ref={contentRef} onClick={event => window.contentClicks.push([event.currentTarget.tagName,event.target.tagName])}><DialogTitle id="composed-title" ref={titleRef} onClick={event => window.titleClicks.push([event.currentTarget.tagName,event.target.tagName])} action={<button data-testid="dialog-title-action">Help</button>}>Composed dialog title</DialogTitle><DialogBody id="body-root" ref={bodyRef} onClick={event => window.bodyClicks.push([event.currentTarget.tagName,event.target.tagName])}><p data-testid="body-copy">Composed dialog body</p></DialogBody><DialogActions id="actions-root" ref={actionsRef} onClick={event => window.actionsClicks.push([event.currentTarget.tagName,event.target.tagName])}><button data-testid="action">Save</button></DialogActions></DialogContent></DialogSurface></Dialog>
@@ -57,7 +63,7 @@ const bundle = await build({
           <div hidden><DialogContent as="section" data-testid="polymorphic-content">Content root</DialogContent><DialogBody as="article" data-testid="polymorphic-body">Body root</DialogBody></div>
         </>;
       }
-      createRoot(document.querySelector("#root")).render(<App/>);window.dialogOpenChanges=[];window.alertOpenChanges=[];window.nonModalOpenChanges=[];window.fallbackOpenChanges=[];window.enhancedTriggerChanges=[];window.cancelTriggerClicks=0;window.disabledTriggerClicks=0;window.unenhancedDisabledClicks=0;window.preventDialogEscape=false;window.surfaceClicks=[];window.surfaceEscapeEvents=[];window.titleClicks=[];window.contentClicks=[];window.bodyClicks=[];window.actionsClicks=[];`,
+      createRoot(document.querySelector("#root")).render(<App/>);window.dialogOpenChanges=[];window.alertOpenChanges=[];window.nonModalOpenChanges=[];window.fallbackOpenChanges=[];window.enhancedTriggerChanges=[];window.mountOpenChanges=[];window.cancelTriggerClicks=0;window.disabledTriggerClicks=0;window.unenhancedDisabledClicks=0;window.preventDialogEscape=false;window.surfaceClicks=[];window.surfaceEscapeEvents=[];window.titleClicks=[];window.contentClicks=[];window.bodyClicks=[];window.actionsClicks=[];`,
     resolveDir: process.cwd(), sourcefile: "dialog-parity.tsx", loader: "tsx",
   },
   bundle: true, format: "iife", platform: "browser", target: ["es2020"], write: false,
@@ -66,7 +72,7 @@ const bundle = await build({
 });
 const server = createServer((request, response) => request.url === "/bundle.js"
   ? response.writeHead(200, { "content-type": "text/javascript" }).end(bundle.outputFiles[0].contents)
-  : response.writeHead(200, { "content-type": "text/html" }).end("<!doctype html><html><head><style>html,body{min-height:200vh}</style></head><body><div id='root'></div><script src='/bundle.js'></script></body></html>"));
+  : response.writeHead(200, { "content-type": "text/html" }).end("<!doctype html><html><head><style>html,body{min-height:200vh}</style></head><body><div id='mount-target'></div><div id='object-mount-target'></div><div id='root'></div><script src='/bundle.js'></script></body></html>"));
 await new Promise(done => server.listen(0, "127.0.0.1", done));
 const require = createRequire(import.meta.url);
 const { chromium } = require("/Users/vilius/.t3/projects/spfx-research/node_modules/playwright");
@@ -79,6 +85,14 @@ try {
   page.on("pageerror", error => (error.message === "A DialogTrigger child must be a single element; React Fragments are not supported." ? expectedTriggerErrors : errors).push(error.message));
   await page.goto(`http://127.0.0.1:${server.address().port}`);
   await page.addScriptTag({ path: require.resolve("axe-core") });
+  await page.waitForFunction(() => document.querySelector("[data-testid=mounted-dialog]")?.parentElement?.id === "mount-target");
+  assert.equal(await page.getByTestId("mounted-trigger").evaluate(trigger => trigger.closest("#root") !== null), true, "DialogTrigger stays at its React location when the DialogSurface is portaled");
+  assert.equal(await page.evaluate(() => window.mountedDialogRef.current?.getAttribute("data-testid")), "mounted-dialog", "Dialog ref resolves after the portal host mounts");
+  assert.equal(await page.getByTestId("mounted-dialog").evaluate(host => host.style.getPropertyValue("--portal-theme-check")), "#4f46e5", "provider Fluent theme tokens are copied to the portal host");
+  assert.equal(await page.getByTestId("object-mounted-dialog").evaluate(host => host.parentElement?.id), "object-mount-target", "mountNode accepts the Fluent object form with an element");
+  assert.equal(await page.getByTestId("class-mounted-dialog").evaluate(host => host.parentElement?.className), "dialog-portal-class", "mountNode className styles the generated body portal container");
+  assert.equal(await page.getByTestId("null-mounted-dialog").evaluate(host => host.parentElement?.getAttribute("data-portal-node")), "true", "a null mountNode uses the default body portal container");
+  assert.equal(await page.getByTestId("composed").evaluate(host => host.parentElement?.getAttribute("data-portal-node")), "true", "DialogSurface portals to a generated body container by default");
   assert.deepEqual(await page.evaluate(() => [getComputedStyle(document.documentElement).overflowY, getComputedStyle(document.documentElement).scrollbarGutter, getComputedStyle(document.body).overflowY]), ["clip", "stable", "hidden"], "open modal and alert dialogs lock document scrolling with stable scrollbar geometry");
   assert.deepEqual(await page.evaluate(() => [document.querySelector('[data-testid="polymorphic-content"]')?.localName, document.querySelector('[data-testid="polymorphic-body"]')?.localName]), ["section", "article"], "DialogContent and DialogBody honor the Fluent polymorphic as prop");
 
@@ -92,6 +106,12 @@ try {
   await page.waitForFunction(() => !document.querySelector("[data-testid=alert]")?.shadowRoot?.querySelector("dialog")?.open);
   assert.deepEqual(await page.evaluate(() => window.alertOpenChanges), [{ open: false, type: "escapeKeyDown", currentTarget: "DIALOG" }], "Fluent alert dialogs close on Escape and report the Escape reason");
   assert.deepEqual(await page.evaluate(() => [getComputedStyle(document.documentElement).overflowY, getComputedStyle(document.documentElement).scrollbarGutter, getComputedStyle(document.body).overflowY]), ["visible", "auto", "visible"], "closing the last modal restores the prior document scroll styles");
+  await page.getByTestId("mounted-trigger").click();
+  await page.waitForFunction(() => document.querySelector("[data-testid=mounted-dialog]")?.shadowRoot?.querySelector("dialog")?.open);
+  assert.deepEqual(await page.evaluate(() => window.mountOpenChanges), [{ open: true, type: "triggerClick" }], "a trigger at the original location controls the portaled dialog host");
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(() => !document.querySelector("[data-testid=mounted-dialog]")?.shadowRoot?.querySelector("dialog")?.open);
+  assert.deepEqual(await page.evaluate(() => window.mountOpenChanges), [{ open: true, type: "triggerClick" }, { open: false, type: "escapeKeyDown" }], "portaled dialog dismissals preserve the source and reason contract");
   const scrollLockStates = await page.evaluate(() => {
     document.documentElement.style.overflowY = "scroll";
     document.documentElement.style.scrollbarGutter = "auto";

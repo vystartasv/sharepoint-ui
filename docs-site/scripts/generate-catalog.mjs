@@ -8,10 +8,10 @@ const siteCatalog = resolve(siteRoot, "catalog/components.json");
 await mkdir(dirname(siteCatalog), { recursive: true });
 const catalogSources = [
   resolve(projectRoot, "packages/sharepoint-ui/components.json"),
-  resolve(siteRoot, "node_modules/@vilius/sharepoint-ui/components.json"),
+  resolve(siteRoot, "node_modules/@spfx-fast/sharepoint-ui/components.json"),
 ];
 const catalogSource = catalogSources.find(existsSync);
-if (!catalogSource) throw new Error("Cannot find components.json in the workspace or installed @vilius/sharepoint-ui package.");
+if (!catalogSource) throw new Error("Cannot find components.json in the workspace or installed @spfx-fast/sharepoint-ui package.");
 await copyFile(catalogSource, siteCatalog);
 const catalog = JSON.parse(await (await import("node:fs/promises")).readFile(siteCatalog, "utf8"));
 const components = catalog.components;

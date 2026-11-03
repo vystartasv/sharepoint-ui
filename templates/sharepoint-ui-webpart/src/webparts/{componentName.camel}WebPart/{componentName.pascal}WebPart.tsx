@@ -3,7 +3,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { Version } from "@microsoft/sp-core-library";
 import { ThemeProvider } from "@microsoft/sp-component-base";
 import { BaseClientSideWebPart } from "@microsoft/sp-webpart-base";
-import { applySharePointTheme, type SharePointTheme, type FluentThemeTokens } from "@vilius/sharepoint-ui";
+import { applySharePointTheme, type SharePointTheme, type FluentThemeTokens } from "@spfx-fast/sharepoint-ui";
 import * as strings from "<%= componentName.pascal %>WebPartStrings";
 import <%= componentName.pascal %> from "./components/<%= componentName.pascal %>";
 

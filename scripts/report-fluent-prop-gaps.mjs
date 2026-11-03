@@ -276,7 +276,7 @@ function getFluentOwnProps(source, componentName, fluentFiles) {
 }
 
 const fluentPackageOverridesByComponent = new Map(Object.entries(fluentPackageOverrides));
-const fluentPackageNames = [...new Set([...baseline.families.map(family => family.package), ...Object.values(fluentPackageOverrides)])];
+const fluentPackageNames = [...new Set([...baseline.families.map(family => family.package), ...Object.values(fluentPackageOverrides), "@fluentui/react-portal"])];
 
 const [localPaths, fluentFiles] = await Promise.all([
   sourceFiles(resolve(root, "packages/sharepoint-ui/src")),

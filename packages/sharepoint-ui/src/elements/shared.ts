@@ -25,25 +25,30 @@ type AccessibleNameSyncState = {
   observer?: Pick<MutationObserver, "disconnect">;
   descriptionObserver?: Pick<MutationObserver, "disconnect">;
 };
-const accessibleNameSyncStates = new WeakMap<HTMLElement, AccessibleNameSyncState>();
+const accessibleNameSyncStates = new WeakMap<HTMLElement, Map<HTMLElement, AccessibleNameSyncState>>();
 
-function stopHostAccessibleNameObserver(host: HTMLElement): void {
-  const state = accessibleNameSyncStates.get(host);
-  state?.observer?.disconnect();
-  if (state) state.observer = undefined;
+function stopHostAccessibleNameObserver(host: HTMLElement, control?: HTMLElement): void {
+  const hostStates = accessibleNameSyncStates.get(host);
+  const states = control ? [hostStates?.get(control)].filter((state): state is AccessibleNameSyncState => Boolean(state)) : [...(hostStates?.values() ?? [])];
+  for (const state of states) {
+    state.observer?.disconnect();
+    state.observer = undefined;
+  }
 }
 
-function stopHostAccessibleDescriptionObserver(host: HTMLElement): void {
-  const state = accessibleNameSyncStates.get(host);
-  state?.descriptionObserver?.disconnect();
-  if (state) state.descriptionObserver = undefined;
+function stopHostAccessibleDescriptionObserver(host: HTMLElement, control?: HTMLElement): void {
+  const hostStates = accessibleNameSyncStates.get(host);
+  const states = control ? [hostStates?.get(control)].filter((state): state is AccessibleNameSyncState => Boolean(state)) : [...(hostStates?.values() ?? [])];
+  for (const state of states) {
+    state.descriptionObserver?.disconnect();
+    state.descriptionObserver = undefined;
+  }
 }
 
 export function stopHostAccessibleNameSync(host: HTMLElement): void {
-  const state = accessibleNameSyncStates.get(host);
   stopHostAccessibleNameObserver(host);
   stopHostAccessibleDescriptionObserver(host);
-  if (state) {
+  for (const state of accessibleNameSyncStates.get(host)?.values() ?? []) {
     state.labelledBy = undefined;
     state.describedBy = undefined;
   }
@@ -229,7 +234,7 @@ function syncHostAccessibleDescription(host: HTMLElement, control: HTMLElement, 
     const ids = describedBy.trim().split(/\s+/).filter(Boolean);
     const localRoot = control.getRootNode() as ShadowRoot;
     if (ids.length && ids.every(id => localRoot.getElementById(id))) {
-      stopHostAccessibleDescriptionObserver(host);
+      stopHostAccessibleDescriptionObserver(host, control);
       state.describedBy = describedBy;
       state.resolvedDescription = undefined;
       if (control.getAttribute("aria-describedby") !== describedBy) control.setAttribute("aria-describedby", describedBy);
@@ -239,7 +244,7 @@ function syncHostAccessibleDescription(host: HTMLElement, control: HTMLElement, 
     }
     if (control.hasAttribute("aria-describedby")) control.removeAttribute("aria-describedby");
     if (state.describedBy !== describedBy || !state.descriptionObserver) {
-      stopHostAccessibleDescriptionObserver(host);
+      stopHostAccessibleDescriptionObserver(host, control);
       state.describedBy = describedBy;
       state.descriptionObserver = observeAccessibleTextFromIdRefs(host, describedBy, text => {
         state.resolvedDescription = text;
@@ -250,7 +255,7 @@ function syncHostAccessibleDescription(host: HTMLElement, control: HTMLElement, 
     }
     return;
   }
-  stopHostAccessibleDescriptionObserver(host);
+  stopHostAccessibleDescriptionObserver(host, control);
   state.describedBy = null;
   state.resolvedDescription = undefined;
   if (state.originalDescribedBy === null) control.removeAttribute("aria-describedby");
@@ -268,11 +273,18 @@ export function syncHostAccessibleName(host: HTMLElement, control: HTMLElement):
   const describedBy = host.getAttribute("aria-describedby");
   const root = control.getRootNode();
   const inShadowRoot = host.shadowRoot?.contains(control) ?? false;
-  if (!inShadowRoot) return;
-  let state = accessibleNameSyncStates.get(host);
-  if (state?.control !== control) {
-    state?.observer?.disconnect();
-    state?.descriptionObserver?.disconnect();
+  // Most controls live inside the host's shadow root, but compound React adapters
+  // can provide the active control as a slotted light-DOM child. In that case the
+  // host and control share the same tree, so native ID references can be forwarded
+  // directly instead of being ignored.
+  if (!inShadowRoot && host.getRootNode() !== root) return;
+  let hostStates = accessibleNameSyncStates.get(host);
+  if (!hostStates) {
+    hostStates = new Map();
+    accessibleNameSyncStates.set(host, hostStates);
+  }
+  let state = hostStates.get(control);
+  if (!state) {
     state = {
       control,
       originalLabel: control.getAttribute("aria-label") === label ? null : control.getAttribute("aria-label"),
@@ -280,21 +292,24 @@ export function syncHostAccessibleName(host: HTMLElement, control: HTMLElement):
       originalDescription: control.getAttribute("aria-description") === description ? null : control.getAttribute("aria-description"),
       originalDescribedBy: control.getAttribute("aria-describedby") === describedBy ? null : control.getAttribute("aria-describedby"),
     };
-    accessibleNameSyncStates.set(host, state);
+    hostStates.set(control, state);
   }
   if (label === null && labelledBy === null) {
-    stopHostAccessibleNameObserver(host);
+    stopHostAccessibleNameObserver(host, control);
     if (state.originalLabel === null) control.removeAttribute("aria-label"); else control.setAttribute("aria-label", state.originalLabel);
     if (state.originalLabelledBy === null) control.removeAttribute("aria-labelledby"); else control.setAttribute("aria-labelledby", state.originalLabelledBy);
     syncHostAccessibleDescription(host, control, state);
-    if (description === null && describedBy === null) accessibleNameSyncStates.delete(host);
+    if (description === null && describedBy === null) {
+      hostStates.delete(control);
+      if (hostStates.size === 0) accessibleNameSyncStates.delete(host);
+    }
     return;
   }
   if (labelledBy !== null && inShadowRoot) {
     const ids = labelledBy.trim().split(/\s+/).filter(Boolean);
     const localRoot = root as ShadowRoot;
     if (ids.length && ids.every(id => localRoot.getElementById(id))) {
-      stopHostAccessibleNameObserver(host);
+      stopHostAccessibleNameObserver(host, control);
       state.labelledBy = labelledBy;
       control.removeAttribute("aria-label");
       control.setAttribute("aria-labelledby", labelledBy);
@@ -303,7 +318,7 @@ export function syncHostAccessibleName(host: HTMLElement, control: HTMLElement):
     }
     control.removeAttribute("aria-labelledby");
     if (state.labelledBy !== labelledBy || !state.observer) {
-      stopHostAccessibleNameObserver(host);
+      stopHostAccessibleNameObserver(host, control);
       state.labelledBy = labelledBy;
       state.observer = observeAccessibleTextFromIdRefs(host, labelledBy, resolved => {
         if (resolved) {
@@ -314,7 +329,7 @@ export function syncHostAccessibleName(host: HTMLElement, control: HTMLElement):
     syncHostAccessibleDescription(host, control, state);
     return;
   }
-  stopHostAccessibleNameObserver(host);
+  stopHostAccessibleNameObserver(host, control);
   state.labelledBy = labelledBy;
   if (labelledBy !== null) control.setAttribute("aria-labelledby", labelledBy); else control.removeAttribute("aria-labelledby");
   if (labelledBy === null && label !== null) control.setAttribute("aria-label", label); else control.removeAttribute("aria-label");

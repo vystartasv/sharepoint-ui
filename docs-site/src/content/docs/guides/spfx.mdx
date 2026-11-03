@@ -6,13 +6,13 @@ description: Add the library to an SPFx 1.24 web part and pass the current Share
 ## Install
 
 ```sh
-npm install @vilius/sharepoint-ui
+npm install @spfx-fast/sharepoint-ui
 ```
 
 The React adapter is optional at package level. In an SPFx React web part, import the provider and only the components that view needs:
 
 ```tsx
-import { SharePointUIProvider, Button, TextField } from "@vilius/sharepoint-ui/react";
+import { SharePointUIProvider, Button, TextField } from "@spfx-fast/sharepoint-ui/react";
 
 export function RequestForm({ locale }: { locale: string }) {
   return (
@@ -40,4 +40,4 @@ Render the web part normally inside its section. Components inherit CSS custom p
 
 ## Choose imports deliberately
 
-Import components from `@vilius/sharepoint-ui/react` for React composition. Import a leaf definition such as `@vilius/sharepoint-ui/elements/button` for framework-neutral use. The [component catalog](/sharepoint-ui-docs/catalog/) shows the matching tag, slots, callbacks, and styling hooks.
+Import components from `@spfx-fast/sharepoint-ui/react` for React composition. Import a leaf definition such as `@spfx-fast/sharepoint-ui/elements/button` for framework-neutral use. The [component catalog](/sharepoint-ui-docs/catalog/) shows the matching tag, slots, callbacks, and styling hooks.

@@ -22,7 +22,7 @@ import PreviewBench from "../../components/PreviewBench.astro";
 SharePoint UI gives SPFx developers and coding agents a searchable set of controls, compound components, and reusable SharePoint views. Components inherit SharePoint and Fluent theme values. Use the React adapter in SPFx, or register custom elements directly from plain JavaScript and other frameworks.
 
 ```sh
-npm install @vilius/sharepoint-ui
+npm install @spfx-fast/sharepoint-ui
 ```
 
 The package targets SPFx 1.24 and React 18. React is an optional peer dependency; custom-element consumers can import only the definitions they need.
@@ -57,7 +57,7 @@ The React adapter is convenient for SPFx projects. For other frameworks, import 
 ## Compose an SPFx view
 
 ```tsx
-import { Button, SharePointUIProvider, ViewCard } from "@vilius/sharepoint-ui/react";
+import { Button, SharePointUIProvider, ViewCard } from "@spfx-fast/sharepoint-ui/react";
 
 <SharePointUIProvider lang={pageContext.cultureInfo.currentUICultureName}>
   <ViewCard kind="list-item" title={item.Title} subtitle={item.Modified} description={item.Status}>

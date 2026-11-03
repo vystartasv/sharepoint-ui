@@ -32,19 +32,23 @@ try {
   await native.evaluate(element => element.setAttribute("selected-label", "Updated native selected options"));
   assert.equal(await native.locator(".selected").getAttribute("aria-label"), "Updated native selected options", "selected-label updates after connection");
   for (const combo of [native, react]) {
-    assert.equal(await combo.locator('[role="listbox"]').getAttribute("aria-multiselectable"), "true");
-    assert.equal(await combo.locator('[role="option"][aria-selected="true"]').count(), 1);
+    const listboxId = await combo.evaluate(element => (element.listboxElement ?? element.shadowRoot.querySelector('[role="listbox"]'))?.id);
+    const listbox = await combo.getAttribute("data-testid") === "react"
+      ? page.locator(`body > [data-portal-node] > [id="${listboxId}"]`)
+      : combo.locator(`[id="${listboxId}"]`);
+    assert.equal(await listbox.getAttribute("aria-multiselectable"), "true");
+    assert.equal(await listbox.locator('[role="option"][aria-selected="true"]').count(), 1);
     assert.equal((await combo.locator(".tag").innerText()).replace(/\s+/g, ""), "Alpha×");
     await combo.locator("input").click();
-    assert.equal(await combo.locator('[role="listbox"]').isVisible(), true);
-    await combo.locator('[role="option"]', { hasText: "Beta" }).evaluate(option => option.click());
+    assert.equal(await listbox.isVisible(), true);
+    await listbox.locator('[role="option"]', { hasText: "Beta" }).evaluate(option => option.click());
     if (await combo.getAttribute("data-testid") === "react") await page.waitForFunction(() => document.querySelector('[data-testid="react"]').selectedOptions.length === 2);
-    assert.equal(await combo.locator('[role="listbox"]').isVisible(), true, "multi-select stays open after a selection");
-    assert.equal(await combo.locator('[role="option"][aria-selected="true"]').count(), 2);
+    assert.equal(await listbox.isVisible(), true, "multi-select stays open after a selection");
+    assert.equal(await listbox.locator('[role="option"][aria-selected="true"]').count(), 2);
     assert.equal(await combo.locator(".tag").count(), 2);
     assert.equal(await combo.locator("input").inputValue(), "", "selected option labels do not replace the input value");
-    assert.equal(await combo.locator('[role="option"][aria-disabled="true"]').count(), 1);
-    await combo.locator('[role="option"][aria-disabled="true"]').evaluate(option => option.click());
+    assert.equal(await listbox.locator('[role="option"][aria-disabled="true"]').count(), 1);
+    await listbox.locator('[role="option"][aria-disabled="true"]').evaluate(option => option.click());
     assert.equal(await combo.locator(".tag").count(), 2, "disabled options cannot enter the selection");
   }
   await native.locator("input").press("Escape");

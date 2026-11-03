@@ -118,6 +118,7 @@ export function defineTooltip(): void {
     private inTopLayer = false;
     private positioningValue?: TooltipPositioning;
     private positioningRef?: TooltipPositioningRef;
+    private tooltipElementValue?: HTMLElement;
     private readonly positioningHandle: TooltipPositioningImperativeRef = { updatePosition: () => this.position(), setTarget: target => this.setPositioningTarget(target) };
 
     connectedCallback(): void {
@@ -162,6 +163,14 @@ export function defineTooltip(): void {
       this.position();
     }
 
+    get tooltipElement(): HTMLElement | undefined { return this.tooltipElementValue; }
+    set tooltipElement(value: HTMLElement | null | undefined) {
+      const next = value ?? undefined;
+      if (this.tooltipElementValue === next) return;
+      this.tooltipElementValue = next;
+      if (this.isConnected) this.sync();
+    }
+
     private setPositioningRef(ref?: TooltipPositioningRef): void {
       if (this.positioningRef === ref) return;
       if (typeof this.positioningRef === "function") this.positioningRef(null);
@@ -196,7 +205,7 @@ export function defineTooltip(): void {
     set open(value: boolean) { this.setOpen(Boolean(value)); }
 
     private sync(): void {
-      const content = [...this.querySelectorAll<HTMLElement>("[slot=tooltip]")].find(element => element.dataset.spuiTooltipGenerated === undefined);
+      const content = this.tooltipElementValue ?? [...this.querySelectorAll<HTMLElement>("[slot=tooltip]")].find(element => element.dataset.spuiTooltipGenerated === undefined);
       const generated = this.querySelector<HTMLElement>("[data-spui-tooltip-generated]");
       if (content) { generated?.remove(); this.tooltip = content; }
       else if (this.hasAttribute("content")) {

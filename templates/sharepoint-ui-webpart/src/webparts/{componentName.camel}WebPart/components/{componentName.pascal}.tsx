@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Badge, Button, SharePointUIProvider, ViewCard } from "@vilius/sharepoint-ui/react";
+import { Badge, Button, SharePointUIProvider, ViewCard } from "@spfx-fast/sharepoint-ui/react";
 import type { I<%= componentName.pascal %>Props } from "./I<%= componentName.pascal %>Props";
 import styles from "./<%= componentName.pascal %>.module.scss";
 export default function <%= componentName.pascal %>({ locale, rtl, strings }: I<%= componentName.pascal %>Props): React.ReactElement {

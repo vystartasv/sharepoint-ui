@@ -1,14 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "schemaVersion": 2,
-  "package": "@vilius/sharepoint-ui",
+  "package": "@spfx-fast/sharepoint-ui",
   "frameworkCompatibility": {
     "spfx": "1.24.x",
     "react": ">=18.3.1",
     "reactRequired": false
   },
-  "reactEntryPoint": "@vilius/sharepoint-ui/react",
-  "customElementEntryPattern": "@vilius/sharepoint-ui/elements/{module}",
+  "reactEntryPoint": "@spfx-fast/sharepoint-ui/react",
+  "customElementEntryPattern": "@spfx-fast/sharepoint-ui/elements/{module}",
   "coverageWarning": "This catalog is growing and does not claim complete Fluent UI React v9 parity. Check investigation/FLUENT-V9-PARITY-PLAN.md in the source repository.",
   "components": [
     {
@@ -21,6 +21,12 @@
       "summary": "Guide users through a keyboard-contained help surface anchored to a trigger.",
       "api": {
         "reactSignature": "{ children, trigger, trapFocus = true, withArrow = true, ...props }: TeachingPopoverProps",
+        "relatedReactApis": [
+          {
+            "name": "TeachingPopoverProps.mountNode",
+            "description": "Inherits Popover mountNode support for mounting the teaching surface in an HTMLElement or generated body container while its trigger stays in place."
+          }
+        ],
         "callbackProps": [
           "onOpenChange"
         ],
@@ -786,7 +792,7 @@
       "category": "content",
       "registered": false,
       "api": {
-        "reactSignature": "{ alt, fit = \"none\", shape = \"square\", block, bordered, shadow, loading = \"lazy\", decoding = \"async\", style, ...props }: ImageProps",
+        "reactSignature": "{ alt, fit = \"default\", shape = \"square\", block, bordered, shadow, loading, decoding, style, ...props }: ImageProps",
         "callbackProps": [
           "onLoad",
           "onError"
@@ -796,9 +802,10 @@
           "SharePointUIProvider tokens",
           "CSS custom properties",
           "host className/style"
-        ]
+        ],
+        "reactRefType": "HTMLImageElement"
       },
-      "summary": "Render an accessible native image with responsive loading, fit, shape, border, and shadow options."
+      "summary": "Render a native image with HTMLImageElement ref forwarding, responsive loading, Fluent fit defaults, shape, border, and shadow options."
     },
     {
       "react": "Card",
@@ -1209,6 +1216,12 @@
         "reactSignature": "{ children, count, indicator, label, triggerLabel, open, placement = \"bottom\", onOpenChange, content, popoverSurface, tooltip, triggerButton, ...props }: AvatarGroupPopoverProps",
         "callbackProps": [
           "onOpenChange"
+        ],
+        "relatedReactApis": [
+          {
+            "name": "PopoverProps.mountNode",
+            "description": "Portal the popup surface to an HTMLElement or generated body container; className names generated containers and null selects the body fallback. The trigger stays in place."
+          }
         ],
         "slots": [
           "content",
@@ -1964,6 +1977,10 @@
           {
             "name": "ComboBoxProps.selectedLabel",
             "description": "In multiselect mode, names the selected-options group; defaults to SharePointUIProvider.strings.selectedOptionsLabel."
+          },
+          {
+            "name": "ComboBoxProps.mountNode",
+            "description": "Mount the listbox popup in an HTMLElement, a generated body container with a className, or the default body portal; the input stays in place."
           }
         ],
         "callbackProps": [
@@ -1988,7 +2005,7 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Filter and select one or multiple options with accessible checks, visible removable tags, and form-associated values."
+      "summary": "Filter and select one or multiple options with accessible checks, visible removable tags, and form-associated values; mount the listbox popup elsewhere without moving the input."
     },
     {
       "react": "ComboOption",
@@ -2039,7 +2056,13 @@
       "category": "forms",
       "reactOnly": true,
       "api": {
-        "reactSignature": "{ label, button, listbox, value, defaultValue, selectedOptions, defaultSelectedOptions, multiselect = false, disabled, placeholder, onOptionSelect, onOpenChange, onActiveOptionChange, defaultOpen, open, clearable, clearButton, expandIcon, disableAutoFocus, appearance, size, positioning, inlinePopup, children, ...props }: DropdownProps",
+        "reactSignature": "{ label, button, listbox, mountNode, value, defaultValue, selectedOptions, defaultSelectedOptions, multiselect = false, disabled, placeholder, onOptionSelect, onOpenChange, onActiveOptionChange, defaultOpen, open, clearable, clearButton, expandIcon, disableAutoFocus, appearance, size, positioning, inlinePopup, children, ...props }: DropdownProps",
+        "relatedReactApis": [
+          {
+            "name": "DropdownProps.mountNode",
+            "description": "Mount the listbox popup in an HTMLElement, a generated body container with a className, or the default body portal; the trigger stays in place."
+          }
+        ],
         "callbackProps": [
           "onOptionSelect",
           "onOpenChange",
@@ -2059,7 +2082,7 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Choose from grouped options with a button trigger, replaceable button and listbox roots, controlled or default selection, keyboard interaction, and accessible listbox semantics."
+      "summary": "Choose from grouped options with a button trigger, replaceable button and listbox roots, controlled or default selection, keyboard interaction, accessible listbox semantics, and mountNode popup targeting."
     },
     {
       "react": "Listbox",
@@ -2079,9 +2102,10 @@
           "SharePointUIProvider tokens",
           "CSS custom properties",
           "host className/style"
-        ]
+        ],
+        "reactRefType": "HTMLDivElement"
       },
-      "summary": "Render a standalone single or multiselect listbox with keyboard navigation and Option composition."
+      "summary": "Render a standalone single or multiselect listbox with Fluent menu semantics for multiselect, keyboard active-descendant navigation, root refs, and Option composition."
     },
     {
       "react": "Option",
@@ -2090,7 +2114,7 @@
       "category": "forms",
       "reactOnly": true,
       "api": {
-        "reactSignature": "{ value, text, disabled = false, checkIcon, children, ...props }: OptionProps",
+        "reactSignature": "{ value, text, disabled = false, checkIcon, children, id, ...props }: OptionProps",
         "callbackProps": [],
         "slots": [
           "default",
@@ -2435,7 +2459,7 @@
       "module": "dialog",
       "category": "overlays",
       "api": {
-        "reactSignature": "{ children, backdrop, backdropMotion, style, tabIndex = -1, ...props }: DialogSurfaceProps",
+        "reactSignature": "{ children, backdrop, backdropMotion, mountNode: _mountNode, style, tabIndex = -1, ...props }: DialogSurfaceProps",
         "callbackProps": [],
         "slots": [
           "default",
@@ -4028,7 +4052,7 @@
       "module": "tooltip",
       "category": "feedback",
       "api": {
-        "reactSignature": "{ children, content, placement = \"top\", positioning, align, offset, appearance = \"normal\", relationship = \"description\", disabled = false, open, visible, delay, showDelay, hideDelay, withArrow = false, onOpenChange, onVisibleChange, ...props }: ElementProps & { children?: React.ReactNode; content?: React.ReactNode; placement?: \"top\" | \"bottom\" | \"start\" | \"end\" | \"left\" | \"right\"; positioning?: TooltipPositioning; align?: \"start\" | \"center\" | \"end\"; offset?: number; appearance?: TooltipAppearance; relationship?: TooltipRelationship; disabled?: boolean; open?: boolean; visible?: boolean; delay?: number; showDelay?: number; hideDelay?: number; withArrow?: boolean; onOpenChange?: (open: boolean) => void; onVisibleChange?: (event: TooltipVisibleChangeEvent, data: TooltipVisibleChangeData) => void }",
+        "reactSignature": "{ children, content, mountNode, placement = \"top\", positioning, align, offset, appearance = \"normal\", relationship = \"description\", disabled = false, open, visible, delay, showDelay, hideDelay, withArrow = false, onOpenChange, onVisibleChange, ...props }: TooltipProps",
         "callbackProps": [
           "onOpenChange",
           "onVisibleChange"
@@ -4044,7 +4068,7 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Provide delayed hover/focus help with label, description, or inaccessible relationships; supports theme appearances, controlled visibility, arrows, and Fluent-compatible fallback, boundary, sizing, target, offset, and positioning-ref options."
+      "summary": "Provide delayed hover/focus help with label, description, or inaccessible relationships; portal the surface to a custom mountNode while keeping the trigger in place; supports theme appearances, controlled visibility, arrows, and Fluent-compatible fallback, boundary, sizing, target, offset, and positioning-ref options."
     },
     {
       "react": "Popover",
@@ -4053,7 +4077,7 @@
       "module": "popover",
       "category": "feedback",
       "api": {
-        "reactSignature": "{ children, trigger, label, placement = \"bottom\", positioning, open, defaultOpen = false, openOnContext, openOnHover, mouseLeaveDelay, closeOnIframeFocus = true, onOpenChange, inline, trapFocus, inertTrapFocus, legacyTrapFocus, unstable_disableAutoFocus = false, arrow, withArrow, appearance, size, closeOnScroll = false, surfaceMotion, ...props }: ElementProps & { children?: React.ReactNode; trigger?: React.ReactElement; label?: string; placement?: \"top\" | \"bottom\" | \"start\" | \"end\"; positioning?: PopoverPositioning; open?: boolean; defaultOpen?: boolean; openOnContext?: boolean; openOnHover?: boolean; mouseLeaveDelay?: number; closeOnIframeFocus?: boolean; onOpenChange?: (event: PopoverOpenChangeEvent, data: PopoverOpenChangeData) => void; inline?: boolean; trapFocus?: boolean; inertTrapFocus?: boolean; legacyTrapFocus?: boolean; unstable_disableAutoFocus?: boolean; arrow?: boolean; withArrow?: boolean; appearance?: \"brand\" | \"inverted\"; size?: \"small\" | \"medium\" | \"large\"; closeOnScroll?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps> }",
+        "reactSignature": "{ children, trigger, label, placement = \"bottom\", positioning, open, defaultOpen = false, openOnContext, openOnHover, mouseLeaveDelay, closeOnIframeFocus = true, onOpenChange, inline, trapFocus, inertTrapFocus, legacyTrapFocus, unstable_disableAutoFocus = false, arrow, withArrow, appearance, size, closeOnScroll = false, surfaceMotion, mountNode, ...props }: ElementProps & { children?: React.ReactNode; trigger?: React.ReactElement; label?: string; placement?: \"top\" | \"bottom\" | \"start\" | \"end\"; positioning?: PopoverPositioning; open?: boolean; defaultOpen?: boolean; openOnContext?: boolean; openOnHover?: boolean; mouseLeaveDelay?: number; closeOnIframeFocus?: boolean; onOpenChange?: (event: PopoverOpenChangeEvent, data: PopoverOpenChangeData) => void; inline?: boolean; trapFocus?: boolean; inertTrapFocus?: boolean; legacyTrapFocus?: boolean; unstable_disableAutoFocus?: boolean; arrow?: boolean; withArrow?: boolean; appearance?: \"brand\" | \"inverted\"; size?: \"small\" | \"medium\" | \"large\"; closeOnScroll?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>; mountNode?: PortalMountNode }",
         "callbackProps": [
           "onOpenChange"
         ],
@@ -4071,7 +4095,7 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Show a non-modal top-layer surface anchored to a trigger with dismissal, focus return, and Fluent positioning fallbacks, boundaries, offsets, sizing, virtual targets, and update refs."
+      "summary": "Show a non-modal top-layer surface anchored to a trigger, with optional mountNode portal targeting, dismissal, focus return, and Fluent positioning fallbacks, boundaries, offsets, sizing, virtual targets, and update refs."
     },
     {
       "react": "PopoverProvider",
@@ -4088,7 +4112,7 @@
           "React context provider"
         ]
       },
-      "summary": "Supply controlled open state, interaction settings, appearance, and sizing to a composed Popover."
+      "summary": "Supply controlled open state, interaction settings, appearance, sizing, and an optional mountNode to a composed Popover."
     },
     {
       "react": "PopoverTrigger",
@@ -4163,11 +4187,17 @@
       "module": "menu",
       "category": "actions",
       "api": {
-        "reactSignature": "{ children, trigger, label, placement, positioning, open, defaultOpen = false, contextMenu = false, openOnContext = contextMenu, openOnHover = false, hoverDelay = 300, closeOnScroll = false, inline = false, persistOnItemClick = false, checkedValues, defaultCheckedValues = {}, hasCheckmarks = false, hasIcons = false, surfaceMotion, onCheckedValueChange, onOpenChange, onSelect, ...props }: MenuProps",
+        "reactSignature": "{ children, trigger, label, placement, positioning, open, defaultOpen = false, contextMenu = false, openOnContext = contextMenu, openOnHover = false, hoverDelay = 300, closeOnScroll = false, inline = false, persistOnItemClick = false, checkedValues, defaultCheckedValues = {}, hasCheckmarks = false, hasIcons = false, surfaceMotion, mountNode, onCheckedValueChange, onOpenChange, onSelect, ...props }: MenuProps",
         "callbackProps": [
           "onOpenChange",
           "onSelect",
           "onCheckedValueChange"
+        ],
+        "relatedReactApis": [
+          {
+            "name": "MenuProps.mountNode",
+            "description": "Portal the popup surface to an HTMLElement or a generated body container; use className to name a generated container and null to select the body fallback. The trigger stays in place."
+          }
         ],
         "slots": [
           "trigger",
@@ -4181,7 +4211,7 @@
           "named ::part hooks"
         ]
       },
-      "summary": "Offer a trigger-anchored command list with keyboard navigation, typeahead, nested submenus, and dismissal."
+      "summary": "Offer a trigger-anchored command list with keyboard navigation, typeahead, nested submenus, dismissal, and optional popup mounting elsewhere."
     },
     {
       "react": "MenuItem",
@@ -4626,7 +4656,7 @@
       "module": "toaster",
       "category": "feedback",
       "api": {
-        "reactSignature": "{ position = \"top-end\", limit, inline = false, toasterId, announce, \"aria-label\": ariaLabel, children, ...props }: ElementProps & { position?: ToastPosition; limit?: number; inline?: boolean; toasterId?: string; announce?: ToastAnnounce; children?: React.ReactNode }",
+        "reactSignature": "{ position = \"top-end\", limit, inline = false, toasterId, mountNode, announce, \"aria-label\": ariaLabel, children, ...props }: ElementProps & { position?: ToastPosition; limit?: number; inline?: boolean; toasterId?: string; mountNode?: PortalMountNode; announce?: ToastAnnounce; children?: React.ReactNode }",
         "callbackProps": [
           "announce"
         ],

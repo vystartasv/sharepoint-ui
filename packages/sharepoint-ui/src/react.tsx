@@ -1,4 +1,5 @@
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { observeAccessibleTextFromIdRefs, resolveAccessibleTextFromIdRefs } from "./elements/shared.js";
 import { defineButton } from "./elements/button.js";
 import { defineButtonGroup } from "./elements/button-group.js";
@@ -173,6 +174,7 @@ export type MenuCheckedValueChangeEvent = React.MouseEvent | React.KeyboardEvent
 export type MenuCheckedValueChangeData = { name: string; checkedItems: string[] };
 type MenuSelectionContextValue = { checkedValues: MenuCheckedValues; change: (event: MenuCheckedValueChangeEvent, name: string, value: string, checked: boolean, kind: "checkbox" | "radio" | "switch") => void };
 const MenuSelectionContext = React.createContext<MenuSelectionContextValue | null>(null);
+const MenuHostContext = React.createContext<React.RefObject<HTMLElement | null> | null>(null);
 const MenuGroupHeaderContext = React.createContext<string | undefined>(undefined);
 export type ToastControllerUpdateOptions = Omit<ToastDispatchOptions, "id" | "toastId"> & { toastId: string; content?: React.ReactNode };
 type ToastControllerUpdate = {
@@ -251,7 +253,7 @@ function renderDividerWrapper(wrapper?: DividerWrapper): React.ReactNode {
     ? React.cloneElement(wrapper as React.ReactElement<{ slot?: string }>, { slot: "wrapper" })
     : React.createElement("div", { ...wrapper, slot: "wrapper" });
 }
-function useSpuiEvent(ref: React.RefObject<HTMLElement | null>, eventName: string, callback?: (detail: SpuiEventDetail, event: Event) => void, capture = false): void {
+function useSpuiEvent(ref: React.RefObject<HTMLElement | null>, eventName: string, callback?: (detail: SpuiEventDetail, event: Event) => void, capture = false, refreshToken?: unknown): void {
   const callbackRef = React.useRef(callback);
   React.useLayoutEffect(() => { callbackRef.current = callback; }, [callback]);
   React.useLayoutEffect(() => {
@@ -260,7 +262,7 @@ function useSpuiEvent(ref: React.RefObject<HTMLElement | null>, eventName: strin
     const listener = (event: Event) => callbackRef.current?.((event as CustomEvent<SpuiEventDetail>).detail, event);
     element.addEventListener(eventName, listener, capture);
     return () => element.removeEventListener(eventName, listener, capture);
-  }, [ref, eventName, Boolean(callback), capture]);
+  }, [ref, eventName, Boolean(callback), capture, refreshToken]);
 }
 
 type NativeMousePointerEventProps<T extends Element> = Pick<React.DOMAttributes<T>, "onAuxClick" | "onAuxClickCapture" | "onContextMenu" | "onContextMenuCapture" | "onDoubleClick" | "onDoubleClickCapture" | "onMouseDown" | "onMouseDownCapture" | "onMouseEnter" | "onMouseLeave" | "onMouseMove" | "onMouseMoveCapture" | "onMouseOut" | "onMouseOutCapture" | "onMouseOver" | "onMouseOverCapture" | "onMouseUp" | "onMouseUpCapture" | "onGotPointerCapture" | "onGotPointerCaptureCapture" | "onLostPointerCapture" | "onLostPointerCaptureCapture" | "onPointerCancel" | "onPointerCancelCapture" | "onPointerDown" | "onPointerDownCapture" | "onPointerEnter" | "onPointerLeave" | "onPointerMove" | "onPointerMoveCapture" | "onPointerOut" | "onPointerOutCapture" | "onPointerOver" | "onPointerOverCapture" | "onPointerUp" | "onPointerUpCapture">;
@@ -469,8 +471,26 @@ function sourceEventTarget<T extends Element>(sourceEvent: Event, fallback: T): 
   return (sourceEvent.currentTarget instanceof Element ? sourceEvent.currentTarget : sourceEvent.target instanceof Element ? sourceEvent.target : fallback) as T;
 }
 
-function useExposeHostRef<T extends HTMLElement>(localRef: React.RefObject<T | null>, forwardedRef: React.ForwardedRef<HTMLElement>): void {
-  React.useImperativeHandle(forwardedRef, () => localRef.current!, [localRef]);
+function interactionSourceTarget<T extends Element>(sourceEvent: Event, fallback: T): T {
+  const target = sourceEvent.composedPath().find((node): node is HTMLElement => node instanceof HTMLElement && node.matches("button,input,[role=combobox]"));
+  return (target ?? sourceEventTarget(sourceEvent, fallback)) as T;
+}
+
+function useExposeHostRef<T extends HTMLElement>(localRef: React.RefObject<T | null>, forwardedRef: React.ForwardedRef<HTMLElement>, refreshToken?: unknown): void {
+  React.useImperativeHandle(forwardedRef, () => localRef.current!, [localRef, refreshToken]);
+}
+
+function composeReactRefs<T>(...refs: Array<React.Ref<T> | undefined>): React.RefCallback<T> {
+  return value => {
+    for (const ref of refs) {
+      if (typeof ref === "function") ref(value);
+      else if (ref) (ref as React.MutableRefObject<T | null>).current = value;
+    }
+  };
+}
+
+function getElementRef<T>(element: React.ReactElement): React.Ref<T> | undefined {
+  return (element as React.ReactElement & { ref?: React.Ref<T> }).ref;
 }
 
 function getActiveMotionAnimations(root: HTMLElement): Animation[] {
@@ -484,7 +504,7 @@ function getActiveMotionAnimations(root: HTMLElement): Animation[] {
   return [...animations];
 }
 
-function useNativeMotionPresence(ref: React.RefObject<HTMLElement | null>, visible: boolean, enabled: boolean, animationRoot: React.RefObject<HTMLElement | null> = ref): void {
+function useNativeMotionPresence(ref: React.RefObject<HTMLElement | null>, visible: boolean, enabled: boolean, animationRoot: React.RefObject<HTMLElement | null> = ref, refreshToken?: unknown): void {
   React.useLayoutEffect(() => {
     const element = ref.current as (HTMLElement & { open?: boolean }) | null;
     if (!element) return;
@@ -514,7 +534,7 @@ function useNativeMotionPresence(ref: React.RefObject<HTMLElement | null>, visib
       });
     });
     return () => { cancelled = true; cancelAnimationFrame(firstFrame); cancelAnimationFrame(secondFrame); };
-  }, [ref, visible, enabled, animationRoot]);
+  }, [ref, visible, enabled, animationRoot, refreshToken]);
 }
 
 export function SharePointUIProvider({ children, lang, dir, appearance, baseAppearance, density, theme, tokens, fluentTokens, strings }: React.PropsWithChildren<{ lang?: string; dir?: "ltr" | "rtl" | "auto"; appearance?: SharePointUIAppearance; baseAppearance?: SharePointUIBaseAppearance; density?: SharePointUIDensity; theme?: SharePointUIDesignTheme; tokens?: Partial<SharePointUIStyleTokens>; fluentTokens?: FluentThemeTokens; strings?: Partial<SharePointUIStrings> }>): React.ReactElement {
@@ -1056,6 +1076,51 @@ export type DrawerBackdropMotionSlotProps = PresenceMotionSlotProps & { size: "s
 type DialogMotionContextValue = { visible: boolean; unmountOnClose: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps> };
 const DialogMotionContext = React.createContext<DialogMotionContextValue>({ visible: true, unmountOnClose: true });
 const DialogSurfaceContext = React.createContext(false);
+const DialogHostContext = React.createContext<React.RefObject<HTMLElement | null> | null>(null);
+
+export type PortalMountNode = HTMLElement | null | { element?: HTMLElement | null; className?: string };
+
+function resolvePortalMountNode(mountNode: PortalMountNode | undefined): { element?: HTMLElement | null; className?: string } {
+  if (mountNode && typeof mountNode === "object" && "nodeType" in mountNode && mountNode.nodeType === 1) return { element: mountNode as HTMLElement };
+  return mountNode ?? {};
+}
+
+function usePortalContainer(mountNode: PortalMountNode | undefined, dir: UIContextValue["dir"], enabled: boolean): HTMLElement | null {
+  const target = resolvePortalMountNode(mountNode);
+  const externalElement = target.element ?? undefined;
+  const [container, setContainer] = React.useState<HTMLElement | null>(() => enabled ? externalElement ?? null : null);
+  React.useLayoutEffect(() => {
+    if (!enabled) { setContainer(null); return; }
+    if (externalElement) { setContainer(externalElement); return; }
+    if (typeof document === "undefined" || !document.body) return;
+    const portalNode = document.createElement("div");
+    portalNode.className = target.className ?? "";
+    portalNode.setAttribute("data-portal-node", "true");
+    if (dir && dir !== "auto") portalNode.dir = dir;
+    document.body.append(portalNode);
+    setContainer(portalNode);
+    return () => portalNode.remove();
+  }, [enabled, externalElement, target.className, dir]);
+  return container;
+}
+
+function splitDialogTriggers(children: React.ReactNode): { triggers: React.ReactNode[]; content: React.ReactNode[] } {
+  const triggers: React.ReactNode[] = [];
+  const content: React.ReactNode[] = [];
+  React.Children.forEach(children, child => {
+    if (!React.isValidElement(child)) { content.push(child); return; }
+    if (child.type === React.Fragment) {
+      const split = splitDialogTriggers(child.props.children);
+      if (split.triggers.length) triggers.push(React.cloneElement(child, undefined, split.triggers));
+      if (split.content.length) content.push(React.cloneElement(child, undefined, split.content));
+      return;
+    }
+    if (child.type === DialogSurface) { content.push(child); return; }
+    if (child.type === DialogTrigger) triggers.push(child);
+    else content.push(child);
+  });
+  return { triggers, content };
+}
 
 function setDialogSurfaceContent(children: React.ReactNode, mounted: boolean, hasMotion: boolean): React.ReactNode {
   return React.Children.map(children, child => {
@@ -1066,17 +1131,17 @@ function setDialogSurfaceContent(children: React.ReactNode, mounted: boolean, ha
   });
 }
 
-function getDialogSurfaceOptions(children: React.ReactNode): { backdropAppearance?: "dimmed" | "transparent"; hasBackdrop?: boolean; hasMotion?: boolean } {
-  let result: { backdropAppearance?: "dimmed" | "transparent"; hasBackdrop?: boolean; hasMotion?: boolean } = {};
+function getDialogSurfaceOptions(children: React.ReactNode): { backdropAppearance?: "dimmed" | "transparent"; hasBackdrop?: boolean; hasMotion?: boolean; hasSurface?: boolean; mountNode?: PortalMountNode } {
+  let result: { backdropAppearance?: "dimmed" | "transparent"; hasBackdrop?: boolean; hasMotion?: boolean; hasSurface?: boolean; mountNode?: PortalMountNode } = {};
   React.Children.forEach(children, child => {
     if (!React.isValidElement(child)) return;
-    if (child.type === React.Fragment) { result = getDialogSurfaceOptions(child.props.children); return; }
+    if (child.type === React.Fragment) { result = { ...result, ...getDialogSurfaceOptions(child.props.children) }; return; }
     if (child.type !== DialogSurface) return;
-    const props = child.props as { backdrop?: unknown; backdropMotion?: unknown };
+    const props = child.props as { backdrop?: unknown; backdropMotion?: unknown; mountNode?: PortalMountNode };
     const backdrop = props.backdrop;
-    if (React.isValidElement(backdrop)) result = { backdropAppearance: (backdrop.props as { appearance?: "dimmed" | "transparent" }).appearance, hasBackdrop: true, hasMotion: Boolean(props.backdropMotion) };
-    else if (backdrop && typeof backdrop === "object") result = { backdropAppearance: (backdrop as { appearance?: "dimmed" | "transparent" }).appearance, hasBackdrop: true, hasMotion: Boolean(props.backdropMotion) };
-    else if (props.backdropMotion) result = { hasMotion: true };
+    if (React.isValidElement(backdrop)) result = { ...result, backdropAppearance: (backdrop.props as { appearance?: "dimmed" | "transparent" }).appearance, hasBackdrop: true, hasMotion: Boolean(props.backdropMotion), hasSurface: true, mountNode: props.mountNode };
+    else if (backdrop && typeof backdrop === "object") result = { ...result, backdropAppearance: (backdrop as { appearance?: "dimmed" | "transparent" }).appearance, hasBackdrop: true, hasMotion: Boolean(props.backdropMotion), hasSurface: true, mountNode: props.mountNode };
+    else result = { ...result, hasMotion: Boolean(props.backdropMotion) || result.hasMotion, hasSurface: true, mountNode: props.mountNode };
   });
   return result;
 }
@@ -1084,11 +1149,14 @@ function getDialogSurfaceOptions(children: React.ReactNode): { backdropAppearanc
 export const Dialog = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { open?: boolean; defaultOpen?: boolean; title?: string; dialogLabel?: string; modal?: boolean; modalType?: "modal" | "non-modal" | "alert"; inertTrapFocus?: boolean; dismissible?: boolean; closeLabel?: string; unmountOnClose?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>; actions?: React.ReactNode; onOpenChange?: (event: DialogOpenChangeEvent, data: DialogOnOpenChangeData) => void; children?: React.ReactNode }>(function Dialog({ open, defaultOpen = false, title, dialogLabel, modal = true, modalType, inertTrapFocus = false, dismissible = true, closeLabel, unmountOnClose = true, surfaceMotion, actions, onOpenChange, children, ...props }: ElementProps & { open?: boolean; defaultOpen?: boolean; title?: string; dialogLabel?: string; modal?: boolean; modalType?: "modal" | "non-modal" | "alert"; inertTrapFocus?: boolean; dismissible?: boolean; closeLabel?: string; unmountOnClose?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>; actions?: React.ReactNode; onOpenChange?: (event: DialogOpenChangeEvent, data: DialogOnOpenChangeData) => void; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   const context = React.useContext(UIContext);
   const ref = React.useRef<HTMLElement>(null)
-  useExposeHostRef(ref, forwardedRef);;
   const controlled = open !== undefined;
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
   const visible = controlled ? open : uncontrolledOpen;
   ensureDefined(defineDialog);
+  const surfaceOptions = getDialogSurfaceOptions(children);
+  const hasPresenceMotion = Boolean(surfaceMotion || surfaceOptions.hasMotion);
+  const portalContainer = usePortalContainer(surfaceOptions.mountNode, context.dir, Boolean(surfaceOptions.hasSurface));
+  useExposeHostRef(ref, forwardedRef, portalContainer);
   useSpuiEvent(ref, "spui-open-change", (detail, dispatchEvent) => {
     const change = detail as DialogOpenChangeData;
     if (!controlled) setUncontrolledOpen(change.open);
@@ -1098,21 +1166,23 @@ export const Dialog = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps
     const callbackTarget = change.trigger ?? (change.type === "backdropClick" ? sourceEventTarget(change.event, ref.current) ?? surface : surface);
     const callbackEvent = createReactEventBridge(change.event, dispatchEvent, callbackTarget) as unknown as DialogOpenChangeEvent;
     onOpenChange(callbackEvent, { ...change, event: callbackEvent } as DialogOnOpenChangeData);
-  });
-  const surfaceOptions = getDialogSurfaceOptions(children);
-  const hasPresenceMotion = Boolean(surfaceMotion || surfaceOptions.hasMotion);
-  useNativeMotionPresence(ref, visible, hasPresenceMotion);
+  }, false, portalContainer);
+  useNativeMotionPresence(ref, visible, hasPresenceMotion, ref, portalContainer);
   const content = unmountOnClose && !hasPresenceMotion ? setDialogSurfaceContent(children, visible, false) : children;
-  return React.createElement("spui-dialog", useCustomElementProps({ ...props, ref, open: !hasPresenceMotion && controlled ? open : undefined, "default-open": !hasPresenceMotion && !controlled && defaultOpen || undefined, motion: hasPresenceMotion || undefined, title, "dialog-label": dialogLabel ?? context.strings.dialogLabel, modal: modalType ? undefined : modal, "modal-type": modalType, "inert-trap-focus": inertTrapFocus === undefined ? undefined : String(inertTrapFocus), dismissible, "close-label": closeLabel ?? context.strings.close, "backdrop-appearance": surfaceOptions.backdropAppearance, "data-has-custom-backdrop": surfaceOptions.hasBackdrop || undefined }),
-    React.createElement(DialogMotionContext.Provider, { value: { visible, unmountOnClose, surfaceMotion } }, content),
+  const split = surfaceOptions.hasSurface ? splitDialogTriggers(content) : { triggers: [], content: [content] };
+  const dialogHost = React.createElement("spui-dialog", useCustomElementProps({ ...props, style: surfaceOptions.hasSurface ? { ...context.hostStyle, ...props.style } : props.style, ref, open: !hasPresenceMotion && controlled ? open : undefined, "default-open": !hasPresenceMotion && !controlled && defaultOpen || undefined, motion: hasPresenceMotion || undefined, title, "dialog-label": dialogLabel ?? context.strings.dialogLabel, modal: modalType ? undefined : modal, "modal-type": modalType, "inert-trap-focus": inertTrapFocus === undefined ? undefined : String(inertTrapFocus), dismissible, "close-label": closeLabel ?? context.strings.close, "backdrop-appearance": surfaceOptions.backdropAppearance, "data-has-custom-backdrop": surfaceOptions.hasBackdrop || undefined }),
+    React.createElement(DialogMotionContext.Provider, { value: { visible, unmountOnClose, surfaceMotion } }, split.content),
     actions ? React.createElement("div", { slot: "actions", style: { display: "flex", flexWrap: "wrap", gap: 8 } }, actions) : null);
+  if (!surfaceOptions.hasSurface) return dialogHost;
+  const portaledHost = portalContainer ? createPortal(dialogHost, portalContainer) : null;
+  return React.createElement(DialogHostContext.Provider, { value: ref }, React.createElement(React.Fragment, null, split.triggers, portaledHost));
 });
 
 export type DialogBackdropSlotProps = React.ReactElement | (React.HTMLAttributes<HTMLDivElement> & { appearance?: "dimmed" | "transparent" });
 
-export type DialogSurfaceProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & { children?: React.ReactNode; backdrop?: DialogBackdropSlotProps; backdropMotion?: React.ComponentType<PresenceMotionSlotProps> };
+export type DialogSurfaceProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & { children?: React.ReactNode; backdrop?: DialogBackdropSlotProps; backdropMotion?: React.ComponentType<PresenceMotionSlotProps>; mountNode?: PortalMountNode };
 
-export const DialogSurface = /* @__PURE__ */ React.forwardRef<HTMLDivElement, DialogSurfaceProps>(function DialogSurface({ children, backdrop, backdropMotion, style, tabIndex = -1, ...props }: DialogSurfaceProps, forwardedRef): React.ReactElement {
+export const DialogSurface = /* @__PURE__ */ React.forwardRef<HTMLDivElement, DialogSurfaceProps>(function DialogSurface({ children, backdrop, backdropMotion, mountNode: _mountNode, style, tabIndex = -1, ...props }: DialogSurfaceProps, forwardedRef): React.ReactElement {
   const motion = React.useContext(DialogMotionContext);
   ensureDefined(defineDialogSurface);
   const surfaceChildren = React.createElement(DialogSurfaceContext.Provider, { value: true }, children);
@@ -1180,6 +1250,7 @@ function setDialogTriggerRef(ref: React.Ref<HTMLElement> | undefined, value: HTM
 
 export const DialogTrigger = /* @__PURE__ */ React.forwardRef<HTMLElement, DialogTriggerProps>(function DialogTrigger({ children, action, disableButtonEnhancement = false, onClick: triggerOnClick, onKeyDown: triggerOnKeyDown, onKeyUp: triggerOnKeyUp, className: triggerClassName, style: triggerStyle, ...props }: DialogTriggerProps, forwardedRef): React.ReactElement | null {
   const insideSurface = React.useContext(DialogSurfaceContext);
+  const dialogHost = React.useContext(DialogHostContext);
   const resolvedAction = action ?? (insideSurface ? "close" : "open");
   const childProps: DialogTriggerChildProps = { ...props, ...(insideSurface ? {} : { slot: "trigger" }), ...(!disableButtonEnhancement && resolvedAction === "open" ? { "aria-haspopup": "dialog" } : {}), className: triggerClassName, style: triggerStyle };
   const child = typeof children === "function" ? children(childProps) : children;
@@ -1207,7 +1278,8 @@ export const DialogTrigger = /* @__PURE__ */ React.forwardRef<HTMLElement, Dialo
     triggerOnClick?.(event);
     if (!event.isDefaultPrevented()) {
       const trigger = event.currentTarget;
-      trigger.dispatchEvent(new CustomEvent("spui-dialog-trigger", { bubbles: true, composed: true, detail: { action: resolvedAction, trigger, originalEvent: event.nativeEvent } }));
+      const dispatchTarget = !insideSurface && dialogHost?.current ? dialogHost.current : trigger;
+      dispatchTarget.dispatchEvent(new CustomEvent("spui-dialog-trigger", { bubbles: true, composed: true, detail: { action: resolvedAction, trigger, originalEvent: event.nativeEvent } }));
     }
   };
   const onKeyDown = (event: React.KeyboardEvent<HTMLElement>): void => {
@@ -1525,21 +1597,25 @@ export type ComboboxOpenChangeEvent = React.MouseEvent<HTMLElement> | React.Keyb
 export type ComboboxActiveOptionChangeData =
   | { event: React.SyntheticEvent | Event; type: undefined; previousOption: ComboboxOptionValue | null | undefined; nextOption: ComboboxOptionValue | null | undefined }
   | { event: CustomEvent<{ id: string; previousId: string | null }>; type: "change"; previousOption: ComboboxOptionValue | null | undefined; nextOption: ComboboxOptionValue | null | undefined };
-export type ComboBoxProps = NativeClickHostProps<HTMLInputElement> & { label?: string; selectedLabel?: string; value?: string; defaultValue?: string; selectedValue?: string; selectedOptions?: readonly string[]; defaultSelectedOptions?: readonly string[]; multiselect?: boolean; name?: string; form?: string; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; listbox?: React.ReactElement; placeholder?: string; required?: boolean; disabled?: boolean; freeform?: boolean; allowFreeform?: boolean; noResults?: string; clearable?: boolean; clearIcon?: React.ReactNode; expandIcon?: React.ReactNode; defaultOpen?: boolean; disableAutoFocus?: boolean; inlinePopup?: boolean; open?: boolean; appearance?: "filled-darker" | "filled-lighter" | "outline" | "underline"; size?: "small" | "medium" | "large"; positioning?: ComboboxPositioning; children?: React.ReactNode; onValueChange?: (value: string) => void; onOptionSelect?: (event: ComboboxSelectionEvent, data: ComboboxOptionSelectData) => void; onSelectedOptionsChange?: (selectedOptions: string[]) => void; onOpenChange?: (event: ComboboxOpenChangeEvent, data: { open: boolean }) => void; onActiveOptionChange?: (event: React.SyntheticEvent | Event, data: ComboboxActiveOptionChangeData) => void };
+export type ComboBoxProps = NativeClickHostProps<HTMLInputElement> & { label?: string; selectedLabel?: string; value?: string; defaultValue?: string; selectedValue?: string; selectedOptions?: readonly string[]; defaultSelectedOptions?: readonly string[]; multiselect?: boolean; name?: string; form?: string; input?: React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>> | React.InputHTMLAttributes<HTMLInputElement>; listbox?: React.ReactElement; mountNode?: PortalMountNode; placeholder?: string; required?: boolean; disabled?: boolean; freeform?: boolean; allowFreeform?: boolean; noResults?: string; clearable?: boolean; clearIcon?: React.ReactNode; expandIcon?: React.ReactNode; defaultOpen?: boolean; disableAutoFocus?: boolean; inlinePopup?: boolean; open?: boolean; appearance?: "filled-darker" | "filled-lighter" | "outline" | "underline"; size?: "small" | "medium" | "large"; positioning?: ComboboxPositioning; children?: React.ReactNode; onValueChange?: (value: string) => void; onOptionSelect?: (event: ComboboxSelectionEvent, data: ComboboxOptionSelectData) => void; onSelectedOptionsChange?: (selectedOptions: string[]) => void; onOpenChange?: (event: ComboboxOpenChangeEvent, data: { open: boolean }) => void; onActiveOptionChange?: (event: React.SyntheticEvent | Event, data: ComboboxActiveOptionChangeData) => void };
 
 export const ComboBox = /* @__PURE__ */ React.forwardRef<HTMLElement, ComboBoxProps>(function ComboBox(inputProps: ComboBoxProps, forwardedRef): React.ReactElement {
-  const { label, selectedLabel, value, defaultValue, selectedValue, selectedOptions, defaultSelectedOptions, multiselect = false, name, input, listbox, placeholder, required, disabled, freeform, allowFreeform, noResults, clearable, clearIcon, expandIcon, defaultOpen, disableAutoFocus, inlinePopup, open, appearance, size, positioning, onValueChange, onOptionSelect, onSelectedOptionsChange, onOpenChange, onActiveOptionChange, children, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true, supportsSize: true });
+  const { label, selectedLabel, value, defaultValue, selectedValue, selectedOptions, defaultSelectedOptions, multiselect = false, name, input, listbox, mountNode, placeholder, required, disabled, freeform, allowFreeform, noResults, clearable, clearIcon, expandIcon, defaultOpen, disableAutoFocus, inlinePopup, open, appearance, size, positioning, onValueChange, onOptionSelect, onSelectedOptionsChange, onOpenChange, onActiveOptionChange, children, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true, supportsSize: true });
   const ref = React.useRef<HTMLElement & { selectedOptions: string[] }>(null)
   useExposeHostRef(ref, forwardedRef);;
   useNativeControlEvents(ref as React.RefObject<HTMLElement | null>, "input,button", props.onClick, props.onClickCapture, props as NativeRootEventProps<HTMLInputElement>);
   const context = React.useContext(UIContext);
+  const portalContainer = usePortalContainer(mountNode, context.dir, !inlinePopup);
+  const listboxElementRef = React.useRef<HTMLElement>(null);
+  const customListboxRef = listbox == null ? undefined : getElementRef<HTMLElement>(listbox);
+  const listboxRef = React.useMemo(() => composeReactRefs(listboxElementRef, customListboxRef), [customListboxRef]);
   const provider = React.useContext(CompoundComboboxContext);
   ensureDefined(defineCombobox);
   useSpuiEvent(ref, "spui-input", detail => { const next = String(detail.value ?? ""); onValueChange?.(next); provider?.onValueChange?.(next); provider?.setValue?.(next); });
   useSpuiEvent(ref, "spui-open-change", (detail, event) => {
     const nextOpen = Boolean(detail.open);
     const sourceEvent = (detail as SpuiEventDetail & { event?: Event }).event ?? event;
-    const callbackEvent = createReactEventBridge(sourceEvent, event, sourceEventTarget(sourceEvent, ref.current!)) as unknown as ComboboxOpenChangeEvent;
+    const callbackEvent = createReactEventBridge(sourceEvent, event, interactionSourceTarget(sourceEvent, ref.current!)) as unknown as ComboboxOpenChangeEvent;
     onOpenChange?.(callbackEvent, { open: nextOpen });
     provider?.onOpenChange?.(nextOpen);
     provider?.setOpen?.(callbackEvent, nextOpen);
@@ -1585,14 +1661,26 @@ export const ComboBox = /* @__PURE__ */ React.forwardRef<HTMLElement, ComboBoxPr
   const inputSlot = input == null ? null : React.isValidElement(input)
     ? React.cloneElement(input as React.ReactElement<React.InputHTMLAttributes<HTMLInputElement>>, { slot: "input" } as React.InputHTMLAttributes<HTMLInputElement> & { slot: string })
     : React.createElement("input", { ...input, slot: "input" });
-  const listboxSlot = listbox == null ? null : React.cloneElement(listbox, { slot: "listbox" }, null);
+  const listboxSlot = listbox == null || (portalContainer && !inlinePopup) ? null : React.cloneElement(listbox as React.ReactElement<{ slot?: string; ref?: React.Ref<HTMLElement>; style?: React.CSSProperties }>, { slot: "listbox", ref: listboxRef }, null);
+  const portaledListbox = listbox == null
+    ? React.createElement("ul", { slot: "listbox", role: "listbox", ref: listboxElementRef, style: context.hostStyle })
+    : React.cloneElement(listbox as React.ReactElement<{ slot?: string; ref?: React.Ref<HTMLElement>; style?: React.CSSProperties }>, { slot: "listbox", ref: listboxRef, style: { ...context.hostStyle, ...((listbox.props as { style?: React.CSSProperties }).style ?? {}) } }, null);
+  const listboxPortal = portalContainer && !inlinePopup ? createPortal(portaledListbox, portalContainer) : null;
+  React.useLayoutEffect(() => {
+    const element = ref.current as (HTMLElement & { listboxElement?: HTMLElement | null }) | null;
+    if (!element) return;
+    element.listboxElement = portalContainer && !inlinePopup ? listboxElementRef.current : null;
+    return () => { element.listboxElement = null; };
+  }, [portalContainer, inlinePopup, listbox]);
   const clearIconSlot = clearIcon == null ? null : React.isValidElement(clearIcon)
     ? React.cloneElement(clearIcon as React.ReactElement<{ slot?: string }>, { slot: "clear-icon" })
     : React.createElement("span", { slot: "clear-icon", "aria-hidden": true }, clearIcon);
   const expandIconSlot = expandIcon == null ? null : React.isValidElement(expandIcon)
     ? React.cloneElement(expandIcon as React.ReactElement<{ slot?: string }>, { slot: "expand-icon" })
     : React.createElement("span", { slot: "expand-icon", "aria-hidden": true }, expandIcon);
-  return React.createElement(CompoundComboboxContext.Provider, { value: { ...provider, mode: "combobox", value: value ?? provider?.value, selectedOptions: selectedOptions ?? provider?.selectedOptions, multiselect } }, React.createElement("spui-combobox", nativeControlHostProps({ ...props, ref, label, "selected-label": selectedLabel ?? context.strings.selectedOptionsLabel, value: value ?? defaultValue ?? provider?.value, "selected-value": selectedValue, multiselect: multiselect || undefined, name, placeholder, required, disabled, "allow-freeform": freeform ?? allowFreeform, "no-results": noResults ?? context.strings.noResults, clearable, "default-open": open === undefined && provider?.open === undefined ? defaultOpen : undefined, open: open ?? provider?.open ? "" : undefined, "disable-auto-focus": disableAutoFocus, appearance: appearance ?? provider?.appearance, size: size ?? provider?.size, positioning: typeof positioning === "string" ? positioning : positioning?.position ? `${positioning.position}${positioning.align && positioning.align !== "center" ? `-${positioning.align}` : ""}` : undefined, "inline-popup": inlinePopup }), children, inputSlot, clearIconSlot, expandIconSlot, listboxSlot));
+  return React.createElement(CompoundComboboxContext.Provider, { value: { ...provider, mode: "combobox", value: value ?? provider?.value, selectedOptions: selectedOptions ?? provider?.selectedOptions, multiselect } }, React.createElement(React.Fragment, null,
+    React.createElement("spui-combobox", nativeControlHostProps({ ...props, ref, label, "selected-label": selectedLabel ?? context.strings.selectedOptionsLabel, value: value ?? defaultValue ?? provider?.value, "selected-value": selectedValue, multiselect: multiselect || undefined, name, placeholder, required, disabled, "allow-freeform": freeform ?? allowFreeform, "no-results": noResults ?? context.strings.noResults, clearable, "default-open": open === undefined && provider?.open === undefined ? defaultOpen : undefined, open: open ?? provider?.open ? "" : undefined, "disable-auto-focus": disableAutoFocus, appearance: appearance ?? provider?.appearance, size: size ?? provider?.size, positioning: typeof positioning === "string" ? positioning : positioning?.position ? `${positioning.position}${positioning.align && positioning.align !== "center" ? `-${positioning.align}` : ""}` : undefined, "inline-popup": inlinePopup }), children, inputSlot, clearIconSlot, expandIconSlot, listboxSlot),
+    listboxPortal));
 });
 
 export const ComboOption = /* @__PURE__ */ React.forwardRef<HTMLElement, { value: string; label?: string; disabled?: boolean; children?: React.ReactNode }>(function ComboOption({ value, label, disabled, children }: { value: string; label?: string; disabled?: boolean; children?: React.ReactNode }, forwardedRef): React.ReactElement {
@@ -1648,6 +1736,7 @@ export type DropdownProps = NativeClickHostProps<HTMLInputElement> & {
   defaultSelectedOptions?: string[];
   inlinePopup?: boolean;
   listbox?: React.ReactElement;
+  mountNode?: PortalMountNode;
   multiselect?: boolean;
   form?: string;
   onOpenChange?: (event: ComboboxOpenChangeEvent, data: { open: boolean }) => void;
@@ -1665,17 +1754,22 @@ export type DropdownProps = NativeClickHostProps<HTMLInputElement> & {
 };
 
 /** Selection-only combobox that shares the theme, form, and keyboard engine with ComboBox. */
-export const Dropdown = /* @__PURE__ */ React.forwardRef<HTMLElement, DropdownProps>(function Dropdown({ label, button, listbox, value, defaultValue, selectedOptions, defaultSelectedOptions, multiselect = false, disabled, placeholder, onOptionSelect, onOpenChange, onActiveOptionChange, defaultOpen, open, clearable, clearButton, expandIcon, disableAutoFocus, appearance, size, positioning, inlinePopup, children, ...props }: DropdownProps, forwardedRef): React.ReactElement {
-  const strings = React.useContext(UIContext).strings;
+export const Dropdown = /* @__PURE__ */ React.forwardRef<HTMLElement, DropdownProps>(function Dropdown({ label, button, listbox, mountNode, value, defaultValue, selectedOptions, defaultSelectedOptions, multiselect = false, disabled, placeholder, onOptionSelect, onOpenChange, onActiveOptionChange, defaultOpen, open, clearable, clearButton, expandIcon, disableAutoFocus, appearance, size, positioning, inlinePopup, children, ...props }: DropdownProps, forwardedRef): React.ReactElement {
+  const context = React.useContext(UIContext);
+  const strings = context.strings;
   const provider = React.useContext(CompoundComboboxContext);
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
+  const portalContainer = usePortalContainer(mountNode, context.dir, !inlinePopup);
+  const listboxElementRef = React.useRef<HTMLElement>(null);
+  const customListboxRef = listbox == null ? undefined : getElementRef<HTMLElement>(listbox);
+  const listboxRef = React.useMemo(() => composeReactRefs(listboxElementRef, customListboxRef), [customListboxRef]);
   useNativeControlEvents(ref, "input,button", props.onClick, props.onClickCapture, props);
   ensureDefined(defineCombobox);
   useSpuiEvent(ref, "spui-open-change", (detail, event) => {
     const nextOpen = Boolean(detail.open);
     const sourceEvent = (detail as SpuiEventDetail & { event?: Event }).event ?? event;
-    const callbackEvent = createReactEventBridge(sourceEvent, event, sourceEventTarget(sourceEvent, ref.current!)) as unknown as ComboboxOpenChangeEvent;
+    const callbackEvent = createReactEventBridge(sourceEvent, event, interactionSourceTarget(sourceEvent, ref.current!)) as unknown as ComboboxOpenChangeEvent;
     onOpenChange?.(callbackEvent, { open: nextOpen });
     provider?.onOpenChange?.(nextOpen);
     provider?.setOpen?.(callbackEvent, nextOpen);
@@ -1708,41 +1802,86 @@ export const Dropdown = /* @__PURE__ */ React.forwardRef<HTMLElement, DropdownPr
   const clearButtonSlot = clearButton == null ? null : React.isValidElement(clearButton)
     ? React.cloneElement(clearButton as React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>>, { slot: "clear-button", type: "button", className: (clearButton.props as React.ButtonHTMLAttributes<HTMLButtonElement>).className ?? "clear", "aria-label": (clearButton.props as React.ButtonHTMLAttributes<HTMLButtonElement>)["aria-label"] ?? strings.clear })
     : React.createElement("button", { slot: "clear-button", type: "button", "aria-label": strings.clear }, clearButton);
-  const buttonSlot = button == null ? null : React.isValidElement(button)
+  const buttonSlot = button == null
+    ? React.createElement("button", { slot: "button", type: "button", className: "trigger", role: "combobox", "aria-haspopup": "listbox" }, React.createElement("span", { className: "trigger-value" }))
+    : React.isValidElement(button)
     ? React.cloneElement(button as React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>>, { slot: "button", type: "button", className: (button.props as React.ButtonHTMLAttributes<HTMLButtonElement>).className ?? "trigger", role: "combobox", "aria-haspopup": "listbox" })
     : React.createElement("button", { slot: "button", type: "button", className: "trigger", role: "combobox", "aria-haspopup": "listbox" }, button);
   // The Dropdown engine renders its Option children into this root; keep React's
   // virtual child tree empty so it does not try to restore replaced list items.
-  const listboxSlot = listbox == null ? null : React.cloneElement(listbox, { slot: "listbox" }, null);
+  const listboxSlot = listbox == null || (portalContainer && !inlinePopup) ? null : React.cloneElement(listbox as React.ReactElement<{ slot?: string; ref?: React.Ref<HTMLElement>; style?: React.CSSProperties }>, { slot: "listbox", ref: listboxRef }, null);
+  const portaledListbox = listbox == null
+    ? React.createElement("ul", { slot: "listbox", role: "listbox", ref: listboxElementRef, style: context.hostStyle })
+    : React.cloneElement(listbox as React.ReactElement<{ slot?: string; ref?: React.Ref<HTMLElement>; style?: React.CSSProperties }>, { slot: "listbox", ref: listboxRef, style: { ...context.hostStyle, ...((listbox.props as { style?: React.CSSProperties }).style ?? {}) } }, null);
+  const listboxPortal = portalContainer && !inlinePopup ? createPortal(portaledListbox, portalContainer) : null;
+  React.useLayoutEffect(() => {
+    const element = ref.current as (HTMLElement & { listboxElement?: HTMLElement | null }) | null;
+    if (!element) return;
+    element.listboxElement = portalContainer && !inlinePopup ? listboxElementRef.current : null;
+    return () => { element.listboxElement = null; };
+  }, [portalContainer, inlinePopup, listbox]);
   return React.createElement(CompoundComboboxContext.Provider, { value: { ...provider, mode: "combobox", multiselect, selectedOptions: selectedOptions ?? provider?.selectedOptions, value: value ?? provider?.value } },
-    React.createElement("spui-combobox", nativeControlHostProps({ ...props, ref, label: label ?? "", value: value ?? defaultValue ?? provider?.value, "selected-value": !multiselect ? selectedOptions?.[0] ?? defaultSelectedOptions?.[0] ?? provider?.selectedOptions?.[0] : undefined, "selected-options": multiselect ? selectedOptions ? JSON.stringify(selectedOptions) : provider?.selectedOptions ? JSON.stringify(provider.selectedOptions) : undefined : undefined, "default-selected-options": defaultSelectedOptions && multiselect ? JSON.stringify(defaultSelectedOptions) : undefined, multiselect: multiselect || undefined, disabled, placeholder, "read-only": "", "button-trigger": "", "clear-label": strings.clear, open: (open ?? provider?.open) ? "" : undefined, "default-open": defaultOpen ? "" : undefined, clearable: clearable ? "" : undefined, "disable-auto-focus": disableAutoFocus ? "" : undefined, appearance: appearance ?? provider?.appearance, size: size ?? provider?.size, positioning: typeof positioning === "string" ? positioning : positioning?.position ? `${positioning.position}${positioning.align && positioning.align !== "center" ? `-${positioning.align}` : ""}` : undefined, "inline-popup": inlinePopup ? "" : undefined, "no-results": strings.noResults }), children, buttonSlot, clearButtonSlot, expandIcon == null ? null : React.createElement("span", { slot: "expand-icon", "aria-hidden": true }, expandIcon), listboxSlot));
+    React.createElement(React.Fragment, null,
+      React.createElement("spui-combobox", nativeControlHostProps({ ...props, ref, label: label ?? "", value: value ?? defaultValue ?? provider?.value, "selected-value": !multiselect ? selectedOptions?.[0] ?? defaultSelectedOptions?.[0] ?? provider?.selectedOptions?.[0] : undefined, "selected-options": multiselect ? selectedOptions ? JSON.stringify(selectedOptions) : provider?.selectedOptions ? JSON.stringify(provider.selectedOptions) : undefined : undefined, "default-selected-options": defaultSelectedOptions && multiselect ? JSON.stringify(defaultSelectedOptions) : undefined, multiselect: multiselect || undefined, disabled, placeholder, "read-only": "", "button-trigger": "", "clear-label": strings.clear, open: (open ?? provider?.open) ? "" : undefined, "default-open": defaultOpen ? "" : undefined, clearable: clearable ? "" : undefined, "disable-auto-focus": disableAutoFocus ? "" : undefined, appearance: appearance ?? provider?.appearance, size: size ?? provider?.size, positioning: typeof positioning === "string" ? positioning : positioning?.position ? `${positioning.position}${positioning.align && positioning.align !== "center" ? `-${positioning.align}` : ""}` : undefined, "inline-popup": inlinePopup ? "" : undefined, "no-results": strings.noResults }), children, buttonSlot, clearButtonSlot, expandIcon == null ? null : React.createElement("span", { slot: "expand-icon", "aria-hidden": true }, expandIcon), listboxSlot),
+      listboxPortal));
 });
 
 export type ListboxProps = ElementProps & { children?: React.ReactNode; selectedOptions?: string[]; defaultSelectedOptions?: string[]; multiselect?: boolean; disableAutoFocus?: boolean; onOptionSelect?: (event: ComboboxSelectionEvent, data: ComboboxOptionSelectData) => void };
 /** Standalone keyboard-operable listbox for composing selectable Option elements. */
-export function Listbox({ children, selectedOptions, defaultSelectedOptions = [], multiselect = false, disableAutoFocus = false, onOptionSelect, ...props }: ListboxProps): React.ReactElement {
+export const Listbox = /* @__PURE__ */ React.forwardRef<HTMLDivElement, ListboxProps>(function Listbox({ children, selectedOptions, defaultSelectedOptions = [], multiselect = false, disableAutoFocus = false, onOptionSelect, ...props }: ListboxProps, forwardedRef): React.ReactElement {
   const [uncontrolled, setUncontrolled] = React.useState(defaultSelectedOptions);
   const selected = selectedOptions ?? uncontrolled;
+  const listboxRef = React.useRef<HTMLDivElement>(null);
+  const mergedRef = React.useMemo(() => composeReactRefs<HTMLDivElement>(listboxRef, forwardedRef), [forwardedRef]);
+  React.useLayoutEffect(() => {
+    const root = listboxRef.current;
+    if (!root) return;
+    if (disableAutoFocus) {
+      root.removeAttribute("aria-activedescendant");
+      return;
+    }
+    const options = [...root.querySelectorAll<HTMLElement>('[role="option"], [role="menuitemcheckbox"]')].filter(option => option.getAttribute("aria-disabled") !== "true");
+    const active = options.find(option => option.getAttribute("aria-selected") === "true" || option.getAttribute("aria-checked") === "true") ?? options[0];
+    if (active?.id) root.setAttribute("aria-activedescendant", active.id);
+    else root.removeAttribute("aria-activedescendant");
+  }, [children, disableAutoFocus, multiselect, selected]);
   const select = (event: ComboboxSelectionEvent, value: string, text: string): void => {
     const next = multiselect ? selected.includes(value) ? selected.filter(item => item !== value) : [...selected, value] : [value];
     if (selectedOptions === undefined) setUncontrolled(next);
     onOptionSelect?.(event, { optionValue: value, optionText: text, selectedOptions: next });
   };
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
-    const options = [...event.currentTarget.querySelectorAll<HTMLElement>('[role="option"]:not([aria-disabled="true"])')];
+    props.onKeyDown?.(event as React.KeyboardEvent<HTMLElement>);
+    if (event.defaultPrevented) return;
+    const options = [...event.currentTarget.querySelectorAll<HTMLElement>('[role="option"]:not([aria-disabled="true"]), [role="menuitemcheckbox"]:not([aria-disabled="true"])')];
     if (!options.length) return;
-    const current = options.indexOf(document.activeElement as HTMLElement);
-    const next = event.key === "ArrowDown" ? Math.min(options.length - 1, current + 1) : event.key === "ArrowUp" ? Math.max(0, current < 0 ? options.length - 1 : current - 1) : -1;
-    if (next >= 0) { event.preventDefault(); options[next].focus(); }
-    else if ((event.key === "Enter" || event.key === " ") && current >= 0) { event.preventDefault(); options[current].click(); }
+    const activeId = event.currentTarget.getAttribute("aria-activedescendant");
+    const focused = document.activeElement as HTMLElement;
+    let current = options.findIndex(option => option.id === activeId);
+    if (current < 0) current = options.indexOf(focused);
+    let next = -1;
+    if (event.key === "ArrowDown") next = Math.min(options.length - 1, current + 1);
+    else if (event.key === "ArrowUp") next = Math.max(0, current < 0 ? 0 : current - 1);
+    else if (event.key === "Home" || event.key === "PageUp") next = 0;
+    else if (event.key === "End" || event.key === "PageDown") next = options.length - 1;
+    if (next >= 0) {
+      event.preventDefault();
+      event.currentTarget.setAttribute("aria-activedescendant", options[next].id);
+      options[next].scrollIntoView({ block: "nearest" });
+    } else if ((event.key === "Enter" || event.key === " ") && current >= 0) {
+      event.preventDefault();
+      options[current].click();
+    }
   };
-  return <CompoundComboboxContext.Provider value={{ mode: "listbox", selectedOptions: selected, multiselect, select }}><div {...props} role="listbox" aria-multiselectable={multiselect || undefined} tabIndex={disableAutoFocus ? undefined : 0} onKeyDown={onKeyDown}>{children}</div></CompoundComboboxContext.Provider>;
-}
+  return <CompoundComboboxContext.Provider value={{ mode: "listbox", selectedOptions: selected, multiselect, select }}><div {...props} ref={mergedRef} role={multiselect ? "menu" : "listbox"} tabIndex={0} onKeyDown={onKeyDown}>{children}</div></CompoundComboboxContext.Provider>;
+});
 
 export type OptionProps = ElementProps & { value?: string; text?: string; disabled?: boolean; checkIcon?: React.ReactNode; children?: React.ReactNode };
 /** Option for Dropdown/ComboBox or a standalone Listbox. */
-export const Option = /* @__PURE__ */ React.forwardRef<HTMLElement, OptionProps>(function Option({ value, text, disabled = false, checkIcon, children, ...props }: OptionProps, forwardedRef): React.ReactElement {
+export const Option = /* @__PURE__ */ React.forwardRef<HTMLElement, OptionProps>(function Option({ value, text, disabled = false, checkIcon, children, id, ...props }: OptionProps, forwardedRef): React.ReactElement {
   const context = React.useContext(CompoundComboboxContext);
+  const generatedId = React.useId();
+  const optionId = id ?? generatedId;
   const optionText = text ?? (typeof children === "string" ? children : "");
   const optionValue = value ?? optionText;
   const optionRef = React.useRef<HTMLElement>(null);
@@ -1750,11 +1889,21 @@ export const Option = /* @__PURE__ */ React.forwardRef<HTMLElement, OptionProps>
   React.useLayoutEffect(() => {
     const host = optionRef.current;
     if (!host || context?.mode !== "combobox" || !context.registerOption) return;
-    return context.registerOption({ id: host.id || optionValue, value: optionValue, text: optionText, disabled: disabled || undefined }, host);
-  }, [context?.mode, context?.registerOption, disabled, optionText, optionValue]);
-  if (context?.mode === "combobox") return React.createElement("spui-combobox-option", useCustomElementProps({ ref: optionRef, ...props, value: optionValue, label: optionText, disabled: disabled || undefined }), children);
+    return context.registerOption({ id: host.id || optionId, value: optionValue, text: optionText, disabled: disabled || undefined }, host);
+  }, [context?.mode, context?.registerOption, disabled, optionId, optionText, optionValue]);
+  if (context?.mode === "combobox") return React.createElement("spui-combobox-option", useCustomElementProps({ ref: optionRef, ...props, id: optionId, value: optionValue, label: optionText, disabled: disabled || undefined }), children);
   const selected = context?.selectedOptions?.includes(optionValue) ?? false;
-  return <div {...props} ref={optionRef as unknown as React.Ref<HTMLDivElement>} role="option" aria-selected={selected} aria-disabled={disabled || undefined} tabIndex={-1} style={{ display: "flex", alignItems: "center", minHeight: 36, padding: "8px 10px", borderRadius: "var(--spui-control-radius,4px)", background: selected ? "var(--spui-ui-surface-hover,var(--spui-ui-canvas,#f5f5f5))" : "transparent", color: "var(--spui-ui-text,inherit)", cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.55 : 1, ...props.style }} onClick={event => { props.onClick?.(event); if (!disabled) context?.select?.(event, optionValue, optionText); }}>{checkIcon ?? (selected ? <span aria-hidden="true">✓</span> : null)}{children}</div>;
+  const multiselect = Boolean(context?.multiselect);
+  return <div {...props} ref={optionRef as unknown as React.Ref<HTMLDivElement>} id={optionId} role={multiselect ? "menuitemcheckbox" : "option"} aria-checked={multiselect ? selected : undefined} aria-selected={multiselect ? undefined : selected} aria-disabled={disabled || undefined} tabIndex={-1} style={{ display: "flex", alignItems: "center", minHeight: 36, padding: "8px 10px", borderRadius: "var(--spui-control-radius,4px)", background: selected ? "var(--spui-ui-surface-hover,var(--spui-ui-canvas,#f5f5f5))" : "transparent", color: "var(--spui-ui-text,inherit)", cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.55 : 1, ...props.style }} onClick={event => {
+    if (disabled) { event.preventDefault(); return; }
+    const listbox = event.currentTarget.closest<HTMLElement>('[role="listbox"], [role="menu"]');
+    if (listbox) {
+      listbox.setAttribute("aria-activedescendant", optionId);
+      listbox.focus({ preventScroll: true });
+    }
+    context?.select?.(event, optionValue, optionText);
+    props.onClick?.(event);
+  }}>{checkIcon ?? (selected ? <span aria-hidden="true">✓</span> : null)}{children}</div>;
 });
 
 export type OptionGroupProps = ElementProps & { label?: string; children?: React.ReactNode };
@@ -2541,9 +2690,13 @@ export const TabPanel = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementPro
 });
 
 export type TooltipVisibleChangeEvent = React.PointerEvent<HTMLElement> | React.FocusEvent<HTMLElement> | undefined;
-export const Tooltip = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; content?: React.ReactNode; placement?: "top" | "bottom" | "start" | "end" | "left" | "right"; positioning?: TooltipPositioning; align?: "start" | "center" | "end"; offset?: number; appearance?: TooltipAppearance; relationship?: TooltipRelationship; disabled?: boolean; open?: boolean; visible?: boolean; delay?: number; showDelay?: number; hideDelay?: number; withArrow?: boolean; onOpenChange?: (open: boolean) => void; onVisibleChange?: (event: TooltipVisibleChangeEvent, data: TooltipVisibleChangeData) => void }>(function Tooltip({ children, content, placement = "top", positioning, align, offset, appearance = "normal", relationship = "description", disabled = false, open, visible, delay, showDelay, hideDelay, withArrow = false, onOpenChange, onVisibleChange, ...props }: ElementProps & { children?: React.ReactNode; content?: React.ReactNode; placement?: "top" | "bottom" | "start" | "end" | "left" | "right"; positioning?: TooltipPositioning; align?: "start" | "center" | "end"; offset?: number; appearance?: TooltipAppearance; relationship?: TooltipRelationship; disabled?: boolean; open?: boolean; visible?: boolean; delay?: number; showDelay?: number; hideDelay?: number; withArrow?: boolean; onOpenChange?: (open: boolean) => void; onVisibleChange?: (event: TooltipVisibleChangeEvent, data: TooltipVisibleChangeData) => void }, forwardedRef): React.ReactElement {
+export type TooltipProps = ElementProps & { children?: React.ReactNode; content?: React.ReactNode; mountNode?: PortalMountNode; placement?: "top" | "bottom" | "start" | "end" | "left" | "right"; positioning?: TooltipPositioning; align?: "start" | "center" | "end"; offset?: number; appearance?: TooltipAppearance; relationship?: TooltipRelationship; disabled?: boolean; open?: boolean; visible?: boolean; delay?: number; showDelay?: number; hideDelay?: number; withArrow?: boolean; onOpenChange?: (open: boolean) => void; onVisibleChange?: (event: TooltipVisibleChangeEvent, data: TooltipVisibleChangeData) => void };
+export const Tooltip = /* @__PURE__ */ React.forwardRef<HTMLElement, TooltipProps>(function Tooltip({ children, content, mountNode, placement = "top", positioning, align, offset, appearance = "normal", relationship = "description", disabled = false, open, visible, delay, showDelay, hideDelay, withArrow = false, onOpenChange, onVisibleChange, ...props }: TooltipProps, forwardedRef): React.ReactElement {
+  const context = React.useContext(UIContext);
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
+  const portalContainer = usePortalContainer(mountNode, context.dir, content !== undefined);
+  const tooltipContentRef = React.useRef<HTMLElement>(null);
   const controlledVisible = visible ?? open;
   const controlledVisibleRef = React.useRef(controlledVisible);
   controlledVisibleRef.current = controlledVisible;
@@ -2558,12 +2711,19 @@ export const Tooltip = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProp
   });
   React.useLayoutEffect(() => { const element = ref.current as (HTMLElement & { open?: boolean }) | null; if (element && controlledVisible !== undefined) element.open = controlledVisible; }, [controlledVisible]);
   React.useLayoutEffect(() => { const element = ref.current as (HTMLElement & { positioning?: TooltipPositioning }) | null; if (element) element.positioning = positioning; }, [positioning]);
+  React.useLayoutEffect(() => {
+    const element = ref.current as (HTMLElement & { tooltipElement?: HTMLElement | null }) | null;
+    if (!element) return;
+    element.tooltipElement = tooltipContentRef.current;
+    return () => { if (element.tooltipElement === tooltipContentRef.current) element.tooltipElement = undefined; };
+  }, [portalContainer, content]);
   const resolvedPositioning = typeof positioning === "string" ? positioning : positioning?.position;
   const resolvedAlign = typeof positioning === "object" ? positioning.align : align;
   const resolvedOffset = typeof positioning === "object" ? positioning.offset : offset;
   const resolvedPlacement = resolvedPositioning ?? placement;
-  return React.createElement("spui-tooltip", useCustomElementProps({ ...props, ref, placement: resolvedPlacement, positioning: undefined, align: resolvedAlign, offset: typeof resolvedOffset === "number" ? resolvedOffset : undefined, appearance, relationship, disabled: disabled || undefined, open: controlledVisible, "show-delay": showDelay ?? delay, "hide-delay": hideDelay, "with-arrow": withArrow || undefined }), children,
-    content === undefined ? null : React.createElement("span", { slot: "tooltip" }, content));
+  const tooltipContent = content === undefined ? null : React.createElement("span", { slot: "tooltip", ref: tooltipContentRef, style: context.hostStyle }, content);
+  const tooltipPortal = portalContainer && tooltipContent ? createPortal(tooltipContent, portalContainer) : null;
+  return React.createElement("spui-tooltip", useCustomElementProps({ ...props, ref, placement: resolvedPlacement, positioning: undefined, align: resolvedAlign, offset: typeof resolvedOffset === "number" ? resolvedOffset : undefined, appearance, relationship, disabled: disabled || undefined, open: controlledVisible, "show-delay": showDelay ?? delay, "hide-delay": hideDelay, "with-arrow": withArrow || undefined }), children, tooltipPortal);
 });
 
 export type PopoverContextValue = {
@@ -2574,7 +2734,7 @@ export type PopoverContextValue = {
   contentRef: React.MutableRefObject<HTMLElement | null>;
   openOnHover: boolean;
   openOnContext: boolean;
-  mountNode?: HTMLElement | null;
+  mountNode?: PortalMountNode;
   withArrow: boolean;
   arrowRef: React.MutableRefObject<HTMLDivElement | null>;
   size: "small" | "medium" | "large";
@@ -2589,7 +2749,8 @@ export function PopoverProvider({ value, children }: { value: PopoverContextValu
 }
 
 export type PopoverOpenChangeEvent = MouseEvent | TouchEvent | FocusEvent | React.FocusEvent<HTMLElement> | React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement>;
-export const Popover = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; trigger?: React.ReactElement; label?: string; placement?: "top" | "bottom" | "start" | "end"; positioning?: PopoverPositioning; open?: boolean; defaultOpen?: boolean; openOnContext?: boolean; openOnHover?: boolean; mouseLeaveDelay?: number; closeOnIframeFocus?: boolean; onOpenChange?: (event: PopoverOpenChangeEvent, data: PopoverOpenChangeData) => void; inline?: boolean; trapFocus?: boolean; inertTrapFocus?: boolean; legacyTrapFocus?: boolean; unstable_disableAutoFocus?: boolean; arrow?: boolean; withArrow?: boolean; appearance?: "brand" | "inverted"; size?: "small" | "medium" | "large"; closeOnScroll?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps> }>(function Popover({ children, trigger, label, placement = "bottom", positioning, open, defaultOpen = false, openOnContext, openOnHover, mouseLeaveDelay, closeOnIframeFocus = true, onOpenChange, inline, trapFocus, inertTrapFocus, legacyTrapFocus, unstable_disableAutoFocus = false, arrow, withArrow, appearance, size, closeOnScroll = false, surfaceMotion, ...props }: ElementProps & { children?: React.ReactNode; trigger?: React.ReactElement; label?: string; placement?: "top" | "bottom" | "start" | "end"; positioning?: PopoverPositioning; open?: boolean; defaultOpen?: boolean; openOnContext?: boolean; openOnHover?: boolean; mouseLeaveDelay?: number; closeOnIframeFocus?: boolean; onOpenChange?: (event: PopoverOpenChangeEvent, data: PopoverOpenChangeData) => void; inline?: boolean; trapFocus?: boolean; inertTrapFocus?: boolean; legacyTrapFocus?: boolean; unstable_disableAutoFocus?: boolean; arrow?: boolean; withArrow?: boolean; appearance?: "brand" | "inverted"; size?: "small" | "medium" | "large"; closeOnScroll?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps> }, forwardedRef): React.ReactElement {
+const popoverPortalStyles = `.spui-popover-portal-surface{position:fixed;inset:auto;margin:0;z-index:var(--spui-layer-popover,10000);box-sizing:border-box;width:max-content;max-width:var(--spui-popover-max-width,min(360px,calc(100vw - 16px)));max-height:var(--spui-popover-max-height,min(70vh,calc(100dvh - 24px)));overflow:auto;padding:16px;border:1px solid var(--spui-popover-border,var(--spui-ui-stroke,var(--spui-semantic-body-divider,#d1d1d1)));border-radius:var(--spui-popover-radius,var(--spui-card-radius,8px));background:var(--spui-popover-background,var(--spui-ui-surface,var(--colorNeutralBackground1,#fff)));color:var(--spui-popover-color,var(--spui-ui-text,var(--colorNeutralForeground1,#242424)));box-shadow:var(--spui-popover-shadow,0 8px 24px rgb(0 0 0 / 18%));font-family:var(--spui-font-family,inherit);font-size:14px;line-height:1.45;opacity:1;transform:scale(1);transform-origin:center;transition:opacity var(--spui-motion-duration-normal,140ms) cubic-bezier(.16,1,.3,1),transform var(--spui-motion-duration-normal,140ms) cubic-bezier(.16,1,.3,1)}.spui-popover-portal-surface:not(:popover-open){display:none}.spui-popover-portal-surface[hidden]{display:none!important}.spui-popover-portal-surface h2{margin:0 0 8px;font:600 16px/1.35 var(--spui-font-family,inherit)}.spui-popover-portal-surface h2:empty{display:none}.spui-popover-portal-surface[data-appearance=brand]{--spui-popover-background:var(--spui-ui-accent,var(--colorBrandBackground,#0078d4));--spui-popover-color:var(--spui-ui-accent-text,var(--spui-semantic-primary-button-text,#fff));--spui-popover-border:var(--spui-ui-accent,var(--colorBrandBackground,#0078d4))}.spui-popover-portal-surface[data-appearance=inverted]{--spui-popover-background:var(--spui-ui-text,var(--spui-semantic-body-text,#242424));--spui-popover-color:var(--spui-ui-surface,var(--spui-semantic-body-background,#fff));--spui-popover-border:var(--spui-ui-text,var(--spui-semantic-body-text,#242424))}.spui-popover-portal-surface[data-size=small]{padding:8px;font-size:12px}.spui-popover-portal-surface[data-size=large]{padding:20px;font-size:16px}.spui-popover-portal-surface[data-spui-appearance=glass]{backdrop-filter:blur(18px) saturate(1.35)}.spui-popover-portal-surface[data-arrow]:before{content:"";position:absolute;z-index:1;width:8px;height:8px;border:1px solid var(--spui-popover-border,var(--spui-ui-stroke,#d1d1d1));background:var(--spui-popover-background,var(--spui-ui-surface,#fff));transform:rotate(45deg)}.spui-popover-portal-surface[data-arrow][data-placement=bottom]:before{inset-block-start:-5px;inset-inline-start:var(--spui-popover-arrow-inline-offset,calc(50% - 5px));border-inline-end:0;border-block-end:0}.spui-popover-portal-surface[data-arrow][data-placement=top]:before{inset-block-end:-5px;inset-inline-start:var(--spui-popover-arrow-inline-offset,calc(50% - 5px));border-inline-start:0;border-block-start:0}.spui-popover-portal-surface[data-arrow][data-placement=left]:before{inset-inline-end:-5px;inset-block-start:var(--spui-popover-arrow-block-offset,calc(50% - 5px));border-inline-start:0;border-block-end:0}.spui-popover-portal-surface[data-arrow][data-placement=right]:before{inset-inline-start:-5px;inset-block-start:var(--spui-popover-arrow-block-offset,calc(50% - 5px));border-inline-end:0;border-block-start:0}@media(prefers-reduced-motion:reduce){.spui-popover-portal-surface{transition:none}}@media(forced-colors:active){.spui-popover-portal-surface{border-color:CanvasText;box-shadow:none}.spui-popover-portal-surface:popover-open{outline:1px solid CanvasText}}`;
+export const Popover = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; trigger?: React.ReactElement; label?: string; placement?: "top" | "bottom" | "start" | "end"; positioning?: PopoverPositioning; open?: boolean; defaultOpen?: boolean; openOnContext?: boolean; openOnHover?: boolean; mouseLeaveDelay?: number; closeOnIframeFocus?: boolean; onOpenChange?: (event: PopoverOpenChangeEvent, data: PopoverOpenChangeData) => void; inline?: boolean; trapFocus?: boolean; inertTrapFocus?: boolean; legacyTrapFocus?: boolean; unstable_disableAutoFocus?: boolean; arrow?: boolean; withArrow?: boolean; appearance?: "brand" | "inverted"; size?: "small" | "medium" | "large"; closeOnScroll?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>; mountNode?: PortalMountNode }>(function Popover({ children, trigger, label, placement = "bottom", positioning, open, defaultOpen = false, openOnContext, openOnHover, mouseLeaveDelay, closeOnIframeFocus = true, onOpenChange, inline, trapFocus, inertTrapFocus, legacyTrapFocus, unstable_disableAutoFocus = false, arrow, withArrow, appearance, size, closeOnScroll = false, surfaceMotion, mountNode, ...props }: ElementProps & { children?: React.ReactNode; trigger?: React.ReactElement; label?: string; placement?: "top" | "bottom" | "start" | "end"; positioning?: PopoverPositioning; open?: boolean; defaultOpen?: boolean; openOnContext?: boolean; openOnHover?: boolean; mouseLeaveDelay?: number; closeOnIframeFocus?: boolean; onOpenChange?: (event: PopoverOpenChangeEvent, data: PopoverOpenChangeData) => void; inline?: boolean; trapFocus?: boolean; inertTrapFocus?: boolean; legacyTrapFocus?: boolean; unstable_disableAutoFocus?: boolean; arrow?: boolean; withArrow?: boolean; appearance?: "brand" | "inverted"; size?: "small" | "medium" | "large"; closeOnScroll?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>; mountNode?: PortalMountNode }, forwardedRef): React.ReactElement {
   const provider = React.useContext(PopoverContext);
   const resolvedOpen = open ?? provider?.open;
   const resolvedOpenOnContext = openOnContext ?? provider?.openOnContext ?? false;
@@ -2600,6 +2761,10 @@ export const Popover = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProp
   const resolvedAppearance = appearance ?? provider?.appearance;
   const resolvedSize = size ?? provider?.size ?? "medium";
   const resolvedArrow = withArrow ?? arrow ?? provider?.withArrow ?? false;
+  const context = React.useContext(UIContext);
+  const resolvedMountNode = mountNode === undefined ? provider?.mountNode : mountNode;
+  const portalContainer = usePortalContainer(resolvedMountNode, context.dir, !resolvedInline && resolvedMountNode !== undefined);
+  const portalSurfaceRef = React.useRef<HTMLDivElement>(null);
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   const [motionState, setMotionState] = React.useState(open ?? defaultOpen);
@@ -2636,6 +2801,12 @@ export const Popover = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProp
     const element = ref.current as (HTMLElement & { positioning?: PopoverPositioning }) | null;
     if (element) element.positioning = positioning ?? (resolvedOpenOnContext ? "above" : placement);
   }, [positioning, placement, resolvedOpenOnContext]);
+  React.useLayoutEffect(() => {
+    const element = ref.current as (HTMLElement & { popoverSurface?: HTMLElement | null }) | null;
+    if (!element) return;
+    element.popoverSurface = portalContainer && !resolvedInline ? portalSurfaceRef.current : null;
+    return () => { if (element.popoverSurface === portalSurfaceRef.current) element.popoverSurface = null; };
+  }, [portalContainer, resolvedInline]);
   const parts = React.Children.toArray(children);
   const triggerPart = parts.find(child => React.isValidElement(child) && child.type === PopoverTrigger);
   const surfacePart = parts.find(child => React.isValidElement(child) && child.type === PopoverSurface);
@@ -2648,11 +2819,17 @@ export const Popover = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProp
   const surfaceNode = React.isValidElement<{ children?: React.ReactNode }>(surfacePart)
     ? React.createElement(PopoverSurface, surfacePart.props, surfacePart.props.children)
     : content;
-  return React.createElement("spui-popover", useCustomElementProps({ ...props, ref, label, placement, inline: resolvedInline || undefined, motion: surfaceMotion ? true : undefined, "data-spui-controlled-open": resolvedOpen !== undefined || undefined, "default-open": defaultOpen || undefined, "open-on-context": resolvedOpenOnContext || undefined, "open-on-hover": resolvedOpenOnHover || undefined, "mouse-leave-delay": mouseLeaveDelay, "close-on-iframe-focus": closeOnIframeFocus ? undefined : "false", "trap-focus": resolvedTrapFocus || undefined, "inert-trap-focus": resolvedInertTrapFocus === undefined ? undefined : String(resolvedInertTrapFocus), "legacy-trap-focus": legacyTrapFocus === undefined ? undefined : String(legacyTrapFocus), "unstable-disable-auto-focus": unstable_disableAutoFocus || undefined, arrow: resolvedArrow || undefined, "close-on-scroll": closeOnScroll || undefined, appearance: resolvedAppearance, size: resolvedSize }),
+  const motionSurface = surfaceMotion
+    ? React.createElement(surfaceMotion, { visible: motionVisible, appear: true, unmountOnExit: true, slot: "surface" }, surfaceNode)
+    : surfaceNode;
+  const popoverElement = React.createElement("spui-popover", useCustomElementProps({ ...props, ref, label, placement, inline: resolvedInline || undefined, motion: surfaceMotion ? true : undefined, "data-spui-controlled-open": resolvedOpen !== undefined || undefined, "default-open": defaultOpen || undefined, "open-on-context": resolvedOpenOnContext || undefined, "open-on-hover": resolvedOpenOnHover || undefined, "mouse-leave-delay": mouseLeaveDelay, "close-on-iframe-focus": closeOnIframeFocus ? undefined : "false", "trap-focus": resolvedTrapFocus || undefined, "inert-trap-focus": resolvedInertTrapFocus === undefined ? undefined : String(resolvedInertTrapFocus), "legacy-trap-focus": legacyTrapFocus === undefined ? undefined : String(legacyTrapFocus), "unstable-disable-auto-focus": unstable_disableAutoFocus || undefined, arrow: resolvedArrow || undefined, "close-on-scroll": closeOnScroll || undefined, appearance: resolvedAppearance, size: resolvedSize }),
     triggerNode,
-    React.createElement("div", { slot: "content" }, surfaceMotion
-      ? React.createElement(surfaceMotion, { visible: motionVisible, appear: true, unmountOnExit: true, slot: "surface" }, surfaceNode)
-      : surfaceNode));
+    portalContainer && !resolvedInline ? null : React.createElement("div", { slot: "content" }, motionSurface));
+  const portalSurface = portalContainer && !resolvedInline ? createPortal(React.createElement(React.Fragment, null,
+    React.createElement("style", null, popoverPortalStyles),
+    React.createElement("div", { ref: portalSurfaceRef, className: "spui-popover-portal-surface", part: "surface", popover: "manual", tabIndex: -1, "data-appearance": resolvedAppearance, "data-size": resolvedSize, "data-arrow": resolvedArrow ? "" : undefined, "data-spui-appearance": props["data-spui-appearance"], dir: context.dir, lang: context.lang, style: { ...context.hostStyle, ...props.style } }, motionSurface)
+  ), portalContainer) : null;
+  return React.createElement(React.Fragment, null, popoverElement, portalSurface);
 });
 
 export const PopoverTrigger = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; disableButtonEnhancement?: boolean }>(function PopoverTrigger({ children, disableButtonEnhancement = false, ...props }: ElementProps & { children?: React.ReactNode; disableButtonEnhancement?: boolean }, forwardedRef): React.ReactElement {
@@ -2885,17 +3062,22 @@ export function TeachingPopoverCarouselPageCount({ children, ...props }: Element
 
 export type MenuPositioning = "top" | "bottom" | "start" | "end" | "above" | "below" | "before" | "after" | "above-start" | "above-end" | "below-start" | "below-end";
 export type MenuPositioningOptions = { placement?: MenuPositioning; align?: "start" | "end"; offset?: number };
+const menuPortalStyles = `.spui-menu-portal-surface{position:fixed;inset:auto;margin:0;z-index:var(--spui-layer-popover,10000);box-sizing:border-box;width:max-content;min-width:180px;max-width:min(320px,calc(100vw - 16px));max-height:min(70vh,calc(100dvh - 24px));overflow:auto;padding:4px;border:1px solid var(--spui-menu-border,var(--spui-ui-stroke,var(--spui-semantic-body-divider,#d1d1d1)));border-radius:var(--spui-menu-radius,var(--spui-card-radius,8px));background:var(--spui-menu-background,var(--spui-ui-surface,var(--colorNeutralBackground1,#fff)));color:var(--spui-menu-color,var(--spui-ui-text,var(--colorNeutralForeground1,#242424)));box-shadow:var(--spui-menu-shadow,0 8px 24px rgb(0 0 0 / 18%));font:var(--spui-font-family,inherit);line-height:1.45}.spui-menu-portal-surface:not(:popover-open){display:none}.spui-menu-portal-surface[hidden]{display:none!important}@media(forced-colors:active){.spui-menu-portal-surface{border-color:CanvasText;box-shadow:none;background:Canvas;color:CanvasText}}`;
 export type MenuProps = Omit<ElementProps, "onSelect" | "contextMenu"> & {
   children?: React.ReactNode; trigger?: React.ReactElement; label?: string; placement?: MenuPositioning; positioning?: MenuPositioning | MenuPositioningOptions;
   open?: boolean; defaultOpen?: boolean; contextMenu?: boolean; openOnContext?: boolean; openOnHover?: boolean; hoverDelay?: number;
   closeOnScroll?: boolean; inline?: boolean; persistOnItemClick?: boolean; checkedValues?: MenuCheckedValues; defaultCheckedValues?: MenuCheckedValues;
-  hasCheckmarks?: boolean; hasIcons?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>;
+  hasCheckmarks?: boolean; hasIcons?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>; mountNode?: PortalMountNode;
   onCheckedValueChange?: (event: MenuCheckedValueChangeEvent, data: MenuCheckedValueChangeData) => void;
   onOpenChange?: (event: MenuReactOpenChangeEvent, data: MenuReactOpenChangeData) => void; onSelect?: (value: string, label: string, checked: boolean) => void;
 };
 
-export function Menu({ children, trigger, label, placement, positioning, open, defaultOpen = false, contextMenu = false, openOnContext = contextMenu, openOnHover = false, hoverDelay = 300, closeOnScroll = false, inline = false, persistOnItemClick = false, checkedValues, defaultCheckedValues = {}, hasCheckmarks = false, hasIcons = false, surfaceMotion, onCheckedValueChange, onOpenChange, onSelect, ...props }: MenuProps): React.ReactElement {
+export function Menu({ children, trigger, label, placement, positioning, open, defaultOpen = false, contextMenu = false, openOnContext = contextMenu, openOnHover = false, hoverDelay = 300, closeOnScroll = false, inline = false, persistOnItemClick = false, checkedValues, defaultCheckedValues = {}, hasCheckmarks = false, hasIcons = false, surfaceMotion, mountNode, onCheckedValueChange, onOpenChange, onSelect, ...props }: MenuProps): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null);
+  const parentMenuRef = React.useContext(MenuHostContext);
+  const portalSurfaceRef = React.useRef<HTMLDivElement>(null);
+  const context = React.useContext(UIContext);
+  const portalContainer = usePortalContainer(mountNode, context.dir, !inline && mountNode !== undefined);
   const [internalCheckedValues, setInternalCheckedValues] = React.useState<MenuCheckedValues>(defaultCheckedValues);
   const [motionState, setMotionState] = React.useState(open ?? defaultOpen);
   const motionVisible = open ?? motionState;
@@ -2926,6 +3108,17 @@ export function Menu({ children, trigger, label, placement, positioning, open, d
     const element = ref.current as (HTMLElement & { open?: boolean }) | null;
     if (element && open !== undefined) element.open = open;
   }, [open]);
+  React.useLayoutEffect(() => {
+    const element = ref.current as (HTMLElement & { menuSurface?: HTMLElement | null; parentMenuElement?: HTMLElement | null }) | null;
+    if (!element) return;
+    const parentMenuElement = parentMenuRef?.current ?? null;
+    element.parentMenuElement = parentMenuElement;
+    element.menuSurface = portalContainer && !inline ? portalSurfaceRef.current : null;
+    return () => {
+      if (element.menuSurface === portalSurfaceRef.current) element.menuSurface = null;
+      if (element.parentMenuElement === parentMenuElement) element.parentMenuElement = null;
+    };
+  }, [portalContainer, inline, parentMenuRef]);
   const parts = React.Children.toArray(children);
   const triggerPart = parts.find(child => React.isValidElement(child) && child.type === MenuTrigger);
   const menuChildren = parts.filter(child => child !== triggerPart);
@@ -2937,8 +3130,12 @@ export function Menu({ children, trigger, label, placement, positioning, open, d
   const alignedPosition = positionOptions?.align && positionValue && ["top", "bottom", "above", "below"].includes(positionValue) ? `${positionValue === "above" ? "above" : positionValue === "below" ? "below" : positionValue}-${positionOptions.align}` : positionValue;
   const menuItems = React.createElement("div", { slot: "menu", "has-checkmarks": hasCheckmarks ? "" : undefined, "has-icons": hasIcons ? "" : undefined }, menuChildren);
   const motionContent = surfaceMotion ? React.createElement(surfaceMotion, { visible: motionVisible, appear: true, unmountOnExit: true, slot: "surface" }, menuItems) : menuItems;
-  const menuElement = React.createElement("spui-menu", useCustomElementProps({ ...props, ref, label, placement, positioning: alignedPosition, motion: surfaceMotion ? true : undefined, "position-offset": positionOptions?.offset, "default-open": defaultOpen ? "" : undefined, "context-menu": contextMenu ? "" : undefined, "open-on-context": openOnContext ? "" : undefined, "open-on-hover": openOnHover ? "" : undefined, "hover-delay": hoverDelay, "close-on-scroll": closeOnScroll ? "" : undefined, inline: inline ? "" : undefined, "persist-on-item-click": persistOnItemClick ? "" : undefined }), triggerNode, motionContent);
-  return React.createElement(MenuSelectionContext.Provider, { value: selection }, menuElement);
+  const menuElement = React.createElement("spui-menu", useCustomElementProps({ ...props, ref, label, placement, positioning: alignedPosition, motion: surfaceMotion ? true : undefined, "position-offset": positionOptions?.offset, "default-open": defaultOpen ? "" : undefined, "context-menu": contextMenu ? "" : undefined, "open-on-context": openOnContext ? "" : undefined, "open-on-hover": openOnHover ? "" : undefined, "hover-delay": hoverDelay, "close-on-scroll": closeOnScroll ? "" : undefined, inline: inline ? "" : undefined, "persist-on-item-click": persistOnItemClick ? "" : undefined }), triggerNode, portalContainer && !inline ? null : motionContent);
+  const portalSurface = portalContainer && !inline ? createPortal(React.createElement(React.Fragment, null,
+    React.createElement("style", null, menuPortalStyles),
+    React.createElement("div", { ref: portalSurfaceRef, className: "spui-menu-portal-surface", part: "surface", popover: "manual", role: "menu", "aria-orientation": "vertical", dir: context.dir, lang: context.lang, style: context.hostStyle }, motionContent)
+  ), portalContainer) : null;
+  return React.createElement(MenuHostContext.Provider, { value: ref }, React.createElement(MenuSelectionContext.Provider, { value: selection }, React.createElement(React.Fragment, null, menuElement, portalSurface)));
 }
 
 /** Open a command menu from a right-click, the Context Menu key, or Shift+F10. */
@@ -5607,8 +5804,7 @@ export const FileUpload = /* @__PURE__ */ React.forwardRef<HTMLElement, FileUplo
   return React.createElement("spui-file-upload", nativeControlHostProps({ ...props, ref, label, name, accept, multiple: multiple || undefined, disabled: disabled || undefined, required: required || undefined, "max-files": maxFiles, "max-file-size": maxFileSize, "browse-label": browseLabel ?? context.strings.fileUploadBrowse, "drop-label": dropLabel ?? context.strings.fileUploadDrop, "remove-label": removeLabel ?? context.strings.fileUploadRemove, "selected-label": selectedLabel ?? context.strings.fileUploadSelected, "required-message": context.strings.fileUploadRequired, "file-type-message": context.strings.fileUploadTypeError, "file-too-large-message": context.strings.fileUploadSizeError, "max-files-message": context.strings.fileUploadLimitError }));
 });
 
-export type ImageProps = Omit<React.ImgHTMLAttributes<HTMLImageElement>, "alt" | "loading" | "decoding"> & {
-  alt: string;
+export type ImageProps = Omit<React.ImgHTMLAttributes<HTMLImageElement>, "loading" | "decoding"> & {
   fit?: ImageFit;
   shape?: ImageShape;
   block?: boolean;
@@ -5619,9 +5815,9 @@ export type ImageProps = Omit<React.ImgHTMLAttributes<HTMLImageElement>, "alt" |
 };
 
 /** Theme-aware image styling on a native img; keeps srcset, dimensions, and browser loading native. */
-export function Image({ alt, fit = "none", shape = "square", block, bordered, shadow, loading = "lazy", decoding = "async", style, ...props }: ImageProps): React.ReactElement {
-  return React.createElement("img", useHostProps({ ...props, alt, loading, decoding, style: { ...getImageStyle({ fit, shape, block, bordered, shadow, width: props.width, height: props.height }), ...style } }));
-}
+export const Image = /* @__PURE__ */ React.forwardRef<HTMLImageElement, ImageProps>(function Image({ alt, fit = "default", shape = "square", block, bordered, shadow, loading, decoding, style, ...props }: ImageProps, forwardedRef): React.ReactElement {
+  return React.createElement("img", useHostProps({ ...props, ref: forwardedRef, alt, loading, decoding, style: { ...getImageStyle({ fit, shape, block, bordered, shadow, width: props.width, height: props.height }), ...style } }));
+});
 
 export type SearchBoxChangeEvent = React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLSpanElement>;
 export type SearchBoxProps = Omit<InputProps, "appearance" | "children" | "defaultValue" | "input" | "onChange" | "size" | "type" | "value"> & { children?: React.ReactNode; label?: string; type?: React.HTMLInputTypeAttribute; value?: string; defaultValue?: string; onValueChange?: (value: string) => void; onSearch?: (value: string) => void; onChange?: (event: SearchBoxChangeEvent, data: { value: string }) => void; size?: SearchSize; appearance?: SearchAppearance; clearLabel?: string; contentBefore?: React.ReactNode; contentAfter?: React.ReactNode; dismiss?: React.ReactNode };
@@ -6587,17 +6783,18 @@ function createTargetedToastController(toasterId: string): ToastControllerValue 
   };
 }
 
-export const Toaster = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { position?: ToastPosition; limit?: number; inline?: boolean; toasterId?: string; announce?: ToastAnnounce; children?: React.ReactNode }>(function Toaster({ position = "top-end", limit, inline = false, toasterId, announce, "aria-label": ariaLabel, children, ...props }: ElementProps & { position?: ToastPosition; limit?: number; inline?: boolean; toasterId?: string; announce?: ToastAnnounce; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const Toaster = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { position?: ToastPosition; limit?: number; inline?: boolean; toasterId?: string; mountNode?: PortalMountNode; announce?: ToastAnnounce; children?: React.ReactNode }>(function Toaster({ position = "top-end", limit, inline = false, toasterId, mountNode, announce, "aria-label": ariaLabel, children, ...props }: ElementProps & { position?: ToastPosition; limit?: number; inline?: boolean; toasterId?: string; mountNode?: PortalMountNode; announce?: ToastAnnounce; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   const context = React.useContext(UIContext);
   const [records, setRecords] = React.useState<ToastRecord[]>([]);
   const ref = React.useRef<(HTMLElement & { announce?: ToastAnnounce }) | null>(null)
-  useExposeHostRef(ref, forwardedRef);;
+  const portalContainer = usePortalContainer(mountNode, context.dir, !inline);
+  useExposeHostRef(ref, forwardedRef, portalContainer);
   ensureDefined(defineToaster);
   React.useLayoutEffect(() => {
     const element = ref.current;
     if (element) element.announce = announce;
     return () => { if (element) element.announce = undefined; };
-  }, [announce]);
+  }, [announce, portalContainer]);
   const removeToast = React.useCallback((id: string): void => setRecords(current => current.filter(record => record.id !== id)), []);
   React.useLayoutEffect(() => {
     const element = ref.current;
@@ -6608,7 +6805,7 @@ export const Toaster = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProp
     };
     element.addEventListener("spui-dismiss", handleDismiss);
     return () => element.removeEventListener("spui-dismiss", handleDismiss);
-  }, [removeToast]);
+  }, [removeToast, portalContainer]);
 
   const dispatchToast = React.useCallback((content: React.ReactNode, options: ToastDispatchOptions = {}): string => {
     const { toastId, ...recordOptions } = options;
@@ -6662,7 +6859,7 @@ export const Toaster = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProp
     };
     targetDocument.addEventListener(toastControllerEventName, handleControllerEvent);
     return () => targetDocument.removeEventListener(toastControllerEventName, handleControllerEvent);
-  }, [dispatchToast, updateToast, dismissToast, dismissAllToasts, pauseToast, playToast, focusNewest, toasterId]);
+  }, [dispatchToast, updateToast, dismissToast, dismissAllToasts, pauseToast, playToast, focusNewest, toasterId, portalContainer]);
   React.useLayoutEffect(() => {
     if (!toasterId) return;
     toastControllerRegistry.set(toasterId, controller);
@@ -6677,12 +6874,11 @@ export const Toaster = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProp
   };
   React.Children.forEach(children, partitionChild);
 
-  return React.createElement(ToastControllerContext.Provider, { value: controller },
-    React.createElement(React.Fragment, null,
-      toasterDescendants,
-      React.createElement("spui-toaster", useCustomElementProps({ ...props, ref, position, inline: inline || undefined, limit: Number.isFinite(limit) && limit! >= 0 ? Math.floor(limit!) : undefined, managed: "", "toaster-id": toasterId, "aria-label": ariaLabel ?? context.strings.notifications ?? "Notifications" }),
-        compoundToasts,
-        records.map(record => React.createElement(Toast, { key: record.id, id: record.id, ...record.options }, record.content)))));
+  const toaster = React.createElement("spui-toaster", useCustomElementProps({ ...props, style: inline ? props.style : { ...context.hostStyle, ...props.style }, ref, position, inline: inline || undefined, limit: Number.isFinite(limit) && limit! >= 0 ? Math.floor(limit!) : undefined, managed: "", "toaster-id": toasterId, "aria-label": ariaLabel ?? context.strings.notifications ?? "Notifications" }),
+    compoundToasts,
+    records.map(record => React.createElement(Toast, { key: record.id, id: record.id, ...record.options }, record.content)));
+  const renderedToaster = inline ? toaster : portalContainer ? createPortal(toaster, portalContainer) : null;
+  return React.createElement(ToastControllerContext.Provider, { value: controller }, React.createElement(React.Fragment, null, toasterDescendants, renderedToaster));
 });
 
 export function useToastController(toasterId?: string): ToastControllerValue {

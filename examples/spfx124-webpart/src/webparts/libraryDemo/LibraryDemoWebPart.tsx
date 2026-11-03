@@ -4,7 +4,7 @@ import { Version } from "@microsoft/sp-core-library";
 import { ThemeProvider, type ThemeChangedEventArgs } from "@microsoft/sp-component-base";
 import { BaseClientSideWebPart } from "@microsoft/sp-webpart-base";
 import { SPHttpClient } from "@microsoft/sp-http";
-import { applySharePointTheme, type SharePointTheme, type FluentThemeTokens } from "@vilius/sharepoint-ui";
+import { applySharePointTheme, type SharePointTheme, type FluentThemeTokens } from "@spfx-fast/sharepoint-ui";
 import { MetricsDashboard } from "./components/MetricsDashboard";
 
 export default class LibraryDemoWebPart extends BaseClientSideWebPart<Record<string, never>> {

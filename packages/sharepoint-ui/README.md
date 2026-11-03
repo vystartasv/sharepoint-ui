@@ -1,9 +1,11 @@
-# @vilius/sharepoint-ui
+# @spfx-fast/sharepoint-ui
 
 Host-aware UI components for SharePoint Framework. The package exposes framework-independent custom elements and an optional React 18 adapter. SPFx 1.24 is the validated host.
 
+The package is released under the [MIT License](./LICENSE).
+
 ```tsx
-import { SharePointUIProvider, SharePointCard, Button, TextField } from "@vilius/sharepoint-ui/react";
+import { SharePointUIProvider, SharePointCard, Button, TextField } from "@spfx-fast/sharepoint-ui/react";
 
 <SharePointUIProvider lang="en-GB" dir="ltr" appearance="fluent">
   <SharePointCard>
@@ -18,7 +20,7 @@ React `ref` is supported on 157 catalogued adapters and targets the rendered roo
 Define reusable theme packs as typed partial themes, then compose them in precedence order. The host SharePoint theme still supplies defaults; design-theme values override host-derived semantic roles, `customProperties` supplies app-specific CSS variables, and direct provider `tokens` overrides remain the final styling layer. Typography packs map `fontSize1100`/`fontSize1200` and `lineHeight1100`/`lineHeight1200` to the library's extended `Text` sizes; `fontFamilyMono` styles `Text` with `font="monospace"` and semantic `code`/`pre` elements. The `layers` group coordinates dropdowns, popovers/menus, and toasts across composed controls. The `materials` group tunes glass blur, saturation, and translucency while retaining the active SharePoint/Fluent-derived colors.
 
 ```tsx
-import { SharePointUIProvider, composeSharePointUIDesignThemes, type SharePointUIDesignTheme } from "@vilius/sharepoint-ui/react";
+import { SharePointUIProvider, composeSharePointUIDesignThemes, type SharePointUIDesignTheme } from "@spfx-fast/sharepoint-ui/react";
 
 const brandPack = { palette: { themePrimary: "#1769aa", themeLighter: "#dceafa" }, typography: { fontFamily: "Aptos, sans-serif" } } satisfies SharePointUIDesignTheme;
 const productPack = { colors: { surfaceRaised: "#f7f9fc" }, shape: { cardRadius: "14px" }, materials: { glassBlur: "20px", glassSaturation: "165%", glassSurfaceOpacity: "92%" }, layers: { dropdown: 30, popover: 100, toast: 110 }, customProperties: { "--workbench-card-gap": "12px" } } satisfies SharePointUIDesignTheme;
@@ -39,7 +41,7 @@ Buttons inherit their default size from `ButtonContextProvider`; an explicit `si
 Set `as="a"` with `href` to render a link, or omit `href` for an anchor that acts as a button. Link anchors support native URL attributes; action anchors support Enter and Space. Native buttons preserve `type="submit"`/`type="reset"`, form association, constraint validation, disabled-fieldset behavior, and successful `name`/`value` submission through shadow DOM. Disabled anchors lose their `href`, and unsafe `javascript:`, `data:`, and `vbscript:` URLs are discarded.
 
 ```tsx
-import { Button, ButtonContextProvider } from "@vilius/sharepoint-ui/react";
+import { Button, ButtonContextProvider } from "@spfx-fast/sharepoint-ui/react";
 
 <ButtonContextProvider value={{ size: "small" }}>
   <Button>Compact action</Button>
@@ -53,7 +55,7 @@ Use `ButtonGroup` to give related actions one accessible name and choose horizon
 `CompoundButton` accepts an optional `contentContainer` element to replace the title/description wrapper while retaining the same `children` and `secondaryContent`; its title remains the button's accessible name and the secondary line remains its accessible description. Native consumers can provide a wrapper with `slot="content-container"` and put its content inside that wrapper.
 
 ```tsx
-import { Button, ButtonGroup } from "@vilius/sharepoint-ui/react";
+import { Button, ButtonGroup } from "@spfx-fast/sharepoint-ui/react";
 
 <ButtonGroup label="File actions">
   <Button>Open</Button>
@@ -61,13 +63,13 @@ import { Button, ButtonGroup } from "@vilius/sharepoint-ui/react";
 </ButtonGroup>
 ```
 
-For framework-neutral consumers, register `defineButtonGroup()` from `@vilius/sharepoint-ui/elements/button-group` and use `<spui-button-group aria-label="File actions">`.
+For framework-neutral consumers, register `defineButtonGroup()` from `@spfx-fast/sharepoint-ui/elements/button-group` and use `<spui-button-group aria-label="File actions">`.
 
 Checkbox supports `checked` and `defaultChecked` as `boolean` or `"mixed"`, plus `shape`, `size`, and `labelPosition`. Use `label` for its visible accessible name. Replace the native control with `input` props or an `<input>` element; replace the themed indicator with the `indicator` node or native `slot="indicator"` content. The input remains the accessible, keyboard-operable form control, while the indicator part reflects checked and mixed states. The library's compact `size="small"` keeps the 14px visual indicator while its label provides a minimum 24px pointer target, including icon-only controls. `onChange` reports the tri-state as `{ checked }`; the existing `onCheckedChange` callback remains boolean. Both Checkbox and Switch accept `name`, `value`, `required`, and `disabled`, participate in native `FormData`, reset with their form, and inherit disabled fieldsets. Set `disabledFocusable` with `disabled` to keep a disabled control in keyboard order with `aria-disabled="true"`; pointer and Space activation stay suppressed, and it does not submit a form value.
 
 ```tsx
 import { useState } from "react";
-import { Checkbox, type CheckboxCheckedState } from "@vilius/sharepoint-ui/react";
+import { Checkbox, type CheckboxCheckedState } from "@spfx-fast/sharepoint-ui/react";
 
 function SelectAllRows() {
   const [selectionState, setSelectionState] = useState<CheckboxCheckedState>("mixed");
@@ -91,7 +93,7 @@ React `Tabs`, `TabList`, `Tab`, and `TabPanel` accept string, number, boolean, `
 
 ```tsx
 import { useState } from "react";
-import { Radio, RadioGroup } from "@vilius/sharepoint-ui/react";
+import { Radio, RadioGroup } from "@spfx-fast/sharepoint-ui/react";
 
 function BillingCycle() {
   const [cycle, setCycle] = useState("yearly");
@@ -111,12 +113,12 @@ Framework-neutral code can register `defineRadioGroup()` and use `<spui-radio-gr
 
 `Select` supports controlled `value` or uncontrolled `defaultValue`, Fluent `onChange(event, { value })`, and `appearance="outline|underline|filled-darker|filled-lighter"` with `size="small|medium|large"`. Its inner control remains a native select; size is applied to the custom-element host so it does not enable multirow list mode. Supply `select` as native select props or a `<select>` element to replace the control while retaining host value, label, validation, form, and event behavior. Without that slot, direct `<option>` children use the built-in native select. Replace the default chevron with the React `icon` prop or a native `slot="icon"` element; the icon is positioned with logical direction-aware spacing and inherits the theme foreground.
 
-Use leaf modules from `@vilius/sharepoint-ui/elements/*` when registering custom elements directly. React is an optional peer; custom-element consumers do not load the React adapter.
+Use leaf modules from `@spfx-fast/sharepoint-ui/elements/*` when registering custom elements directly. `react` and `react-dom` are optional peers; both are needed when importing the React adapter, while custom-element consumers do not load either adapter dependency.
 
 Cards can opt into selection with `selected`, `defaultSelected`, or `onSelectionChange`. Selection uses a real checkbox with a visible keyboard focus ring; links, buttons, and other nested controls keep their own actions. The accessible checkbox label defaults to `Select {aria-label}`; set `selectionLabel` to provide a localized label.
 
 ```tsx
-import { Card } from "@vilius/sharepoint-ui/react";
+import { Card } from "@spfx-fast/sharepoint-ui/react";
 
 <Card aria-label="Quarterly plan" selected={isSelected}
   onSelectionChange={(_event, { selected }) => setIsSelected(selected)}>
@@ -162,7 +164,7 @@ Set `inline` to retain Fluent's explicit source-order intent. The custom-element
 `Spinner` supports Fluent's eight sizes, primary/inverted appearance, four label positions, a segmented theme-derived tail, RTL mirroring, localized labels, delayed display, forced colors, and reduced motion. `spinner` and `spinnerTail` accept custom visual slots; their contents are hidden from assistive technology unless the supplied element explicitly overrides that. `SpinnerContextProvider` supplies a default size to nested spinners; an explicit `size` prop takes precedence. `useSpinnerContext()` reads the current `{ size }` value.
 
 ```tsx
-import { Spinner, SpinnerContextProvider } from "@vilius/sharepoint-ui/react";
+import { Spinner, SpinnerContextProvider } from "@spfx-fast/sharepoint-ui/react";
 
 <SpinnerContextProvider value={{ size: "small" }}>
   <Spinner label="Loading files" />
@@ -179,7 +181,7 @@ For brief status feedback, place one `Toaster` near the application root and dis
 `MessageBar` is a persistent surface; its intent supplies a default info, success, warning, or error icon. Pass `icon` to replace it in React, or use `slot="icon"` in framework-neutral markup. Multiline layout includes a bottom reflow spacer by default; replace it with `bottomReflowSpacer` or `slot="bottom-reflow-spacer"`. Existing title, body, and action composition remains available through `MessageBarTitle`, `MessageBarBody`, and `MessageBarActions`.
 
 ```tsx
-import { Button, Toaster, useToastController } from "@vilius/sharepoint-ui/react";
+import { Button, Toaster, useToastController } from "@spfx-fast/sharepoint-ui/react";
 
 function SaveButton() {
   const { dispatchToast } = useToastController();
@@ -242,7 +244,7 @@ For desktop-style command navigation, compose top-level menus in `MenuBar`. It s
 Use `ContextMenu` when commands belong to a target surface rather than a visible trigger. Right-click the trigger, press the Context Menu key, or press Shift+F10; focus moves into the menu and Escape returns it to the target. The pointer invocation positions the menu at the click while keyboard invocation aligns to the target's logical start edge. Framework-neutral consumers can set the `context-menu` attribute on `spui-menu`.
 
 ```tsx
-import { ContextMenu, MenuItem } from "@vilius/sharepoint-ui/react";
+import { ContextMenu, MenuItem } from "@spfx-fast/sharepoint-ui/react";
 
 <ContextMenu label="Document commands" trigger={<button>Quarterly plan.docx</button>}>
   <MenuItem onSelect={openDocument}>Open</MenuItem>
@@ -255,7 +257,7 @@ For framework-neutral consumers, `defineToaster()` registers `<spui-toaster>`; i
 Use `SearchBox` for free-form queries, `ComboBox` for filtering suggestions, and `Dropdown` for selection without typing. Compose `<Option>` and `<OptionGroup>` inside either picker; use `<Listbox>` when the options should remain visible in the page. `ComboboxProvider` accepts Fluent's option registration, active-option, selection, open-state, appearance, and size context fields, and retains the library's `value`, `setValue`, and callback conveniences. Multiselect ComboBox selected chips use `selectedLabel` or `SharePointUIProvider.strings.selectedOptionsLabel` for the accessible group name. Dropdown supports selected/default options, controlled/default open state, multiselect, clear, appearance, size, and placement; values are returned as `{ optionValue, optionText, selectedOptions }`. Its `button`, `listbox`, `clearButton`, and `expandIcon` slots can be composed in React; framework-neutral consumers can assign the equivalent named slots. A custom listbox element replaces the listbox root and receives options rendered from Dropdown's `<Option>` children. `SearchBox` supports controlled `value` or initial `defaultValue`, Fluent `onChange(event, { value })` for typing and clearing, the `onValueChange` alias, Enter submission through `onSearch`, localized clear text, and native form value/reset/required behavior. Compose `contentBefore`, `contentAfter`, and `dismiss` in React; custom-element consumers use `slot="content-before"`, `slot="content-after"`, and `slot="dismiss"`. The clear action remains a labeled button-role control when its dismiss icon is customized. Choose `appearance="outline" | "underline" | "filled-darker" | "filled-lighter"` and `size="small" | "medium" | "large"`.
 
 ```tsx
-import { ComboboxProvider, Dropdown, Option, OptionGroup } from "@vilius/sharepoint-ui/react";
+import { ComboboxProvider, Dropdown, Option, OptionGroup } from "@spfx-fast/sharepoint-ui/react";
 
 <ComboboxProvider value={{ onOptionSelect: (_event, data) => saveCategory(data.optionValue) }}>
   <Dropdown label="Category" defaultSelectedOptions={["planning"]} clearable>
@@ -276,7 +278,7 @@ import { ComboboxProvider, Dropdown, Option, OptionGroup } from "@vilius/sharepo
 `TextArea` supports controlled `value` and uncontrolled `defaultValue`, Fluent `onChange(event, { value })` plus the `onValueChange` alias, `outline`/filled appearances (including shadow variants), `small`/`medium`/`large` sizing, and `resize="none|horizontal|vertical|both"`. It is form-associated, so `name`, required validation, form submission/reset, and disabled fieldsets work. The visible label stays associated with the native textarea inside its shadow root; the framework-neutral element accepts matching `appearance`, `size`, and `resize` attributes.
 
 ```tsx
-import { Input } from "@vilius/sharepoint-ui/react";
+import { Input } from "@spfx-fast/sharepoint-ui/react";
 
 <Input type="email" aria-label="Work email" name="email" required
   contentBefore={<span aria-hidden="true">@</span>}
@@ -288,7 +290,7 @@ import { Input } from "@vilius/sharepoint-ui/react";
 `Label` renders a real native `<label>` in React. For plain JavaScript or another framework, `createLabel(content, { htmlFor, size, required })` returns an `HTMLLabelElement`, preserving browser label association and click-to-focus behavior. `required` adds a visual marker; set `required` on the associated control as well.
 
 ```tsx
-import { Label, Text } from "@vilius/sharepoint-ui/react";
+import { Label, Text } from "@spfx-fast/sharepoint-ui/react";
 
 <Text as="h2" size={700} weight="semibold">Quarterly plan</Text>
 <Label htmlFor="work-item" required>Work item</Label>
@@ -296,8 +298,8 @@ import { Label, Text } from "@vilius/sharepoint-ui/react";
 ```
 
 ```ts
-import { defineText } from "@vilius/sharepoint-ui/elements/text";
-import { createLabel } from "@vilius/sharepoint-ui/elements/label";
+import { defineText } from "@spfx-fast/sharepoint-ui/elements/text";
+import { createLabel } from "@spfx-fast/sharepoint-ui/elements/label";
 
 defineText();
 document.body.append(createLabel("Work item", { htmlFor: "work-item", required: true }));
@@ -306,7 +308,7 @@ document.body.append(createLabel("Work item", { htmlFor: "work-item", required: 
 `ColorPicker` combines the browser's native color chooser with an interactive saturation/brightness area, hue and opacity sliders, editable HEX/RGB values, and tenant-derived accent/status swatches. Use the format selector or set `format="rgb"`; `onFormatChange` reports changes to a controlled format. Use the arrow keys on the color area to adjust saturation and brightness; Shift+Arrow changes them in larger steps. The component's value remains a six-digit hex string; alpha is a separate number from `0` to `1`. Localize the hue, area, saturation/value, channel, format, and value-description strings through `SharePointUIProvider`. Its area, hue, saturation/value, and alpha controls can be composed and replaced while sharing the picker's state. `ColorPicker.onColorChange` matches Fluent's `(event, { color, event, type: "change" })` contract and carries the originating keyboard, pointer, or input event. `ColorArea`, `ColorSlider`, and `AlphaSlider` callbacks use the same data shape; their native `spui-color-change` detail carries those fields too.
 
 ```tsx
-import { AlphaSlider, ColorArea, ColorPicker, ColorSlider } from "@vilius/sharepoint-ui/react";
+import { AlphaSlider, ColorArea, ColorPicker, ColorSlider } from "@spfx-fast/sharepoint-ui/react";
 
 <ColorPicker label="Highlight color" value={color} alpha={opacity}
   onValueChange={(nextColor, nextOpacity) => { setColor(nextColor); setOpacity(nextOpacity); }}
@@ -323,7 +325,7 @@ import { AlphaSlider, ColorArea, ColorPicker, ColorSlider } from "@vilius/sharep
 `Toolbar` groups commands into one keyboard stop. Use `ToolbarButton` and `ToolbarToggleButton` for the standard subtle command appearances, `ToolbarRadioGroup` with named `ToolbarRadioButton` values for mutually exclusive choices, `ToolbarGroup` for named or visual command sets, and `ToolbarDivider` (or `ToolbarSeparator`) between them. `checkedValues` controls radio selection; `defaultCheckedValues` initializes it, and `onCheckedValueChange` reports `{ name, checkedItems }`. The toolbar handles Arrow keys, Home/End, disabled commands, RTL movement, and optional edge wrapping. Framework-neutral elements are available for each primitive.
 
 ```tsx
-import { Button, Toolbar, ToolbarGroup, ToolbarSeparator } from "@vilius/sharepoint-ui/react";
+import { Button, Toolbar, ToolbarGroup, ToolbarSeparator } from "@spfx-fast/sharepoint-ui/react";
 
 <Toolbar label="Document actions" orientation="horizontal">
   <ToolbarGroup label="File">
@@ -341,7 +343,7 @@ import { Button, Toolbar, ToolbarGroup, ToolbarSeparator } from "@vilius/sharepo
 `Overflow` keeps higher-priority and pinned commands visible as its width changes. Supply the same action as a `MenuItem` through each item's `overflowContent`; the menu reuses your callback without moving or cloning the visible control.
 
 ```tsx
-import { Button, MenuItem, Overflow, OverflowDivider, OverflowItem } from "@vilius/sharepoint-ui/react";
+import { Button, MenuItem, Overflow, OverflowDivider, OverflowItem } from "@spfx-fast/sharepoint-ui/react";
 
 <Overflow label="Document actions" onOverflowItemSelect={runAction}>
   <OverflowItem id="save" pinned overflowContent={<MenuItem value="save">Save</MenuItem>}>
@@ -363,7 +365,7 @@ Headless React compositions can use `OverflowProvider` with the registration con
 `SwatchPicker` supports accessible color and image swatches, a disabled option, row or grid layout, arrow-key roving focus, and controlled or default selection. Swatches use Fluent's 20/24/28/32px size scale; picker spacing is 2px or 4px. Selected color and image swatches show a theme-derived inset ring. Its `onSelectionChange(event, data)` callback includes Fluent's `event`, `type: "click"`, `selectedValue`, and `selectedSwatch` fields plus the library's selected-color arrays and selection mode. `EmptySwatch` provides an add-color action that you can connect to `ColorPicker` or a custom dialog.
 
 ```tsx
-import { ColorSwatch, EmptySwatch, SwatchPicker } from "@vilius/sharepoint-ui/react";
+import { ColorSwatch, EmptySwatch, SwatchPicker } from "@spfx-fast/sharepoint-ui/react";
 
 <SwatchPicker aria-label="Workspace colors" selectedValue={colorName} columns={5}
   onSelectionChange={(_event, { selectedValue, selectedColor }) => { setColorName(selectedValue); setColor(selectedColor); }}>
@@ -381,7 +383,7 @@ Arrow keys move focus through enabled swatches; Enter or Space selects the focus
 For Fluent v9 Nav composition, `AppItem` is a selectable app destination, `AppItemStatic` is a non-interactive app identity, and `SplitNavItem` keeps its secondary action separate from navigation. Its `navItem` slot can replace the primary destination, and `actionButton`, `menuButton`, and `toggleButton` provide independent controls; pair each with its optional tooltip slot. The legacy `action` and `onAction` props remain supported. `NavDrawer` adds `NavDrawerHeader`, `NavDrawerBody`, and `NavDrawerFooter`; its mobile `type="overlay"` uses the top layer, while `type="inline"` opens in page flow. `tabbable={false}` uses one Tab stop with ArrowUp/ArrowDown/Home/End movement; `tabbable` enables normal Tab stops. Use `selectedCategoryValue`/`defaultSelectedCategoryValue` and `onNavItemSelect`/`onNavCategoryItemToggle` when matching Fluent's category selection contract. `Hamburger` is a localized, keyboard-operable control; connect its `onClick` to the owning drawer state.
 
 ```tsx
-import { Avatar, Nav, NavCategory, NavCategoryItem, NavItem, NavSubItem, NavSubItemGroup } from "@vilius/sharepoint-ui/react";
+import { Avatar, Nav, NavCategory, NavCategoryItem, NavItem, NavSubItem, NavSubItemGroup } from "@spfx-fast/sharepoint-ui/react";
 
 <Nav label="Workspace" collapsible defaultCollapsed={false} selectedValue={selected} openCategories={open} onItemSelect={value => setSelected(value)} onCategoryToggle={(_, __, values) => setOpen(values)}>
   <NavItem value="home" href="/sites/workspace" avatar={<Avatar name="Workspace" image="/assets/workspace.png" size={28} />}>Home</NavItem>
@@ -393,7 +395,7 @@ import { Avatar, Nav, NavCategory, NavCategoryItem, NavItem, NavSubItem, NavSubI
 ```
 
 ```tsx
-import { Avatar } from "@vilius/sharepoint-ui/react";
+import { Avatar } from "@spfx-fast/sharepoint-ui/react";
 
 <Avatar name="Amara Okafor" size={40} color="colorful" active="active" />
 ```
@@ -405,7 +407,7 @@ import { Avatar } from "@vilius/sharepoint-ui/react";
 Use `AvatarGroupProvider` to share size/layout defaults through custom group composition; explicit `AvatarGroup` props take precedence.
 
 ```tsx
-import { Avatar, AvatarGroup } from "@vilius/sharepoint-ui/react";
+import { Avatar, AvatarGroup } from "@spfx-fast/sharepoint-ui/react";
 
 <AvatarGroup label="Project collaborators" maxVisible={3}>
   <Avatar name="Amara Okafor" color="colorful" />
@@ -418,7 +420,7 @@ import { Avatar, AvatarGroup } from "@vilius/sharepoint-ui/react";
 `Persona` adds identity details and presence to the same Avatar foundation. Supply `presenceLabel` in the current locale; set `textPosition="below"` for compact people lists, pass an `avatar` slot to provide a custom marker, or compose `primaryText`, `secondaryText`, `tertiaryText`, and `quaternaryText` to replace the corresponding text lines. `primaryText` defaults to `name`.
 
 ```tsx
-import { Persona } from "@vilius/sharepoint-ui/react";
+import { Persona } from "@spfx-fast/sharepoint-ui/react";
 
 <Persona name="Amara Okafor" secondaryText="Product owner" tertiaryText="London"
   presence="available" presenceLabel="Available" color="colorful" />
@@ -430,7 +432,7 @@ Theme input layers together: `applySharePointTheme()` forwards SPFx palette, sem
 
 `SharePointUIProvider` places theme variables on one `display: contents` wrapper, so component hosts inherit them through light DOM and shadow roots without receiving a copy of the full token map. Use it at the app or page root, outside slot-driven custom-element compositions. Component `style` props remain inline and take precedence over provider tokens.
 
-The published [`@vilius/sharepoint-ui/tokens`](./tokens.json) JSON file is generated from element style sources and lists each `--spui-*` variable by consuming component and theme-definition source. Dynamic namespaces such as `--spui-palette-*` are listed under `dynamicPrefixes`. It is a discoverability index; component-internal variables can change between releases. Run `npm run tokens:generate` after changing component styles and `npm run tokens:check` to detect stale output.
+The published [`@spfx-fast/sharepoint-ui/tokens`](./tokens.json) JSON file is generated from element style sources and lists each `--spui-*` variable by consuming component and theme-definition source. Dynamic namespaces such as `--spui-palette-*` are listed under `dynamicPrefixes`. It is a discoverability index; component-internal variables can change between releases. Run `npm run tokens:generate` after changing component styles and `npm run tokens:check` to detect stale output.
 
 ```tsx
 <SharePointUIProvider
@@ -458,7 +460,7 @@ The current catalog includes buttons, fields, cards, avatars, Persona, toggles, 
 `DatePicker` keeps its form value as ISO `YYYY-MM-DD`, displays and parses dates using the inherited `lang`, and includes an accessible month calendar with locale week starts, RTL-aware arrow keys, month/year navigation, and min/max disabling. It supports native form submission, required and invalid-date validity, reset, and disabled fieldsets. Override labels with the `SharePointUIProvider` strings `datePickerCalendar`, `datePickerPreviousMonth`, `datePickerNextMonth`, `datePickerInvalid`, and `datePickerRequired`, or use the matching `calendarLabel`, `previousMonthLabel`, `nextMonthLabel`, `invalidDateMessage`, and `requiredMessage` props for a single picker.
 
 ```tsx
-import { DatePicker } from "@vilius/sharepoint-ui/react";
+import { DatePicker } from "@spfx-fast/sharepoint-ui/react";
 
 <DatePicker label="Review date" name="reviewDate" value={reviewDate}
   min="2026-01-01" max="2027-12-31" onValueChange={setReviewDate} />
@@ -477,7 +479,7 @@ Set `closeLabel` to localize or override the built-in close button's accessible 
 Use `DrawerHeader`, `DrawerHeaderNavigation`, `DrawerHeaderTitle`, `DrawerBody`, and `DrawerFooter` to compose the overlay surface. The header helper is a fragment so its named title and navigation slots remain direct children of the drawer. `DrawerHeaderTitle` accepts an optional `action`. `OverlayDrawer` is the Fluent convenience API with `start`/`small` defaults and `modalType`; `defaultOpen` initializes its uncontrolled state. `InlineDrawer` stays in page flow as a labelled, non-modal complementary region and supports a separator, logical placement, and the same header/body/footer pieces. `Drawer type="inline"` selects that in-flow engine.
 
 ```tsx
-import { Button, DrawerBody, DrawerFooter, DrawerHeader, DrawerHeaderNavigation, DrawerHeaderTitle, InlineDrawer, OverlayDrawer } from "@vilius/sharepoint-ui/react";
+import { Button, DrawerBody, DrawerFooter, DrawerHeader, DrawerHeaderNavigation, DrawerHeaderTitle, InlineDrawer, OverlayDrawer } from "@spfx-fast/sharepoint-ui/react";
 
 <OverlayDrawer open={editing} onOpenChange={setEditing}>
   <DrawerHeader>
@@ -494,7 +496,7 @@ import { Button, DrawerBody, DrawerFooter, DrawerHeader, DrawerHeaderNavigation,
 ```
 
 ```tsx
-import { Button, Drawer } from "@vilius/sharepoint-ui/react";
+import { Button, Drawer } from "@spfx-fast/sharepoint-ui/react";
 
 <Button aria-controls="workspace-drawer" aria-expanded={open} onClick={() => setOpen(true)}>Details</Button>
 <Drawer id="workspace-drawer" open={open} title="Workspace details" position="end" onOpenChange={setOpen}
@@ -507,7 +509,7 @@ import { Button, Drawer } from "@vilius/sharepoint-ui/react";
 `Tag` and `TagGroup` provide theme-derived filter/status chips, semantic `color="success" | "warning" | "danger" | "informative"` variants, size and shape variants, optional dismissal, and a composed horizontal or vertical group. Semantic fills and borders derive from the active theme surface and status colors; selected states use the theme selection role. Tag text and boundaries meet 4.5:1 and 3:1 in a 48-case light/strong-surface matrix across filled, outline, and brand appearances; forced-colors mode uses system colors. TagGroup accepts controlled `selectedValues` or `defaultSelectedValues`, inherits appearance, size, disabled and dismissible defaults, and emits `onTagSelect`/`onDismiss`. It defaults to a labelled toolbar and supports arrow-key navigation. `InteractionTag` composes a primary action and optional secondary dismiss action; `selected` is exposed as `aria-pressed` on the primary button. Both actions work through React callbacks or composed custom events. A dismissible `Tag` emits `onDismiss`; remove it from your controlled data to update the group.
 
 ```tsx
-import { Tag, TagGroup } from "@vilius/sharepoint-ui/react";
+import { Tag, TagGroup } from "@spfx-fast/sharepoint-ui/react";
 
 <TagGroup aria-label="Active filters">
   {filters.map(filter => <Tag key={filter.id} value={filter.id} dismissible
@@ -518,7 +520,7 @@ import { Tag, TagGroup } from "@vilius/sharepoint-ui/react";
 ```
 
 ```tsx
-import { InteractionTag, InteractionTagPrimary, InteractionTagSecondary } from "@vilius/sharepoint-ui/react";
+import { InteractionTag, InteractionTagPrimary, InteractionTagSecondary } from "@spfx-fast/sharepoint-ui/react";
 
 <InteractionTag value={document.id} selected={selected} onTagSelect={() => setSelected(value => !value)} onDismiss={() => removeDocument(document.id)}>
   <InteractionTagPrimary media={<Avatar name={document.owner} />}
@@ -530,7 +532,7 @@ import { InteractionTag, InteractionTagPrimary, InteractionTagSecondary } from "
 `TagPicker` combines search, multi-selection, removable chips, keyboard navigation, and form submission. Keep its option values stable, control the selected value array, and supply a label (or `aria-label`). Set `selectedLabel` on TagPicker or multiselect ComboBox, or use `SharePointUIProvider`'s `selectedOptionsLabel` string, to localize the selected-options group. Compose `TagPickerControl`, `TagPickerGroup`, and `TagPickerInput` to customize the selected-value area, and `TagPickerList`/`TagPickerOptionGroup` to organize results while retaining the same picker state engine. `inline` keeps the open results in the regular document layer; `noPopover` keeps them visible for static or embedded result layouts. The default uses the browser top layer so SharePoint sections can’t clip the list.
 
 ```tsx
-import { TagPicker, TagPickerControl, TagPickerGroup, TagPickerInput, TagPickerList, TagPickerOption, TagPickerOptionGroup } from "@vilius/sharepoint-ui/react";
+import { TagPicker, TagPickerControl, TagPickerGroup, TagPickerInput, TagPickerList, TagPickerOption, TagPickerOptionGroup } from "@spfx-fast/sharepoint-ui/react";
 
 <TagPicker label="Task owners" selectedValues={owners} onChange={setOwners}>
   <TagPickerOption value="amara">Amara Okafor</TagPickerOption>
@@ -556,12 +558,12 @@ For a custom control layout, the compound parts retain the picker’s built-in k
 </TagPicker>
 ```
 
-The framework-neutral element uses `defineTagPicker` from `@vilius/sharepoint-ui/elements/tag-picker`, a `value: string[]` property, `spui-change` events, and child `spui-tag-picker-option` entries. Set `name` to submit each selected value as a repeated form field.
+The framework-neutral element uses `defineTagPicker` from `@spfx-fast/sharepoint-ui/elements/tag-picker`, a `value: string[]` property, `spui-change` events, and child `spui-tag-picker-option` entries. Set `name` to submit each selected value as a repeated form field.
 
 `Rating` uses native radio semantics, supports controlled/default values, configurable max and half-step precision, custom `iconFilled`/`iconOutline` React components (or `icon-filled`/`icon-outline` slots on the custom element), and native form participation with `name` and `required`.
 
 ```tsx
-import { Rating } from "@vilius/sharepoint-ui/react";
+import { Rating } from "@spfx-fast/sharepoint-ui/react";
 
 <Rating label="Prioritization rating" value={rating} max={5} step={0.5}
   color="marigold" onChange={(_event, data) => setRating(data.value)} />
@@ -570,7 +572,7 @@ import { Rating } from "@vilius/sharepoint-ui/react";
 `RatingDisplay` is the read-only counterpart; it supports fractional values, compact mode, a localized count, custom icons, and custom item composition. `RatingItem` can also be used directly inside `<spui-rating-display>` to compose the stars. A display is announced as one image with a generated or supplied label.
 
 ```tsx
-import { RatingDisplay, RatingItem } from "@vilius/sharepoint-ui/react";
+import { RatingDisplay, RatingItem } from "@spfx-fast/sharepoint-ui/react";
 
 <RatingDisplay value={4.5} count={128} color="brand" size="large" label="Customer rating">
   {Array.from({ length: 5 }, (_, index) => <RatingItem key={index} value={index + 1} />)}
@@ -580,7 +582,7 @@ import { RatingDisplay, RatingItem } from "@vilius/sharepoint-ui/react";
 `List` composes `ListItem` rows with optional single or multiple selection. It supports controlled `selectedItems`, `defaultSelectedItems`, a cancelable `onAction`, and `navigationMode="items" | "composite"`; the composite mode exposes grid/row semantics for rows containing focusable cells. Arrow keys move between rows, and composite rows also move through their internal controls. Selection callbacks provide `{ event, type: "change", selectedItems }`; item action callbacks provide `{ event, type: "ListItemAction", value }`, matching Fluent's event data shape. The native `spui-selection-change` detail includes the originating event and `type: "change"`. Use `disabledSelection` to prevent selection while preserving an item's action. A custom `checkmark` control such as `Checkbox` stays synchronized with the row selection and disabled state.
 
 ```tsx
-import { Checkbox, List, ListItem } from "@vilius/sharepoint-ui/react";
+import { Checkbox, List, ListItem } from "@spfx-fast/sharepoint-ui/react";
 
 <List aria-label="Recent documents" selectionMode="multiselect"
   defaultSelectedItems={["plan", "brief"]}>
@@ -589,14 +591,14 @@ import { Checkbox, List, ListItem } from "@vilius/sharepoint-ui/react";
 </List>
 ```
 
-Framework-neutral consumers can register `defineList()` from `@vilius/sharepoint-ui/elements/list` and compose `<spui-list selection-mode="multiselect"><spui-list-item value="plan">Project plan</spui-list-item></spui-list>`. Listen for `spui-selection-change` and cancelable `spui-list-item-action` events.
+Framework-neutral consumers can register `defineList()` from `@spfx-fast/sharepoint-ui/elements/list` and compose `<spui-list selection-mode="multiselect"><spui-list-item value="plan">Project plan</spui-list-item></spui-list>`. Listen for `spui-selection-change` and cancelable `spui-list-item-action` events.
 
 `Link` supports native safe URLs, subtle appearance, underline modes, inline text styling, and `disabledFocusable`. With `href`, it renders an anchor; without `href`, it renders a non-submitting button. Set `as="span"` for a button-like span with keyboard activation. Disabled-focusable links remain in the Tab sequence with `aria-disabled="true"` while blocking navigation and click callbacks. Unsafe URL schemes are removed from the rendered anchor.
 
 `Breadcrumb` composes ordinary links into a labelled navigation landmark and ordered list. Pass `list={<ul />}` to replace the list root while retaining the same `BreadcrumbItem` children; framework-neutral consumers can assign an `<ol>` or `<ul>` with `slot="list"`. Use `current` on the current location item; optional `focusMode="arrow"` adds roving focus, Home/End, and RTL-aware arrow navigation while skipping the non-interactive current item.
 
 ```tsx
-import { Breadcrumb, BreadcrumbItem, Link } from "@vilius/sharepoint-ui/react";
+import { Breadcrumb, BreadcrumbItem, Link } from "@spfx-fast/sharepoint-ui/react";
 
 <Breadcrumb label="Page location" focusMode="arrow">
   <BreadcrumbItem><Link href="/sites/workspace">Workspace</Link></BreadcrumbItem>
@@ -606,8 +608,8 @@ import { Breadcrumb, BreadcrumbItem, Link } from "@vilius/sharepoint-ui/react";
 ```
 
 ```tsx
-import { Tree } from "@vilius/sharepoint-ui/react";
-import type { TreeNode } from "@vilius/sharepoint-ui";
+import { Tree } from "@spfx-fast/sharepoint-ui/react";
+import type { TreeNode } from "@spfx-fast/sharepoint-ui";
 
 const libraries: TreeNode[] = [
   { id: "shared", label: "Shared documents", children: [
@@ -628,7 +630,7 @@ Localize React defaults with `SharePointUIProvider` strings `treeLabel`, `treeTo
 For lift-and-shift composition, `TreeItem` declares branch/leaf structure and a `TreeItemLayout` or `TreeItemPersonaLayout` supplies the content. `FlatTree` accepts flat `FlatTreeItem` records with `parentValue`, which is useful when records arrive from an indexed SharePoint source.
 
 ```tsx
-import { Tree, TreeItem, TreeItemLayout, TreeItemPersonaLayout } from "@vilius/sharepoint-ui/react";
+import { Tree, TreeItem, TreeItemLayout, TreeItemPersonaLayout } from "@spfx-fast/sharepoint-ui/react";
 
 <Tree aria-label="Workspace" selectionMode="single">
   <TreeItem value="team" itemType="branch" open>
@@ -643,7 +645,7 @@ import { Tree, TreeItem, TreeItemLayout, TreeItemPersonaLayout } from "@vilius/s
 ```
 
 ```tsx
-import { VirtualList } from "@vilius/sharepoint-ui/react";
+import { VirtualList } from "@spfx-fast/sharepoint-ui/react";
 
 <VirtualList
   aria-label="Open tasks"
@@ -663,8 +665,8 @@ The React entry point also exports the Fluent-compatible virtualizer helpers `us
 For async collections, `VirtualList` accepts a `VirtualListDataSource` with a stable `length`, synchronous `getItem(index)`, and abortable `loadRange(start, end, signal)`. The range is end-exclusive and must populate every requested item before resolving. Optional `subscribe` notifies the list after external changes and allows retry after a reported load failure. Unloaded items are passed to `renderItem` as `undefined`; `aria-busy` tracks the active request, and `onDataLoadError` receives failures. The native element emits `spui-data-load-error` with the failed range and error.
 
 ```tsx
-import type { VirtualListDataSource } from "@vilius/sharepoint-ui";
-import { VirtualList } from "@vilius/sharepoint-ui/react";
+import type { VirtualListDataSource } from "@spfx-fast/sharepoint-ui";
+import { VirtualList } from "@spfx-fast/sharepoint-ui/react";
 
 <VirtualList dataSource={sharePointRows} aria-label="Documents"
   onDataLoadError={(error, range) => reportLoadFailure(error, range)}
@@ -672,7 +674,7 @@ import { VirtualList } from "@vilius/sharepoint-ui/react";
 ```
 
 ```tsx
-import { Virtualizer } from "@vilius/sharepoint-ui/react";
+import { Virtualizer } from "@spfx-fast/sharepoint-ui/react";
 
 <Virtualizer aria-label="Open tasks" numItems={50_000} itemSize={40} virtualizerLength={24}>
   {index => <TaskRow task={tasks[index]} />}
@@ -689,7 +691,7 @@ import { Virtualizer } from "@vilius/sharepoint-ui/react";
 The framework-neutral `spui-virtual-list` uses the same `axis="horizontal"`, `item-size`/`itemSize`, and `measure-items`/`measureItems` options. `row-height` remains supported for vertical lists. Its `scrollToIndex(index, align, behavior)` method navigates to items without creating a React dependency.
 
 ```ts
-import { defineVirtualList } from "@vilius/sharepoint-ui/elements/virtual-list";
+import { defineVirtualList } from "@spfx-fast/sharepoint-ui/elements/virtual-list";
 
 defineVirtualList();
 type Person = { name: string };
@@ -710,7 +712,7 @@ document.querySelector("#people-rail")?.append(list);
 ```
 
 ```tsx
-import { Button, Table, TableBody, TableCell, TableCellActions, TableCellLayout, TableHeader, TableHeaderCell, TableRow, TableSelectionCell } from "@vilius/sharepoint-ui/react";
+import { Button, Table, TableBody, TableCell, TableCellActions, TableCellLayout, TableHeader, TableHeaderCell, TableRow, TableSelectionCell } from "@spfx-fast/sharepoint-ui/react";
 
 <Table aria-label="SharePoint requests" size="small" appearance="dividers">
   <TableHeader><TableRow><TableSelectionCell aria-label="Select all requests" /><TableHeaderCell sortable sortDirection={sort} onSort={setSort}>Modified</TableHeaderCell><TableHeaderCell>Request</TableHeaderCell></TableRow></TableHeader>
@@ -728,7 +730,7 @@ For app-owned table markup, compose Fluent-style feature plugins instead of rewr
 
 ```tsx
 import * as React from "react";
-import { Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow, createTableColumn, useTableColumnSizing_unstable, useTableFeatures, useTableSelection, useTableSort } from "@vilius/sharepoint-ui/react";
+import { Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow, createTableColumn, useTableColumnSizing_unstable, useTableFeatures, useTableSelection, useTableSort } from "@spfx-fast/sharepoint-ui/react";
 
 type Request = { id: string; title: string };
 const columns = [createTableColumn<Request>({
@@ -763,8 +765,8 @@ function RequestTable({ requests }: { requests: Request[] }) {
 ```
 
 ```tsx
-import { DataGrid } from "@vilius/sharepoint-ui/react";
-import type { DataGridColumn } from "@vilius/sharepoint-ui";
+import { DataGrid } from "@spfx-fast/sharepoint-ui/react";
+import type { DataGridColumn } from "@spfx-fast/sharepoint-ui";
 
 type Task = { id: string; title: string; owner: string };
 const columns: DataGridColumn<Task>[] = [
@@ -782,8 +784,8 @@ For Fluent-style composition, add `DataGridHeader`/`DataGridBody`, `DataGridRow`
 For large or server-paged lists, supply an indexed source instead of materializing all rows. `length` is the displayed row count; provide `selectableCount` when that count includes group headers. Implement `getItem` for a flat list, or `getRow` when the provider also returns group headers. Sorting, filtering, and grouping order are owned by the source; update its cache and notify subscribers after the query changes.
 
 ```tsx
-import { DataGrid } from "@vilius/sharepoint-ui/react";
-import type { DataGridDataSource } from "@vilius/sharepoint-ui";
+import { DataGrid } from "@spfx-fast/sharepoint-ui/react";
+import type { DataGridDataSource } from "@spfx-fast/sharepoint-ui";
 
 const listeners = new Set<() => void>();
 const cache = new Map<number, Task>();
@@ -831,7 +833,7 @@ Provide `getRowHeight` when records need different row heights. Heights are boun
 ```
 
 ```tsx
-import { Input } from "@vilius/sharepoint-ui/react";
+import { Input } from "@spfx-fast/sharepoint-ui/react";
 
 <Input type="email" aria-label="Contact email" name="contactEmail"
   value={email} onValueChange={setEmail} required />
@@ -842,14 +844,14 @@ import { Input } from "@vilius/sharepoint-ui/react";
 Use `FileUpload` to select files for an application upload flow. It supports browse and drag/drop, type/count/size limits, removable file rows, localized labels, required validation, and native form `FormData`. It reports `File[]` through `onFilesChange`; the application remains responsible for sending those files to SharePoint or another service.
 
 ```tsx
-import { FileUpload } from "@vilius/sharepoint-ui/react";
+import { FileUpload } from "@spfx-fast/sharepoint-ui/react";
 
 <FileUpload label="Attachments" name="attachments" accept=".pdf,image/*"
   multiple maxFiles={5} maxFileSize={10 * 1024 * 1024}
   onFilesChange={setFiles} onFilesError={reportFileErrors} />
 ```
 
-For custom elements, call `defineFileUpload()` from `@vilius/sharepoint-ui/elements/file-upload`. Listen for `spui-file-change` (`detail.files`) and `spui-file-error` (`detail.errors`); selected files are available from the host's `files` property.
+For custom elements, call `defineFileUpload()` from `@spfx-fast/sharepoint-ui/elements/file-upload`. Listen for `spui-file-change` (`detail.files`) and `spui-file-error` (`detail.errors`); selected files are available from the host's `files` property.
 
 `RichTextEditor` sanitizes rich HTML pasted from other apps and preserves line breaks when plain text is pasted; markup-looking plain text stays inert. Undo/redo, form reset/required behavior, and disabled fieldsets are supported. It can insert durable images when the application provides an uploader. The callback owns SharePoint library selection, upload permissions, and URL persistence; returned links must use HTTP or HTTPS. The editor also accepts pasted image files through the same callback, limits each image to 10 MiB, and saves the resulting image URL in its HTML value.
 
@@ -860,12 +862,12 @@ For custom elements, call `defineFileUpload()` from `@vilius/sharepoint-ui/eleme
 
 Framework-neutral consumers set the element's `uploadImage` property to the same `(file: File) => Promise<string>` contract. Failed uploads emit `spui-image-upload-error`; the existing editor value is preserved.
 
-`components.json` is the agent-facing API index: it records each React signature, callback props, child slots, styling hooks, and the cross-cutting SharePoint theme, localization, persistence, and accessibility contract. Run `npm run catalog:check --workspace @vilius/sharepoint-ui` to catch stale signatures and missing entries.
+`components.json` is the agent-facing API index: it records each React signature, callback props, child slots, styling hooks, and the cross-cutting SharePoint theme, localization, persistence, and accessibility contract. Run `npm run catalog:check --workspace @spfx-fast/sharepoint-ui` to catch stale signatures and missing entries.
 
 Compose a small manual Carousel from the existing SharePoint view cards. It uses native touch scrolling, keyboard controls, localized provider strings, RTL-aware key handling, and reduced-motion behavior.
 
 ```tsx
-import { Badge, Carousel, ViewCard } from "@vilius/sharepoint-ui/react";
+import { Badge, Carousel, ViewCard } from "@spfx-fast/sharepoint-ui/react";
 
 <Carousel label="Recently updated documents" onIndexChange={setActiveIndex}>
   {documents.map(document => <ViewCard key={document.id} kind="document"
@@ -875,10 +877,10 @@ import { Badge, Carousel, ViewCard } from "@vilius/sharepoint-ui/react";
 </Carousel>
 ```
 
-For custom-element or other framework use, call `defineCarousel()` from `@vilius/sharepoint-ui/elements/carousel` and compose direct child slides; it emits `spui-carousel-change` with `{ value: index }`.
+For custom-element or other framework use, call `defineCarousel()` from `@spfx-fast/sharepoint-ui/elements/carousel` and compose direct child slides; it emits `spui-carousel-change` with `{ value: index }`.
 
 ```tsx
-import { Accordion, AccordionItem } from "@vilius/sharepoint-ui/react";
+import { Accordion, AccordionItem } from "@spfx-fast/sharepoint-ui/react";
 
 <Accordion mode="single">
   <AccordionItem heading="Document details" defaultOpen>
@@ -893,4 +895,4 @@ In single non-collapsible mode, the only open header exposes `aria-disabled="tru
 `AccordionHeader` accepts Fluent's `button` slot as a native button element or button props. Use it to add a class, inline styles, accessible labels, data attributes for stable tests, or an `onClick` handler; the library retains ownership of the button's expanded, disabled, type, and keyboard-navigation state. The handler receives the native click event and can call `preventDefault()` to cancel the toggle.
 `AccordionPanel` accepts `collapseMotion` for a custom presence transition. While closing, the region remains mounted but becomes inert and `aria-hidden` until the motion finishes; reopening cancels the pending exit. Custom motion should respect `prefers-reduced-motion`.
 
-For agent-friendly composition, theming, localization, RTL, rich-text persistence, and handoff checks, see [AGENTS.md](./AGENTS.md). Agent Skills compatible tools can load the task-specific skill from `skills/sharepoint-ui`; for example: `npx skills add ./node_modules/@vilius/sharepoint-ui/skills/sharepoint-ui`.
+For agent-friendly composition, theming, localization, RTL, rich-text persistence, and handoff checks, see [AGENTS.md](./AGENTS.md). Agent Skills compatible tools can load the task-specific skill from `skills/sharepoint-ui`; for example: `npx skills add ./node_modules/@spfx-fast/sharepoint-ui/skills/sharepoint-ui`.

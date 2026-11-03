@@ -24,7 +24,7 @@ The demo uses React 18.3.1, SPFx 1.24.0, Node 22, TypeScript 5.8, and the Heft b
 Import only the React components the web part renders. Package metadata marks modules side-effect free, and each custom-element definition lives in a leaf module so production bundlers can discard unused families.
 
 ```tsx
-import { Button, Checkbox, Drawer, Menu, MenuItem, TextArea } from "@vilius/sharepoint-ui/react";
+import { Button, Checkbox, Drawer, Menu, MenuItem, TextArea } from "@spfx-fast/sharepoint-ui/react";
 
 <Button variant="primary">Save</Button>
 <Checkbox checked={enabled} onCheckedChange={setEnabled}>Enable alerts</Checkbox>
@@ -41,7 +41,7 @@ import { Button, Checkbox, Drawer, Menu, MenuItem, TextArea } from "@vilius/shar
 For framework-free use, register only a selected custom element:
 
 ```ts
-import { defineButton } from "@vilius/sharepoint-ui/elements/button";
+import { defineButton } from "@spfx-fast/sharepoint-ui/elements/button";
 defineButton();
 ```
 
@@ -136,7 +136,7 @@ spfx create \
   --local-source ./templates
 ```
 
-The generated app depends on `@vilius/sharepoint-ui@^0.4.0`. Public npm publication is being prepared; after the initial release, install the package from npm before building a generated project.
+The generated app depends on `@spfx-fast/sharepoint-ui@^0.4.0`. Public npm publication is being prepared; after the initial release, install the package from npm before building a generated project.
 
 ## Theme contract
 

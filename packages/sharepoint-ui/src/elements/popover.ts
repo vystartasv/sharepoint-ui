@@ -76,38 +76,40 @@ function getBoundaryRect(boundary: PopoverBoundary | undefined, contextElement?:
 
 const nextId = (() => { let value = 0; return () => `spui-popover-${++value}`; })();
 
-type InertFocusState = { overlays: Map<HTMLElement, HTMLElement[]>; baseline: Map<HTMLElement, boolean>; applied: Set<HTMLElement> };
+type InertPopoverOverlay = { triggers: HTMLElement[]; surface?: HTMLElement };
+type InertFocusState = { overlays: Map<HTMLElement, InertPopoverOverlay>; baseline: Map<HTMLElement, boolean>; applied: Set<HTMLElement> };
 const inertFocusStates = new WeakMap<Document, InertFocusState>();
 
-function syncInertFocusState(document: Document, host: HTMLElement, triggers: HTMLElement[], active: boolean): void {
+function syncInertFocusState(document: Document, host: HTMLElement, triggers: HTMLElement[], active: boolean, surface?: HTMLElement): void {
   let state = inertFocusStates.get(document);
   if (active) {
     if (!state) {
       state = { overlays: new Map(), baseline: new Map(), applied: new Set() };
       inertFocusStates.set(document, state);
     }
-    state.overlays.set(host, triggers);
+    state.overlays.set(host, { triggers, surface });
   } else if (state) state.overlays.delete(host);
   if (!state) return;
 
   for (const element of state.applied) element.inert = state.baseline.get(element) ?? false;
   state.applied.clear();
   const hosts = new Set(state.overlays.keys());
+  const surfaces = new Set([...state.overlays.values()].flatMap(overlay => overlay.surface ? [overlay.surface] : []));
   const inert = (element: HTMLElement): void => {
     if (!state!.baseline.has(element)) state!.baseline.set(element, element.inert);
     state!.applied.add(element);
     element.inert = true;
   };
   const visit = (element: HTMLElement): void => {
-    if (hosts.has(element)) return;
-    if ([...hosts].some(hostElement => element.contains(hostElement))) {
+    if (hosts.has(element) || surfaces.has(element)) return;
+    if ([...hosts, ...surfaces].some(overlayElement => element.contains(overlayElement))) {
       for (const child of [...element.children]) if (child instanceof HTMLElement) visit(child);
       return;
     }
     inert(element);
   };
   for (const child of [...document.body.children]) if (child instanceof HTMLElement) visit(child);
-  for (const triggersForHost of state.overlays.values()) for (const trigger of triggersForHost) inert(trigger);
+  for (const overlay of state.overlays.values()) for (const trigger of overlay.triggers) inert(trigger);
   if (!state.overlays.size) {
     for (const [element, previous] of state.baseline) element.inert = previous;
     state.baseline.clear();
@@ -141,8 +143,12 @@ export function definePopover(): void {
     static observedAttributes = ["open", "default-open", "motion", "placement", "positioning", "align", "offset", "label", "inline", "trap-focus", "inert-trap-focus", "legacy-trap-focus", "unstable-disable-auto-focus", "arrow", "appearance", "size", "close-on-scroll", "close-on-iframe-focus", "open-on-context", "open-on-hover", "mouse-leave-delay"];
     private events?: AbortController;
     private observer?: MutationObserver;
+    private surfaceObserver?: MutationObserver;
     private resizeObserver?: ResizeObserver;
     private panel?: HTMLElement & { showPopover?: () => void; hidePopover?: () => void };
+    private internalPanel?: HTMLElement & { showPopover?: () => void; hidePopover?: () => void };
+    private externalPanel?: HTMLElement & { showPopover?: () => void; hidePopover?: () => void };
+    private surfaceEvents?: AbortController;
     private trigger?: HTMLElement;
     private triggerState?: { haspopup: string | null; controls: string | null; expanded: string | null };
     private isOpen = false;
@@ -169,6 +175,40 @@ export function definePopover(): void {
     set open(value: boolean) { this.setOpen(Boolean(value)); }
     get inline(): boolean { return this.hasAttribute("inline"); }
     set inline(value: boolean) { this.toggleAttribute("inline", Boolean(value)); }
+    set popoverSurface(value: HTMLElement | null | undefined) {
+      const previousPanel = this.panel;
+      this.surfaceEvents?.abort();
+      this.surfaceObserver?.disconnect();
+      this.externalPanel = value as (HTMLElement & { showPopover?: () => void; hidePopover?: () => void }) | null ?? undefined;
+      this.panel = this.externalPanel ?? this.internalPanel;
+      if (previousPanel && previousPanel !== this.panel) {
+        previousPanel.hidePopover?.();
+        previousPanel.hidden = true;
+      }
+      if (this.panel) {
+        this.panel.id ||= nextId();
+        this.panel.setAttribute("popover", "manual");
+        this.panel.tabIndex = -1;
+      }
+      if (this.isConnected && this.externalPanel) {
+        this.surfaceEvents = new AbortController();
+        const options = { signal: this.surfaceEvents.signal };
+        this.externalPanel.addEventListener("click", this.onClick, options);
+        this.externalPanel.addEventListener("spui-popover-request-close", this.onRequestClose, options);
+        this.externalPanel.addEventListener("keydown", this.onKeyDown, options);
+        this.externalPanel.addEventListener("focusout", this.onFocusOut, options);
+        this.externalPanel.addEventListener("pointerenter", this.onHoverEnter, options);
+        this.externalPanel.addEventListener("pointerleave", this.onHoverLeave, options);
+        this.surfaceObserver = new MutationObserver(() => this.syncLabel());
+        this.surfaceObserver.observe(this.externalPanel, { childList: true, subtree: true, attributes: true, attributeFilter: ["slot", "id"] });
+      }
+      if (this.isConnected) {
+        this.syncLabel();
+        this.syncPositionObserver();
+        this.syncVisibility();
+      }
+    }
+    get popoverSurface(): HTMLElement | null { return this.externalPanel ?? null; }
     syncOpen(value: boolean): void { this.setOpen(Boolean(value), true, false); }
     show(): void { this.setOpen(true); }
     hide(): void { this.setOpen(false); }
@@ -192,7 +232,8 @@ export function definePopover(): void {
       this.shadowRoot?.querySelector("slot[name=title]")?.addEventListener("slotchange", this.syncLabel, options);
       this.observer = new MutationObserver(() => { this.syncTrigger(); this.syncLabel(); });
       this.observer.observe(this, { childList: true, subtree: true, attributes: true, attributeFilter: ["disable-button-enhancement"] });
-      this.panel = this.shadowRoot?.querySelector<HTMLElement>(".surface") as (HTMLElement & { showPopover?: () => void; hidePopover?: () => void }) | undefined;
+      this.internalPanel = this.shadowRoot?.querySelector<HTMLElement>(".surface") as (HTMLElement & { showPopover?: () => void; hidePopover?: () => void }) | undefined;
+      this.panel = this.externalPanel ?? this.internalPanel;
       this.panel?.addEventListener("pointerenter", this.onHoverEnter, options);
       this.panel?.addEventListener("pointerleave", this.onHoverLeave, options);
       this.resizeObserver = new ResizeObserver(() => { if (!this.positioningOptions?.disableUpdateOnResize) this.position(); });
@@ -205,8 +246,10 @@ export function definePopover(): void {
 
     disconnectedCallback(): void {
       this.observer?.disconnect();
+      this.surfaceObserver?.disconnect();
       this.resizeObserver?.disconnect();
       this.events?.abort();
+      this.surfaceEvents?.abort();
       const positioningRef = this.positioningOptions?.positioningRef;
       if (typeof positioningRef === "function") positioningRef(null);
       else if (positioningRef) (positioningRef as { current: PopoverPositioningImperativeRef | null }).current = null;
@@ -262,10 +305,12 @@ export function definePopover(): void {
       const triggerSlot = document.createElement("slot");
       triggerSlot.name = "trigger";
       shadow.append(style, triggerSlot, panel);
-      this.panel = panel;
+      this.internalPanel = panel;
+      this.panel = this.externalPanel ?? panel;
     }
 
     private assigned(slotName: string): HTMLElement[] {
+      if (slotName === "content" && this.externalPanel) return [this.externalPanel];
       return this.shadowRoot?.querySelector<HTMLSlotElement>(`slot[name=${slotName}]`)?.assignedElements({ flatten: true }).filter((node): node is HTMLElement => node instanceof HTMLElement) ?? [];
     }
 
@@ -300,11 +345,11 @@ export function definePopover(): void {
 
     private syncLabel = (): void => {
       if (!this.panel) return;
-      const title = this.assigned("title");
-      const heading = this.panel.querySelector("h2");
-      if (heading) heading.hidden = title.length === 0;
-      if (title.length) {
-        this.panel.setAttribute("aria-labelledby", `${this.panel.id}-title`);
+      const title = this.externalPanel ? [...this.externalPanel.querySelectorAll<HTMLElement>("h1,h2,h3,h4,h5,h6,[slot=title]")] : this.assigned("title");
+      const heading = this.panel.querySelector<HTMLElement>("h2") ?? title[0];
+      if (heading && this.externalPanel && !heading.id) heading.id = `${this.panel.id}-title`;
+      if (heading && title.length) {
+        this.panel.setAttribute("aria-labelledby", heading.id || `${this.panel.id}-title`);
         this.panel.removeAttribute("aria-label");
       } else {
         this.panel.removeAttribute("aria-labelledby");
@@ -390,7 +435,7 @@ export function definePopover(): void {
     }
 
     private syncInertFocus(): void {
-      syncInertFocusState(this.ownerDocument, this, this.assigned("trigger"), this.isOpen && this.trapFocusEnabled && this.inertTrapFocusEnabled);
+      syncInertFocusState(this.ownerDocument, this, this.assigned("trigger"), this.isOpen && this.trapFocusEnabled && this.inertTrapFocusEnabled, this.externalPanel);
     }
 
     private get positioningOptions(): PopoverPositioningOptions | undefined { return typeof this.positioning === "object" && this.positioning !== null ? this.positioning : undefined; }
@@ -523,7 +568,7 @@ export function definePopover(): void {
     private onScroll = (event: Event): void => {
       if (!this.hasAttribute("close-on-scroll") && !this.hasAttribute("open-on-context")) { this.position(); return; }
       const target = event.target;
-      if (!(target instanceof Node) || !this.contains(target)) this.setOpen(false, false, true, event);
+      if (!(target instanceof Node) || !this.contains(target) && !this.externalPanel?.contains(target)) this.setOpen(false, false, true, event);
     };
 
     private onClick = (event: Event): void => {
@@ -573,7 +618,7 @@ export function definePopover(): void {
       this.iframeBlurTimer = setTimeout(() => {
         this.iframeBlurTimer = undefined;
         const active = this.ownerDocument.activeElement;
-        if (this.isConnected && this.isOpen && active instanceof HTMLIFrameElement && !this.contains(active)) this.setOpen(false, false, true, event);
+        if (this.isConnected && this.isOpen && active instanceof HTMLIFrameElement && !this.contains(active) && !this.externalPanel?.contains(active)) this.setOpen(false, false, true, event);
       }, 0);
     };
 
@@ -607,7 +652,7 @@ export function definePopover(): void {
     }
 
     private onFocusOut = (event: FocusEvent): void => {
-      if (event.relatedTarget instanceof Node && this.contains(event.relatedTarget)) return;
+      if (event.relatedTarget instanceof Node && (this.contains(event.relatedTarget) || this.externalPanel?.contains(event.relatedTarget))) return;
       if (this.trapFocusEnabled && this.inertTrapFocusEnabled) return;
       queueMicrotask(() => {
         if (!this.isOpen || this.focusIsInside()) return;
@@ -617,16 +662,18 @@ export function definePopover(): void {
     };
 
     private focusables(): HTMLElement[] {
-      const result: HTMLElement[] = [];
+      const result = new Set<HTMLElement>();
+      const selector = "button,a[href],input:not([type=hidden]),select,textarea,[tabindex]";
+      const inspect = (node: Element): void => {
+        if (node instanceof HTMLElement && node.matches(selector) && !node.hasAttribute("disabled") && node.tabIndex >= 0 && node.getClientRects().length) result.add(node);
+        if (node.shadowRoot) visit(node.shadowRoot);
+        if (node instanceof HTMLSlotElement) for (const assigned of node.assignedElements({ flatten: true })) inspect(assigned);
+      };
       const visit = (root: ParentNode): void => {
-        for (const node of root.querySelectorAll<HTMLElement>("button,a[href],input:not([type=hidden]),select,textarea,[tabindex]")) {
-          if (!node.hasAttribute("disabled") && node.tabIndex >= 0 && node.getClientRects().length) result.push(node);
-          if (node.shadowRoot) visit(node.shadowRoot);
-          if (node instanceof HTMLSlotElement) for (const assigned of node.assignedElements({ flatten: true })) visit(assigned);
-        }
+        for (const node of root.querySelectorAll<HTMLElement>("*")) inspect(node);
       };
       for (const content of this.assigned("content")) visit(content);
-      return [...new Set(result)];
+      return [...result];
     }
 
     private focusFirst = (): void => { (this.focusables()[0] ?? this.panel)?.focus(); };
@@ -646,14 +693,14 @@ export function definePopover(): void {
     private focusIsInside(): boolean {
       let active: Element | null = document.activeElement;
       while (active) {
-        if (active === this || this.contains(active)) return true;
+        if (active === this || this.contains(active) || this.externalPanel?.contains(active)) return true;
         active = active.shadowRoot?.activeElement ?? null;
       }
       return false;
     }
 
     private onOutsidePointerDown = (event: PointerEvent): void => {
-      if (this.isOpen && event.target instanceof Node && !this.contains(event.target) && !event.composedPath().includes(this)) this.setOpen(false, false, true, event);
+      if (this.isOpen && event.target instanceof Node && !this.contains(event.target) && !this.externalPanel?.contains(event.target) && !event.composedPath().includes(this) && !event.composedPath().includes(this.externalPanel!)) this.setOpen(false, false, true, event);
     };
 
     private setOpen(value: boolean, force = false, notify = true, sourceEvent?: Event): void {
