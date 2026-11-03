@@ -6563,14 +6563,14 @@ export function useTableCompositeNavigation(): TableCompositeNavigation {
     if (!event.currentTarget.contains(activeElement)) return;
 
     const activeRole = activeElement.getAttribute("role");
-    if (event.key === "ArrowRight" && activeRole === "row" && activeElement instanceof HTMLElement) {
+    const isRtl = document.defaultView?.getComputedStyle(event.currentTarget).direction === "rtl";
+    if (event.key === (isRtl ? "ArrowLeft" : "ArrowRight") && activeRole === "row" && activeElement instanceof HTMLElement) {
       const firstFocusable = activeElement.querySelector<HTMLElement>('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])');
       firstFocusable?.focus();
     }
     if (activeRole === "row") return;
 
     const isInCell = activeElement.closest('[role="cell"],[role="gridcell"]') !== null;
-    const isRtl = document.defaultView?.getComputedStyle(event.currentTarget).direction === "rtl";
     const moveToCell = (direction: -1 | 1, vertical: boolean): void => {
       const cell = eventTarget.closest<HTMLElement>('[role="cell"],[role="gridcell"]');
       const row = cell?.closest<HTMLElement>('[role="row"]');
