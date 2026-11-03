@@ -85,6 +85,7 @@
       });
     }
     stage?.addEventListener("spui-input", event => updateStatus(event.target));
+    stage?.addEventListener("spui-change", event => updateStatus(event.target));
     stage?.addEventListener("spui-selection-change", (event) => {
       const detail = event.detail ?? {};
       const values = Array.isArray(detail.selectedValues) ? detail.selectedValues : detail.selectedValue ? [detail.selectedValue] : [];
