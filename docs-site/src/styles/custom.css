@@ -188,14 +188,21 @@
 }
 
 .preview-actions {
-  flex-wrap: wrap;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
   margin-top: 1.5rem;
 }
 
 .preview-actions > spui-button {
+  display: flex;
+  width: 100%;
   min-height: var(--spui-control-height, 32px);
-  align-self: flex-start;
+}
+
+.preview-actions > spui-button::part(control) {
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .preview-surface {
