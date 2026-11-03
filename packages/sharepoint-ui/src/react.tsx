@@ -316,9 +316,13 @@ const nativeEventBindings: ReadonlyArray<{ eventName: string; prop: string; capt
 ];
 const nativeEventPropNames = new Set(nativeEventBindings.map(binding => binding.prop));
 function withoutNativeControlEventProps(props: Record<string, unknown>): Record<string, unknown> {
-  const hostProps = { ...props };
-  for (const prop of nativeEventPropNames) delete hostProps[prop];
-  return hostProps;
+  let hostProps: Record<string, unknown> | undefined;
+  for (const prop in props) {
+    if (!Object.prototype.hasOwnProperty.call(props, prop) || !nativeEventPropNames.has(prop)) continue;
+    hostProps ??= { ...props };
+    delete hostProps[prop];
+  }
+  return hostProps ?? props;
 }
 function nativeControlHostProps(props: Record<string, unknown>): Record<string, unknown> {
   return useCustomElementProps(withoutNativeControlEventProps(props));
