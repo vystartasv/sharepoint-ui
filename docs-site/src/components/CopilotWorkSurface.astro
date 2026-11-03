@@ -21,14 +21,14 @@
     </div>
 
     <div class="copilot-demo__user-message">
-      <p>Show the access reviews due this week and let me approve them here.</p>
+      <p>Show the open access reviews. Let me approve one here.</p>
     </div>
 
     <div class="copilot-demo__agent-message">
       <svg class="copilot-demo__agent-mark" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 1.5 14.8 9.2 22.5 12l-7.7 2.8L12 22.5l-2.8-7.7L1.5 12l7.7-2.8L12 1.5Z" fill="currentColor"/></svg>
       <div>
         <strong>Access Review Agent</strong>
-        <p>I found three reviews due this week. Check the owners and scope, then choose an action. Your review list remains the source of truth.</p>
+        <p>I found three open reviews. Two are ready to review; one needs owner confirmation. Check the scope, then choose an action.</p>
       </div>
     </div>
 
@@ -38,19 +38,19 @@
           <p class="copilot-demo__eyebrow">CONTOSO OPERATIONS · SHAREPOINT</p>
           <h3>Access reviews <spui-badge color="informative" size="small">3 due</spui-badge></h3>
         </div>
-        <spui-tag size="small" color="warning">Review before 14 Nov</spui-tag>
+        <spui-tag size="small" color="informative">Quarterly cycle · Q4</spui-tag>
       </header>
 
       <div class="copilot-demo__summary" aria-label="Review totals">
         <div><strong id="copilot-open-count">3</strong><span>Open reviews</span></div>
-        <div><strong>2</strong><span>Due this week</span></div>
-        <div><strong>1</strong><span>Needs attention</span></div>
+        <div><strong>2</strong><span>Ready to review</span></div>
+        <div><strong>1</strong><span>Needs owner</span></div>
       </div>
 
       <spui-search-box id="copilot-search" label="Find a review" placeholder="Search reviews" clear-label="Clear search"></spui-search-box>
 
       <div class="copilot-demo__review-list" id="copilot-review-list">
-        <spui-view-card class="copilot-demo__review" data-search="quarterly access review taylor chen external guests" kind="approval" title="Quarterly access review" subtitle="Taylor Chen · Due 14 Nov" description="Confirm access for external guests before the quarterly audit.">
+        <spui-view-card class="copilot-demo__review" data-search="quarterly access review taylor chen external guests" kind="approval" title="Quarterly access review" subtitle="Taylor Chen · External guests" description="Confirm access for external guests before the quarterly audit.">
           <spui-avatar slot="leading" name="Taylor Chen" initials="TC" size="36" decorative></spui-avatar>
           <spui-tag slot="status" size="small" color="warning">Needs review</spui-tag>
           <div class="copilot-demo__scope"><span>Scope</span><strong>8 guests · 2 sites</strong></div>
@@ -58,7 +58,7 @@
           <spui-button slot="actions" appearance="secondary" size="small" data-decision="details">Review details</spui-button>
         </spui-view-card>
 
-        <spui-view-card class="copilot-demo__review" data-search="finance workspace alex chen membership changes" kind="approval" title="Finance workspace" subtitle="Alex Chen · Due 15 Nov" description="Review membership changes for the Finance workspace.">
+        <spui-view-card class="copilot-demo__review" data-search="finance workspace alex chen membership changes" kind="approval" title="Finance workspace" subtitle="Alex Chen · Membership review" description="Review membership changes for the Finance workspace.">
           <spui-avatar slot="leading" name="Alex Chen" initials="AC" size="36" decorative></spui-avatar>
           <spui-tag slot="status" size="small" color="informative">Ready to approve</spui-tag>
           <div class="copilot-demo__scope"><span>Scope</span><strong>4 members · 1 group</strong></div>
@@ -66,7 +66,7 @@
           <spui-button slot="actions" appearance="secondary" size="small" data-decision="details">Review details</spui-button>
         </spui-view-card>
 
-        <spui-view-card class="copilot-demo__review" data-search="project atlas access request priya shah" kind="approval" title="Project Atlas access" subtitle="Priya Shah · Due 18 Nov" description="Check a requested role change for the project site.">
+        <spui-view-card class="copilot-demo__review" data-search="project atlas access request priya shah" kind="approval" title="Project Atlas access" subtitle="Priya Shah · Role change" description="Check a requested role change for the project site.">
           <spui-avatar slot="leading" name="Priya Shah" initials="PS" size="36" decorative></spui-avatar>
           <spui-tag slot="status" size="small" color="danger">Owner confirmation</spui-tag>
           <div class="copilot-demo__scope"><span>Scope</span><strong>1 role change · 1 site</strong></div>

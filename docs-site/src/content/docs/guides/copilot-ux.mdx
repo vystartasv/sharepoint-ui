@@ -19,7 +19,7 @@ Copilot UX components became generally available with SPFx 1.24. Development and
 
 ## Why it matters
 
-The agent can turn an intent such as “show reviews due this week” into a SharePoint-themed task surface. A user can inspect the owners, scope, and state, then take an action inside Copilot without leaving the conversation. Use `ViewCard`, `Badge`, `Tag`, `Avatar`, and `Button` to build that surface; keep list access, permission checks, and writes in the SPFx component's data service.
+The agent can turn an intent such as “show open reviews that need attention” into a SharePoint-themed task surface. A user can inspect the owners, scope, and state, then take an action inside Copilot without leaving the conversation. Use `ViewCard`, `Badge`, `Tag`, `Avatar`, and `Button` to build that surface; keep list access, permission checks, and writes in the SPFx component's data service.
 
 SPFx declares the tool and its parameters in the Copilot component manifest. A Zod schema describes the arguments for the agent:
 
@@ -28,7 +28,7 @@ import { z } from "zod";
 
 export const propertiesSchema = z.object({
   listId: z.string().uuid().describe("The authorized SharePoint list to review."),
-  dueBefore: z.string().describe("ISO date. Show reviews due before this date."),
+  status: z.string().optional().describe("Optional review status to show."),
   query: z.string().optional().describe("Optional title or owner search."),
 });
 ```
@@ -134,7 +134,7 @@ import { createCopilotTextContent } from "@microsoft/sp-copilot-component";
 await this.context.copilotBridge.updateModelContextAsync({
   content: [createCopilotTextContent(
     `Access reviews: ${visibleReviews.length} visible; ${selectedReviews.length} selected; ` +
-    `due before ${dueBefore}. No approval has been submitted yet.`
+    `filter: ${query || "all reviews"}. No approval has been submitted yet.`
   )],
 });
 ```
