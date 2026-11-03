@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
-import { getDirectionFromLanguage, observeAccessibleTextFromIdRefs, resolveAccessibleTextFromIdRefs } from "./elements/shared.js";
+import { getDirectionFromLanguage, observeAccessibleTextFromIdRefs, resolveAccessibleTextFromIdRefs, scrollToInlineOffset } from "./elements/shared.js";
 import { defineButton } from "./elements/button.js";
 import { defineButtonGroup } from "./elements/button-group.js";
 import { defineCompoundButton, defineMenuButton, defineSplitButton, defineToggleButton, type ButtonAppearance, type ButtonShape, type ButtonSize } from "./elements/button-variants.js";
@@ -3596,7 +3596,7 @@ function VirtualListEngine<T>({ items, itemCount, dataSource, onDataLoadError, r
       setScrollOffset(0);
     } else if (horizontal && previous.rtl !== rtl) {
       const offset = Math.abs(element.scrollLeft);
-      element.scrollLeft = rtl ? -offset : offset;
+      scrollToInlineOffset(element, offset);
       setScrollOffset(offset);
     }
     setViewportSize((windowScroll ? window.innerHeight : horizontal ? element.clientWidth : element.clientHeight) || 320);
@@ -3673,7 +3673,7 @@ function VirtualListEngine<T>({ items, itemCount, dataSource, onDataLoadError, r
     if (!measureItems || !element || !adjustment) return;
     pendingAnchorAdjustment.current = 0;
     if (windowScroll) window.scrollBy(0, adjustment);
-    else if (horizontal) element.scrollLeft += rtl ? -adjustment : adjustment;
+    else if (horizontal) scrollToInlineOffset(element, Math.abs(element.scrollLeft) + adjustment);
     else element.scrollTop += adjustment;
     const offset = getOffset(element);
     onScrollOffsetChange?.(offset);
@@ -3691,7 +3691,7 @@ function VirtualListEngine<T>({ items, itemCount, dataSource, onDataLoadError, r
       if (windowScroll && hostRef.current) {
         const documentTop = hostRef.current.getBoundingClientRect().top + window.scrollY;
         window.scrollTo({ top: Math.max(0, documentTop + destination), behavior });
-      } else if (horizontal) element.scrollTo({ left: rtl ? -Math.max(0, destination) : Math.max(0, destination), behavior });
+      } else if (horizontal) scrollToInlineOffset(element, Math.max(0, destination), behavior);
       else element.scrollTo({ top: Math.max(0, destination), behavior });
       const nextOffset = getOffset(element);
       onScrollOffsetChange?.(nextOffset);
@@ -3735,7 +3735,7 @@ function VirtualListEngine<T>({ items, itemCount, dataSource, onDataLoadError, r
             const direction = position >= lastPaginationPosition.current ? 1 : -1;
             const index = Math.max(0, Math.min(total - 1, closest === lastPaginationIndex.current && position !== lastPaginationPosition.current ? closest + direction : closest));
             const target = indexOffset(index);
-            if (horizontal) element.scrollTo({ left: rtl ? -target : target, behavior: "smooth" }); else element.scrollTo({ top: target, behavior: "smooth" });
+            if (horizontal) scrollToInlineOffset(element, target, "smooth"); else element.scrollTo({ top: target, behavior: "smooth" });
             lastPaginationPosition.current = target;
             lastPaginationIndex.current = index;
           }, 100);
@@ -3839,7 +3839,7 @@ export function Virtualizer({ children, numItems, itemSize, virtualizerLength = 
           const offset = Math.max(0, reversed ? totalSize - normalOffset - rowSize : normalOffset);
           const applyScroll = (): void => {
             if (viewport.current !== element) return;
-            if (axis === "horizontal") { const rtl = getComputedStyle(element).direction === "rtl"; element.scrollTo({ left: rtl ? -offset : offset, behavior }); }
+            if (axis === "horizontal") scrollToInlineOffset(element, offset, behavior);
             else element.scrollTo({ top: offset, behavior });
             updateScrollPosition?.(axis === "horizontal" ? Math.abs(element.scrollLeft) : element.scrollTop);
           };
@@ -4449,7 +4449,7 @@ function VirtualDataGrid<T>({ items, dataSource, onDataLoadError, onDataSourceGr
       let column = orderedColumns.length - 1;
       if (shouldVirtualizeColumns) {
         setColumnWindow({ start: Math.max(0, column - 8), end: column + 1 });
-        viewport.current?.scrollTo({ left: viewport.current.scrollWidth, behavior: "auto" });
+        if (viewport.current) scrollToInlineOffset(viewport.current, viewport.current.scrollWidth);
       }
       setActiveCell({ row, column });
       pendingBoundaryFocus.current = { row, column };

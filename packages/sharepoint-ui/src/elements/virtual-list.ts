@@ -1,4 +1,4 @@
-import { base } from "./shared.js";
+import { base, scrollToInlineOffset } from "./shared.js";
 
 export type VirtualListItemRenderer<T = unknown> = (item: T, index: number) => Node | string | number | null;
 export interface VirtualListDataSource<T = unknown> {
@@ -351,7 +351,7 @@ export function defineVirtualList(): void {
     private scrollOffset(): number { return this.axis === "horizontal" ? Math.abs(this.viewport?.scrollLeft ?? 0) : this.viewport?.scrollTop ?? 0; }
     private setScrollOffset(offset: number, behavior: ScrollBehavior = "auto"): void {
       if (!this.viewport) return;
-      if (this.axis === "horizontal") this.viewport.scrollTo({ left: this.isRtl() ? -offset : offset, behavior });
+      if (this.axis === "horizontal") scrollToInlineOffset(this.viewport, offset, behavior);
       else this.viewport.scrollTo({ top: offset, behavior });
     }
     private isRtl(): boolean { return this.axis === "horizontal" && getComputedStyle(this.viewport ?? this).direction === "rtl"; }

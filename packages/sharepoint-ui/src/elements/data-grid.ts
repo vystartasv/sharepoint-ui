@@ -1,4 +1,4 @@
-import { base } from "./shared.js";
+import { base, scrollToInlineOffset } from "./shared.js";
 import { VariableSizeIndex } from "./virtual-list.js";
 import { clampDataGridColumnWidth, clampDataGridRowHeight, dataGridColumnVar, filterDataGridItems, fitDataGridColumnWidths, formatDataGridClipboard, getDataGridCellValue, getDataGridColumnSizing, getDataGridColumnWindow, groupDataGridItems, parseDataGridClipboard, parseDataGridClipboardValue, parseDataGridInputValue, sortDataGridItems, toDataGridInputValue, writeDataGridClipboardText, type DataGridCellEdit, type DataGridCellEditError, type DataGridColumn, getDataGridDataSourceRow, type DataGridDataSource, type DataGridDataSourceRow, type DataGridColumnSizingOptions, type DataGridColumnWidths, type DataGridEditValue, type DataGridFocusMode, type DataGridGroup, type DataGridSelectionAppearance, type DataGridSelectionModel, type DataGridSort, type DataGridSortDirection } from "./data-grid-model.js";
 
@@ -952,7 +952,7 @@ export function defineDataGrid(): void {
         this.pendingBoundaryFocus = { row: rowIndex, column: columnIndex, attempts: 0, scheduled: false };
         if (this.virtualizeColumns && columnIndex >= this.columnWindow.end) {
           this.columnWindow = { start: Math.max(0, columnIndex - 8), end: columnIndex + 1 };
-          this.viewport.scrollLeft = this.viewport.scrollWidth;
+          scrollToInlineOffset(this.viewport, this.viewport.scrollWidth);
           this.columnWindowChanged = true;
         }
         const sizes = this.indexRowSizes(rows, this.positiveNumber(this.getAttribute("row-height"), 40));

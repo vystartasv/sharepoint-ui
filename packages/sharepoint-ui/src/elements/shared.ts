@@ -14,6 +14,12 @@ const ltrScriptTags = ["ar-Latn", "fa-Latn", "he-Latn", "ks-Deva", "sd-Deva", "u
 export const directionByLanguage = `${rtlLanguageTags.map(tag => `:host(:lang(${tag}):not([dir]))`).join(",")}{direction:rtl}${ltrScriptTags.map(tag => `:host(:lang(${tag}):not([dir]))`).join(",")}{direction:ltr}`;
 export const base = `:host{font:inherit;font-family:var(--spui-font-family,inherit);color:var(--spui-ui-text,var(--spui-semantic-body-text,var(--colorNeutralForeground1,#323130)));color-scheme:var(--spui-color-scheme,light dark)}${directionByLanguage}button,input,textarea{font:inherit;font-family:var(--spui-font-family,inherit)}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-semantic-focus-border,var(--colorStrokeFocus2,#005a9e)));outline-offset:2px}`;
 
+/** Scroll a horizontal viewport from its logical inline-start, regardless of the inherited text direction. */
+export function scrollToInlineOffset(element: HTMLElement, offset: number, behavior: ScrollBehavior = "auto"): void {
+  const rtl = element.ownerDocument.defaultView?.getComputedStyle(element).direction === "rtl";
+  element.scrollTo({ left: rtl ? -offset : offset, behavior });
+}
+
 export type NativeFormControl = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 export type NativeFormControlDefaults = {
   control: NativeFormControl;
