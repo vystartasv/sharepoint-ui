@@ -106,7 +106,7 @@ defineButton();
 
 For a Copilot surface that reads SharePoint data, updates the visible-state context, and saves through `SPHttpClient`, use the [SPFx CLI template](https://github.com/vystartasv/sharepoint-ui/tree/main/templates/spfx-fast-copilot-access-review) or the [complete tenant-connected example](https://github.com/vystartasv/sharepoint-ui/tree/main/examples/spfx124-copilot-ux). Both are framework-free and import only the custom elements they use.
 
-For a metadata-driven form, use `<SharePointField>` from `/react` or `<spui-sharepoint-field>` without React. Both select the control from SharePoint metadata, apply accessible labels and field rules, and support rich-text Notes. Load Lookup/User options in the host; Choice values come from field metadata. For custom elements, register once and set object data as properties:
+For a metadata-driven form, use `<SharePointField>` from `/react` or `<spui-sharepoint-field>` without React. Both select the control from SharePoint metadata, apply accessible labels and field rules, and support rich-text Notes. Load Lookup/User/taxonomy options in the host; Choice values come from field metadata. Normalize taxonomy item values with `normalizeSharePointTaxonomyValue()` and save them with `serializeSharePointTaxonomyFieldFormValue()` through `ValidateUpdateListItem`. For custom elements, register once and set object data as properties:
 
 ```ts
 import { defineSharePointField } from "@spfx-fast/sharepoint-ui/elements/sharepoint-fields";
