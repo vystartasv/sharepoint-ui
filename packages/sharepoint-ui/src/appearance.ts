@@ -40,7 +40,7 @@ export function getSharePointUIStyleTokens(appearance: SharePointUIAppearance = 
     "--spui-ui-warning-surface": "var(--spui-semantic-warning-background, #fff4ce)",
     "--spui-ui-danger": "var(--spui-semantic-error-text, #b10e1c)",
     "--spui-ui-danger-surface": "var(--spui-semantic-error-background, #fde7e9)",
-    "--spui-focus-ring": "var(--spui-ui-border-focus)"
+    "--spui-focus-ring": "var(--spui-semantic-focus-border, var(--colorStrokeFocus2, var(--spui-ui-accent)))"
   });
   else {
     const presetText = String(tokens["--spui-ui-text"]);
@@ -67,7 +67,7 @@ export function getSharePointUIStyleTokens(appearance: SharePointUIAppearance = 
       "--spui-ui-warning-surface": `var(--spui-semantic-warning-background, ${tokens["--spui-ui-warning-surface"]})`,
       "--spui-ui-danger": `var(--spui-semantic-error-text, ${tokens["--spui-ui-danger"]})`,
       "--spui-ui-danger-surface": `var(--spui-semantic-error-background, ${tokens["--spui-ui-danger-surface"]})`,
-      "--spui-focus-ring": "var(--spui-ui-border-focus)"
+      "--spui-focus-ring": "var(--spui-semantic-focus-border, var(--colorStrokeFocus2, var(--spui-ui-accent)))"
     });
   }
   if (selectedBase === "ios") {
@@ -91,7 +91,7 @@ export function getSharePointUIStyleTokens(appearance: SharePointUIAppearance = 
       "--spui-ui-warning-surface": "light-dark(var(--spui-semantic-warning-background, #fff3d6), color-mix(in srgb, var(--spui-semantic-warning-background, #342900) 28%, black 72%))",
       "--spui-ui-danger": "light-dark(var(--spui-semantic-error-text, #d70015), color-mix(in srgb, var(--spui-semantic-error-text, #d70015) 30%, white 70%))",
       "--spui-ui-danger-surface": "light-dark(var(--spui-semantic-error-background, #ffe5e8), color-mix(in srgb, var(--spui-semantic-error-background, #3a1114) 28%, black 72%))",
-      "--spui-focus-ring": "var(--spui-ui-border-focus)"
+      "--spui-focus-ring": "var(--spui-semantic-focus-border, var(--colorStrokeFocus2, var(--spui-ui-accent)))"
     });
   }
   // Stable shared roles for applications that style slots or compose their own
