@@ -234,8 +234,9 @@ export function defineAccordion(): void {
       if (!target) return;
       const index = triggers.indexOf(target);
       let next: HTMLButtonElement | undefined;
-      if (event.key === "ArrowDown" || event.key === "ArrowRight") next = triggers[index + 1] ?? (navigation === "circular" ? triggers[0] : undefined);
-      else if (event.key === "ArrowUp" || event.key === "ArrowLeft") next = triggers[index - 1] ?? (navigation === "circular" ? triggers.at(-1) : undefined);
+      const rtl = getComputedStyle(this).direction === "rtl";
+      if (event.key === "ArrowDown" || event.key === (rtl ? "ArrowLeft" : "ArrowRight")) next = triggers[index + 1] ?? (navigation === "circular" ? triggers[0] : undefined);
+      else if (event.key === "ArrowUp" || event.key === (rtl ? "ArrowRight" : "ArrowLeft")) next = triggers[index - 1] ?? (navigation === "circular" ? triggers.at(-1) : undefined);
       else if (event.key === "Home") next = triggers[0];
       else if (event.key === "End") next = triggers.at(-1);
       if (!next) return;
