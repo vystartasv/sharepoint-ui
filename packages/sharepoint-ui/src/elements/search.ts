@@ -1,4 +1,4 @@
-import { base } from "./shared.js";
+import { base, syncHostAccessibleName } from "./shared.js";
 
 export type SearchSize = "small" | "medium" | "large";
 export type SearchAppearance = "outline" | "underline" | "filled-darker" | "filled-lighter" | "filled-darker-shadow" | "filled-lighter-shadow";
@@ -81,6 +81,7 @@ export function defineSearchBox(): void {
     private syncFormValue(): void {
       if (!this.#internals) return;
       const input = this.shadowRoot?.querySelector("input");
+      if (input) syncHostAccessibleName(this, input);
       this.#internals.setFormValue(this.#value, this.#value);
       if (input && !input.validity.valid) {
         const invalidFlags = ["badInput", "customError", "patternMismatch", "rangeOverflow", "rangeUnderflow", "stepMismatch", "tooLong", "tooShort", "typeMismatch", "valueMissing"] as const;

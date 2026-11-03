@@ -1,10 +1,10 @@
-import { base, rememberNativeFormControlDefaults, type NativeFormControlDefaults } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
 
 export function defineSlider(): void {
   if (customElements.get("spui-slider")) return;
   class SpuiSlider extends HTMLElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "value", "default-value", "min", "max", "step", "size", "vertical", "disabled", "name", "aria-label", "aria-description", "aria-describedby", "aria-invalid", "aria-orientation", "aria-required", "aria-valuetext"];
+    static observedAttributes = ["label", "value", "default-value", "min", "max", "step", "size", "vertical", "disabled", "name", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "aria-orientation", "aria-required", "aria-valuetext"];
     private internals: ElementInternals | undefined;
     private currentValue: string | undefined;
     private currentDefaultValue: string | undefined;
@@ -47,7 +47,7 @@ export function defineSlider(): void {
           else input.removeAttribute("orient");
         }
       } else if (name === "disabled") input.disabled = this.formDisabled || this.hasAttribute("disabled") || Boolean(this.slotInputDefaults?.disabled);
-      else if (name === "aria-label" || name === "aria-description" || name === "aria-describedby" || name === "aria-invalid" || name === "aria-orientation" || name === "aria-required" || name === "aria-valuetext") {
+      else if (name === "aria-label" || name === "aria-labelledby" || name === "aria-description" || name === "aria-describedby" || name === "aria-invalid" || name === "aria-orientation" || name === "aria-required" || name === "aria-valuetext") {
         if (name === "aria-orientation") this.defaultAriaOrientation = undefined;
         value === null ? input.removeAttribute(name) : input.setAttribute(name, value);
       }
@@ -124,6 +124,7 @@ export function defineSlider(): void {
         input.setAttribute("aria-orientation", orientation);
         this.defaultAriaOrientation = { input, value: orientation };
       } else this.defaultAriaOrientation = undefined;
+      syncHostAccessibleName(this, input);
       input.disabled = this.formDisabled || this.hasAttribute("disabled") || Boolean(input === fallback ? false : this.slotInputDefaults?.disabled);
       this.syncFormValue(input); this.syncVisual(input);
     }

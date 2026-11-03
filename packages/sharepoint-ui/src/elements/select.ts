@@ -1,4 +1,4 @@
-import { base, rememberNativeFormControlDefaults, type NativeFormControlDefaults } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
 
 export type SelectAppearance = "outline" | "underline" | "filled-darker" | "filled-lighter";
 export type SelectSize = "small" | "medium" | "large";
@@ -113,6 +113,7 @@ export function defineSelect(): void {
     formStateRestoreCallback(state: string | File | FormData | null): void { if (typeof state === "string") this.value = state; }
 
     private syncFormValue(select: HTMLSelectElement): void {
+      syncHostAccessibleName(this, select);
       const value = select.multiple
         ? [...select.selectedOptions].reduce((data, option) => { const name = this.getAttribute("name"); if (name) data.append(name, option.value); return data; }, new FormData())
         : select.value;

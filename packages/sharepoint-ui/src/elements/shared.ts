@@ -13,6 +13,34 @@ export type NativeFormControlDefaults = {
   defaultChecked: boolean;
 };
 
+export function syncHostAccessibleName(host: HTMLElement, control: HTMLElement): void {
+  const label = host.getAttribute("aria-label");
+  const labelledBy = host.getAttribute("aria-labelledby");
+  const root = control.getRootNode();
+  const inShadowRoot = host.shadowRoot?.contains(control) ?? false;
+  if (!inShadowRoot) return;
+  if (label === null && labelledBy === null) return;
+  if (labelledBy !== null && inShadowRoot) {
+    const ids = labelledBy.trim().split(/\s+/).filter(Boolean);
+    const localRoot = root as ShadowRoot;
+    if (ids.length && ids.every(id => localRoot.getElementById(id))) {
+      control.removeAttribute("aria-label");
+      control.setAttribute("aria-labelledby", labelledBy);
+      return;
+    }
+    const scope = host.getRootNode() as Document | ShadowRoot;
+    const resolved = ids.map(id => {
+      const target = scope.getElementById(id) ?? host.ownerDocument.getElementById(id);
+      return target?.getAttribute("aria-label") || target?.textContent?.trim() || "";
+    }).filter(Boolean).join(" ");
+    control.removeAttribute("aria-labelledby");
+    if (resolved) control.setAttribute("aria-label", resolved); else control.removeAttribute("aria-label");
+    return;
+  }
+  if (labelledBy !== null) control.setAttribute("aria-labelledby", labelledBy); else control.removeAttribute("aria-labelledby");
+  if (labelledBy === null && label !== null) control.setAttribute("aria-label", label); else control.removeAttribute("aria-label");
+}
+
 export function rememberNativeFormControlDefaults(current: NativeFormControlDefaults | undefined, control: NativeFormControl): NativeFormControlDefaults {
   if (current?.control === control) return current;
   return {

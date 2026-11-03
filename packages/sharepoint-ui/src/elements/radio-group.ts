@@ -1,4 +1,4 @@
-import { base } from "./shared.js";
+import { base, syncHostAccessibleName } from "./shared.js";
 
 function radioOptionLabel(option: Element, fallback: string): string {
   const text = [...option.childNodes].filter(node => !(node instanceof Element && ["input", "indicator", "label"].includes(node.getAttribute("slot") ?? ""))).map(node => node.textContent ?? "").join("").trim();
@@ -63,7 +63,7 @@ export function defineRadioGroup(): void {
   if (customElements.get("spui-radio-group")) return;
   class SpuiRadioGroup extends HTMLElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "value", "default-value", "disabled", "required", "name", "orientation", "layout", "aria-label", "aria-description", "aria-describedby", "aria-invalid"];
+    static observedAttributes = ["label", "value", "default-value", "disabled", "required", "name", "orientation", "layout", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid"];
     private internals: ElementInternals | undefined;
     private observer: MutationObserver | undefined;
     private currentValue: string | undefined;
@@ -117,10 +117,11 @@ export function defineRadioGroup(): void {
       }
       if (name === "disabled") fieldset.disabled = this.formDisabledValue || this.hasAttribute("disabled");
       if (name === "orientation" || name === "layout") fieldset.dataset.layout = this.getLayout();
-      if (name === "aria-label" || name === "aria-description" || name === "aria-describedby" || name === "aria-invalid") {
+      if (name === "aria-label" || name === "aria-labelledby" || name === "aria-description" || name === "aria-describedby" || name === "aria-invalid") {
         const value = this.getAttribute(name);
         if (value === null) fieldset.removeAttribute(name);
         else fieldset.setAttribute(name, value);
+        syncHostAccessibleName(this, fieldset);
       }
       if (name === "value") this.currentValue = value ?? "";
       for (const radio of fieldset.querySelectorAll<HTMLInputElement>('input[type="radio"]')) {
@@ -245,7 +246,7 @@ export function defineRadioGroup(): void {
       const fieldset = document.createElement("fieldset");
       fieldset.disabled = this.formDisabledValue || this.hasAttribute("disabled");
       fieldset.dataset.layout = this.getLayout();
-      for (const name of ["aria-label", "aria-description", "aria-describedby", "aria-invalid"]) {
+      for (const name of ["aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid"]) {
         const value = this.getAttribute(name);
         if (value !== null) fieldset.setAttribute(name, value);
       }
@@ -263,6 +264,7 @@ export function defineRadioGroup(): void {
       fieldset.append(legend, ...radios);
       fieldset.addEventListener("change", () => this.syncFormValue());
       shadow.replaceChildren(style, fieldset);
+      syncHostAccessibleName(this, fieldset);
       this.syncFormValue();
     }
 

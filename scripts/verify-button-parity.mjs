@@ -7,7 +7,7 @@ import { build } from "esbuild";
 const root = resolve(process.cwd());
 const bundle = await build({
   stdin: {
-    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{Button,MenuButton,MenuItem,SplitButton}from"${resolve(root, "packages/sharepoint-ui/src/react.tsx")}";window.enabledClicks=0;window.disabledClicks=0;window.slotClicks=0;window.objectSlotClicks=0;createRoot(document.querySelector("#root")).render(<><Button data-testid="before" icon={<b>+</b>} iconPosition="before" onClick={()=>window.enabledClicks++}>Add item</Button><Button data-testid="after" icon={<b>!</b>} iconPosition="after">Review item</Button><Button data-testid="reset" type="reset">Reset</Button><Button data-testid="disabled" disabled disabledFocusable onClick={()=>window.disabledClicks++}>Disabled action</Button><Button data-testid="native-disabled" disabled>Disabled normally</Button><SplitButton data-testid="split" disabled disabledFocusable icon={<b>+</b>} iconPosition="after" menuItems={<MenuItem>Rename</MenuItem>}>Copy</SplitButton><SplitButton data-testid="split-slots" menuItems={<MenuItem>Open custom action</MenuItem>} primaryActionButton={<Button data-testid="slot-primary" appearance="outline" onClick={()=>window.slotClicks++}>Custom primary</Button>} menuButton={<MenuButton data-testid="slot-menu-button" appearance="subtle">Custom menu trigger</MenuButton>}>Fallback primary</SplitButton><SplitButton data-testid="split-slot-props" menuItems={<MenuItem>Open prop action</MenuItem>} primaryActionButton={{"data-testid":"object-primary",appearance:"subtle",onClick:()=>window.objectSlotClicks++,children:"Object primary"}} menuButton={{"data-testid":"object-menu",children:"Object menu",appearance:"outline"}}>Fallback primary</SplitButton></>);`,
+    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{Button,MenuButton,MenuItem,SplitButton}from"${resolve(root, "packages/sharepoint-ui/src/react.tsx")}";import{SplitButton as FluentSplitButton}from"@fluentui/react-components";window.enabledClicks=0;window.disabledClicks=0;window.slotClicks=0;window.objectSlotClicks=0;createRoot(document.querySelector("#root")).render(<><Button data-testid="before" icon={<b>+</b>} iconPosition="before" onClick={()=>window.enabledClicks++}>Add item</Button><Button data-testid="after" icon={<b>!</b>} iconPosition="after">Review item</Button><Button data-testid="reset" type="reset">Reset</Button><Button data-testid="disabled" disabled disabledFocusable onClick={()=>window.disabledClicks++}>Disabled action</Button><Button data-testid="native-disabled" disabled>Disabled normally</Button><FluentSplitButton data-testid="fluent-split">Copy</FluentSplitButton><SplitButton data-testid="split-labelledby" menuItems={<MenuItem>Run</MenuItem>} primaryActionButton={<Button data-testid="external-label-primary" aria-labelledby="split-primary-label">Fallback primary</Button>} menuButton={<MenuButton data-testid="external-label-menu">Other visible name</MenuButton>}>Fallback primary</SplitButton><SplitButton data-testid="split" disabled disabledFocusable icon={<b>+</b>} iconPosition="after" menuItems={<MenuItem>Rename</MenuItem>}>Copy</SplitButton><SplitButton data-testid="split-explicit-menu-label" menuItems={<MenuItem>Open custom action</MenuItem>} menuButton={<MenuButton aria-label="File actions">Menu caption</MenuButton>}>Save file</SplitButton><SplitButton data-testid="split-slots" menuItems={<MenuItem>Open custom action</MenuItem>} primaryActionButton={<Button data-testid="slot-primary" appearance="outline" onClick={()=>window.slotClicks++}>Custom primary</Button>} menuButton={<MenuButton data-testid="slot-menu-button" appearance="subtle">Custom menu trigger</MenuButton>}>Fallback primary</SplitButton><SplitButton data-testid="split-slot-props" menuItems={<MenuItem>Open prop action</MenuItem>} primaryActionButton={{"data-testid":"object-primary",appearance:"subtle",onClick:()=>window.objectSlotClicks++,children:"Object primary"}} menuButton={{"data-testid":"object-menu",children:"Object menu",appearance:"outline"}}>Fallback primary</SplitButton></>);`,
     resolveDir: root,
     sourcefile: "button-parity.tsx",
     loader: "tsx",
@@ -22,7 +22,7 @@ const bundle = await build({
 });
 const server = createServer((request, response) => request.url === "/bundle.js"
   ? response.writeHead(200, { "content-type": "text/javascript" }).end(bundle.outputFiles[0].contents)
-  : response.writeHead(200, { "content-type": "text/html" }).end("<!doctype html><html><body><div id='root'></div><script src='/bundle.js'></script></body></html>"));
+  : response.writeHead(200, { "content-type": "text/html" }).end("<!doctype html><html><body><span id='split-primary-label'>Approve request</span><div id='root'></div><script src='/bundle.js'></script></body></html>"));
 await new Promise(done => server.listen(0, "127.0.0.1", done));
 const require = createRequire(import.meta.url);
 const { chromium } = require("/Users/vilius/.t3/projects/spfx-research/node_modules/playwright");
@@ -74,11 +74,16 @@ try {
   assert.equal(await nativeDisabled.isDisabled(), true, "ordinary disabled remains a native disabled button");
   const splitButtons = page.getByTestId("split").locator("spui-button");
   assert.equal(await splitButtons.count(), 2, "SplitButton composes primary and menu Button controls");
+  assert.equal(await page.getByTestId("fluent-split").getByRole("button", { name: "Copy", exact: true }).count(), 2, "pinned Fluent labels both split actions from the primary action");
+  assert.equal(await page.getByTestId("split-labelledby").getByRole("button", { name: "Approve request", exact: true }).count(), 2, "Button resolves aria-labelledby across its shadow root and SplitButton applies that name to the menu action");
+  assert.equal(await page.getByTestId("split").getByRole("button", { name: "Copy", exact: true }).count(), 2, "local SplitButton matches Fluent accessible names");
   for (const control of await splitButtons.all()) {
     const button = control.locator("button");
     assert.equal(await button.getAttribute("aria-disabled"), "true", "SplitButton disabledFocusable reaches both actions");
     assert.equal(await button.getAttribute("disabled"), null);
   }
+  assert.equal(await page.getByTestId("split-explicit-menu-label").getByRole("button", { name: "File actions", exact: true }).count(), 1, "an explicit menu-button accessible name is preserved");
+  assert.equal(await page.getByTestId("split-slots").getByRole("button", { name: "Custom primary", exact: true }).count(), 2, "the menu action inherits the custom primary action name");
   const customPrimary = page.getByTestId("slot-primary").locator("button");
   assert.equal(await customPrimary.getAttribute("class"), "outline", "custom primary slot keeps its appearance override");
   assert.equal(await page.getByTestId("slot-primary").evaluate(host => host.textContent.trim()), "Custom primary", "custom primary slot replaces the default action content");
@@ -88,6 +93,7 @@ try {
   assert.equal(await customMenu.locator("button").getAttribute("aria-haspopup"), "menu", "custom menu slot receives menu semantics");
   await customMenu.locator("button").click();
   assert.equal(await page.getByRole("menuitem", { name: "Open custom action" }).isVisible(), true, "custom menu slot opens the composed Menu");
+  assert.equal(await page.getByTestId("split-slot-props").getByRole("button", { name: "Object primary", exact: true }).count(), 2, "object slots inherit the primary accessible name");
   const objectPrimary = page.getByTestId("object-primary").locator("button");
   assert.equal(await page.getByTestId("object-primary").evaluate(host => host.textContent.trim()), "Object primary", "prop-object primary slot supplies children");
   assert.equal(await objectPrimary.getAttribute("class"), "subtle");

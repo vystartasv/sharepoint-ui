@@ -1,4 +1,4 @@
-import { base } from "./shared.js";
+import { base, syncHostAccessibleName } from "./shared.js";
 
 export type ButtonAppearance = "primary" | "secondary" | "outline" | "subtle" | "transparent";
 export type ButtonSize = "small" | "medium" | "large";
@@ -41,7 +41,7 @@ export function defineButton(): void {
   if (customElements.get("spui-button")) return;
   class SpuiButton extends HTMLElement {
     static formAssociated = true;
-    static observedAttributes = ["as", "href", "target", "rel", "download", "hreflang", "referrerpolicy", "form", "formaction", "formenctype", "formmethod", "formnovalidate", "formtarget", "name", "value", "variant", "appearance", "size", "shape", "icon-only", "icon-position", "vertical", "disabled", "disabled-focusable", "type", "tabindex", "aria-label", "aria-description", "aria-describedby", "aria-pressed", "aria-expanded", "aria-haspopup", "aria-controls", "aria-current", "aria-disabled", "title"];
+    static observedAttributes = ["as", "href", "target", "rel", "download", "hreflang", "referrerpolicy", "form", "formaction", "formenctype", "formnovalidate", "formtarget", "name", "value", "variant", "appearance", "size", "shape", "icon-only", "icon-position", "vertical", "disabled", "disabled-focusable", "type", "tabindex", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-pressed", "aria-expanded", "aria-haspopup", "aria-controls", "aria-current", "aria-disabled", "title"];
     private internals = this.attachInternals();
     private formSubmitter?: HTMLButtonElement;
     private formDisabled = false;
@@ -51,7 +51,15 @@ export function defineButton(): void {
     disconnectedCallback() { this.formSubmitter?.remove(); this.formSubmitter = undefined; }
     attributeChangedCallback(name: string) {
       if (!this.isConnected) return;
-      if (["aria-label", "aria-description", "aria-describedby", "aria-pressed", "aria-expanded", "aria-haspopup", "aria-controls", "title"].includes(name)) {
+      if (name === "aria-label" || name === "aria-labelledby") {
+        const button = this.shadowRoot?.querySelector<HTMLElement>("button,a");
+        if (button) {
+          if (this.hasAttribute("aria-label") || this.hasAttribute("aria-labelledby")) syncHostAccessibleName(this, button);
+          else { button.removeAttribute("aria-label"); button.removeAttribute("aria-labelledby"); }
+        }
+        return;
+      }
+      if (["aria-description", "aria-describedby", "aria-pressed", "aria-expanded", "aria-haspopup", "aria-controls", "title"].includes(name)) {
         const button = this.shadowRoot?.querySelector("button,a"); const value = this.getAttribute(name);
         if (button) value === null ? button.removeAttribute(name) : button.setAttribute(name, value);
         return;
@@ -119,7 +127,7 @@ export function defineButton(): void {
         document.addEventListener("click", () => { if (!event.defaultPrevented && !disabled && this.formSubmitter?.isConnected) this.formSubmitter.click(); }, { once: true });
       });
       if (this.hasAttribute("tabindex")) button.setAttribute("tabindex", this.getAttribute("tabindex")!);
-      for (const name of ["aria-label", "aria-description", "aria-describedby", "aria-pressed", "aria-expanded", "aria-haspopup", "aria-controls", "aria-current", "title"]) { const value = this.getAttribute(name); if (value !== null) button.setAttribute(name, value); }
+      for (const name of ["aria-description", "aria-describedby", "aria-pressed", "aria-expanded", "aria-haspopup", "aria-controls", "aria-current", "title"]) { const value = this.getAttribute(name); if (value !== null) button.setAttribute(name, value); }
       const appearance = this.getAttribute("appearance") ?? (this.getAttribute("variant") === "primary" ? "primary" : "secondary");
       button.className = appearance === "primary" ? "primary" : appearance === "outline" || appearance === "subtle" || appearance === "transparent" ? appearance : "secondary";
       button.part.add("control");
@@ -128,7 +136,7 @@ export function defineButton(): void {
       iconSlot.addEventListener("slotchange", () => { icon.hidden = !iconSlot.assignedNodes({ flatten: true }).length; });
       icon.hidden = !iconSlot.assignedNodes({ flatten: true }).length;
       const content = document.createElement("span"); content.className = "content"; content.append(document.createElement("slot"));
-      button.append(icon, content); applyButtonStyle(shadow, button);
+      button.append(icon, content); applyButtonStyle(shadow, button); syncHostAccessibleName(this, button);
       if (restoreFocus) button.focus();
     }
     private syncFormSubmitter(as: string, type: string | null, disabled: boolean): void {

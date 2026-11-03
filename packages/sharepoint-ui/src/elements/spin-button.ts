@@ -1,4 +1,4 @@
-import { base, rememberNativeFormControlDefaults, type NativeFormControlDefaults } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
 
 export type SpinButtonAppearance = "outline" | "underline" | "filled-darker" | "filled-lighter";
 export type SpinButtonSize = "small" | "medium";
@@ -8,7 +8,7 @@ export function defineSpinButton(): void {
   if (customElements.get("spui-spin-button")) return;
   class SpuiSpinButton extends HTMLElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "value", "default-value", "display-value", "min", "max", "step", "step-page", "precision", "size", "appearance", "disabled", "required", "read-only", "name", "aria-label", "aria-description", "aria-describedby", "aria-invalid", "aria-valuetext", "increment-label", "decrement-label"];
+    static observedAttributes = ["label", "value", "default-value", "display-value", "min", "max", "step", "step-page", "precision", "size", "appearance", "disabled", "required", "read-only", "name", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "aria-valuetext", "increment-label", "decrement-label"];
     private internals: ElementInternals | undefined;
     private currentValue: string | undefined;
     private formDisabled = false;
@@ -63,7 +63,7 @@ export function defineSpinButton(): void {
       else if (name === "required") input.required = this.hasAttribute("required") || Boolean(this.slotInputDefaults?.required);
       else if (name === "read-only") input.readOnly = this.hasAttribute("read-only") || Boolean(this.slotInputDefaults?.readOnly);
       else if (name === "name") { /* The form-associated host owns the submitted name. */ }
-      else if (name === "aria-label" || name === "aria-description" || name === "aria-describedby" || name === "aria-invalid" || name === "aria-valuetext") value === null ? input.removeAttribute(name) : input.setAttribute(name, value);
+      else if (name === "aria-label" || name === "aria-labelledby" || name === "aria-description" || name === "aria-describedby" || name === "aria-invalid" || name === "aria-valuetext") value === null ? input.removeAttribute(name) : input.setAttribute(name, value);
       this.syncAria(input);
       this.syncFormState(input);
       this.updateButtons(input);
@@ -110,6 +110,7 @@ export function defineSpinButton(): void {
       return Math.min(max, Math.max(min, this.rounded(value)));
     }
     private syncAria(input: HTMLInputElement): void {
+      syncHostAccessibleName(this, input);
       const value = this.numberValue();
       const min = this.getAttribute("min");
       const max = this.getAttribute("max");

@@ -43,7 +43,7 @@ import { createRoot } from "react-dom/client";
 import { ${componentNames.join(", ")} } from "${reactPath}";
 window.mount = () => createRoot(document.querySelector("#root")).render(React.createElement(React.Fragment, null,
   React.createElement("form", { id: "external-controls" }),
-  ...[${componentNames.join(", ")}].map((Component, index) => React.createElement(Component, { key: index, "data-form-check": String(index), form: "external-controls", name: "field" + index }))));`,
+  ...[${componentNames.join(", ")}].map((Component, index) => React.createElement(Component, { key: index, "data-form-check": String(index), form: "external-controls", name: "field" + index, "aria-labelledby": "form-control-label" }))));`,
     resolveDir: root,
     sourcefile: "form-associated-controls.tsx",
     loader: "tsx",
@@ -57,7 +57,7 @@ window.mount = () => createRoot(document.querySelector("#root")).render(React.cr
   write: false,
 });
 const server = createServer((request, response) => {
-  if (new URL(request.url, "http://localhost").pathname === "/") return response.writeHead(200, { "content-type": "text/html" }).end("<!doctype html><html><body><div id='root'></div></body></html>");
+  if (new URL(request.url, "http://localhost").pathname === "/") return response.writeHead(200, { "content-type": "text/html" }).end("<!doctype html><html><body><span id='form-control-label' hidden>Form control name</span><div id='root'></div></body></html>");
   if (new URL(request.url, "http://localhost").pathname === "/bundle.js") return response.writeHead(200, { "content-type": "text/javascript" }).end(bundle.outputFiles[0].contents);
   response.writeHead(404).end();
 });
@@ -79,6 +79,14 @@ try {
   })));
   assert.equal(associations.length, componentNames.length, "all form-associated React controls rendered");
   for (const association of associations) assert.equal(association.formId, "external-controls", `${componentNames[association.index]} associates with an external form`);
+  const labelledControlNames = new Set(["Button", "Checkbox", "ComboBox", "Input", "RadioGroup", "SearchBox", "Select", "Slider", "SpinButton", "Switch", "TextArea"]);
+  for (const name of labelledControlNames) {
+    const host = page.locator(`[data-form-check="${componentNames.indexOf(name)}"]`);
+    const resolved = await host.evaluate(element => element.shadowRoot
+      ? [...element.shadowRoot.querySelectorAll("input,select,textarea,button,fieldset,[role=combobox]")].some(control => control.getAttribute("aria-label") === "Form control name")
+      : false);
+    assert.equal(resolved, true, `${name} resolves an external aria-labelledby reference into its shadow control`);
+  }
   assert.deepEqual(errors, [], "form-associated controls render without browser errors");
   console.log(`Verified form prop types and external form ownership for ${componentNames.length} React controls.`);
 } finally {

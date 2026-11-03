@@ -1,4 +1,4 @@
-import { base, rememberNativeFormControlDefaults, type NativeFormControlDefaults } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
 
 export type InputSize = "small" | "medium" | "large";
 export type InputAppearance = "outline" | "underline" | "filled-darker" | "filled-lighter" | "filled-darker-shadow" | "filled-lighter-shadow";
@@ -128,6 +128,7 @@ export function defineInput(): void {
       if (this.hasAttribute("default-checked")) input.defaultChecked = true;
       if (this.hasAttribute("checked")) input.checked = true;
       if (!this.dirty && input.type !== "file" && this.hasAttribute("value")) input.value = this.currentValue || this.defaultValue;
+      syncHostAccessibleName(this, input);
       this.syncForm(input);
     }
 

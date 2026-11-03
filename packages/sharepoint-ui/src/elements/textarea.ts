@@ -1,4 +1,4 @@
-import { base, rememberNativeFormControlDefaults, type NativeFormControlDefaults } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
 
 export function defineTextArea(): void {
   if (customElements.get("spui-textarea")) return;
@@ -95,6 +95,7 @@ export function defineTextArea(): void {
       input.disabled = this.disabled || this.formDisabled || Boolean(defaults?.disabled);
       input.required = this.required || Boolean(defaults?.required);
       input.readOnly = this.readOnly || Boolean(defaults?.readOnly);
+      syncHostAccessibleName(this, input);
       this.syncForm(input);
     }
     private handleTextareaInput = (event: Event): void => { const input = this.input(); if (!input) return; this.currentValue = input.value; this.dirty = true; this.syncForm(input); this.dispatchEvent(new CustomEvent("spui-input", { bubbles: true, composed: true, detail: { value: input.value, sourceEvent: event } })); };

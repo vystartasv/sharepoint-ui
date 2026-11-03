@@ -1,4 +1,4 @@
-import { base, rememberNativeFormControlDefaults, type NativeFormControlDefaults } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
 
 type CheckedState = boolean | "mixed";
 
@@ -105,6 +105,7 @@ function defineToggle(name: "spui-checkbox" | "spui-switch", type: "checkbox" | 
         const value = this.getAttribute(attr);
         if (value !== null && !input.hasAttribute(attr)) input.setAttribute(attr, value);
       }
+      syncHostAccessibleName(this, input);
       if (this.generatedLabelInput && this.generatedLabelInput.getAttribute("aria-label") === this.generatedLabel) this.generatedLabelInput.removeAttribute("aria-label");
       this.generatedLabelInput = undefined;
       this.generatedLabel = "";
@@ -173,7 +174,10 @@ function defineToggle(name: "spui-checkbox" | "spui-switch", type: "checkbox" | 
       if (name === "required") input.required = this.hasAttribute(name) || Boolean(this.slotInputDefaults?.required);
       if (name === "name") input.removeAttribute("name");
       if (name === "value") input.value = this.getAttribute(name) ?? this.slotInputDefaults?.value ?? "on";
-      if (name === "aria-label" || name === "aria-labelledby" || name === "aria-description" || name === "aria-describedby" || name === "aria-invalid") { const value = this.getAttribute(name); value === null ? input.removeAttribute(name) : input.setAttribute(name, value); }
+      if (name === "aria-label" || name === "aria-labelledby" || name === "aria-description" || name === "aria-describedby" || name === "aria-invalid") {
+        const value = this.getAttribute(name); value === null ? input.removeAttribute(name) : input.setAttribute(name, value);
+        syncHostAccessibleName(this, input);
+      }
       this.syncFormState();
     }
   }

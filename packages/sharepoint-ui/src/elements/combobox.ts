@@ -1,4 +1,4 @@
-import { base, rememberNativeFormControlDefaults, type NativeFormControlDefaults } from "./shared.js";
+import { base, rememberNativeFormControlDefaults, syncHostAccessibleName, type NativeFormControlDefaults } from "./shared.js";
 
 export function defineCombobox(): void {
   if (customElements.get("spui-combobox")) return;
@@ -290,6 +290,7 @@ export function defineCombobox(): void {
         else if (explicitLabelledBy !== null) { trigger.removeAttribute("aria-label"); trigger.setAttribute("aria-labelledby", explicitLabelledBy); }
         else if (label && trigger.getRootNode() !== this.shadowRoot) { trigger.removeAttribute("aria-labelledby"); trigger.setAttribute("aria-label", label.textContent?.trim() ?? ""); }
         else { trigger.removeAttribute("aria-label"); if (label) trigger.setAttribute("aria-labelledby", label.id); else trigger.removeAttribute("aria-labelledby"); }
+        syncHostAccessibleName(this, trigger);
         for (const name of ["aria-description", "aria-describedby", "aria-invalid"]) {
           const value = this.getAttribute(name);
           if (value === null) trigger.removeAttribute(name); else trigger.setAttribute(name, value);

@@ -520,7 +520,13 @@ export const SplitButton = /* @__PURE__ */ React.forwardRef<HTMLElement, Element
   const resolvedMenuLabel = menuLabel ?? strings.splitButtonMenuLabel ?? "More options";
   const groupLabel = typeof children === "string" ? `${children} actions` : "Actions";
   const triggerIcon = menuIcon ?? React.createElement("svg", { viewBox: "0 0 12 8", width: 12, height: 8, "aria-hidden": true, focusable: false }, React.createElement("path", { d: "m1 1 5 5 5-5", fill: "none", stroke: "currentColor", strokeWidth: 1.5 }));
-  const triggerDefaults = { "aria-label": resolvedMenuLabel, disabled, disabledFocusable, iconOnly: true, size, shape, appearance: "secondary" as const };
+  const menuButtonProps = isReactElement(menuButton) ? menuButton.props : menuButton;
+  const hasMenuButtonName = typeof menuButtonProps?.["aria-label"] === "string" || typeof menuButtonProps?.["aria-labelledby"] === "string";
+  const primaryButtonProps = isReactElement(primaryActionButton) ? primaryActionButton.props : primaryActionButton;
+  const primaryLabelledBy = typeof primaryButtonProps?.["aria-labelledby"] === "string" ? primaryButtonProps["aria-labelledby"] : "";
+  const primaryLabelledName = typeof document === "undefined" ? "" : primaryLabelledBy.split(/\s+/).filter(Boolean).map(id => document.getElementById(id)?.getAttribute("aria-label") || document.getElementById(id)?.textContent?.trim() || "").filter(Boolean).join(" ");
+  const primaryAccessibleName = primaryLabelledName || (typeof primaryButtonProps?.["aria-label"] === "string" ? primaryButtonProps["aria-label"] : getVisibleText(primaryButtonProps?.children ?? children));
+  const triggerDefaults = { ...(!hasMenuButtonName ? { "aria-label": (menuLabel ?? primaryAccessibleName) || resolvedMenuLabel } : {}), disabled, disabledFocusable, iconOnly: true, size, shape, appearance: "secondary" as const };
   const trigger = isReactElement(menuButton)
     ? React.cloneElement(menuButton as React.ReactElement<any>, { ...triggerDefaults, ...menuButton.props })
     : menuButton ? React.createElement(MenuButton, { ...triggerDefaults, ...(menuButton as React.ComponentProps<typeof MenuButton>) }) : React.createElement(Button, triggerDefaults, triggerIcon);
@@ -6330,8 +6336,9 @@ export function useSkeletonContext(): SkeletonContextValue {
 
 export const Skeleton = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { shape?: SkeletonShape; width?: string | number; height?: string | number; animated?: boolean; animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; children?: React.ReactNode }>(function Skeleton({ shape = "text", width, height, animated = true, animation, appearance = "opaque", size, children, ...props }: ElementProps & { shape?: SkeletonShape; width?: string | number; height?: string | number; animated?: boolean; animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineSkeleton);
+  const strings = React.useContext(UIContext).strings;
   const value: SkeletonContextValue = { animation: animated ? animation ?? "wave" : "none", appearance, size, shape };
-  return React.createElement(SkeletonContext.Provider, { value }, React.createElement("spui-skeleton", useCustomElementProps({ ...props, ref: forwardedRef, shape, width, height, animated, animation, appearance, size }), children));
+  return React.createElement(SkeletonContext.Provider, { value }, React.createElement("spui-skeleton", useCustomElementProps({ ...props, "aria-label": props["aria-label"] ?? (props["aria-labelledby"] ? undefined : strings.loading), ref: forwardedRef, shape, width, height, animated, animation, appearance, size }), children));
 });
 
 export const SkeletonItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; shape?: "rectangle" | "square" | "circle" }>(function SkeletonItem({ animation, appearance, size, shape, ...props }: ElementProps & { animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; shape?: "rectangle" | "square" | "circle" }, forwardedRef): React.ReactElement {

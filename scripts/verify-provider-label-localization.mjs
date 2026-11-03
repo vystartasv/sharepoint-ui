@@ -86,7 +86,7 @@ try {
     const attribute = testId.includes("breadcrumb") ? "label" : testId.includes("menu-bar") ? "aria-label" : "label";
     assert.equal(await element.getAttribute(attribute), expected, `${testId} resolves provider or explicit label`);
   }
-  assert.equal(await page.getByRole("button", { name: "Daugiau parinkčių" }).count(), 1, "SplitButton reads the provider menu label");
+  assert.equal(await page.getByTestId("localized-split-button").getByRole("button", { name: "Save", exact: true }).count(), 2, "SplitButton menu action inherits the primary action's accessible name");
   assert.equal(await page.getByRole("button", { name: "Custom options" }).count(), 1, "SplitButton explicit menu label wins");
   assert.equal(await page.getByTestId("localized-hamburger").getAttribute("aria-label"), "Perjungti navigaciją");
   assert.equal(await page.getByTestId("override-hamburger").getAttribute("aria-label"), "Custom navigation toggle");
