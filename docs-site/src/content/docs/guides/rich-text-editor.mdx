@@ -89,6 +89,96 @@ const field: SharePointMultiLineField = {
 
 The field accepts SharePoint's PascalCase metadata and camelCase equivalents. An explicit `AllowHyperlink: false` disables link creation and strips link wrappers in every rich mode; when the property is absent, safe links remain available. Plain mode emits plain text. Other modes emit sanitized HTML; `html` accepts additional semantic elements and safe text styles (such as color, font, and alignment) while still removing scripts, embedded objects, unsafe URLs, and unsupported attributes. Set `contentMode="plain"`, `"restricted"`, or `"rich"` explicitly to narrow an unconstrained host or a field's available mode. Sanitization intentionally does not preserve arbitrary active HTML, scripts, embeds, or unsafe attributes. For custom elements, spread `getRichTextEditorFieldOptions(field)` onto `<spui-rich-text-editor>`.
 
+## Load and save a SharePoint note field
+
+Keep the field's `RichText`, `RestrictedMode`, `RichTextMode`, and `AllowHyperlink` metadata with your data layer and pass it as `field`. Use the field's **internal name** in REST requests; this example uses `Notes`. The SPFx `SPHttpClient` sends the current user's SharePoint authentication and uses the current web URL.
+
+```tsx
+import * as React from "react";
+import { SPHttpClient } from "@microsoft/sp-http";
+import type { WebPartContext } from "@microsoft/sp-webpart-base";
+import { Button, RichTextEditor, type SharePointMultiLineField } from "@spfx-fast/sharepoint-ui/react";
+
+type NoteItem = { Notes?: string | null };
+type LoadedNote = { html: string; etag: string };
+
+function noteUrl(context: WebPartContext, listId: string, itemId: number): string {
+  return `${context.pageContext.web.absoluteUrl}/_api/web/lists(guid'${listId}')/items(${itemId})`;
+}
+
+async function loadNote(context: WebPartContext, listId: string, itemId: number): Promise<LoadedNote> {
+  const response = await context.spHttpClient.get(
+    `${noteUrl(context, listId, itemId)}?$select=Id,Notes`,
+    SPHttpClient.configurations.v1,
+    { headers: { accept: "application/json;odata.metadata=none" } },
+  );
+  if (!response.ok) throw new Error(`Could not load Notes (${response.status}).`);
+  const item = await response.json() as NoteItem;
+  return { html: item.Notes ?? "", etag: response.headers.get("ETag") ?? "*" };
+}
+
+async function saveNote(context: WebPartContext, listId: string, itemId: number, html: string, etag: string): Promise<void> {
+  const response = await context.spHttpClient.post(noteUrl(context, listId, itemId), SPHttpClient.configurations.v1, {
+    headers: {
+      "content-type": "application/json;odata.metadata=none",
+      "if-match": etag,
+      "x-http-method": "MERGE",
+    },
+    body: JSON.stringify({ Notes: html }),
+  });
+  if (!response.ok) throw new Error(`Could not save Notes (${response.status}). Reload the item if another person changed it.`);
+}
+
+export function NotesEditor({ context, listId, itemId, field }: {
+  context: WebPartContext;
+  listId: string;
+  itemId: number;
+  field: SharePointMultiLineField;
+}) {
+  const [html, setHtml] = React.useState("");
+  const [status, setStatus] = React.useState("Loading note…");
+  const [ready, setReady] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
+  const etag = React.useRef("*");
+
+  React.useEffect(() => {
+    let active = true;
+    void loadNote(context, listId, itemId).then(item => {
+      if (!active) return;
+      etag.current = item.etag;
+      setHtml(item.html);
+      setReady(true);
+      setStatus("");
+    }).catch(error => { if (active) setStatus(String(error)); });
+    return () => { active = false; };
+  }, [context, listId, itemId]);
+
+  const save = async () => {
+    setSaving(true);
+    setStatus("Saving…");
+    try {
+      await saveNote(context, listId, itemId, html, etag.current);
+      const saved = await loadNote(context, listId, itemId);
+      etag.current = saved.etag;
+      setHtml(saved.html);
+      setStatus("Saved");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Could not save the note.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return <>
+    <RichTextEditor label="Notes" value={html} onValueChange={setHtml} field={field} disabled={!ready || saving} />
+    <Button appearance="primary" onClick={() => void save()} disabled={!ready || saving}>Save notes</Button>
+    <span role="status" aria-live="polite">{status}</span>
+  </>;
+}
+```
+
+`Notes` must be the field's internal name, `listId` must be the list GUID, and the caller should supply the field metadata read from that list. A stale ETag is reported as a save error instead of silently replacing another user's edit. The sample reads the saved value back so the next update uses the current ETag and reflects the server value. For more complex list queries and writes, Microsoft recommends a typed SharePoint data library such as PnPjs over hand-built REST calls. See Microsoft's guides for [SPHttpClient in SPFx](https://learn.microsoft.com/en-us/sharepoint/dev/spfx/connect-to-sharepoint) and [list item REST operations](https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-lists-and-list-items-with-rest).
+
 ## Load the editor only when needed
 
 For pages where editing is optional, keep the editor out of the initial web-part bundle. `React.lazy` lets the SPFx webpack build place the React adapter and editor in an async chunk, requested when the user starts editing.
