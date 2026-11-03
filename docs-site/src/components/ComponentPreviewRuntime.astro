@@ -132,6 +132,21 @@
         ];
         updateStatus();
       }
+      const tree = stage?.querySelector("spui-tree");
+      if (tree && "items" in tree) {
+        tree.items = [
+          { id: "projects", label: "Projects", children: [
+            { id: "access-review", label: "Quarterly access review" },
+            { id: "site-launch", label: "Site launch checklist" },
+          ] },
+          { id: "shared", label: "Shared documents", children: [
+            { id: "migration", label: "Content migration plan" },
+          ] },
+        ];
+        tree.expandedKeys = ["projects"];
+        tree.selectedKeys = ["access-review"];
+        updateStatus();
+      }
     } catch (error) {
       if (status) status.textContent = `${demo.dataset.label ?? "Component"} preview could not be loaded.`;
       console.error("SharePoint UI preview failed to load", error);

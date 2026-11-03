@@ -162,6 +162,9 @@ function exampleFor(component) {
   if (component.tag === "spui-data-grid" || component.module.startsWith("data-grid")) {
     return { tag: "spui-data-grid", attrs: 'aria-label="Project work items"', content: "", related: true };
   }
+  if (component.tag === "spui-tree" || component.module === "tree") {
+    return { tag: "spui-tree", attrs: 'aria-label="Workspace folders" selection-mode="single"', content: "", related: true };
+  }
   if (compositions[component.module]) return { ...compositions[component.module], content: "", related: true, kind: "composition" };
   if (component.module === "radio-group") return { tag: "spui-radio-group", attrs: 'label="Delivery method" value="email" name="delivery"', content: "", related: true };
   if (component.react === "SwatchPicker") return { tag: "spui-swatch-picker", attrs: 'aria-label="Choose site theme colors" selection-mode="multiple" layout="row"', markup: '<spui-swatch-picker aria-label="Choose site theme colors" selection-mode="multiple" layout="row"><spui-color-swatch value="accent" color="var(--spui-ui-accent,#0078d4)" aria-label="Site accent"></spui-color-swatch><spui-color-swatch value="accent-hover" color="var(--spui-semantic-primary-button-background-hovered,#005a9e)" aria-label="Accent hover"></spui-color-swatch><spui-color-swatch value="link" color="var(--spui-semantic-link,#005a9e)" aria-label="Link"></spui-color-swatch><spui-color-swatch value="body-text" color="var(--spui-ui-text,#323130)" aria-label="Body text"></spui-color-swatch></spui-swatch-picker>', content: "", related: false };
