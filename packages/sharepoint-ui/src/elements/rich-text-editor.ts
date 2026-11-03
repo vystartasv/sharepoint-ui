@@ -491,7 +491,10 @@ export function defineRichTextEditor(): void {
       this.touchSelectionGesture = undefined;
     }
     private wrapUnfocusedSelection(range: Range, createWrapper: () => HTMLElement): boolean {
-      const walker = this.editor.ownerDocument.createTreeWalker(this.editor, NodeFilter.SHOW_TEXT);
+      const selectionRoot = range.commonAncestorContainer.nodeType === Node.TEXT_NODE
+        ? range.commonAncestorContainer.parentNode ?? this.editor
+        : range.commonAncestorContainer;
+      const walker = this.editor.ownerDocument.createTreeWalker(selectionRoot, NodeFilter.SHOW_TEXT);
       const nodes: Text[] = [];
       while (walker.nextNode()) {
         const node = walker.currentNode as Text;
