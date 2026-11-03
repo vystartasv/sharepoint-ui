@@ -4,10 +4,12 @@ export { getRichTextEditorFieldOptions, type SharePointMultiLineField } from "..
 
 export type RichTextEditorLink = { href: string; text?: string; title?: string; openInNewTab?: boolean };
 export type RichTextEditorLinkPicker = (currentLink: RichTextEditorLink | null) => Promise<RichTextEditorLink | null>;
+export type RichTextEditorImageUploadResult = string | { src: string; alt: string };
+export type RichTextEditorImageUploader = (file: File) => Promise<RichTextEditorImageUploadResult>;
 
 export interface SharePointRichTextEditorElement extends HTMLElement {
   value: string;
-  uploadImage?: (file: File) => Promise<string>;
+  uploadImage?: RichTextEditorImageUploader;
   linkPicker?: RichTextEditorLinkPicker;
   readonly form: HTMLFormElement | null;
   readonly validity: ValidityState | undefined;
@@ -146,9 +148,9 @@ export function defineRichTextEditor(): void {
     private probingSelection = false;
     private probedSelection?: Range;
     /** Uploads to a durable asset store and returns the image URL to persist in editor HTML. */
-    private imageUploader?: (file: File) => Promise<string>;
-    get uploadImage(): ((file: File) => Promise<string>) | undefined { return this.imageUploader; }
-    set uploadImage(value: ((file: File) => Promise<string>) | undefined) { this.imageUploader = value; this.syncImageButton(); }
+    private imageUploader?: RichTextEditorImageUploader;
+    get uploadImage(): RichTextEditorImageUploader | undefined { return this.imageUploader; }
+    set uploadImage(value: RichTextEditorImageUploader | undefined) { this.imageUploader = value; this.syncImageButton(); }
     private linkPickerValue?: RichTextEditorLinkPicker;
     private linkPickerButton?: HTMLButtonElement;
     private pickingLink = false;
@@ -741,10 +743,12 @@ export function defineRichTextEditor(): void {
       if (!this.imageUploader || !file.type.startsWith("image/") || file.size > 10 * 1024 * 1024 || this.uploadingImage) return;
       this.uploadingImage = true; this.syncImageButton();
       try {
-        const src = await this.imageUploader(file);
+        const uploaded = await this.imageUploader(file);
+        const src = typeof uploaded === "string" ? uploaded : uploaded.src;
+        if (typeof uploaded !== "string" && typeof uploaded.alt !== "string") throw new Error("Image upload results must include alt text; use an empty string only for decorative images.");
         if (!safeImageSrc(src)) throw new Error("Image upload must return an HTTP or HTTPS URL.");
         this.restoreSelection();
-        const image = document.createElement("img"); image.src = new URL(src, document.baseURI).href; image.alt = file.name.replace(/\.[^.]*$/, "").slice(0, 200);
+        const image = document.createElement("img"); image.src = new URL(src, document.baseURI).href; image.alt = (typeof uploaded === "string" ? file.name.replace(/\.[^.]*$/, "") : uploaded.alt).slice(0, 200);
         const selection = this.selection(); const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
         if (range && this.editor.contains(range.commonAncestorContainer)) { range.deleteContents(); range.insertNode(image); range.setStartAfter(image); range.collapse(true); selection!.removeAllRanges(); selection!.addRange(range); }
         else this.editor.append(image);

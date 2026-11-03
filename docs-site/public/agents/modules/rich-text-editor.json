@@ -41,6 +41,10 @@
             "description": "Receives sanitized HTML after edits. With a controlled value prop, update that prop from this callback; the editor preserves its live selection while React applies the committed value."
           },
           {
+            "name": "RichTextEditorProps.onImageUpload",
+            "description": "Upload the selected file and return its URL string, or return { src, alt } to provide meaningful image alternative text. The object form requires alt; use alt: \"\" only for decorative images. String results use filename-based alternative text."
+          },
+          {
             "name": "RichTextEditor mobile selection",
             "description": "On touch devices, press and hold text to use the browser's native selection handles. The editor does not force blur or refocus during the gesture; toolbar formatting uses the saved range."
           },

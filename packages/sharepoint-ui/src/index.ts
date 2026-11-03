@@ -44,7 +44,7 @@ export type { SpinButtonAppearance, SpinButtonSize, SpinButtonChangeData } from 
 export { defineSlider } from "./elements/slider.js";
 export { defineDatePicker } from "./elements/date-picker.js";
 export { defineCombobox } from "./elements/combobox.js";
-export { defineRichTextEditor, getRichTextEditorFieldOptions, type SharePointMultiLineField, type SharePointRichTextEditorElement, type RichTextEditorLink, type RichTextEditorLinkPicker } from "./elements/rich-text-editor.js";
+export { defineRichTextEditor, getRichTextEditorFieldOptions, type SharePointMultiLineField, type SharePointRichTextEditorElement, type RichTextEditorImageUploadResult, type RichTextEditorImageUploader, type RichTextEditorLink, type RichTextEditorLinkPicker } from "./elements/rich-text-editor.js";
 export { defineAlert, type AlertAppearance } from "./elements/alert.js";
 export { defineSkeleton, defineSkeletonItem, type SkeletonAnimation, type SkeletonAppearance, type SkeletonItemSize, type SkeletonShape } from "./elements/skeleton.js";
 export { DEFAULT_ACCENT, getSharePointUIStyleTokens, type SharePointUIAppearance, type SharePointUIBaseAppearance, type SharePointUIDensity, type SharePointUIStyleTokens } from "./appearance.js";

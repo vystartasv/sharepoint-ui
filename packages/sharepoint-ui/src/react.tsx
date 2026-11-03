@@ -34,8 +34,8 @@ export type { SpinButtonAppearance, SpinButtonSize, SpinButtonChangeData } from 
 import { defineSlider } from "./elements/slider.js";
 import { defineDatePicker } from "./elements/date-picker.js";
 import { defineCombobox } from "./elements/combobox.js";
-import { defineRichTextEditor, getRichTextEditorFieldOptions, type RichTextEditorLinkPicker, type SharePointMultiLineField } from "./elements/rich-text-editor.js";
-export { getRichTextEditorFieldOptions, type SharePointMultiLineField, type RichTextEditorLink, type RichTextEditorLinkPicker } from "./elements/rich-text-editor.js";
+import { defineRichTextEditor, getRichTextEditorFieldOptions, type RichTextEditorImageUploader, type RichTextEditorLinkPicker, type SharePointMultiLineField } from "./elements/rich-text-editor.js";
+export { getRichTextEditorFieldOptions, type SharePointMultiLineField, type RichTextEditorImageUploadResult, type RichTextEditorImageUploader, type RichTextEditorLink, type RichTextEditorLinkPicker } from "./elements/rich-text-editor.js";
 import { getSharePointFieldAdapter, type SharePointFieldMetadata, type SharePointFieldValue } from "./sharepoint-fields.js";
 import { defineAlert } from "./elements/alert.js";
 import { defineSkeleton, defineSkeletonItem, type SkeletonAnimation, type SkeletonAppearance, type SkeletonItemSize, type SkeletonShape } from "./elements/skeleton.js";
@@ -1981,7 +1981,7 @@ export const OptionGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, OptionG
 export type RichTextImageUploadErrorData = { fileName: string; error: unknown };
 export type RichTextEditorContentMode = "plain" | "restricted" | "rich" | "html";
 const richTextEditorModeRank: Record<RichTextEditorContentMode, number> = { plain: 0, restricted: 1, rich: 2, html: 3 };
-export type RichTextEditorProps = NativeClickHostProps<HTMLDivElement> & { label?: string; editorLabel?: string; value?: string; defaultValue?: string; placeholder?: string; field?: SharePointMultiLineField; contentMode?: RichTextEditorContentMode; allowHyperlink?: boolean; disabled?: boolean; readOnly?: boolean; required?: boolean; name?: string; form?: string; onValueChange?: (value: string) => void; onImageUpload?: (file: File) => Promise<string>; onImageUploadError?: (data: RichTextImageUploadErrorData) => void; linkPicker?: RichTextEditorLinkPicker; onLinkPickerError?: (error: unknown) => void };
+export type RichTextEditorProps = NativeClickHostProps<HTMLDivElement> & { label?: string; editorLabel?: string; value?: string; defaultValue?: string; placeholder?: string; field?: SharePointMultiLineField; contentMode?: RichTextEditorContentMode; allowHyperlink?: boolean; disabled?: boolean; readOnly?: boolean; required?: boolean; name?: string; form?: string; onValueChange?: (value: string) => void; onImageUpload?: RichTextEditorImageUploader; onImageUploadError?: (data: RichTextImageUploadErrorData) => void; linkPicker?: RichTextEditorLinkPicker; onLinkPickerError?: (error: unknown) => void };
 
 export const RichTextEditor = /* @__PURE__ */ React.forwardRef<HTMLElement, RichTextEditorProps>(function RichTextEditor(inputProps: RichTextEditorProps, forwardedRef): React.ReactElement {
   const { label, editorLabel, value, defaultValue, placeholder, field, contentMode, allowHyperlink, disabled, readOnly, required, name, onValueChange, onImageUpload, onImageUploadError, linkPicker, onLinkPickerError, ...props } = useFieldControlProps_unstable(inputProps, { supportsRequired: true });
@@ -1995,7 +1995,7 @@ export const RichTextEditor = /* @__PURE__ */ React.forwardRef<HTMLElement, Rich
   useNativeControlEvents(ref, '[role="textbox"]', props.onClick, props.onClickCapture, props);
   const strings = React.useContext(UIContext).strings;
   ensureDefined(defineRichTextEditor);
-  React.useEffect(() => { const element = ref.current as (HTMLElement & { uploadImage?: (file: File) => Promise<string> }) | null; if (element) element.uploadImage = onImageUpload; return () => { if (element) delete element.uploadImage; }; }, [onImageUpload]);
+  React.useEffect(() => { const element = ref.current as (HTMLElement & { uploadImage?: RichTextEditorImageUploader }) | null; if (element) element.uploadImage = onImageUpload; return () => { if (element) delete element.uploadImage; }; }, [onImageUpload]);
   React.useEffect(() => { const element = ref.current as (HTMLElement & { linkPicker?: RichTextEditorLinkPicker }) | null; if (element) element.linkPicker = linkPicker; return () => { if (element) delete element.linkPicker; }; }, [linkPicker]);
   useSpuiEvent(ref, "spui-input", value !== undefined || onValueChange ? detail => {
     onValueChange?.(String(detail.value ?? ""));

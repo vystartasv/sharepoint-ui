@@ -55,6 +55,20 @@ function NotesEditor() {
 
 `openSharePointPageOrFilePicker` represents the picker supplied by your host application; this package does not add a picker dependency or make tenant requests. The callback receives the current link when editing one. Its result must use an allowed `http:`, `https:`, or `mailto:` URL. Unsafe results are rejected, and picker failures are reported through `onLinkPickerError`.
 
+## Add images with useful alternative text
+
+The React `onImageUpload` callback and custom-element `uploadImage` property can keep returning a URL string, or return `{ src, alt }`. Use the object form when the host can collect or generate a meaningful description; `alt` is required, and `alt: ""` is only for decorative images. A string URL keeps the legacy filename-based alternative text.
+
+```tsx
+<RichTextEditor
+  label="Project notes"
+  onImageUpload={async file => {
+    const src = await uploadToSharePoint(file);
+    return { src, alt: await describeImageForEditor(file) };
+  }}
+/>
+```
+
 ## Save the value
 
 Use the editor's sanitized `onValueChange` value with your normal SPFx persistence path. Provide loading, saved, and error feedback in the web part. Read back important writes where the workflow requires confirmation. To render saved content, pass it back through `RichTextEditor` or another sanitizer-aware renderer; do not inject it with raw `innerHTML`.
