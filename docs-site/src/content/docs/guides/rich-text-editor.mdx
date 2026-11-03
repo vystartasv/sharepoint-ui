@@ -47,6 +47,29 @@ function NotesEditor() {
 
 Use the editor's sanitized `onValueChange` value with your normal SPFx persistence path. Provide loading, saved, and error feedback in the web part. Read back important writes where the workflow requires confirmation. To render saved content, pass it back through `RichTextEditor` or another sanitizer-aware renderer; do not inject it with raw `innerHTML`.
 
+## Match the SharePoint field
+
+Set the editor's mode from the target multiline field. `RichText: false` uses plain text; `RichText: true` with `RestrictedMode: true` keeps basic formatting; enhanced rich text allows the editor's formatting, tables, and safe links when `AllowHyperlink` is enabled. `html` mode is for an unconstrained host field and still sanitizes the markup.
+
+```tsx
+import {
+  getRichTextEditorFieldOptions,
+  RichTextEditor,
+  type SharePointMultiLineField,
+} from "@spfx-fast/sharepoint-ui/react";
+
+// Load these settings with the field metadata your SPFx data layer already uses.
+const field: SharePointMultiLineField = {
+  RichText: true,
+  RestrictedMode: false,
+  AllowHyperlink: true,
+};
+
+<RichTextEditor label="Project notes" {...getRichTextEditorFieldOptions(field)} />
+```
+
+The helper accepts SharePoint's PascalCase metadata and camelCase equivalents. Plain mode emits plain text. Other modes emit sanitized HTML; `html` accepts additional semantic elements while still removing scripts, embedded objects, unsafe URLs, and arbitrary attributes.
+
 ## Load the editor only when needed
 
 For pages where editing is optional, keep the editor out of the initial web-part bundle. `React.lazy` lets the SPFx webpack build place the React adapter and editor in an async chunk, requested when the user starts editing.

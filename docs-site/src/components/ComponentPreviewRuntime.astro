@@ -27,8 +27,14 @@
       if (stage) stage.dataset.spuiAppearance = selectedAppearance;
       const overrides = createPreviewThemeOverrides(capturedTokens, accentValue, presetKey !== "sharepoint" || accentValue !== preset.accent);
       const tokens = getSharePointUIStyleTokens(selectedAppearance, overrides, baseAppearance);
-      for (const [name, value] of Object.entries(tokens)) demo.style.setProperty(name, value);
-      for (const [name, value] of Object.entries(overrides)) demo.style.setProperty(name, value);
+      for (const [name, value] of Object.entries(tokens)) {
+        demo.style.setProperty(name, value);
+        stage?.style.setProperty(name, value);
+      }
+      for (const [name, value] of Object.entries(overrides)) {
+        demo.style.setProperty(name, value);
+        stage?.style.setProperty(name, value);
+      }
       if (accent && accent.value !== accentValue) accent.value = accentValue;
       if (tokenReadout) {
         tokenReadout.replaceChildren();

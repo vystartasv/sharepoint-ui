@@ -2,6 +2,12 @@ import { base, syncHostAccessibleName } from "./shared.js";
 
 export type RichTextEditorLink = { href: string; text?: string; title?: string; openInNewTab?: boolean };
 export type RichTextEditorLinkPicker = (currentLink: RichTextEditorLink | null) => Promise<RichTextEditorLink | null>;
+export type SharePointMultiLineField = { richText?: boolean; restrictedMode?: boolean; allowHyperlink?: boolean; RichText?: boolean; RestrictedMode?: boolean; AllowHyperlink?: boolean };
+export function getRichTextEditorFieldOptions(field: SharePointMultiLineField): { contentMode: "plain" | "restricted" | "rich"; allowHyperlink: boolean } {
+  const richText = field.RichText ?? field.richText ?? false;
+  const restricted = field.RestrictedMode ?? field.restrictedMode ?? false;
+  return { contentMode: !richText ? "plain" : restricted ? "restricted" : "rich", allowHyperlink: Boolean(richText && (field.AllowHyperlink ?? field.allowHyperlink)) };
+}
 
 export interface SharePointRichTextEditorElement extends HTMLElement {
   value: string;
@@ -18,7 +24,25 @@ export interface SharePointRichTextEditorElement extends HTMLElement {
 }
 declare global { interface HTMLElementTagNameMap { "spui-rich-text-editor": SharePointRichTextEditorElement; } }
 
+const toolbarIconPaths: Record<string, string> = {
+  bold: "M6 4h5a3 3 0 0 1 0 6H6z M6 10h6a3 3 0 0 1 0 6H6z", italic: "M10 4h6 M8 16h6 M13 4 9 16", underline: "M6 4v5a4 4 0 0 0 8 0V4 M5 16h10",
+  insertUnorderedList: "M8 5h9 M8 10h9 M8 15h9 M4 5h.01 M4 10h.01 M4 15h.01", insertOrderedList: "M9 5h8 M9 10h8 M9 15h8 M4 4h1v3 M3.5 7h2 M3.5 10.5c0-1 2-1 2 0 0 .6-2 1.5-2 2.5h2 M4 14h1a1 1 0 0 1 0 2H4",
+  undo: "M9 7 5 10l4 3 M5 10h7a4 4 0 0 1 4 4", redo: "M11 7 15 10l-4 3 M15 10H8a4 4 0 0 0-4 4",
+  insertTable: "M3 4h14v12H3z M3 8h14 M3 12h14 M8 4v12 M13 4v12", insertImage: "M3 4h14v12H3z M4 14l4-4 3 3 2-2 3 3 M7 7h.01",
+  insertRowAbove: "M3 9h14v7H3z M3 12h14 M10 3v4 M8 5h4", insertRowBelow: "M3 4h14v7H3z M3 8h14 M10 13v4 M8 15h4",
+  insertColumnBefore: "M6 4h11v12H6z M10 4v12 M14 4v12 M3 10h3 M4.5 8.5v3", insertColumnAfter: "M3 4h11v12H3z M7 4v12 M11 4v12 M14 10h3 M15.5 8.5v3",
+  deleteRow: "M3 5h14v10H3z M3 10h14 M8 5v5 M13 5v5 M8 13h4", deleteColumn: "M5 3v14h10V3z M10 3v14 M5 8h5 M5 13h5 M12 8v4", deleteTable: "M3 4h14v12H3z M3 8h14 M3 12h14 M8 4v12 M13 4v12 M10 9v4 M8.5 11h3",
+  createLink: "M7 10h6 M9 7l1-1a3 3 0 0 1 4 4l-2 2a3 3 0 0 1-4 0 M11 13l-1 1a3 3 0 0 1-4-4l2-2a3 3 0 0 1 4 0"
+};
+function createToolbarIcon(command: string): SVGSVGElement {
+  const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  icon.setAttribute("viewBox", "0 0 20 20"); icon.setAttribute("width", "20"); icon.setAttribute("height", "20"); icon.setAttribute("aria-hidden", "true"); icon.setAttribute("focusable", "false"); icon.setAttribute("fill", "none"); icon.setAttribute("stroke", "currentColor"); icon.setAttribute("stroke-width", "1.7"); icon.setAttribute("stroke-linecap", "round"); icon.setAttribute("stroke-linejoin", "round");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path"); path.setAttribute("d", toolbarIconPaths[command] ?? "M4 10h12"); icon.append(path); return icon;
+}
+
 const ALLOWED = new Set(["P", "DIV", "SPAN", "BR", "HR", "STRONG", "B", "EM", "I", "U", "S", "DEL", "INS", "UL", "OL", "LI", "A", "H1", "H2", "H3", "H4", "H5", "H6", "BLOCKQUOTE", "PRE", "TABLE", "THEAD", "TBODY", "TFOOT", "TR", "TH", "TD", "CAPTION", "SUP", "SUB", "CODE", "IMG"]);
+const HTML_ONLY = new Set(["MAIN", "SECTION", "ARTICLE", "HEADER", "FOOTER", "ASIDE", "FIGURE", "FIGCAPTION", "DETAILS", "SUMMARY", "DL", "DT", "DD", "ABBR", "CITE", "Q", "MARK", "SMALL", "TIME", "WBR"]);
+const RESTRICTED = new Set(["P", "DIV", "SPAN", "BR", "STRONG", "B", "EM", "I", "U", "S", "DEL", "INS", "UL", "OL", "LI", "H1", "H2", "H3", "H4", "H5", "H6", "BLOCKQUOTE", "PRE", "SUP", "SUB", "CODE"]);
 const DROP_CONTENT = new Set(["SCRIPT", "STYLE", "IFRAME", "OBJECT", "EMBED", "TEMPLATE"]);
 function safeHref(value: string): boolean {
   if (/[\u0000-\u001f\u007f]/.test(value)) return false;
@@ -28,14 +52,28 @@ function safeHref(value: string): boolean {
 function safeImageSrc(value: string): boolean {
   try { return ["http:", "https:"].includes(new URL(value.trim(), document.baseURI).protocol); } catch { return false; }
 }
-function cleanHtml(html: string): string {
+function plainText(html: string): string {
   const doc = new DOMParser().parseFromString(html, "text/html");
+  doc.body.querySelectorAll([...DROP_CONTENT].join(",")).forEach(element => element.remove());
+  const read = (node: Node): string => [...node.childNodes].map(child => {
+    if (child.nodeType === Node.TEXT_NODE) return child.textContent ?? "";
+    if (child.nodeType !== Node.ELEMENT_NODE) return "";
+    if ((child as Element).tagName === "BR") return "\n";
+    const value = read(child);
+    return /^(ADDRESS|ARTICLE|BLOCKQUOTE|DIV|H[1-6]|LI|P|PRE|SECTION)$/.test((child as Element).tagName) ? `${value}\n` : value;
+  }).join("");
+  return read(doc.body).replace(/[\t ]*\n[\t ]*/g, "\n").replace(/\n{3,}/g, "\n\n").replace(/\n$/, "");
+}
+function cleanHtml(html: string, mode: "plain" | "restricted" | "rich" | "html" = "rich", allowHyperlink = true): string {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  if (mode === "plain") return plainText(html);
+  const allowedTags = mode === "restricted" ? RESTRICTED : mode === "html" ? new Set([...ALLOWED, ...HTML_ONLY]) : ALLOWED;
   const clean = (node: Node): void => {
     for (const child of [...node.childNodes]) {
       if (child.nodeType === Node.ELEMENT_NODE) {
         const element = child as HTMLElement;
         if (DROP_CONTENT.has(element.tagName)) { child.remove(); continue; }
-        if (!ALLOWED.has(element.tagName)) { clean(element); child.replaceWith(...[...child.childNodes]); continue; }
+        if (!allowedTags.has(element.tagName) || (element.tagName === "A" && !allowHyperlink)) { clean(element); child.replaceWith(...[...child.childNodes]); continue; }
         for (const attr of [...element.attributes]) {
           const link = element.tagName === "A" && attr.name === "href" && safeHref(attr.value);
           const linkTitle = element.tagName === "A" && attr.name === "title" && attr.value.length <= 512;
@@ -62,7 +100,7 @@ export function defineRichTextEditor(): void {
   if (customElements.get("spui-rich-text-editor")) return;
   class SpuiRichTextEditor extends HTMLElement implements SharePointRichTextEditorElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "editor-label", "placeholder", "disabled", "read-only", "required", "required-message", "value", "name", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "bold-label", "italic-label", "underline-label", "bullet-list-label", "number-list-label", "link-label", "undo-label", "redo-label", "insert-table-label", "insert-image-label", "image-input-label", "insert-row-above-label", "insert-row-below-label", "insert-column-before-label", "insert-column-after-label", "delete-row-label", "delete-column-label", "delete-table-label", "toolbar-label", "link-prompt", "link-dialog-label", "link-text-label", "link-title-label", "link-apply-label", "link-remove-label", "link-cancel-label", "link-new-tab-label", "link-invalid-message", "link-picker-label", "link-picker-loading-label", "link-picker-error-message"];
+    static observedAttributes = ["label", "editor-label", "placeholder", "content-mode", "allow-hyperlink", "disabled", "read-only", "required", "required-message", "value", "name", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "bold-label", "italic-label", "underline-label", "bullet-list-label", "number-list-label", "link-label", "undo-label", "redo-label", "insert-table-label", "insert-image-label", "image-input-label", "insert-row-above-label", "insert-row-below-label", "insert-column-before-label", "insert-column-after-label", "delete-row-label", "delete-column-label", "delete-table-label", "toolbar-label", "link-prompt", "link-dialog-label", "link-text-label", "link-title-label", "link-apply-label", "link-remove-label", "link-cancel-label", "link-new-tab-label", "link-invalid-message", "link-picker-label", "link-picker-loading-label", "link-picker-error-message"];
     private editor!: HTMLDivElement;
     private internals: ElementInternals | undefined;
     private formDisabled = false;
@@ -92,6 +130,8 @@ export function defineRichTextEditor(): void {
     private savedCell?: HTMLTableCellElement;
     private selectedTablePath?: { table: number; row: number; cell: number };
     private events?: AbortController;
+    private get contentMode(): "plain" | "restricted" | "rich" | "html" { const mode = this.getAttribute("content-mode"); return mode === "plain" || mode === "restricted" || mode === "html" ? mode : "rich"; }
+    private get allowHyperlinks(): boolean { return this.contentMode !== "plain" && this.getAttribute("allow-hyperlink") !== "false"; }
     constructor() { super(); try { this.internals = this.attachInternals(); } catch { /* Editing remains available in engines without form association. */ } }
     connectedCallback(): void {
       this.events?.abort();
@@ -106,6 +146,7 @@ export function defineRichTextEditor(): void {
     attributeChangedCallback(name: string): void {
       if (!this.isConnected) return;
       if (name === "value") this.value = this.getAttribute("value") ?? "";
+      else if ((name === "content-mode" || name === "allow-hyperlink") && this.editor) { this.value = this.value; this.syncContentMode(); }
       else if ((name === "disabled" || name === "read-only") && this.editor) { this.syncDisabled(); this.syncForm(); }
       else if (name === "required" && this.editor) { this.editor.setAttribute("aria-required", String(this.hasAttribute("required"))); this.syncForm(); }
       else if (name === "required-message" && this.editor) this.syncForm();
@@ -121,8 +162,8 @@ export function defineRichTextEditor(): void {
       else this.refreshStrings();
     }
     private syncEditorLabel(): void { this.editor.setAttribute("aria-label", this.getAttribute("aria-label") ?? this.getAttribute("label") ?? this.getAttribute("editor-label") ?? "Rich text"); }
-    get value(): string { return this.editor ? cleanHtml(this.editor.innerHTML) : this.pendingValue ?? this.getAttribute("value") ?? ""; }
-    set value(value: string) { this.pendingValue = value; if (this.editor) { this.editor.innerHTML = cleanHtml(value); this.syncForm(); } }
+    get value(): string { return this.editor ? (this.contentMode === "plain" ? plainText(this.editor.innerHTML) : cleanHtml(this.editor.innerHTML, this.contentMode, this.allowHyperlinks)) : this.pendingValue ?? this.getAttribute("value") ?? ""; }
+    set value(value: string) { this.pendingValue = value; if (this.editor) { if (this.contentMode === "plain") this.editor.textContent = plainText(value); else this.editor.innerHTML = cleanHtml(value, this.contentMode, this.allowHyperlinks); this.syncForm(); } }
     get form(): HTMLFormElement | null { return this.internals?.form ?? null; }
     get validity(): ValidityState | undefined { return this.internals?.validity; }
     get validationMessage(): string { return this.internals?.validationMessage ?? ""; }
@@ -136,7 +177,7 @@ export function defineRichTextEditor(): void {
     private syncDisabled(): void {
       const disabled = this.formDisabled || this.hasAttribute("disabled");
       const readOnly = disabled || this.hasAttribute("read-only");
-      this.editor.contentEditable = String(!readOnly);
+      this.editor.contentEditable = readOnly ? "false" : this.contentMode === "plain" ? "plaintext-only" : "true";
       this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only")));
       this.editor.setAttribute("aria-disabled", String(disabled));
       this.shadowRoot?.querySelectorAll<HTMLButtonElement>("[role=toolbar] button").forEach(button => { button.disabled = readOnly; });
@@ -149,11 +190,23 @@ export function defineRichTextEditor(): void {
     }
     private syncImageButton(): void {
       const button = this.shadowRoot?.querySelector<HTMLButtonElement>('[data-command="insertImage"]');
-      if (button) button.disabled = this.formDisabled || this.hasAttribute("disabled") || this.hasAttribute("read-only") || !this.imageUploader || this.uploadingImage;
+      if (button) { button.hidden = !this.imageUploader || this.contentMode === "plain" || this.contentMode === "restricted"; button.disabled = this.formDisabled || this.hasAttribute("disabled") || this.hasAttribute("read-only") || !this.imageUploader || this.uploadingImage; }
+    }
+    private syncContentMode(): void {
+      const toolbar = this.shadowRoot?.querySelector<HTMLElement>('[role="toolbar"]');
+      if (toolbar) {
+        toolbar.hidden = this.contentMode === "plain";
+        toolbar.querySelectorAll<HTMLButtonElement>("button[data-command]").forEach(button => {
+          const command = button.dataset.command;
+          button.hidden = (this.contentMode === "restricted" && (command === "insertTable" || command === "insertImage" || button.hasAttribute("data-table-command"))) || (command === "createLink" && !this.allowHyperlinks);
+        });
+      }
+      if (this.editor) this.editor.style.whiteSpace = this.contentMode === "plain" ? "pre-wrap" : "";
+      this.syncDisabled(); this.syncTableActions();
     }
     private syncLinkPickerButton(): void {
       if (this.linkPickerButton) {
-        this.linkPickerButton.hidden = !this.linkPickerValue;
+        this.linkPickerButton.hidden = !this.linkPickerValue || !this.allowHyperlinks;
         this.linkPickerButton.disabled = this.formDisabled || this.hasAttribute("disabled") || this.hasAttribute("read-only");
         this.linkPickerButton.setAttribute("aria-disabled", String(this.pickingLink));
         this.linkPickerButton.setAttribute("aria-busy", String(this.pickingLink));
@@ -166,7 +219,8 @@ export function defineRichTextEditor(): void {
     private syncForm(): void { const value = this.value; this.pendingValue = value; this.internals?.setFormValue(value || null); const active = this.willValidate; const missing = active && this.hasAttribute("required") && !this.editor?.textContent?.trim(); const customError = active && Boolean(this.customError); const flags: ValidityStateFlags = { ...(missing ? { valueMissing: true } : {}), ...(customError ? { customError: true } : {}) }; const message = customError ? this.customError : missing ? this.getAttribute("required-message") ?? "Enter some text." : ""; try { this.internals?.setValidity(flags, message); } catch { /* Engines without form association remain editable. */ } }
     private sanitizeEditor(): void {
       const html = this.editor.innerHTML;
-      const value = cleanHtml(html);
+      const value = cleanHtml(html, this.contentMode, this.allowHyperlinks);
+      if (this.contentMode === "plain") { if (this.editor.textContent !== value) this.editor.textContent = value; return; }
       if (value === html) return;
       const cell = this.selectedCell();
       const tableIndex = cell ? [...this.editor.querySelectorAll("table")].indexOf(cell.closest("table")!) : -1;
@@ -237,6 +291,8 @@ export function defineRichTextEditor(): void {
       const hasSpans = Boolean(table && [...table.querySelectorAll<HTMLTableCellElement>("td,th")].some(cell => cell.rowSpan !== 1 || cell.colSpan !== 1));
       const rowCount = table?.rows.length ?? 0;
       const columnCount = table ? Math.min(...[...table.rows].map(row => row.cells.length)) : 0;
+      const tableGroup = this.shadowRoot?.querySelector<HTMLElement>(".toolbar-group--table");
+      if (tableGroup) tableGroup.hidden = this.contentMode === "restricted" || this.contentMode === "plain" || !cell || !table;
       this.shadowRoot?.querySelectorAll<HTMLButtonElement>("button[data-table-command]").forEach(button => {
         const command = button.dataset.tableCommand;
         button.disabled = !cell || !table || hasSpans || (command === "deleteRow" && rowCount <= 1) || (command === "deleteColumn" && columnCount <= 1);
@@ -465,7 +521,17 @@ export function defineRichTextEditor(): void {
       const label = document.createElement("label"); label.textContent = this.getAttribute("label") ?? ""; label.hidden = !this.hasAttribute("label"); label.part.add("label");
       const toolbar = document.createElement("div"); toolbar.setAttribute("role", "toolbar"); toolbar.setAttribute("aria-orientation", "horizontal"); toolbar.part.add("toolbar");
       const actions: Array<[string,string,string?,string?,string?]> = [["Bold","bold"],["Italic","italic"],["Underline","underline"],["Bulleted list","insertUnorderedList",undefined,"• List"],["Numbered list","insertOrderedList",undefined,"1. List"],["Undo","undo"],["Redo","redo"],["Insert table","insertTable"],["Insert image","insertImage",undefined,undefined,"insert-image-label"],["Insert row above","insertRowAbove",undefined,undefined,"insert-row-above-label"],["Insert row below","insertRowBelow",undefined,undefined,"insert-row-below-label"],["Insert column before","insertColumnBefore",undefined,undefined,"insert-column-before-label"],["Insert column after","insertColumnAfter",undefined,undefined,"insert-column-after-label"],["Delete row","deleteRow",undefined,undefined,"delete-row-label"],["Delete column","deleteColumn",undefined,undefined,"delete-column-label"],["Delete table","deleteTable",undefined,undefined,"delete-table-label"],["Link","createLink"]];
-      for (const [title, command, value, short, labelAttribute] of actions) { const button = document.createElement("button"); button.type = "button"; button.dataset.command = command; button.dataset.fallback = short ?? title; if (labelAttribute) { button.dataset.labelAttribute = labelAttribute; if (command.startsWith("insertRow") || command.startsWith("insertColumn") || command.startsWith("delete")) button.dataset.tableCommand = command; } button.tabIndex = toolbar.children.length === 0 ? 0 : -1; button.textContent = title; button.setAttribute("aria-label", title); button.addEventListener("mousedown", event => event.preventDefault()); button.addEventListener("click", () => this.command(command, value)); toolbar.append(button); }
+      let tableActions: HTMLDivElement | undefined;
+      for (const [title, command, value, , labelAttribute] of actions) {
+        const isTableAction = command.startsWith("insertRow") || command.startsWith("insertColumn") || command.startsWith("delete");
+        if (isTableAction && !tableActions) { tableActions = document.createElement("div"); tableActions.className = "toolbar-group toolbar-group--table"; tableActions.setAttribute("role", "group"); tableActions.setAttribute("aria-label", "Table editing"); tableActions.hidden = true; toolbar.append(tableActions); }
+        const button = document.createElement("button"); button.type = "button"; button.dataset.command = command; button.dataset.fallback = title;
+        if (labelAttribute) button.dataset.labelAttribute = labelAttribute;
+        if (isTableAction) button.dataset.tableCommand = command;
+        button.tabIndex = toolbar.querySelector("button[data-command]") ? -1 : 0; button.append(createToolbarIcon(command)); button.setAttribute("aria-label", title); button.title = title;
+        button.addEventListener("mousedown", event => event.preventDefault()); button.addEventListener("click", () => this.command(command, value));
+        (isTableAction ? tableActions! : toolbar).append(button);
+      }
       this.imageInput = document.createElement("input"); this.imageInput.type = "file"; this.imageInput.accept = "image/*"; this.imageInput.hidden = true; this.imageInput.setAttribute("aria-label", this.getAttribute("image-input-label") ?? "Choose image"); this.imageInput.addEventListener("change", () => { const file = this.imageInput?.files?.[0]; if (file) void this.insertUploadedImage(file); this.imageInput!.value = ""; }); toolbar.append(this.imageInput);
       const linkForm = document.createElement("form"); this.linkForm = linkForm; linkForm.className = "link-editor"; linkForm.part.add("link-editor"); linkForm.hidden = true; linkForm.setAttribute("aria-label", this.getAttribute("link-dialog-label") ?? "Edit link");
       const makeLinkField = (attribute: string, fallback: string, type = "text"): HTMLInputElement => {
@@ -495,7 +561,7 @@ export function defineRichTextEditor(): void {
       toolbar.addEventListener("focusin", event => { const active = event.target as HTMLButtonElement; toolbar.querySelectorAll<HTMLButtonElement>("button").forEach(button => { button.tabIndex = button === active ? 0 : -1; }); });
       toolbar.addEventListener("keydown", event => {
         const key = (event as KeyboardEvent).key;
-        const buttons = [...toolbar.querySelectorAll<HTMLButtonElement>("button:not(:disabled)")];
+      const buttons = [...toolbar.querySelectorAll<HTMLButtonElement>("button:not(:disabled):not([hidden])")];
         const current = buttons.indexOf(event.target as HTMLButtonElement);
         const rtl = getComputedStyle(this).direction === "rtl";
         const step = key === "ArrowRight" ? (rtl ? -1 : 1) : key === "ArrowLeft" ? (rtl ? 1 : -1) : 0;
@@ -503,7 +569,7 @@ export function defineRichTextEditor(): void {
         if (index < 0 || !buttons[index]) return;
         event.preventDefault(); buttons[index].tabIndex = 0; buttons.forEach((button, buttonIndex) => { if (buttonIndex !== index) button.tabIndex = -1; }); buttons[index].focus();
       });
-      this.editor = document.createElement("div"); this.editor.setAttribute("role", "textbox"); this.editor.setAttribute("aria-multiline", "true"); this.syncEditorLabel(); const invalid = this.getAttribute("aria-invalid"); if (invalid !== null) this.editor.setAttribute("aria-invalid", invalid); this.editor.contentEditable = String(!this.hasAttribute("disabled") && !this.hasAttribute("read-only")); this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only"))); this.editor.setAttribute("aria-disabled", String(this.hasAttribute("disabled"))); this.editor.setAttribute("aria-required", String(this.hasAttribute("required"))); this.editor.dataset.placeholder = this.getAttribute("placeholder") ?? "Write something…"; this.editor.part.add("editor");
+      this.editor = document.createElement("div"); this.editor.setAttribute("role", "textbox"); this.editor.setAttribute("aria-multiline", "true"); this.syncEditorLabel(); const invalid = this.getAttribute("aria-invalid"); if (invalid !== null) this.editor.setAttribute("aria-invalid", invalid); this.editor.contentEditable = this.hasAttribute("disabled") || this.hasAttribute("read-only") ? "false" : this.contentMode === "plain" ? "plaintext-only" : "true"; this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only"))); this.editor.setAttribute("aria-disabled", String(this.hasAttribute("disabled"))); this.editor.setAttribute("aria-required", String(this.hasAttribute("required"))); this.editor.dataset.placeholder = this.getAttribute("placeholder") ?? "Write something…"; this.editor.part.add("editor");
       this.editor.addEventListener("keydown", event => { const key = (event as KeyboardEvent).key.toLowerCase(); const shortcut = (event as KeyboardEvent).metaKey || (event as KeyboardEvent).ctrlKey; if (!shortcut) return; if (key === "z") { event.preventDefault(); this.command((event as KeyboardEvent).shiftKey ? "redo" : "undo"); } else if (key === "y") { event.preventDefault(); this.command("redo"); } });
       this.editor.addEventListener("input", () => { this.sanitizeEditor(); this.syncForm(); this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true })); });
       this.editor.addEventListener("mouseup", this.onSelectionChange);
@@ -513,9 +579,15 @@ export function defineRichTextEditor(): void {
       this.editor.addEventListener("paste", event => {
         event.preventDefault();
         const clipboard = (event as ClipboardEvent).clipboardData;
+        if (this.contentMode === "plain") {
+          this.editor.ownerDocument.execCommand("insertText", false, clipboard?.getData("text/plain") ?? plainText(clipboard?.getData("text/html") ?? ""));
+          this.sanitizeEditor(); this.syncForm();
+          this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
+          return;
+        }
         const imageFile = [...(clipboard?.files ?? [])].find(file => file.type.startsWith("image/"));
         if (imageFile) { void this.insertUploadedImage(imageFile); return; }
-        const html = cleanHtml(clipboard?.getData("text/html") ?? "");
+        const html = cleanHtml(clipboard?.getData("text/html") ?? clipboard?.getData("text/plain") ?? "", this.contentMode, this.allowHyperlinks);
         const text = clipboard?.getData("text/plain") ?? "";
         if (html) this.editor.ownerDocument.execCommand("insertHTML", false, html);
         else this.editor.ownerDocument.execCommand("insertText", false, text);
@@ -524,7 +596,7 @@ export function defineRichTextEditor(): void {
         this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
       });
       this.editor.addEventListener("blur", () => { this.sanitizeEditor(); this.syncForm(); this.dispatchEvent(new CustomEvent("spui-change", { detail: { value: this.value }, bubbles: true, composed: true })); });
-      const style = document.createElement("style"); style.textContent = `${base}:host{display:grid;gap:6px}label{font-weight:600;color:var(--spui-ui-muted,var(--spui-semantic-body-text,inherit))}[role=toolbar]{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface,#fff)}button{border:0;border-radius:4px;background:transparent;color:var(--spui-ui-text,inherit);padding:6px 8px;font:inherit;cursor:pointer}button:hover:not(:disabled){background:var(--spui-ui-surface-hover,#eee)}button[aria-pressed=true]{background:color-mix(in srgb,var(--spui-ui-accent,#0078d4) 14%,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,var(--spui-semantic-body-text,#323130))}button:disabled{opacity:.55;cursor:not-allowed}button:focus-visible,[role=textbox]:focus-visible,input:focus-visible{outline:2px solid var(--spui-focus-ring,#005a9e);outline-offset:2px}[role=textbox]{min-height:120px;box-sizing:border-box;padding:10px 12px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit;line-height:1.5;overflow:auto;caret-color:var(--spui-focus-ring,#005a9e)}[role=textbox]:empty:before{content:attr(data-placeholder);color:var(--spui-ui-muted,#666);pointer-events:none}table{border-collapse:collapse;max-width:100%;margin-block:8px}caption{text-align:start;font-weight:600}td,th{min-width:56px;padding:6px 9px;border:1px solid var(--spui-ui-stroke,#c8c8c8);text-align:start}th{background:var(--spui-ui-surface-hover,#f5f5f5);font-weight:600}a{color:var(--spui-semantic-link,#0f6cbd)}@media(forced-colors:active){button{border:1px solid ButtonText}button[aria-pressed=true]{color:Highlight;border-color:Highlight}td,th{border-color:CanvasText}}`;
+      const style = document.createElement("style"); style.textContent = `${base}:host{display:grid;gap:6px}label{font-weight:600;color:var(--spui-ui-muted,var(--spui-semantic-body-text,inherit))}[role=toolbar]{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:6px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface,#fff)}[role=toolbar][hidden],button[hidden]{display:none}.toolbar-group{display:flex;flex-wrap:wrap;gap:2px;padding-inline-start:4px;border-inline-start:1px solid var(--spui-ui-stroke,#c8c8c8)}.toolbar-group[hidden]{display:none}button{box-sizing:border-box;display:inline-grid;place-items:center;flex:none;width:36px;min-width:36px;min-height:36px;padding:0;border:0;border-radius:var(--spui-control-radius,4px);background:transparent;color:var(--spui-ui-text,inherit);font:inherit;cursor:pointer}button svg{display:block;width:18px;height:18px}button:hover:not(:disabled){background:var(--spui-ui-surface-hover,#eee)}button[aria-pressed=true]{background:color-mix(in srgb,var(--spui-ui-accent,#0078d4) 14%,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,var(--spui-semantic-body-text,#323130))}button:disabled{opacity:.42;cursor:not-allowed}button:focus-visible,[role=textbox]:focus-visible,input:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}[role=textbox]{min-height:120px;box-sizing:border-box;padding:10px 12px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit;line-height:1.5;overflow:auto;caret-color:var(--spui-focus-ring,var(--spui-ui-accent,#005a9e))}[role=textbox]:empty:before{content:attr(data-placeholder);color:var(--spui-ui-muted,#666);pointer-events:none}table{border-collapse:collapse;max-width:100%;margin-block:8px}caption{text-align:start;font-weight:600}td,th{min-width:56px;padding:6px 9px;border:1px solid var(--spui-ui-stroke,#c8c8c8);text-align:start}th{background:var(--spui-ui-surface-hover,#f5f5f5);font-weight:600}a{color:var(--spui-semantic-link,#0f6cbd)}@media(pointer:coarse){[role=toolbar] button{width:44px;min-width:44px;min-height:44px}}@media(forced-colors:active){button{border:1px solid ButtonText}button[aria-pressed=true]{color:Highlight;border-color:Highlight}td,th{border-color:CanvasText}}`;
       style.textContent += `.link-editor{display:flex;flex-wrap:wrap;align-items:end;gap:8px;padding:8px;border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface-hover,var(--spui-ui-surface,#fff))}.link-editor[hidden]{display:none}.link-field{display:grid;flex:1 1 150px;gap:4px;min-width:0;color:var(--spui-ui-text,inherit);font-size:13px}.link-field input{box-sizing:border-box;width:100%;min-width:0;min-height:32px;padding:5px 8px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#8a8886));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit)}.link-actions{display:flex;flex-wrap:wrap;gap:4px}.link-actions button{border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,4px);background:var(--spui-ui-surface,#fff)}.link-actions [data-link-action=apply]{border-color:transparent;background:var(--spui-semantic-primary-button-background,var(--spui-ui-accent,#0078d4));color:var(--spui-ui-accent-text,#fff)}.link-error{flex:1 0 100%;color:var(--spui-ui-danger,var(--spui-semantic-error-text,#c50f1f));font-size:13px}`;
       style.textContent += `.link-new-tab{display:inline-flex;flex:1 0 100%;align-items:center;gap:8px;color:var(--spui-ui-text,inherit);font-size:13px}.link-new-tab input{width:16px;height:16px;min-height:16px;margin:0;accent-color:var(--spui-ui-accent,#0078d4)}`;
       style.textContent += `.link-picker-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}`;
@@ -532,6 +604,7 @@ export function defineRichTextEditor(): void {
       syncHostAccessibleName(this, this.editor);
       this.syncDisabled();
       this.refreshStrings();
+      this.syncContentMode();
       this.onSelectionChange();
     }
     private refreshStrings(): void {
@@ -544,8 +617,8 @@ export function defineRichTextEditor(): void {
       toolbar.querySelectorAll<HTMLButtonElement>("button[data-command]").forEach((button,index) => {
         const attribute = button.dataset.labelAttribute ?? attrs[index];
         const text = this.getAttribute(attribute) ?? button.dataset.fallback ?? "";
-        button.textContent = button.dataset.command === "insertUnorderedList" && !this.hasAttribute(attribute) ? "• List" : button.dataset.command === "insertOrderedList" && !this.hasAttribute(attribute) ? "1. List" : text;
         button.setAttribute("aria-label", text);
+        button.title = text;
       });
       if (this.linkForm) {
         this.linkForm.setAttribute("aria-label", this.getAttribute("link-dialog-label") ?? "Edit link");
