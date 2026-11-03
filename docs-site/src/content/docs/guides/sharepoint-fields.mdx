@@ -157,9 +157,52 @@ await saveItem(itemUrl, patch);
 
 Only supplied values are included, so omitted fields remain untouched in a PATCH. Explicit `null` clears a nullable value; empty required values, read-only writes, unknown field names, property collisions, and invalid bounds throw before the request. Missing required fields are allowed in partial edits; new-item forms should include every required value. `getSharePointListItemUrl()` validates the list GUID and positive item ID. The host still sends the authorized request and supplies the list item's entity type and ETag as required by its REST update strategy; see Microsoft's [list-item REST guidance](https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-lists-and-list-items-with-rest#update-list-item).
 
-## Render with existing controls
+## Render a metadata-driven form
 
-The recipe uses the same component names and prop concepts used elsewhere in the library. For a URL field, use `urlFormat` to render the saved URL as a `Link` or `Image` in a record view; use the `input` recipe when editing. A choice field can be rendered as a Select without inventing app-specific naming:
+`SharePointField` chooses the matching library control, applies the field label and description, and maps its value callback to one `onValueChange` shape. It handles text, numeric, URL, plain and rich Note, Choice, MultiChoice, Boolean, DateTime, Lookup, and User fields. This convenience renderer is React-only; `getSharePointFieldAdapter()` remains framework-independent for custom-element and other-framework forms. The form can stay driven by SharePoint metadata:
+
+```tsx
+import { useState } from "react";
+import { SharePointField, type SharePointFieldValue } from "@spfx-fast/sharepoint-ui/react";
+import type { SharePointFieldMetadata } from "@spfx-fast/sharepoint-ui/sharepoint-fields";
+
+function DynamicListForm({
+  fields,
+  optionsByField
+}: {
+  fields: SharePointFieldMetadata[];
+  optionsByField: Record<string, { value: string | number; label: string }[]>;
+}) {
+  const [values, setValues] = useState<Record<string, SharePointFieldValue>>({});
+
+  return <form>{fields.map(field => {
+    const name = field.InternalName ?? field.internalName ?? "";
+    return <SharePointField
+      key={name}
+      field={field}
+      value={values[name]}
+      options={optionsByField[name]}
+      onValueChange={value => setValues(current => ({ ...current, [name]: value }))}
+    />;
+  })}</form>;
+}
+```
+
+The `options` prop is for Lookup and User fields: the host loads those choices with its authorized SharePoint or people-search service. Choice and MultiChoice options come from the field metadata. `defaultValue` enables local uncontrolled use; pass `value` and `onValueChange` to control the field from form state. Localize the `emptyOptionLabel` and `addChoiceLabel` prompts for the current language. Unsupported SharePoint field types stay explicit; supply `renderUnsupported` for a specialized control.
+
+| Property | Purpose |
+| --- | --- |
+| `field` | SharePoint field metadata used to choose the control and its rules. |
+| `value` / `defaultValue` | Current value for controlled use, or initial value for local use. |
+| `onValueChange` | Receives the value in the shape expected by the field serializer. |
+| `options` | Loaded choices for Lookup and User fields. |
+| `disabled`, `hint`, `validationMessage` | Apply form state and help text consistently. |
+| `renderUnsupported` | Render a custom control for an unsupported field type. |
+| `emptyOptionLabel`, `addChoiceLabel` | Localize the empty and fill-in choice prompts. |
+
+## Customize a single control
+
+Use the adapter directly when a form needs a custom layout or specialized control. A choice field can be rendered as a Select:
 
 ```tsx
 import { Select } from "@spfx-fast/sharepoint-ui/react";

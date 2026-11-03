@@ -36,6 +36,7 @@ import { defineDatePicker } from "./elements/date-picker.js";
 import { defineCombobox } from "./elements/combobox.js";
 import { defineRichTextEditor, getRichTextEditorFieldOptions, type RichTextEditorLinkPicker, type SharePointMultiLineField } from "./elements/rich-text-editor.js";
 export { getRichTextEditorFieldOptions, type SharePointMultiLineField, type RichTextEditorLink, type RichTextEditorLinkPicker } from "./elements/rich-text-editor.js";
+import { getSharePointFieldAdapter, type SharePointFieldMetadata, type SharePointFieldValue } from "./sharepoint-fields.js";
 import { defineAlert } from "./elements/alert.js";
 import { defineSkeleton, defineSkeletonItem, type SkeletonAnimation, type SkeletonAppearance, type SkeletonItemSize, type SkeletonShape } from "./elements/skeleton.js";
 import { defineLink } from "./elements/link.js";
@@ -7189,3 +7190,156 @@ export const AccordionPanel = /* @__PURE__ */ React.forwardRef<HTMLElement, Elem
   const open = React.useContext(AccordionItemOpenContext);
   return React.createElement("spui-accordion-panel", useCustomElementProps({ ref: forwardedRef, ...props, slot: "panel", motion: collapseMotion ? true : undefined }), collapseMotion ? React.createElement(collapseMotion, { visible: open, appear: true, unmountOnExit: true }, children) : children);
 });
+
+export type SharePointFieldOption = { value: string | number; label: string; disabled?: boolean };
+export type SharePointFieldProps = {
+  field: SharePointFieldMetadata;
+  value?: SharePointFieldValue;
+  defaultValue?: SharePointFieldValue;
+  options?: readonly SharePointFieldOption[];
+  onValueChange?: (value: SharePointFieldValue) => void;
+  disabled?: boolean;
+  hint?: React.ReactNode;
+  validationMessage?: React.ReactNode;
+  renderUnsupported?: (field: SharePointFieldMetadata, reason: string) => React.ReactNode;
+  addChoiceLabel?: string;
+  emptyOptionLabel?: string;
+  className?: string;
+  style?: React.CSSProperties;
+};
+
+/** Render a SharePoint field recipe using the library's matching form control. */
+export function SharePointField({ field, value, defaultValue, options: providedOptions, onValueChange, disabled = false, hint, validationMessage, renderUnsupported, addChoiceLabel = "Add another choice", emptyOptionLabel = "Select an option", className, style }: SharePointFieldProps): React.ReactElement | null {
+  const adapter = getSharePointFieldAdapter(field);
+  const [internalValue, setInternalValue] = React.useState<SharePointFieldValue | undefined>(defaultValue);
+  const [fillInValue, setFillInValue] = React.useState("");
+  if (adapter.hidden) return null;
+
+  const currentValue = value === undefined ? internalValue : value;
+  const updateValue = (next: SharePointFieldValue): void => {
+    if (value === undefined) setInternalValue(next);
+    onValueChange?.(next);
+  };
+  const label = adapter.label || adapter.name || adapter.fieldType;
+  const name = adapter.name || undefined;
+  const stringValue = adapter.control === "date-picker" ? toSharePointDateControlString(currentValue) : toSharePointControlString(currentValue);
+  const choices: readonly SharePointFieldOption[] = providedOptions ?? (adapter.choices ?? []).map(choice => ({ value: choice, label: choice }));
+  const controlDisabled = disabled || (adapter.readOnly && !["input", "textarea", "rich-text-editor"].includes(adapter.control));
+  let control: React.ReactNode;
+
+  switch (adapter.control) {
+    case "input":
+      control = <Input type={adapter.inputType ?? "text"} name={name} value={stringValue} min={adapter.min} max={adapter.max} step={adapter.step} maxLength={adapter.maxLength} required={adapter.required} disabled={disabled} readOnly={adapter.readOnly} onValueChange={next => updateValue(next)} />;
+      break;
+    case "textarea":
+      control = <TextArea name={name} value={stringValue} maxLength={adapter.maxLength} required={adapter.required} disabled={disabled} readOnly={adapter.readOnly} onValueChange={next => updateValue(next)} />;
+      break;
+    case "rich-text-editor":
+      control = <RichTextEditor name={name} value={stringValue} field={field} required={adapter.required} disabled={disabled} readOnly={adapter.readOnly} onValueChange={next => updateValue(next)} />;
+      break;
+    case "select":
+      control = adapter.allowFillIn
+        ? <ComboBox name={name} value={stringValue} selectedValue={stringValue} placeholder={emptyOptionLabel} freeform allowFreeform required={adapter.required} disabled={controlDisabled} onValueChange={next => updateValue(next)} onOptionSelect={(_, data) => updateValue(data.optionValue ?? null)}>
+          {choices.map(option => <Option key={String(option.value)} value={String(option.value)} text={option.label} disabled={option.disabled}>{option.label}</Option>)}
+        </ComboBox>
+        : <Select name={name} value={stringValue} required={adapter.required} disabled={controlDisabled} onValueChange={next => updateValue(next)}>
+          <option value="" disabled={adapter.required}>{emptyOptionLabel}</option>
+          {choices.map(option => <option key={String(option.value)} value={String(option.value)} disabled={option.disabled}>{option.label}</option>)}
+        </Select>;
+      break;
+    case "radio-group":
+      control = <RadioGroup name={name} value={stringValue} required={adapter.required} disabled={controlDisabled} onValueChange={next => updateValue(next)}>
+        {choices.map(option => <Radio key={String(option.value)} value={String(option.value)} label={option.label} disabled={option.disabled} />)}
+      </RadioGroup>;
+      break;
+    case "checkbox":
+      control = <Checkbox name={name} checked={currentValue === true || currentValue === "true"} disabled={controlDisabled} onCheckedChange={next => updateValue(next)} />;
+      break;
+    case "multi-choice": {
+      const selected = Array.isArray(currentValue) ? currentValue.map(String) : [];
+      const visibleOptions: SharePointFieldOption[] = [...choices];
+      for (const selectedValue of selected) {
+        if (!visibleOptions.some(option => String(option.value) === selectedValue)) visibleOptions.push({ value: selectedValue, label: selectedValue });
+      }
+      const setSelected = (choice: string, checked: boolean): void => {
+        const next = checked ? [...new Set([...selected, choice])] : selected.filter(item => item !== choice);
+        updateValue(next);
+      };
+      const addFillIn = (): void => {
+        const next = fillInValue.trim();
+        if (!next || selected.includes(next)) return;
+        updateValue([...selected, next]);
+        setFillInValue("");
+      };
+      control = <>
+        {visibleOptions.map(option => <Checkbox key={String(option.value)} label={option.label} checked={selected.includes(String(option.value))} disabled={controlDisabled || option.disabled} onCheckedChange={checked => setSelected(String(option.value), checked)} />)}
+        {adapter.allowFillIn ? <div style={{ display: "flex", alignItems: "end", gap: 8, marginBlockStart: 8 }}>
+          <Input type="text" value={fillInValue} aria-label={addChoiceLabel} disabled={controlDisabled} onValueChange={setFillInValue} onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); addFillIn(); } }} />
+          <Button type="button" appearance="outline" disabled={controlDisabled || !fillInValue.trim()} onClick={addFillIn}>{addChoiceLabel}</Button>
+        </div> : null}
+      </>;
+      break;
+    }
+    case "date-picker":
+      control = <DatePicker name={name} value={stringValue} required={adapter.required} disabled={controlDisabled} readOnly={adapter.readOnly} onValueChange={next => updateValue(next)} />;
+      break;
+    case "combobox":
+      control = <ComboBox
+        name={name}
+        multiselect={adapter.multiple}
+        selectedValue={adapter.multiple ? undefined : stringValue}
+        selectedOptions={adapter.multiple && Array.isArray(currentValue) ? currentValue.map(String) : undefined}
+        required={adapter.required}
+        disabled={controlDisabled}
+        placeholder={emptyOptionLabel}
+        onOptionSelect={(_, data) => { if (!adapter.multiple) updateValue(data.optionValue ?? null); }}
+        onSelectedOptionsChange={next => { if (adapter.multiple) updateValue(next); }}
+      >
+        {choices.map(option => <Option key={String(option.value)} value={String(option.value)} text={option.label} disabled={option.disabled}>{option.label}</Option>)}
+      </ComboBox>;
+      break;
+    case "read-only":
+      control = <TextField name={name} value={stringValue} readOnly />;
+      break;
+    case "unsupported": {
+      const fallback = renderUnsupported?.(field, adapter.unsupportedReason ?? "No renderer is registered for this SharePoint field type.");
+      control = fallback ?? <div role="note">This SharePoint field type needs a custom renderer ({adapter.fieldType}).</div>;
+      break;
+    }
+  }
+
+  if (adapter.control === "multi-choice") {
+    return <Field hint={hint ?? adapter.description} validationMessage={validationMessage} disabled={disabled} className={className} style={style}>
+      <SharePointMultiChoiceGroup label={label} required={adapter.required} disabled={disabled}>{control}</SharePointMultiChoiceGroup>
+    </Field>;
+  }
+  return <Field label={label} hint={hint ?? adapter.description} validationMessage={validationMessage} required={adapter.required} disabled={disabled} className={className} style={style}>{control}</Field>;
+}
+
+function toSharePointControlString(value: SharePointFieldValue | undefined): string {
+  if (value == null) return "";
+  if (typeof value === "string" || typeof value === "number") return String(value);
+  if (value instanceof Date) {
+    const pad = (part: number): string => String(part).padStart(2, "0");
+    return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}T${pad(value.getHours())}:${pad(value.getMinutes())}`;
+  }
+  if (typeof value === "object" && "url" in value) return value.url;
+  return "";
+}
+
+function SharePointMultiChoiceGroup({ label, required, disabled, children }: { label: string; required: boolean; disabled: boolean; children: React.ReactNode }): React.ReactElement {
+  const fieldProps = useFieldControlProps_unstable({ role: "group", "aria-label": label }, { supportsRequired: false });
+  return <fieldset {...fieldProps} aria-required={required || undefined} disabled={disabled} style={{ minWidth: 0, margin: 0, padding: 0, border: 0 }}>
+    <legend>{label}{required ? <span aria-hidden="true"> *</span> : null}</legend>
+    {children}
+  </fieldset>;
+}
+
+function toSharePointDateControlString(value: SharePointFieldValue | undefined): string {
+  if (value instanceof Date) {
+    const pad = (part: number): string => String(part).padStart(2, "0");
+    return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`;
+  }
+  const text = toSharePointControlString(value);
+  return /^\d{4}-\d{2}-\d{2}/.exec(text)?.[0] ?? text;
+}
