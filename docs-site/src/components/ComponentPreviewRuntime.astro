@@ -14,6 +14,7 @@
     const stage = demo.querySelector(".component-demo__stage");
     const status = demo.querySelector(".component-demo__status");
     const tokenReadout = demo.querySelector("[data-preview-tokens]");
+    let interactionSummary = "";
 
     const applyTokens = () => {
       const selectedAppearance = appearance?.value ?? "ios";
@@ -58,7 +59,7 @@
         : control?.value;
       const selectedValue = value !== undefined && value !== "" ? ` · Value: ${Array.isArray(value) ? value.join(", ") : value}` : "";
       const selection = theme?.selectedOptions?.[0]?.textContent ?? preset.label ?? "SharePoint teal";
-      status.textContent = `${selection} theme · accent ${accent?.value ?? preset.accent}${selectedValue}`;
+      status.textContent = `${selection} theme · accent ${accent?.value ?? preset.accent}${selectedValue}${interactionSummary}`;
     };
 
     appearance?.addEventListener("change", applyTokens);
@@ -81,6 +82,12 @@
         } else updateStatus(target);
       });
     }
+    stage?.addEventListener("spui-selection-change", (event) => {
+      const detail = event.detail ?? {};
+      const values = Array.isArray(detail.selectedValues) ? detail.selectedValues : detail.selectedValue ? [detail.selectedValue] : [];
+      interactionSummary = values.length ? ` · Selected: ${values.join(", ")}` : " · Selection cleared";
+      updateStatus(event.target);
+    });
     try {
       await registerPreviewElements(demo);
       updateStatus();

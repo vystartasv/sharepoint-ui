@@ -6048,6 +6048,52 @@ export type SwatchPickerSelectionChangeEvent = SharePointUIEvent;
 export type SwatchPickerOnSelectionChangeData =
   | (SwatchPickerSelection & { event: SharePointUIEvent; type: undefined; selectedSwatch: string })
   | (SwatchPickerSelection & { event: React.MouseEvent<HTMLButtonElement>; type: "click"; selectedSwatch: string });
+export type SavedSwatchPalette = { id: string; name: string; colors: readonly { value: string; color: string; label?: string }[] };
+export type SwatchPaletteStore = {
+  list: () => Promise<readonly SavedSwatchPalette[]>;
+  save: (palette: SavedSwatchPalette) => Promise<void>;
+  remove: (id: string) => Promise<void>;
+};
+export function useSavedSwatchPalettes(store: SwatchPaletteStore): {
+  palettes: readonly SavedSwatchPalette[];
+  loading: boolean;
+  error: unknown;
+  reload: () => Promise<readonly SavedSwatchPalette[]>;
+  save: (palette: SavedSwatchPalette) => Promise<void>;
+  remove: (id: string) => Promise<void>;
+} {
+  const [palettes, setPalettes] = React.useState<readonly SavedSwatchPalette[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<unknown>(null);
+  const request = React.useRef(0);
+  const mounted = React.useRef(false);
+  const reload = React.useCallback(async () => {
+    const current = ++request.current;
+    setLoading(true); setError(null);
+    try {
+      const result = await store.list();
+      if (mounted.current && request.current === current) setPalettes(result);
+      return result;
+    } catch (cause) {
+      if (mounted.current && request.current === current) setError(cause);
+      throw cause;
+    } finally {
+      if (mounted.current && request.current === current) setLoading(false);
+    }
+  }, [store]);
+  React.useEffect(() => { mounted.current = true; void reload().catch(() => {}); return () => { mounted.current = false; request.current++; }; }, [reload]);
+  const save = React.useCallback(async (palette: SavedSwatchPalette) => {
+    if (mounted.current) setError(null);
+    try { await store.save(palette); await reload(); }
+    catch (cause) { if (mounted.current) setError(cause); throw cause; }
+  }, [store, reload]);
+  const remove = React.useCallback(async (id: string) => {
+    if (mounted.current) setError(null);
+    try { await store.remove(id); await reload(); }
+    catch (cause) { if (mounted.current) setError(cause); throw cause; }
+  }, [store, reload]);
+  return { palettes, loading, error, reload, save, remove };
+}
 export type SwatchPickerProps = ElementProps & { selectedValue?: string; defaultSelectedValue?: string; selectedValues?: string[]; defaultSelectedValues?: string[]; selectionMode?: "single" | "multiple"; layout?: "row" | "grid"; size?: "extra-small" | "small" | "medium" | "large"; shape?: "rounded" | "square" | "circular"; spacing?: "small" | "medium"; focusMode?: "arrow" | "tab"; columns?: number; onSelectionChange?: (event: SwatchPickerSelectionChangeEvent, data: SwatchPickerOnSelectionChangeData) => void; children?: React.ReactNode };
 
 export const SwatchPicker = /* @__PURE__ */ React.forwardRef<HTMLElement, SwatchPickerProps>(function SwatchPicker({ children, selectedValue, defaultSelectedValue, selectedValues, defaultSelectedValues, selectionMode = "single", layout = "grid", size = "medium", shape = "square", spacing = "medium", focusMode = "arrow", columns = 6, onSelectionChange, ...props }: SwatchPickerProps, forwardedRef): React.ReactElement {

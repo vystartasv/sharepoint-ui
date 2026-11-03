@@ -594,7 +594,7 @@ These additions improve common SharePoint work beyond the baseline catalog. They
 | Drawer | Add persistent non-modal behavior with explicit dismissal policy | Keeps supporting panes available without blocking the page while preserving predictable focus and dismissal | Implemented and locally verified |
 | Carousel | Add an optional thumbnail-preview strip for image-focused galleries, with roving keyboard focus and localized accessible labels | Lets users navigate media collections by visual preview without making ordinary SharePoint records heavier | Queued |
 | Overflow | Add persisted compact-mode preference for responsive command shelves | Lets a SharePoint workspace retain a user's density preference across visits | Queued |
-| SwatchPicker | Add multi-select and saved tenant palettes | Lets design tools offer reusable brand palettes and allow several colors where the workflow needs them | Queued |
+| SwatchPicker | Support reusable saved palettes through a persistence hook; multi-select is already part of the baseline | Lets design tools reuse brand palettes while SharePoint persistence stays in the app's existing data layer | Implemented `useSavedSwatchPalettes` with host-owned `SwatchPaletteStore`; built-in theme presets remain queued |
 
 ## Gates for each component family
 

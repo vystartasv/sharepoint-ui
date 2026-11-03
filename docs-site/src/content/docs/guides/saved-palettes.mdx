@@ -1,0 +1,98 @@
+---
+title: Save reusable color palettes
+description: Persist named SwatchPicker palettes through your app's SharePoint data service.
+---
+
+`useSavedSwatchPalettes` gives a React web part one predictable API for loading, saving, deleting, and refreshing named palettes. The library does not choose where tenant data lives. Connect its small store contract to the SharePoint list or configuration service the app already uses.
+
+## Define the store once
+
+Keep the store object stable outside the component (or memoize it). Each method can delegate to PnPjs, REST, Graph, or your existing data layer.
+
+```tsx
+import {
+  type SavedSwatchPalette,
+  type SwatchPaletteStore,
+} from "@spfx-fast/sharepoint-ui/react";
+
+const paletteStore: SwatchPaletteStore = {
+  list: () => paletteDataService.list(),
+  save: (palette: SavedSwatchPalette) => paletteDataService.upsert(palette.id, palette),
+  remove: (id: string) => paletteDataService.remove(id),
+};
+```
+
+`paletteDataService` is the app's SharePoint persistence adapter. A typical list implementation stores `id` and `name` in text columns and serializes `colors` as JSON, then maps rows back to `SavedSwatchPalette`. Apply the same permissions and validation as for other tenant data. The library adds no network calls, browser storage, or persistence package.
+
+## Load and apply a saved palette
+
+```tsx
+import * as React from "react";
+import {
+  ColorSwatch,
+  SwatchPicker,
+  useSavedSwatchPalettes,
+} from "@spfx-fast/sharepoint-ui/react";
+
+const availableColors = [
+  { value: "ocean", color: "#0078d4", label: "Ocean blue" },
+  { value: "leaf", color: "#107c10", label: "Leaf green" },
+  { value: "berry", color: "#c239b3", label: "Berry pink" },
+];
+
+export function BrandPaletteEditor() {
+  const { palettes, loading, error, save, remove } = useSavedSwatchPalettes(paletteStore);
+  const [selected, setSelected] = React.useState<string[]>([]);
+  const [name, setName] = React.useState("");
+
+  const saveSelection = () => {
+    const palette = {
+      id: crypto.randomUUID(),
+      name,
+      colors: availableColors.filter(color => selected.includes(color.value)),
+    };
+    void save(palette).catch(() => {}); // The hook exposes failures through `error`.
+  };
+
+  return (
+    <section>
+      <SwatchPicker
+        aria-label="Choose brand colors"
+        selectionMode="multiple"
+        selectedValues={selected}
+        onSelectionChange={(_event, data) => setSelected(data.selectedValues)}
+      >
+        {availableColors.map(color => <ColorSwatch key={color.value} {...color} />)}
+      </SwatchPicker>
+
+      <ul aria-label="Saved palettes">
+        {palettes.map(palette => (
+          <li key={palette.id}>
+            <button type="button" onClick={() => setSelected(palette.colors.map(color => color.value))}>
+              {palette.name}
+            </button>
+            <button type="button" onClick={() => void remove(palette.id).catch(() => {})}>
+              Delete {palette.name}
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <label>
+        Palette name
+        <input value={name} onChange={event => setName(event.target.value)} />
+      </label>
+      <button type="button" disabled={loading || !name.trim() || selected.length === 0} onClick={saveSelection}>
+        Save selected colors
+      </button>
+      <p role="status">
+        {loading ? "Loading palettes…" : error ? "Palette request failed." : `${palettes.length} saved palettes`}
+      </p>
+    </section>
+  );
+}
+```
+
+The hook returns `palettes`, `loading`, `error`, `reload`, `save`, and `remove`. A record has the shape `{ id, name, colors: [{ value, color, label? }] }`. Loading runs when the component mounts; successful saves and deletes refresh the list. Handle the returned promise when your page needs custom success or failure feedback.
+
+See the [SwatchPicker component page](/sharepoint-ui/components/swatch-picker/swatch-picker/) for the live color control and complete selection API.

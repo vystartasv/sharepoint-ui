@@ -22,14 +22,28 @@
           "host className/style"
         ],
         "reactSignature": "{ children, selectedValue, defaultSelectedValue, selectedValues, defaultSelectedValues, selectionMode = \"single\", layout = \"grid\", size = \"medium\", shape = \"square\", spacing = \"medium\", focusMode = \"arrow\", columns = 6, onSelectionChange, ...props }: SwatchPickerProps",
-        "reactRefType": "HTMLElement"
+        "reactRefType": "HTMLElement",
+        "relatedReactApis": [
+          {
+            "name": "useSavedSwatchPalettes(store)",
+            "description": "Load, save, remove, and refresh named palettes through a stable host-owned store. Use the app's SharePoint data service for tenant-wide persistence; the hook adds no network or storage dependency. See the saved palettes guide for a complete React recipe."
+          },
+          {
+            "name": "SwatchPaletteStore",
+            "description": "Implement list, save, and remove with the app's current persistence service. Keep the store object stable across React renders."
+          },
+          {
+            "name": "SavedSwatchPalette",
+            "description": "A named palette record with an id and color entries containing value, color, and optional label."
+          }
+        ]
       },
       "react": "SwatchPicker",
       "tag": "spui-swatch-picker",
       "define": "defineSwatchPicker",
       "summary": "Render accessible color and image swatches as a keyboard-operable single- or multi-selection grid or row.",
       "highValueAdditions": [
-        "Offer reusable named theme-color presets alongside caller-defined palettes."
+        "Offer built-in named SharePoint theme-color presets alongside caller-defined palettes."
       ]
     },
     {
