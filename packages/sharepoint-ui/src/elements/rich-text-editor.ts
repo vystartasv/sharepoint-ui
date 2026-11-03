@@ -411,6 +411,8 @@ export function defineRichTextEditor(): void {
         }
       }
       if (!range || !this.editor.contains(range.commonAncestorContainer)) return;
+      const toolbar = this.shadowRoot?.querySelector<HTMLElement>('[role="toolbar"]');
+      if (range.collapsed && !this.editor.matches(":focus") && this.savedRange && !this.savedRange.collapsed && toolbar?.contains(this.shadowRoot?.activeElement ?? null)) return;
       this.savedRange = range.cloneRange();
       const node = range.startContainer;
       const element = node instanceof Element ? node : node.parentElement;
@@ -693,6 +695,11 @@ export function defineRichTextEditor(): void {
       const shadow = this.shadowRoot ?? this.attachShadow({ mode: "open" });
       const label = document.createElement("label"); label.textContent = this.getAttribute("label") ?? ""; label.hidden = !this.hasAttribute("label"); label.part.add("label");
       const toolbar = document.createElement("div"); toolbar.setAttribute("role", "toolbar"); toolbar.setAttribute("aria-orientation", "horizontal"); toolbar.part.add("toolbar");
+      toolbar.addEventListener("pointerdown", () => {
+        const selection = this.selection();
+        const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
+        if (range && !range.collapsed && this.editor.contains(range.commonAncestorContainer)) this.savedRange = range.cloneRange();
+      }, true);
       const format = document.createElement("select"); format.className = "toolbar-format"; format.dataset.command = "formatBlock"; format.dataset.labelAttribute = "format-block-label"; format.setAttribute("aria-label", this.getAttribute("format-block-label") ?? "Text style");
       for (const [value, attribute, fallback] of [["P", "paragraph-label", "Paragraph"], ["H1", "heading-1-label", "Heading 1"], ["H2", "heading-2-label", "Heading 2"], ["H3", "heading-3-label", "Heading 3"], ["BLOCKQUOTE", "blockquote-label", "Quote"], ["PRE", "preformatted-label", "Preformatted"]]) {
         const option = document.createElement("option"); option.value = value; option.dataset.labelAttribute = attribute; option.textContent = this.getAttribute(attribute) ?? fallback; format.append(option);
