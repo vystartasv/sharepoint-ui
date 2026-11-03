@@ -27,6 +27,16 @@ const productTheme = {
 
 Theme packs compose left to right; later packs override earlier values. Host-derived SharePoint values remain the defaults. Provider token values can be used for a final app-level override, and `customProperties` can carry app-specific CSS variables.
 
+Set `brandColor` when the product needs a coordinated palette from one brand color. The theme helper derives accent, focus, selection, surface, hover, and border tokens; explicit `colors`, `fluentTokens`, and provider tokens still override those values.
+
+```tsx
+const requestTheme = { brandColor: "#0f6cbd" } satisfies SharePointUIDesignTheme;
+
+<SharePointUIProvider theme={requestTheme}>
+  <RequestWorkspace />
+</SharePointUIProvider>
+```
+
 ## Use the current UI culture for RTL
 
 Set the provider `lang` from the SPFx page culture. The provider derives `dir` from the language tag, so Arabic and other RTL languages flow right-to-left while English and other LTR languages flow left-to-right. An explicit `dir` always takes precedence. Direct custom elements recognize common RTL language tags; Tooltip also resolves its nearest language when choosing logical placement, and Toaster uses the language-derived direction for start/end positioning. Set `dir` on a region when it needs to override the inherited page direction. Keep the content's actual `lang` accurate for assistive technology.

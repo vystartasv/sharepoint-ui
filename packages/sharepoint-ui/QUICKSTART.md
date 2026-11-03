@@ -34,6 +34,8 @@ export function RequestList({
 
 In the web part, pass `this.context.pageContext.cultureInfo.currentUICultureName` as `locale`. For a single control, import its React export from `/react`; import only what the view uses.
 
+Set `brandColor` on the provider theme to derive a coordinated accent, focus, selection, surface, hover, and border palette. Explicit design tokens override the derived values; see the [theme guide](https://vystartasv.github.io/sharepoint-ui/guides/theming-and-direction/).
+
 ## The shared component pattern
 
 - Every React adapter is a named export from `@spfx-fast/sharepoint-ui/react`. React imports register the element automatically; do not call `defineX()` in React.

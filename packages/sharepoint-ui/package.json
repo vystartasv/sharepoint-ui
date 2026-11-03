@@ -47,6 +47,10 @@
       "types": "./dist/appearance.d.ts",
       "import": "./dist/appearance.js"
     },
+    "./theme": {
+      "types": "./dist/theme.d.ts",
+      "import": "./dist/theme.js"
+    },
     "./tokens": "./tokens.json"
   },
   "files": [

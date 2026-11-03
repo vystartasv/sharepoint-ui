@@ -17,9 +17,51 @@ defineButton();
 
 In plain HTML, add the package's emitted module through your bundler. In another framework, use that framework's normal custom-element integration and listen to the documented `spui-*` events. The [Button API page](/sharepoint-ui/components/button/) lists its tag, slots, callbacks, and styling hooks.
 
-## Register a selection of elements
+## Compose a SharePoint work-item list
 
-Prefer leaf imports when a web part uses a small set of components. `defineSharePointUIElements()` registers the whole catalog for apps that genuinely need it. Avoid importing the entire catalog just to use a button or a field.
+Import only the modules used by this view. Each definition is idempotent, so calling it once during app startup is enough.
+
+```ts
+import { defineButton } from "@spfx-fast/sharepoint-ui/elements/button";
+import { defineSearchBox } from "@spfx-fast/sharepoint-ui/elements/search";
+import { defineTag } from "@spfx-fast/sharepoint-ui/elements/tags";
+import { defineViewCard } from "@spfx-fast/sharepoint-ui/elements/view-card";
+
+defineButton();
+defineSearchBox();
+defineTag();
+defineViewCard();
+```
+
+```html
+<section aria-label="Access reviews">
+  <spui-search-box id="review-search" label="Find a review" placeholder="Search reviews"></spui-search-box>
+  <div id="review-list">
+    <spui-view-card data-search="quarterly access review" kind="approval" title="Quarterly access review" subtitle="Due 14 November" description="Confirm access for external guests.">
+      <spui-tag slot="status">In progress</spui-tag>
+      <spui-button slot="actions" appearance="primary">Open review</spui-button>
+    </spui-view-card>
+  </div>
+</section>
+```
+
+Connect the search field to your view data. `spui-input` bubbles across the custom-element boundary; its `detail.value` is the current text.
+
+```ts
+const search = document.querySelector("#review-search");
+const cards = [...document.querySelectorAll<HTMLElement>("#review-list [data-search]")];
+
+search?.addEventListener("spui-input", (event) => {
+  const query = (event as CustomEvent<{ value: string }>).detail.value.trim().toLocaleLowerCase();
+  for (const card of cards) {
+    card.hidden = !(card.getAttribute("data-search") ?? "").toLocaleLowerCase().includes(query);
+  }
+});
+```
+
+The card's `actions` and `status` slots work the same way in React (`slot="actions"` / `slot="status"`). Keep data fetching and navigation in your host app; listen to the action's normal `click` event and call your SharePoint service. The [ViewCard page](/sharepoint-ui/components/view-card/view-card/) lists all slots. For exact event names and details, use the [Search event inventory](/sharepoint-ui/agents/events/search.json).
+
+`defineSharePointUIElements()` registers the whole catalog for apps that genuinely need it. Avoid importing the catalog just to use one view.
 
 ## Forms and labels
 

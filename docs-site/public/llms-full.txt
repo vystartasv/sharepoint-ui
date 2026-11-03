@@ -15,6 +15,7 @@ For the predictable cross-component pattern and copy-ready Tooltip/Persona compo
 - In an SPFx React web part, import the React adapter from `@spfx-fast/sharepoint-ui/react` and import only the components used.
 - In plain HTML or another framework, import a leaf definition such as `@spfx-fast/sharepoint-ui/elements/button`, then call `defineButton()` once. For native form labels, use `createLabel()` from `@spfx-fast/sharepoint-ui/elements/label`; it returns a real `<label>` so `htmlFor`/`for` association works.
 - `defineSharePointUIElements()` registers the full current catalog; use it only when the whole catalog is needed.
+- Set `brandColor` in `SharePointUIProvider` theme data to derive matching accent, focus, selection, surface, hover, and border tokens. Explicit design tokens override the derived values; the theme API also has a framework-free `@spfx-fast/sharepoint-ui/theme` entry point.
 
 For temporary feedback, mount one `Toaster` near the app root and dispatch from descendants with `useToastController()`. For a controller outside the Toaster subtree or when an app has multiple toast regions, set `toasterId` on the target Toaster and pass the same ID to `useToastController(toasterId)`. The controller supports both `updateToast(id, update)` and Fluent's `updateToast({ toastId, content, ...options })` form. Use a permanent status surface as well when the information must remain available after the toast expires.
 

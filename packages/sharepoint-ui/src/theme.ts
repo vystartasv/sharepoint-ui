@@ -20,7 +20,7 @@ export type SharePointUIDesignTheme = {
   palette?: Record<string, string>;
   /** Any Fluent v9 theme values, exposed under their native CSS variable names and composable with the other design-pack groups. */
   fluentTokens?: FluentThemeTokens;
-  /** Brand input for an automatically tinted accent scale. Hex values also get an AA-aware on-accent foreground; other CSS colors can set colors.accentForeground explicitly. */
+  /** Brand seed for an accent scale and softly tinted surfaces. Hex values also get an AA-aware on-accent foreground; other CSS colors can set colors.accentForeground explicitly. */
   brandColor?: string;
   /** App- or component-specific CSS custom properties, merged after semantic roles and before direct provider tokens. */
   customProperties?: Record<`--${string}`, string | number>;
@@ -146,12 +146,53 @@ export function getSharePointUIDesignTokens(theme?: SharePointUIDesignTheme): Re
     "--spui-selection-background": `color-mix(in srgb, ${accent} 14%, var(--spui-ui-surface))`,
     "--spui-selection-border": accent,
     "--spui-link-color": `var(--spui-semantic-link, color-mix(in srgb, ${accent} 55%, var(--spui-ui-text) 45%))`,
-    "--spui-focus-ring": "var(--spui-ui-border-focus)",
+    "--spui-ui-border-focus": accent,
+    "--spui-focus-ring": accent,
     "--spui-ui-info": accent,
     "--spui-ui-info-surface": `color-mix(in srgb, ${accent} 12%, var(--spui-ui-surface))`,
     "--spui-primary-background": accent,
     "--spui-primary-hover": `color-mix(in srgb, ${accent} 84%, black)`
   });
+  if (theme?.brandColor) {
+    const darker = `color-mix(in srgb, ${accent} 78%, black)`;
+    const brandLink = `light-dark(color-mix(in srgb, ${accent} 65%, black), color-mix(in srgb, ${accent} 76%, white))`;
+    const canvas = `light-dark(color-mix(in srgb, ${accent} 7%, white), color-mix(in srgb, ${accent} 8%, #10191a))`;
+    const surface = `light-dark(color-mix(in srgb, ${accent} 2%, white), color-mix(in srgb, ${accent} 12%, #182526))`;
+    const surfaceHover = `light-dark(color-mix(in srgb, ${accent} 12%, white), color-mix(in srgb, ${accent} 20%, #26383b))`;
+    const border = `light-dark(color-mix(in srgb, ${accent} 24%, #d1d1d1), color-mix(in srgb, ${accent} 32%, #6b7476))`;
+    Object.assign(result, {
+      "--spui-ui-canvas": canvas,
+      "--spui-ui-surface": surface,
+      "--spui-ui-surface-alt": canvas,
+      "--spui-ui-surface-hover": surfaceHover,
+      "--spui-ui-stroke": border,
+      "--spui-ui-border-subtle": `light-dark(color-mix(in srgb, ${accent} 14%, #e5e5e5), color-mix(in srgb, ${accent} 20%, #344245))`,
+      "--spui-selection-background": `light-dark(color-mix(in srgb, ${accent} 15%, white), color-mix(in srgb, ${accent} 24%, #202b2c))`,
+      "--spui-semantic-primary-button-background": accent,
+      "--spui-semantic-primary-button-background-hovered": `color-mix(in srgb, ${accent} 84%, black)`,
+      "--spui-semantic-input-focus-border-alt": accent,
+      "--spui-semantic-input-background-checked": accent,
+      "--spui-semantic-link": brandLink,
+      "--spui-semantic-link-hovered": darker,
+      "--spui-control-border": border,
+      "--spui-input-border": border,
+      "--spui-semantic-body-background": canvas,
+      "--spui-semantic-card-background": surface,
+      "--spui-semantic-body-divider": border,
+      "--spui-semantic-button-background-hovered": surfaceHover,
+      "--colorBrandBackground": accent,
+      "--colorBrandBackground2": `light-dark(color-mix(in srgb, ${accent} 12%, white), color-mix(in srgb, ${accent} 18%, #182526))`,
+      "--colorBrandBackground2Hover": `light-dark(color-mix(in srgb, ${accent} 20%, white), color-mix(in srgb, ${accent} 26%, #26383b))`,
+      "--colorBrandBackgroundPressed": `color-mix(in srgb, ${accent} 76%, black)`,
+      "--colorBrandBackgroundSelected": darker,
+      "--colorBrandForegroundLink": brandLink,
+      "--colorBrandStroke2Hover": `light-dark(color-mix(in srgb, ${accent} 62%, white), color-mix(in srgb, ${accent} 62%, #6b7476))`,
+      "--colorNeutralBackground1": surface,
+      "--colorNeutralBackground1Hover": surfaceHover,
+      "--colorNeutralBackground2": canvas,
+      "--colorNeutralStroke2": border,
+    });
+  }
   if (accent && !theme?.colors?.accentForeground) {
     const hex = /^#([\da-f]{3}|[\da-f]{6})$/i.exec(accent)?.[1];
     if (hex) {
@@ -169,6 +210,19 @@ export function getSharePointUIDesignTokens(theme?: SharePointUIDesignTheme): Re
         if (token) result[token] = String(value);
       }
     }
+  }
+  // Explicit Fluent values are the host's final named-token layer, even when
+  // a brand seed also generates defaults for the same Fluent roles.
+  for (const [name, value] of Object.entries(theme?.fluentTokens ?? {})) {
+    if (value !== undefined && (typeof value === "string" || typeof value === "number")) {
+      result[name.startsWith("--") ? name : `--${name}`] = String(value);
+    }
+  }
+  if (accent) {
+    const foreground = theme?.colors?.accentForeground ?? result["--spui-ui-accent-text"];
+    if (theme?.brandColor && result["--spui-semantic-primary-button-text"] === undefined && foreground) result["--spui-semantic-primary-button-text"] = foreground;
+    if (theme?.brandColor && result["--colorNeutralForegroundOnBrand"] === undefined && foreground) result["--colorNeutralForegroundOnBrand"] = foreground;
+    if (theme?.colors?.link) result["--spui-semantic-link"] = theme.colors.link;
   }
   // App-specific properties are the final design-pack layer; direct provider tokens still win later.
   for (const [name, value] of Object.entries(theme?.customProperties ?? {})) {

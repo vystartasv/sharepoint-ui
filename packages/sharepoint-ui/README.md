@@ -36,4 +36,6 @@ defineButton();
 
 The docs cover theming, RTL, accessibility, forms, rich-text persistence, and every component. See [AGENTS.md](./AGENTS.md) for agent guidance and [components.json](./components.json) for the API catalog.
 
+For framework-independent theme helpers, import from `@spfx-fast/sharepoint-ui/theme`. Set `brandColor` in `SharePointUIDesignTheme` to derive coordinated accent, focus, selection, surface, hover, and border colors.
+
 [MIT License](./LICENSE)

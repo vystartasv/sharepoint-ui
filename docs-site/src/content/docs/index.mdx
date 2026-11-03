@@ -53,6 +53,18 @@ The catalog covers 243 named exports across 62 modules, including the named comp
   <a class="catalog-link" href="/sharepoint-ui/components/rich-text-editor/rich-text-editor/">See the rich text editor in action <span aria-hidden="true">→</span></a>
 </div>
 
+## Why use this for SharePoint?
+
+Fluent UI is a strong general-purpose system. Choose SharePoint UI when the experience needs SharePoint-specific composition and deployment fit. The same elements work through React or direct custom-element imports, so a web part can use the API shape that fits its host and ship only what it renders.
+
+<div class="sharepoint-advantages">
+  <section><h3>Fits the tenant</h3><p>Inherit the site palette and font, map locale to RTL, and keep each view inside its SharePoint section.</p></section>
+  <section><h3>Starts with real work</h3><p>Compose document, person, task, approval, and list-item views from reusable cards, plus a rich text editor that can match field limits.</p></section>
+  <section><h3>Predictable for agents</h3><p>Use one component pattern, copyable examples, and machine-readable API slices instead of guessing slots and event names.</p></section>
+</div>
+
+This is the product wedge, not a claim that every control is smaller or faster than Fluent UI. Choose Fluent UI directly when you need its broader ecosystem without these SharePoint-specific needs.
+
 ## Keep composition lightweight
 
 The React adapter is convenient for SPFx projects. For other frameworks, import a leaf element definition and register it once. Both approaches use the same theme-aware custom-element implementation.

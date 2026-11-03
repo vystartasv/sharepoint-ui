@@ -1,59 +1,138 @@
-<section class="preview-bench" aria-label="Live SharePoint UI component preview">
+<section class="preview-bench" aria-label="Interactive SharePoint UI work surface">
   <div class="preview-copy">
-    <h2>Built for the page you already have.</h2>
-    <p>Controls inherit the active SharePoint palette and keep their layout inside the section that hosts them.</p>
+    <p class="preview-kicker">SharePoint UI · SPFx 1.24</p>
+    <h2>Build the work surface your site needs.</h2>
+    <p>Theme-aware components for SharePoint work: compose a useful view, keep the tenant palette, and ship only the pieces you use.</p>
     <div class="preview-actions">
       <spui-button appearance="primary" id="preview-save">Save update</spui-button>
-      <spui-button appearance="secondary" id="preview-theme">Change accent</spui-button>
+      <spui-button appearance="secondary" id="preview-theme">Change site theme</spui-button>
     </div>
+    <ul class="preview-proof" aria-label="Library features">
+      <li>SharePoint theme tokens</li>
+      <li>React or custom elements</li>
+      <li>Agent-ready component docs</li>
+    </ul>
   </div>
-  <div class="preview-surface" id="preview-surface">
-    <div class="preview-toolbar">
-      <span class="preview-dot" aria-hidden="true"></span>
-      <span>Request review</span>
-      <spui-tag appearance="brand" size="small">In progress</spui-tag>
+
+  <div class="preview-app" id="preview-app" aria-label="Contoso Operations SharePoint site preview">
+    <header class="preview-site-header">
+      <div class="preview-site-identity">
+        <span class="preview-site-mark" aria-hidden="true">C</span>
+        <span><strong>Contoso Operations</strong><small>SharePoint site</small></span>
+      </div>
+      <spui-avatar name="Taylor Chen" initials="TC" size="34" decorative></spui-avatar>
+    </header>
+
+    <div class="preview-app-layout">
+      <nav class="preview-app-nav" aria-label="Workspace">
+        <a class="is-current" href="#reviews" aria-current="page">Reviews</a>
+        <a href="#team">Team access <spui-badge color="informative" size="small">3</spui-badge></a>
+        <a href="#policies">Policies</a>
+      </nav>
+
+      <div class="preview-app-main">
+        <div class="preview-app-heading">
+          <div>
+            <p>ACCESS MANAGEMENT</p>
+            <h3>Quarterly reviews</h3>
+          </div>
+          <span class="preview-period">Q4 · 2026</span>
+        </div>
+
+        <div class="preview-metrics" aria-label="Review summary">
+          <div><strong>12</strong><span>Open reviews</span></div>
+          <div><strong>3</strong><span>Due this week</span></div>
+          <div><strong>8</strong><span>Ready to close</span></div>
+        </div>
+
+        <spui-search-box id="preview-search" label="Find a review" placeholder="Search work items" clear-label="Clear search"></spui-search-box>
+
+        <div class="preview-request-list" id="preview-request-list" aria-label="Access reviews">
+          <spui-view-card class="preview-request" data-search="quarterly access review external guests taylor chen" kind="approval" title="Quarterly access review" subtitle="Taylor Chen · Due 14 Nov" description="Confirm access for external guests before the quarterly audit.">
+            <spui-avatar slot="leading" name="Taylor Chen" initials="TC" size="38" decorative></spui-avatar>
+            <spui-tag slot="status" id="preview-review-status" appearance="brand" size="small">In progress</spui-tag>
+            <div class="preview-request-meta"><span>Last updated</span><strong>Today, 9:42 AM</strong></div>
+            <spui-button slot="actions" appearance="primary" size="small" id="preview-review-action">Mark ready</spui-button>
+            <spui-button slot="actions" appearance="subtle" size="small" id="preview-details">View details</spui-button>
+          </spui-view-card>
+
+          <spui-view-card class="preview-request" data-search="finance workspace access review alex chen" kind="task" title="Finance workspace" subtitle="Alex Chen · Due 18 Nov" description="Review membership changes for the Finance workspace.">
+            <spui-avatar slot="leading" name="Alex Chen" initials="AC" size="38" decorative></spui-avatar>
+            <spui-badge slot="status" color="warning" size="small">Needs review</spui-badge>
+            <div class="preview-request-meta"><span>Last updated</span><strong>Yesterday</strong></div>
+            <spui-button slot="actions" appearance="secondary" size="small" id="preview-finance-action">Review access</spui-button>
+          </spui-view-card>
+        </div>
+        <output class="preview-message" id="preview-message" aria-live="polite">Showing 2 of 12 access reviews</output>
+      </div>
     </div>
-    <label class="preview-field-label" for="preview-title">Work item</label>
-    <spui-input id="preview-title" aria-label="Work item" value="Quarterly access review" size="medium"></spui-input>
-    <div class="preview-status">
-      <spui-badge appearance="tint" color="success">Ready for review</spui-badge>
-      <span>Updated just now</span>
-    </div>
-      <output id="preview-message" class="preview-message" aria-live="polite">iOS · SharePoint theme · #007780</output>
   </div>
 </section>
 
 <script>
-  import { defineBadge, defineButton, defineInput, defineTag } from "@spfx-fast/sharepoint-ui/elements";
+  import { defineAvatar } from "@spfx-fast/sharepoint-ui/elements/avatar";
+  import { defineBadge } from "@spfx-fast/sharepoint-ui/elements/badge";
+  import { defineButton } from "@spfx-fast/sharepoint-ui/elements/button";
+  import { defineSearchBox } from "@spfx-fast/sharepoint-ui/elements/search";
+  import { defineTag } from "@spfx-fast/sharepoint-ui/elements/tags";
+  import { defineViewCard } from "@spfx-fast/sharepoint-ui/elements/view-card";
   import { getSharePointUIStyleTokens } from "@spfx-fast/sharepoint-ui/appearance";
   import themeCapture from "../data/sharepoint-theme.json";
   import { createPreviewThemeOverrides } from "../utils/preview-theme.js";
 
+  defineAvatar();
   defineBadge();
   defineButton();
-  defineInput();
+  defineSearchBox();
   defineTag();
+  defineViewCard();
 
   const preview = document.querySelector<HTMLElement>(".preview-bench");
+  const app = document.querySelector<HTMLElement>("#preview-app");
   const accents = ["#007780", "#0f6cbd", "#107c10", "#c239b3"];
+  const accentNames = ["SharePoint teal", "Blue", "Green", "Pink"];
   let accentIndex = 0;
+  let reviewReady = false;
   const applyPreviewTheme = (accent: string) => {
-    if (!preview) return;
+    if (!preview || !app) return;
     const overrides = createPreviewThemeOverrides(themeCapture.presets.sharepoint.tokens, accent, accent !== themeCapture.presets.sharepoint.accent);
     Object.entries(getSharePointUIStyleTokens("ios", overrides)).forEach(([name, value]) => preview.style.setProperty(name, value));
     Object.entries(overrides).forEach(([name, value]) => preview.style.setProperty(name, value));
   };
   applyPreviewTheme(accents[accentIndex]);
 
-  const previewMessage = document.querySelector<HTMLOutputElement>("#preview-message");
+  const message = document.querySelector<HTMLOutputElement>("#preview-message");
+  const reviewStatus = document.querySelector<HTMLElement>("#preview-review-status");
+  const reviewAction = document.querySelector<HTMLElement>("#preview-review-action");
+  const requestCards = [...document.querySelectorAll<HTMLElement>(".preview-request")];
+
   document.querySelector("#preview-save")?.addEventListener("click", () => {
-    if (previewMessage) previewMessage.textContent = "Your update is ready to save.";
+    if (!reviewStatus || !reviewAction || !message) return;
+    reviewReady = !reviewReady;
+    reviewStatus.textContent = reviewReady ? "Ready for review" : "In progress";
+    reviewStatus.setAttribute("color", reviewReady ? "success" : "neutral");
+    reviewStatus.setAttribute("appearance", reviewReady ? "filled" : "brand");
+    reviewAction.textContent = reviewReady ? "Reopen review" : "Mark ready";
+    message.textContent = reviewReady ? "Quarterly access review is ready to close." : "Quarterly access review reopened.";
   });
+
   document.querySelector("#preview-theme")?.addEventListener("click", () => {
-    if (preview) {
-      accentIndex = (accentIndex + 1) % accents.length;
-      applyPreviewTheme(accents[accentIndex]);
-      if (previewMessage) previewMessage.textContent = `iOS · ${accentIndex === 0 ? "SharePoint theme" : "accent"} · ${accents[accentIndex]}`;
-    }
+    accentIndex = (accentIndex + 1) % accents.length;
+    applyPreviewTheme(accents[accentIndex]);
+    if (message) message.textContent = `Showing 2 of 12 reviews · ${accentNames[accentIndex]} theme`;
   });
+
+  document.querySelector("#preview-search")?.addEventListener("spui-input", (event) => {
+    const query = String((event as CustomEvent<{ value?: string }>).detail?.value ?? "").trim().toLocaleLowerCase();
+    let visibleCount = 0;
+    for (const card of requestCards) {
+      card.hidden = !card.dataset.search?.includes(query);
+      if (!card.hidden) visibleCount++;
+    }
+    if (message) message.textContent = query ? `${visibleCount} matching review${visibleCount === 1 ? "" : "s"}` : "Showing 2 of 12 access reviews";
+  });
+
+  document.querySelectorAll("#preview-details, #preview-finance-action").forEach(button => button.addEventListener("click", () => {
+    if (message) message.textContent = "Details are ready to open in your SharePoint work item.";
+  }));
 </script>
