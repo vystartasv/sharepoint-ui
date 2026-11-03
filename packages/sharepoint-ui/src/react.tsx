@@ -950,12 +950,14 @@ export const DialogTrigger = /* @__PURE__ */ React.forwardRef<HTMLElement, Eleme
   return React.createElement("spui-dialog-trigger", useCustomElementProps({ ref: forwardedRef, ...props, action, "disable-button-enhancement": disableButtonEnhancement || undefined }), children);
 });
 
-export function Drawer({ type = "overlay", open, defaultOpen = false, unmountOnClose = true, separator = false, title, modal = true, dismissible = true, position = "end", size = "medium", expandable = false, expanded, surfaceMotion, backdropMotion, closeLabel, expandLabel, restoreLabel, actions, onOpenChange, onExpandedChange, onDismiss, children, ...props }: ElementProps & { type?: "overlay" | "inline"; open?: boolean; defaultOpen?: boolean; unmountOnClose?: boolean; separator?: boolean; title?: string; modal?: boolean; dismissible?: boolean; position?: "start" | "end" | "top" | "bottom"; size?: "small" | "medium" | "large" | "full"; expandable?: boolean; expanded?: boolean; surfaceMotion?: React.ComponentType<DrawerSurfaceMotionSlotProps>; backdropMotion?: React.ComponentType<DrawerBackdropMotionSlotProps>; closeLabel?: string; expandLabel?: string; restoreLabel?: string; actions?: React.ReactNode; onOpenChange?: (open: boolean) => void; onExpandedChange?: (expanded: boolean) => void; onDismiss?: () => void; children?: React.ReactNode }): React.ReactElement {
+export type DrawerProps = ElementProps & { type?: "overlay" | "inline"; open?: boolean; defaultOpen?: boolean; unmountOnClose?: boolean; separator?: boolean; title?: string; modal?: boolean; modalType?: "modal" | "non-modal" | "alert"; inertTrapFocus?: boolean; dismissible?: boolean; position?: "start" | "end" | "top" | "bottom"; size?: "small" | "medium" | "large" | "full"; expandable?: boolean; expanded?: boolean; surfaceMotion?: React.ComponentType<DrawerSurfaceMotionSlotProps>; backdropMotion?: React.ComponentType<DrawerBackdropMotionSlotProps>; closeLabel?: string; expandLabel?: string; restoreLabel?: string; actions?: React.ReactNode; onOpenChange?: (open: boolean) => void; onExpandedChange?: (expanded: boolean) => void; onDismiss?: () => void; children?: React.ReactNode };
+export const Drawer = /* @__PURE__ */ React.forwardRef<HTMLElement, DrawerProps>(function Drawer({ type = "overlay", open, defaultOpen = false, unmountOnClose = true, separator = false, title, modal = true, modalType, inertTrapFocus = false, dismissible = true, position = "end", size = "medium", expandable = false, expanded, surfaceMotion, backdropMotion, closeLabel, expandLabel, restoreLabel, actions, onOpenChange, onExpandedChange, onDismiss, children, ...props }: DrawerProps, forwardedRef): React.ReactElement {
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
   const actualOpen = open ?? uncontrolledOpen;
   const handleOpenChange = (next: boolean): void => { if (open === undefined) setUncontrolledOpen(next); onOpenChange?.(next); };
   const context = React.useContext(UIContext);
   const ref = React.useRef<HTMLElement>(null);
+  useExposeHostRef(ref, forwardedRef);
   ensureDefined(defineDrawer);
   useSpuiEvent(ref, "spui-open-change", detail => handleOpenChange(Boolean(detail.open)));
   useSpuiEvent(ref, "spui-dismiss", onDismiss ? () => onDismiss() : undefined);
@@ -964,8 +966,8 @@ export function Drawer({ type = "overlay", open, defaultOpen = false, unmountOnC
   const motionEnabled = Boolean(surfaceMotion || backdropMotion);
   const motionRootRef = React.useRef<HTMLDivElement>(null);
   useNativeMotionPresence(ref, actualOpen, motionEnabled && type !== "inline", motionRootRef);
-  if (type === "inline") return React.createElement(InlineDrawer, { ...props, open: actualOpen, title, position, size, separator, unmountOnClose, surfaceMotion, actions }, children);
-  const drawer = React.createElement("spui-drawer", useCustomElementProps({ ...props, ref, open: motionEnabled ? undefined : actualOpen, motion: motionEnabled || undefined, title, modal, dismissible, position, size, expandable: expandable || undefined, expanded, "data-has-custom-backdrop": backdropMotion || undefined, "close-label": closeLabel ?? context.strings.close, "expand-label": expandLabel ?? context.strings.drawerExpand ?? "Expand drawer to full screen", "restore-label": restoreLabel ?? context.strings.drawerRestore ?? "Restore drawer size" }),
+  if (type === "inline") return React.createElement(InlineDrawer, { ...props, ref: forwardedRef, open: actualOpen, title, position, size, separator, unmountOnClose, surfaceMotion, actions }, children);
+  const drawer = React.createElement("spui-drawer", useCustomElementProps({ ...props, ref, open: motionEnabled ? undefined : actualOpen, motion: motionEnabled || undefined, title, modal, "modal-type": modalType, "inert-trap-focus": inertTrapFocus || undefined, dismissible, position, size, expandable: expandable || undefined, expanded, "data-has-custom-backdrop": backdropMotion || undefined, "close-label": closeLabel ?? context.strings.close, "expand-label": expandLabel ?? context.strings.drawerExpand ?? "Expand drawer to full screen", "restore-label": restoreLabel ?? context.strings.drawerRestore ?? "Restore drawer size" }),
     backdropMotion ? React.createElement(backdropMotion, { visible: actualOpen, appear: unmountOnClose, unmountOnExit: unmountOnClose, size, slot: "backdrop" }, React.createElement("div", { slot: "backdrop", "aria-hidden": true })) : null,
     unmountOnClose && !actualOpen && !motionEnabled ? null : children,
     actions ? React.createElement("div", { slot: "actions", style: { display: "flex", flexWrap: "wrap", gap: 8 } }, actions) : null);
@@ -973,7 +975,7 @@ export function Drawer({ type = "overlay", open, defaultOpen = false, unmountOnC
     ? React.createElement("div", { ref: motionRootRef, style: { display: "contents" } }, React.createElement(surfaceMotion, { visible: actualOpen, appear: unmountOnClose, unmountOnExit: unmountOnClose, position, size, dir: props.dir === "rtl" || context.dir === "rtl" || (props.dir === undefined && context.dir === undefined && typeof document !== "undefined" && getComputedStyle(document.documentElement).direction === "rtl") ? "rtl" : "ltr" }, drawer))
     : backdropMotion ? React.createElement("div", { ref: motionRootRef, style: { display: "contents" } }, drawer) : drawer;
   return surfaced;
-}
+});
 
 export function DrawerHeader({ children }: { children?: React.ReactNode }): React.ReactElement {
   return React.createElement(React.Fragment, null, children);
@@ -1004,23 +1006,34 @@ export function DrawerFooter({ children, ...props }: ElementProps & { children?:
   return React.createElement("div", useHostProps({ ...props, slot: "actions", style: { display: "flex", alignItems: "center", justifyContent: "flex-end", flexWrap: "wrap", gap: 8, ...props.style } }), children);
 }
 
-export function InlineDrawer({ open = false, title, position = "start", size = "small", separator = false, unmountOnClose = true, surfaceMotion, actions, children, ...props }: ElementProps & { open?: boolean; title?: string; position?: "start" | "end" | "top" | "bottom"; size?: "small" | "medium" | "large" | "full"; separator?: boolean; unmountOnClose?: boolean; surfaceMotion?: React.ComponentType<DrawerSurfaceMotionSlotProps>; actions?: React.ReactNode; children?: React.ReactNode }): React.ReactElement {
+export type InlineDrawerProps = ElementProps & { open?: boolean; title?: string; position?: "start" | "end" | "top" | "bottom"; size?: "small" | "medium" | "large" | "full"; separator?: boolean; unmountOnClose?: boolean; surfaceMotion?: React.ComponentType<DrawerSurfaceMotionSlotProps>; actions?: React.ReactNode; children?: React.ReactNode };
+export const InlineDrawer = /* @__PURE__ */ React.forwardRef<HTMLElement, InlineDrawerProps>(function InlineDrawer({ open = false, title, position = "start", size = "small", separator = false, unmountOnClose = true, surfaceMotion, actions, children, ...props }: InlineDrawerProps, forwardedRef): React.ReactElement {
   const context = React.useContext(UIContext);
   ensureDefined(defineInlineDrawer);
   const dir = props.dir === "rtl" || context.dir === "rtl" || (props.dir === undefined && context.dir === undefined && typeof document !== "undefined" && getComputedStyle(document.documentElement).direction === "rtl") ? "rtl" : "ltr";
-  const drawer = React.createElement("spui-inline-drawer", useCustomElementProps({ ...props, open: open || undefined, motion: surfaceMotion ? true : undefined, title, position, size, separator: separator || undefined, "aria-label": props["aria-label"] ?? title ?? context.strings.drawerLabel ?? "Supplementary content" }),
+  const drawer = React.createElement("spui-inline-drawer", useCustomElementProps({ ...props, ref: forwardedRef, open: open || undefined, motion: surfaceMotion ? true : undefined, title, position, size, separator: separator || undefined, "aria-label": props["aria-label"] ?? title ?? context.strings.drawerLabel ?? "Supplementary content" }),
     title == null ? null : React.createElement("span", { slot: "title" }, title), unmountOnClose && !open && !surfaceMotion ? null : children,
     actions == null ? null : React.createElement("div", { slot: "actions", style: { display: "flex", flexWrap: "wrap", gap: 8 } }, actions));
   return surfaceMotion
     ? React.createElement(surfaceMotion, { visible: open, appear: unmountOnClose, unmountOnExit: unmountOnClose, position, size, dir }, drawer)
     : drawer;
-}
+});
 
-export function OverlayDrawer({ open, defaultOpen, modalType = "modal", position = "start", size = "small", onOpenChange, ...props }: Omit<Parameters<typeof Drawer>[0], "type" | "open" | "modal" | "position" | "size" | "onOpenChange"> & { open?: boolean; defaultOpen?: boolean; modalType?: "modal" | "non-modal"; position?: "start" | "end" | "bottom"; size?: "small" | "medium" | "large" | "full"; onOpenChange?: (open: boolean) => void }): React.ReactElement {
+export type OverlayDrawerProps = Omit<Parameters<typeof Drawer>[0], "type" | "open" | "modal" | "modalType" | "inertTrapFocus" | "position" | "size" | "onOpenChange"> & { open?: boolean; defaultOpen?: boolean; modalType?: "modal" | "non-modal" | "alert"; inertTrapFocus?: boolean; position?: "start" | "end" | "bottom"; size?: "small" | "medium" | "large" | "full"; onOpenChange?: (event: DialogOpenChangeEvent, data: DialogOnOpenChangeData) => void };
+export function OverlayDrawer({ open, defaultOpen, modalType = "modal", inertTrapFocus = false, position = "start", size = "small", onOpenChange, ...props }: OverlayDrawerProps): React.ReactElement {
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen ?? false);
   const actualOpen = open ?? uncontrolledOpen;
-  const handleOpenChange = (next: boolean): void => { if (open === undefined) setUncontrolledOpen(next); onOpenChange?.(next); };
-  return React.createElement(Drawer, { ...props, type: "overlay", open: actualOpen, modal: modalType !== "non-modal", position, size, onOpenChange: handleOpenChange });
+  const handleOpenChange = (next: boolean): void => { if (open === undefined) setUncontrolledOpen(next); };
+  const drawerRef = React.useRef<HTMLElement>(null);
+  useSpuiEvent(drawerRef, "spui-open-change", (detail, dispatchEvent) => {
+    const change = detail as DialogOpenChangeData;
+    if (!onOpenChange || !change.type || !change.event || !drawerRef.current) return;
+    const surface = drawerRef.current.shadowRoot?.querySelector("dialog");
+    if (!surface) return;
+    const callbackEvent = createReactEventBridge(change.event, dispatchEvent, surface) as unknown as DialogOpenChangeEvent;
+    onOpenChange(callbackEvent, { ...change, event: callbackEvent } as DialogOnOpenChangeData);
+  });
+  return React.createElement(Drawer, { ...props, ref: drawerRef, type: "overlay", open: actualOpen, modal: modalType !== "non-modal", modalType, inertTrapFocus, position, size, onOpenChange: handleOpenChange });
 }
 
 export const ProgressBar = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { value?: number; max?: number; label?: string; color?: ProgressBarColor; shape?: ProgressBarShape; thickness?: ProgressBarThickness; bar?: React.ReactNode; indeterminateMotion?: React.ReactNode }>(function ProgressBar({ value, max = 1, label, color, shape = "rounded", thickness = "medium", bar, indeterminateMotion, ...props }: ElementProps & { value?: number; max?: number; label?: string; color?: ProgressBarColor; shape?: ProgressBarShape; thickness?: ProgressBarThickness; bar?: React.ReactNode; indeterminateMotion?: React.ReactNode }, forwardedRef): React.ReactElement {
@@ -2021,12 +2034,12 @@ export const AppItemStatic = /* @__PURE__ */ React.forwardRef<HTMLElement, Eleme
   return React.createElement("spui-app-item-static", useCustomElementProps({ ...props, ref: forwardedRef }), icon === undefined ? null : React.createElement("span", { slot: "icon" }, icon), children);
 });
 
-export const Hamburger = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; open?: boolean; label?: string; disabled?: boolean; onClick?: React.MouseEventHandler<HTMLElement> }>(function Hamburger({ children, icon, open = false, label, disabled = false, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; open?: boolean; label?: string; disabled?: boolean; onClick?: React.MouseEventHandler<HTMLElement> }, forwardedRef): React.ReactElement {
+export const Hamburger = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; open?: boolean; label?: string; disabled?: boolean; disabledFocusable?: boolean; appearance?: ButtonAppearance; iconPosition?: "before" | "after"; shape?: ButtonShape; size?: ButtonSize; onClick?: React.MouseEventHandler<HTMLElement> }>(function Hamburger({ children, icon, open = false, label, disabled = false, disabledFocusable = false, appearance = "subtle", iconPosition = "before", shape = "rounded", size = "medium", ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; open?: boolean; label?: string; disabled?: boolean; disabledFocusable?: boolean; appearance?: ButtonAppearance; iconPosition?: "before" | "after"; shape?: ButtonShape; size?: ButtonSize; onClick?: React.MouseEventHandler<HTMLElement> }, forwardedRef): React.ReactElement {
   ensureDefined(defineHamburger);
   const strings = React.useContext(UIContext).strings;
   const resolvedLabel = label ?? strings.navigationToggle ?? "Toggle navigation";
   const defaultIcon = React.createElement("svg", { viewBox: "0 0 24 24", width: 22, height: 22, "aria-hidden": true }, React.createElement("path", { d: "M4 6h16M4 12h16M4 18h16" }));
-  return React.createElement("spui-hamburger", useCustomElementProps({ ref: forwardedRef, ...props, role: "button", tabindex: disabled ? -1 : 0, disabled: disabled || undefined, "aria-label": props["aria-label"] ?? resolvedLabel, "aria-expanded": open }), renderIconSlot(icon ?? (children == null ? defaultIcon : null)), children);
+  return React.createElement("spui-hamburger", useCustomElementProps({ ref: forwardedRef, ...props, appearance, size, shape, "icon-position": iconPosition, disabled: disabled || undefined, "disabled-focusable": disabledFocusable || undefined, "aria-label": props["aria-label"] ?? resolvedLabel, "aria-expanded": open }), renderIconSlot(icon ?? (children == null ? defaultIcon : null)), children);
 });
 
 export type NavDrawerProps = Omit<React.ComponentProps<typeof Nav>, "children" | "open" | "defaultOpen" | "onOpenChange"> & {
@@ -2333,20 +2346,25 @@ export type TeachingPopoverCarouselChangeEvent = Event | React.SyntheticEvent;
 type TeachingCarouselContextValue = { index: number; count: number; value: string; values: string[]; initialStepText?: string; finalStepText?: string; onValueChange?: (event: TeachingPopoverCarouselChangeEvent, data: TeachingPopoverCarouselValueChangeData) => void; onFinish?: (event: TeachingPopoverCarouselChangeEvent, data: TeachingPopoverCarouselFinishData) => void; setIndex: (index: number, event: TeachingPopoverCarouselChangeEvent) => void; selectValue: (value: string, event: TeachingPopoverCarouselChangeEvent) => void };
 const TeachingCarouselContext = React.createContext<TeachingCarouselContextValue | null>(null);
 
+export type TeachingPopoverProps = React.ComponentProps<typeof Popover>;
+
 /** Guided, keyboard-contained help surface. Its parts use native React composition and add no runtime dependency. */
-export function TeachingPopover({ children, trigger, label, placement = "bottom", open, onOpenChange, ...props }: ElementProps & { children?: React.ReactNode; trigger?: React.ReactElement; label?: string; placement?: "top" | "bottom" | "start" | "end"; open?: boolean; onOpenChange?: (open: boolean) => void }): React.ReactElement {
+export function TeachingPopover({ children, trigger, trapFocus = true, withArrow = true, ...props }: TeachingPopoverProps): React.ReactElement {
   const context = React.useContext(UIContext);
   ensureDefined(defineNativeTeachingPopover);
   const parts = React.Children.toArray(children);
   const triggerPart = parts.find(child => React.isValidElement(child) && child.type === TeachingPopoverTrigger);
-  const composedTrigger = trigger ?? (React.isValidElement<{ children?: React.ReactNode }>(triggerPart) ? triggerPart.props.children as React.ReactElement | undefined : undefined);
+  const composedTrigger = trigger ?? (React.isValidElement<{ children?: React.ReactNode; disableButtonEnhancement?: boolean }>(triggerPart)
+    ? React.createElement(PopoverTrigger, { ...triggerPart.props, disableButtonEnhancement: triggerPart.props.disableButtonEnhancement }, triggerPart.props.children)
+    : undefined);
   const content = triggerPart ? parts.filter(child => child !== triggerPart) : children;
-  return React.createElement(Popover, { ...props, trigger: composedTrigger, label: label ?? context.strings.teachingPopoverLabel, placement, open, onOpenChange: onOpenChange ? (_event, data) => onOpenChange(data.open) : undefined, trapFocus: true, arrow: true }, content);
+  return React.createElement(Popover, { ...props, trigger: composedTrigger, label: props.label ?? context.strings.teachingPopoverLabel, trapFocus, withArrow }, content);
 }
 
-export function TeachingPopoverTrigger({ children, ...props }: ElementProps & { children?: React.ReactNode }): React.ReactElement {
-  return React.createElement("span", useHostProps({ ...props, style: { display: "contents", ...props.style }, "data-spui-teaching-trigger": "" }), children);
-}
+export const TeachingPopoverTrigger = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; disableButtonEnhancement?: boolean }>(function TeachingPopoverTrigger({ children, disableButtonEnhancement = false, ...props }: ElementProps & { children?: React.ReactNode; disableButtonEnhancement?: boolean }, forwardedRef): React.ReactElement {
+  ensureDefined(definePopover);
+  return React.createElement("spui-popover-trigger", useCustomElementProps({ ...props, ref: forwardedRef, "disable-button-enhancement": disableButtonEnhancement || undefined, "data-spui-teaching-trigger": "" }), children);
+});
 
 export function TeachingPopoverSurface({ children, ...props }: ElementProps & { children?: React.ReactNode }): React.ReactElement {
   return React.createElement("div", useHostProps({ ...props, style: { display: "grid", gap: "12px", minWidth: "min(320px, calc(100vw - 64px))", maxWidth: "100%", boxSizing: "border-box", ...props.style }, "data-spui-teaching-surface": "" }), children);
@@ -2477,7 +2495,8 @@ export function TeachingPopoverCarouselFooter({ children, previous, next, layout
   return React.createElement(TeachingCarouselContext.Provider, { value: footerContext }, React.createElement("footer", useHostProps({ ...props, "data-layout": layout, style: { display: "flex", alignItems: "center", justifyContent: layout === "offset" ? "space-between" : "center", flexWrap: "wrap", gap: "8px", ...props.style } }), previous, children, next));
 }
 
-export function TeachingPopoverCarouselFooterButton({ navType, altText, children, onClick, ...props }: ElementProps & { navType: "next" | "prev" | "previous" | "dismiss"; altText?: React.ReactNode; children?: React.ReactNode; onClick?: React.MouseEventHandler<HTMLElement> }): React.ReactElement {
+export type TeachingPopoverCarouselFooterButtonProps = Omit<ButtonProps, "children"> & { navType: "next" | "prev" | "previous" | "dismiss"; altText?: React.ReactNode; children?: React.ReactNode };
+export function TeachingPopoverCarouselFooterButton({ navType, altText, children, onClick, appearance, size = "medium", shape, icon, iconPosition = "before", ...props }: TeachingPopoverCarouselFooterButtonProps): React.ReactElement {
   const carousel = React.useContext(TeachingCarouselContext);
   const context = React.useContext(UIContext);
   const previous = navType === "prev" || navType === "previous";
@@ -2494,8 +2513,7 @@ export function TeachingPopoverCarouselFooterButton({ navType, altText, children
     else if (navType === "next") carousel?.setIndex((carousel.index || 0) + 1, event);
     if (navType === "next" && atEdge) carousel?.onFinish?.(event, { value: carousel.value, event: event as React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>, type: "click" });
   };
-  const buttonProps = useHostProps({ ...props, type: "button", appearance: navType === "next" ? "primary" : dismiss ? "subtle" : "secondary", size: "medium", style: { minWidth: "96px", ...props.style }, "aria-label": label, "data-spui-popover-close": dismiss ? "" : undefined, onClick: click }) as Parameters<typeof Button>[0];
-  return React.createElement(Button, buttonProps, buttonText);
+  return React.createElement(Button, { ...props, type: props.type ?? "button", appearance: appearance ?? (navType === "next" ? "primary" : dismiss ? "subtle" : "secondary"), size, shape, icon, iconPosition, style: { minWidth: "96px", ...props.style }, "aria-label": props["aria-label"] ?? label, "data-spui-popover-close": dismiss ? "" : undefined, onClick: click }, buttonText);
 }
 
 export function TeachingPopoverCarouselNav({ children, onKeyDown, ...props }: ElementProps & { children?: React.ReactNode }): React.ReactElement {
@@ -5243,10 +5261,10 @@ export function Image({ alt, fit = "none", shape = "square", block, bordered, sh
 }
 
 export type SearchBoxChangeEvent = React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLSpanElement>;
-export type SearchBoxProps = Omit<InputProps, "appearance" | "children" | "defaultValue" | "input" | "onChange" | "size" | "type" | "value"> & { label?: string; value?: string; defaultValue?: string; onValueChange?: (value: string) => void; onSearch?: (value: string) => void; onChange?: (event: SearchBoxChangeEvent, data: { value: string }) => void; size?: SearchSize; appearance?: SearchAppearance; clearLabel?: string; contentBefore?: React.ReactNode; contentAfter?: React.ReactNode; dismiss?: React.ReactNode };
+export type SearchBoxProps = Omit<InputProps, "appearance" | "children" | "defaultValue" | "input" | "onChange" | "size" | "type" | "value"> & { children?: React.ReactNode; label?: string; type?: React.HTMLInputTypeAttribute; value?: string; defaultValue?: string; onValueChange?: (value: string) => void; onSearch?: (value: string) => void; onChange?: (event: SearchBoxChangeEvent, data: { value: string }) => void; size?: SearchSize; appearance?: SearchAppearance; clearLabel?: string; contentBefore?: React.ReactNode; contentAfter?: React.ReactNode; dismiss?: React.ReactNode };
 
 export const SearchBox = /* @__PURE__ */ React.forwardRef<HTMLElement, SearchBoxProps>(function SearchBox(inputProps: SearchBoxProps, forwardedRef): React.ReactElement {
-  const { label, value, defaultValue, onValueChange, onSearch, onChange, size = "medium", appearance = "outline", clearLabel, readOnly, contentBefore, contentAfter, dismiss, ...props } = useFieldControlProps_unstable(inputProps, { supportsSize: true });
+  const { label, type = "search", value, defaultValue, onValueChange, onSearch, onChange, size = "medium", appearance = "outline", clearLabel, readOnly, contentBefore, contentAfter, dismiss, ...props } = useFieldControlProps_unstable(inputProps, { supportsSize: true });
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
   const context = React.useContext(UIContext);
@@ -5266,7 +5284,7 @@ export const SearchBox = /* @__PURE__ */ React.forwardRef<HTMLElement, SearchBox
     if (value !== undefined) element.value = value;
     else if (defaultValue !== undefined) element.defaultValue = defaultValue;
   }, [value, defaultValue]);
-  return React.createElement("spui-search-box", useCustomElementProps({ ...props, ref, label, value: undefined, size, appearance, "clear-label": clearLabel ?? context.strings.clear, "read-only": readOnly || undefined }),
+  return React.createElement("spui-search-box", useCustomElementProps({ ...props, ref, label, type, value: undefined, size, appearance, "clear-label": clearLabel ?? context.strings.clear, "read-only": readOnly || undefined }),
     contentBefore == null ? null : React.createElement("span", { slot: "content-before" }, contentBefore),
     contentAfter == null ? null : React.createElement("span", { slot: "content-after" }, contentAfter),
     dismiss == null ? null : React.createElement("span", { slot: "dismiss" }, dismiss));

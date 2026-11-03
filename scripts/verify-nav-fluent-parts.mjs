@@ -21,7 +21,7 @@ const bundle = await build({
     sourcefile: "nav-fluent-parts.tsx",
     loader: "tsx",
     resolveDir: process.cwd(),
-    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{AppItem,AppItemStatic,Hamburger,Nav,NavCategory,NavCategoryItem,NavDrawer,NavDrawerBody,NavDrawerFooter,NavDrawerHeader,NavItem,NavSubItemGroup,SplitNavItem}from"${resolve("packages/sharepoint-ui/src/react.tsx")}";window.selects=[];window.toggles=[];window.navEvents=[];window.hamburgers=0;function App(){return <><Nav data-testid="nav" defaultSelectedCategoryValue="projects" onNavItemSelect={(e,d)=>{window.selects.push(d);window.navEvents.push({eventSame:e===d.event,type:d.type,currentTarget:d.event.currentTarget?.tagName,target:d.event.target?.tagName,nativeEventType:d.event.nativeEvent?.type})}} onNavCategoryItemToggle={(e,d)=>{window.toggles.push(d);window.navEvents.push({eventSame:e===d.event,type:d.type,currentTarget:d.event.currentTarget?.tagName,target:d.event.target?.tagName,nativeEventType:d.event.nativeEvent?.type})}}><AppItem value="app" href="#app">App</AppItem><AppItemStatic>Application label</AppItemStatic><NavCategory value="projects"><NavCategoryItem>Projects</NavCategoryItem><NavItem value="project-a" href="#project-a">Project A</NavItem></NavCategory><SplitNavItem value="split" actionLabel="More split actions" onAction={()=>window.selects.push({value:"action"})}>Split destination</SplitNavItem></Nav><NavDrawer data-testid="drawer" label="Workspace" defaultOpen modal={false} dismissible={false} position="end" tabbable={false} defaultOpenCategories={["drawer-projects"]}><NavDrawerHeader>Workspace title</NavDrawerHeader><NavDrawerBody><NavCategory value="drawer-projects"><NavCategoryItem>Drawer projects</NavCategoryItem><NavSubItemGroup><NavItem value="drawer-home">Drawer home</NavItem></NavSubItemGroup></NavCategory></NavDrawerBody><NavDrawerFooter><NavItem value="settings">Settings</NavItem></NavDrawerFooter></NavDrawer><NavDrawer data-testid="inline-drawer" type="inline" label="Inline navigation" defaultOpen><NavItem value="inline-home">Inline home</NavItem></NavDrawer><Hamburger data-testid="hamburger" label="Open workspace navigation" open onClick={()=>window.hamburgers++}/></>}createRoot(document.querySelector("#root")).render(<App/>);`,
+    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{AppItem,AppItemStatic,Hamburger,Nav,NavCategory,NavCategoryItem,NavDrawer,NavDrawerBody,NavDrawerFooter,NavDrawerHeader,NavItem,NavSubItemGroup,SplitNavItem}from"${resolve("packages/sharepoint-ui/src/react.tsx")}";window.selects=[];window.toggles=[];window.navEvents=[];window.hamburgers=0;function App(){return <><Nav data-testid="nav" defaultSelectedCategoryValue="projects" onNavItemSelect={(e,d)=>{window.selects.push(d);window.navEvents.push({eventSame:e===d.event,type:d.type,currentTarget:d.event.currentTarget?.tagName,target:d.event.target?.tagName,nativeEventType:d.event.nativeEvent?.type})}} onNavCategoryItemToggle={(e,d)=>{window.toggles.push(d);window.navEvents.push({eventSame:e===d.event,type:d.type,currentTarget:d.event.currentTarget?.tagName,target:d.event.target?.tagName,nativeEventType:d.event.nativeEvent?.type})}}><AppItem value="app" href="#app">App</AppItem><AppItemStatic>Application label</AppItemStatic><NavCategory value="projects"><NavCategoryItem>Projects</NavCategoryItem><NavItem value="project-a" href="#project-a">Project A</NavItem></NavCategory><SplitNavItem value="split" actionLabel="More split actions" onAction={()=>window.selects.push({value:"action"})}>Split destination</SplitNavItem></Nav><NavDrawer data-testid="drawer" label="Workspace" defaultOpen modal={false} dismissible={false} position="end" tabbable={false} defaultOpenCategories={["drawer-projects"]}><NavDrawerHeader>Workspace title</NavDrawerHeader><NavDrawerBody><NavCategory value="drawer-projects"><NavCategoryItem>Drawer projects</NavCategoryItem><NavSubItemGroup><NavItem value="drawer-home">Drawer home</NavItem></NavSubItemGroup></NavCategory></NavDrawerBody><NavDrawerFooter><NavItem value="settings">Settings</NavItem></NavDrawerFooter></NavDrawer><NavDrawer data-testid="inline-drawer" type="inline" label="Inline navigation" defaultOpen><NavItem value="inline-home">Inline home</NavItem></NavDrawer><Hamburger data-testid="hamburger" label="Open workspace navigation" appearance="primary" iconPosition="after" shape="square" size="large" open onClick={()=>window.hamburgers++}/><Hamburger data-testid="disabled-hamburger" label="Unavailable navigation" disabledFocusable onClick={()=>window.hamburgers++}/></>}createRoot(document.querySelector("#root")).render(<App/>);`,
   },
   bundle: true,
   format: "iife",
@@ -77,12 +77,25 @@ try {
   await page.keyboard.press("ArrowDown");
   assert.equal(await drawerNav.locator("spui-nav-item").first().evaluate(node => node.shadowRoot.querySelector("button,a") === node.shadowRoot.activeElement), true, "arrow navigation moves focus through roving drawer items");
   const hamburger = page.locator('[data-testid="hamburger"]');
-  assert.equal(await hamburger.getAttribute("role"), "button");
-  assert.equal(await hamburger.getAttribute("aria-label"), "Open workspace navigation");
-  assert.equal(await hamburger.getAttribute("aria-expanded"), "true");
+  const hamburgerButton = hamburger.locator("button");
+  assert.equal(await hamburgerButton.getAttribute("aria-label"), "Open workspace navigation");
+  assert.equal(await hamburgerButton.getAttribute("aria-expanded"), "true");
+  assert.equal(await hamburger.getAttribute("appearance"), "primary");
+  assert.equal(await hamburger.getAttribute("icon-position"), "after");
+  assert.equal(await hamburger.getAttribute("shape"), "square");
+  assert.equal(await hamburger.getAttribute("size"), "large");
+  assert.equal(await hamburgerButton.evaluate(node => getComputedStyle(node).borderRadius), "0px", "shape=square reaches the native control styling");
+  assert.notEqual(await hamburgerButton.evaluate(node => getComputedStyle(node).backgroundColor), "rgba(0, 0, 0, 0)", "appearance=primary uses the theme-derived button surface");
   await hamburger.focus();
   await page.keyboard.press("Space");
   assert.equal(await page.evaluate(() => window.hamburgers), 1, "Hamburger is keyboard operable");
+  const disabledHamburger = page.locator('[data-testid="disabled-hamburger"]');
+  const disabledButton = disabledHamburger.locator("button");
+  assert.equal(await disabledButton.getAttribute("aria-disabled"), "true", "disabledFocusable remains reachable and announced as disabled");
+  assert.deepEqual(await disabledButton.evaluate(button => ({ disabled: button.disabled, tabIndex: button.tabIndex })), { disabled: false, tabIndex: 0 }, "disabledFocusable uses a focusable native button");
+  await disabledHamburger.focus();
+  await page.keyboard.press("Enter");
+  assert.equal(await page.evaluate(() => window.hamburgers), 1, "disabledFocusable blocks activation");
   const drawerSurface = drawer.locator("spui-drawer");
   assert.equal(await drawerSurface.getAttribute("open"), "true", "defaultOpen opens the composed Drawer engine");
   await drawerSurface.evaluate(node => { node.open = false; });

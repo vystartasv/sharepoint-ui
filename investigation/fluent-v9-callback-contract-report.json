@@ -2,8 +2,8 @@
   "baseline": "@fluentui/react-components@9.75.0",
   "scope": "Candidate comparison of callback second-parameter property names, first-parameter event assignability, nested data.event type assignability, and inherited-handler collisions against Fluent 9.75.0 declarations. Event candidates are reported when callback or payload event types are not mutually assignable. This does not prove event identity, runtime semantics, or assistive-technology behavior. Union payload branches are combined. Review candidates against exact declarations before changing public API.",
   "summary": {
-    "callbackPropsInspected": 64,
-    "callbacksWithObjectPayload": 63,
+    "callbackPropsInspected": 66,
+    "callbacksWithObjectPayload": 65,
     "callbacksWithoutObjectPayload": 1,
     "callbackDataGaps": 0,
     "missingDataFields": 0,

@@ -9,14 +9,14 @@ const bundle = await build({
   stdin: {
     contents: `import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { Button, SharePointUIProvider, TeachingPopover, TeachingPopoverBody, TeachingPopoverCarousel, TeachingPopoverCarouselCard, TeachingPopoverCarouselFooter, TeachingPopoverCarouselFooterButton, TeachingPopoverCarouselNav, TeachingPopoverCarouselNavButton, TeachingPopoverCarouselPageCount, TeachingPopoverFooter, TeachingPopoverHeader, TeachingPopoverSurface, TeachingPopoverTitle } from "${resolve("packages/sharepoint-ui/src/react.tsx")}";
+import { Button, SharePointUIProvider, TeachingPopover, TeachingPopoverBody, TeachingPopoverCarousel, TeachingPopoverCarouselCard, TeachingPopoverCarouselFooter, TeachingPopoverCarouselFooterButton, TeachingPopoverCarouselNav, TeachingPopoverCarouselNavButton, TeachingPopoverCarouselPageCount, TeachingPopoverFooter, TeachingPopoverHeader, TeachingPopoverSurface, TeachingPopoverTitle, TeachingPopoverTrigger } from "${resolve("packages/sharepoint-ui/src/react.tsx")}";
 import { defineTeachingPopover } from "${resolve("packages/sharepoint-ui/src/elements/teaching-popover.ts")}";
-window.reactCarouselChanges=[]; window.finishData=null; window.mountTour = () => {
+window.reactCarouselChanges=[]; window.finishData=null; window.teachingOpenChanges=[]; const ContractMotion=({visible,children})=><div data-testid="contract-surface-motion" data-visible={String(visible)}>{children}</div>; window.mountTour = () => {
   function App() {
     const [announcement, setAnnouncement] = React.useState("");
     const [finished, setFinished] = React.useState("");
     return <SharePointUIProvider lang="ar" dir="rtl" appearance="ios" strings={{ teachingPopoverLabel: "جولة مساحة العمل", teachingPopoverDismiss: "إغلاق الجولة", teachingPopoverSteps: "خطوات الجولة", teachingPopoverPrevious: "السابق", teachingPopoverNext: "التالي", teachingPopoverFinish: "إنهاء الجولة", teachingPopoverPageCount: "{current} من {total}", teachingPopoverPageLabel: "الخطوة {current} من {total}" }}>
-      <TeachingPopover data-testid="tour" placement="bottom" trigger={<Button data-testid="tour-trigger">ابدأ الجولة</Button>}>
+      <TeachingPopover data-testid="tour" placement="bottom" onOpenChange={(event,data)=>window.teachingOpenChanges.push({open:data.open,eventType:event.type})} trigger={<Button data-testid="tour-trigger">ابدأ الجولة</Button>}>
         <TeachingPopoverSurface data-testid="tour-surface">
           <TeachingPopoverHeader icon={<span data-testid="custom-header-icon">i</span>} dismissButton={<Button data-testid="custom-header-dismiss">×</Button>}><TeachingPopoverTitle>التعرّف على مساحة العمل</TeachingPopoverTitle></TeachingPopoverHeader>
           <TeachingPopoverFooter data-testid="react-action-footer" primary="متابعة" secondary={<Button onClick={event => event.preventDefault()}>السابق</Button>} />
@@ -34,9 +34,14 @@ window.reactCarouselChanges=[]; window.finishData=null; window.mountTour = () =>
           </TeachingPopoverCarousel>
         </TeachingPopoverSurface>
       </TeachingPopover>
+      <TeachingPopover data-testid="contract-tour" defaultOpen label="Contract tour" appearance="brand" size="large" closeOnIframeFocus={false} closeOnScroll inertTrapFocus inline openOnContext openOnHover mouseLeaveDelay={13} positioning={{ position: "below", align: "end" }} trapFocus={false} withArrow={false} unstable_disableAutoFocus surfaceMotion={ContractMotion}>
+        <TeachingPopoverTrigger data-testid="contract-trigger" disableButtonEnhancement><div>Contract trigger</div></TeachingPopoverTrigger>
+        <TeachingPopoverSurface>Contract surface</TeachingPopoverSurface>
+      </TeachingPopover>
       <TeachingPopover data-testid="title-tour" label="جولة العنوان" trigger={<Button data-testid="title-trigger">جولة العنوان</Button>}>
         <TeachingPopoverSurface><TeachingPopoverTitle dismissButton={<Button data-testid="title-dismiss">إغلاق العنوان</Button>}>عنوان الجولة</TeachingPopoverTitle></TeachingPopoverSurface>
       </TeachingPopover>
+      <TeachingPopoverCarouselFooterButton data-testid="contract-footer-button" navType="next" appearance="outline" size="small" shape="square" disabledFocusable icon={<span data-testid="contract-footer-icon">→</span>} iconPosition="after">Continue</TeachingPopoverCarouselFooterButton>
       <output data-testid="announcement">{announcement}</output><output data-testid="finished">{finished}</output>
     </SharePointUIProvider>;
   }
@@ -111,10 +116,35 @@ try {
   await page.addScriptTag({ url: `http://127.0.0.1:${server.address().port}/tour.js` });
   await page.evaluate(() => window.mountTour());
   await page.evaluate(() => window.mountNativeTour());
+  const contractTour = page.getByTestId("contract-tour");
+  assert.equal(await contractTour.getAttribute("default-open"), "true", "TeachingPopover supports uncontrolled defaultOpen");
+  assert.equal(await contractTour.getAttribute("appearance"), "brand");
+  assert.equal(await contractTour.getAttribute("size"), "large");
+  assert.equal(await contractTour.getAttribute("close-on-iframe-focus"), "false");
+  assert.equal(await contractTour.getAttribute("close-on-scroll"), "true");
+  assert.equal(await contractTour.getAttribute("inert-trap-focus"), "true");
+  assert.equal(await contractTour.getAttribute("inline"), "true");
+  assert.equal(await contractTour.getAttribute("open-on-context"), "true");
+  assert.equal(await contractTour.getAttribute("open-on-hover"), "true");
+  assert.equal(await contractTour.getAttribute("mouse-leave-delay"), "13");
+  assert.equal(await contractTour.getAttribute("trap-focus"), null, "explicitly disabling focus trap is preserved");
+  assert.equal(await contractTour.getAttribute("arrow"), null, "explicitly disabling the arrow is preserved");
+  assert.deepEqual(await contractTour.evaluate(node => node.positioning), { position: "below", align: "end" }, "positioning object reaches the native engine");
+  assert.equal(await page.getByTestId("contract-surface-motion").getAttribute("data-visible"), "true", "surfaceMotion is used for the open teaching surface");
+  assert.equal(await page.getByTestId("contract-trigger").getAttribute("disable-button-enhancement"), "true", "TeachingPopoverTrigger forwards disableButtonEnhancement");
+  const footerButton = page.getByTestId("contract-footer-button");
+  assert.equal(await footerButton.getAttribute("appearance"), "outline");
+  assert.equal(await footerButton.getAttribute("size"), "small");
+  assert.equal(await footerButton.getAttribute("shape"), "square");
+  assert.equal(await footerButton.getAttribute("icon-position"), "after");
+  assert.equal(await footerButton.getAttribute("disabled-focusable"), "true");
+  assert.equal(await footerButton.locator('[slot="icon"]').count(), 1, "footer button icon prop is slotted");
+  await contractTour.evaluate(node => node.remove());
   const trigger = page.getByTestId("tour-trigger");
   await trigger.click();
   const dialog = page.getByRole("dialog", { name: "جولة مساحة العمل" });
   await dialog.waitFor({ state: "visible" });
+  assert.deepEqual(await page.evaluate(() => window.teachingOpenChanges[0]), { open: true, eventType: "click" }, "TeachingPopover forwards Fluent’s event and open data");
   await page.waitForFunction(() => {
     const host = document.querySelector('[data-testid="tour-trigger"]');
     return host?.getAttribute("aria-expanded") === "true" || host?.shadowRoot?.querySelector("button")?.getAttribute("aria-expanded") === "true";

@@ -7,7 +7,7 @@ export function defineSearchBox(): void {
   if (customElements.get("spui-search-box")) return;
   class SpuiSearchBox extends HTMLElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "value", "placeholder", "disabled", "required", "read-only", "name", "autocomplete", "maxlength", "minlength", "pattern", "inputmode", "size", "appearance", "clear-label", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "aria-required"];
+    static observedAttributes = ["label", "value", "placeholder", "type", "disabled", "required", "read-only", "name", "autocomplete", "maxlength", "minlength", "pattern", "inputmode", "size", "appearance", "clear-label", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "aria-required"];
     #internals = this.attachInternals();
     #value = "";
     #dirty = false;
@@ -37,6 +37,7 @@ export function defineSearchBox(): void {
         if (label) label.textContent = value ?? "";
       }
       if (name === "placeholder") this.input().placeholder = value ?? "";
+      if (name === "type") this.input().type = value || "search";
       if (name === "disabled") this.input().disabled = value !== null || this.#formDisabled;
       if (name === "required") { this.input().required = value !== null; this.syncFormValue(); }
       if (name === "read-only") this.input().readOnly = value !== null;
@@ -110,7 +111,7 @@ export function defineSearchBox(): void {
       contentBefore.name = "content-before";
       contentBefore.append(icon);
       const input = document.createElement("input");
-      input.type = "search";
+      input.type = this.getAttribute("type") || "search";
       input.value = this.#value;
       input.placeholder = this.getAttribute("placeholder") ?? "";
       input.disabled = this.#formDisabled || this.hasAttribute("disabled");

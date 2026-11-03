@@ -20,7 +20,7 @@
       "registered": true,
       "summary": "Guide users through a keyboard-contained help surface anchored to a trigger.",
       "api": {
-        "reactSignature": "{ children, trigger, label, placement = \"bottom\", open, onOpenChange, ...props }: ElementProps & { children?: React.ReactNode; trigger?: React.ReactElement; label?: string; placement?: \"top\" | \"bottom\" | \"start\" | \"end\"; open?: boolean; onOpenChange?: (open: boolean) => void }",
+        "reactSignature": "{ children, trigger, trapFocus = true, withArrow = true, ...props }: TeachingPopoverProps",
         "callbackProps": [
           "onOpenChange"
         ],
@@ -44,14 +44,15 @@
       "registered": true,
       "summary": "Provide the trigger composition part for TeachingPopover.",
       "api": {
-        "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+        "reactSignature": "{ children, disableButtonEnhancement = false, ...props }: ElementProps & { children?: React.ReactNode; disableButtonEnhancement?: boolean }",
         "callbackProps": [],
         "slots": [
           "trigger"
         ],
         "styling": [
           "host className/style"
-        ]
+        ],
+        "reactRefType": "HTMLElement"
       }
     },
     {
@@ -240,7 +241,7 @@
       "registered": true,
       "summary": "Move between tutorial steps or finish and dismiss the tour.",
       "api": {
-        "reactSignature": "{ navType, altText, children, onClick, ...props }: ElementProps & { navType: \"next\" | \"prev\" | \"previous\" | \"dismiss\"; altText?: React.ReactNode; children?: React.ReactNode; onClick?: React.MouseEventHandler<HTMLElement> }",
+        "reactSignature": "{ navType, altText, children, onClick, appearance, size = \"medium\", shape, icon, iconPosition = \"before\", ...props }: TeachingPopoverCarouselFooterButtonProps",
         "callbackProps": [
           "onClick"
         ],
@@ -1960,7 +1961,10 @@
       "api": {
         "reactSignature": "inputProps: ComboBoxProps",
         "relatedReactApis": [
-          { "name": "ComboBoxProps.selectedLabel", "description": "In multiselect mode, names the selected-options group; defaults to SharePointUIProvider.strings.selectedOptionsLabel." }
+          {
+            "name": "ComboBoxProps.selectedLabel",
+            "description": "In multiselect mode, names the selected-options group; defaults to SharePointUIProvider.strings.selectedOptionsLabel."
+          }
         ],
         "callbackProps": [
           "onValueChange",
@@ -2210,7 +2214,10 @@
       "api": {
         "reactSignature": "inputProps: RichTextEditorProps",
         "relatedReactApis": [
-          { "name": "RichTextEditorProps.editorLabel", "description": "Accessible name used when no aria-label or visible label is supplied; defaults to SharePointUIProvider.strings.richTextEditorLabel." }
+          {
+            "name": "RichTextEditorProps.editorLabel",
+            "description": "Accessible name used when no aria-label or visible label is supplied; defaults to SharePointUIProvider.strings.richTextEditorLabel."
+          }
         ],
         "callbackProps": [
           "onValueChange",
@@ -2396,7 +2403,10 @@
       "api": {
         "reactSignature": "{ open, defaultOpen = false, title, dialogLabel, modal = true, modalType, inertTrapFocus = false, dismissible = true, closeLabel, unmountOnClose = true, surfaceMotion, actions, onOpenChange, children, ...props }: ElementProps & { open?: boolean; defaultOpen?: boolean; title?: string; dialogLabel?: string; modal?: boolean; modalType?: \"modal\" | \"non-modal\" | \"alert\"; inertTrapFocus?: boolean; dismissible?: boolean; closeLabel?: string; unmountOnClose?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>; actions?: React.ReactNode; onOpenChange?: (event: DialogOpenChangeEvent, data: DialogOnOpenChangeData) => void; children?: React.ReactNode }",
         "relatedReactApis": [
-          { "name": "DialogProps.dialogLabel", "description": "Names the fallback heading when no title is supplied; defaults to SharePointUIProvider.strings.dialogLabel." }
+          {
+            "name": "DialogProps.dialogLabel",
+            "description": "Names the fallback heading when no title is supplied; defaults to SharePointUIProvider.strings.dialogLabel."
+          }
         ],
         "callbackProps": [
           "onOpenChange"
@@ -2553,7 +2563,7 @@
       "module": "drawer",
       "category": "overlays",
       "api": {
-        "reactSignature": "{ type = \"overlay\", open, defaultOpen = false, unmountOnClose = true, separator = false, title, modal = true, dismissible = true, position = \"end\", size = \"medium\", expandable = false, expanded, surfaceMotion, backdropMotion, closeLabel, expandLabel, restoreLabel, actions, onOpenChange, onExpandedChange, onDismiss, children, ...props }: ElementProps & { type?: \"overlay\" | \"inline\"; open?: boolean; defaultOpen?: boolean; unmountOnClose?: boolean; separator?: boolean; title?: string; modal?: boolean; dismissible?: boolean; position?: \"start\" | \"end\" | \"top\" | \"bottom\"; size?: \"small\" | \"medium\" | \"large\" | \"full\"; expandable?: boolean; expanded?: boolean; surfaceMotion?: React.ComponentType<DrawerSurfaceMotionSlotProps>; backdropMotion?: React.ComponentType<DrawerBackdropMotionSlotProps>; closeLabel?: string; expandLabel?: string; restoreLabel?: string; actions?: React.ReactNode; onOpenChange?: (open: boolean) => void; onExpandedChange?: (expanded: boolean) => void; onDismiss?: () => void; children?: React.ReactNode }",
+        "reactSignature": "{ type = \"overlay\", open, defaultOpen = false, unmountOnClose = true, separator = false, title, modal = true, modalType, inertTrapFocus = false, dismissible = true, position = \"end\", size = \"medium\", expandable = false, expanded, surfaceMotion, backdropMotion, closeLabel, expandLabel, restoreLabel, actions, onOpenChange, onExpandedChange, onDismiss, children, ...props }: DrawerProps",
         "callbackProps": [
           "onOpenChange",
           "onExpandedChange",
@@ -2573,7 +2583,8 @@
           "host className/style",
           "named ::part hooks",
           "::part(expand-button)"
-        ]
+        ],
+        "reactRefType": "HTMLElement"
       },
       "summary": "Present a modal or non-modal task surface with optional full-screen expansion."
     },
@@ -2584,7 +2595,7 @@
       "module": "drawer",
       "category": "feedback",
       "api": {
-        "reactSignature": "{ open = false, title, position = \"start\", size = \"small\", separator = false, unmountOnClose = true, surfaceMotion, actions, children, ...props }: ElementProps & { open?: boolean; title?: string; position?: \"start\" | \"end\" | \"top\" | \"bottom\"; size?: \"small\" | \"medium\" | \"large\" | \"full\"; separator?: boolean; unmountOnClose?: boolean; surfaceMotion?: React.ComponentType<DrawerSurfaceMotionSlotProps>; actions?: React.ReactNode; children?: React.ReactNode }",
+        "reactSignature": "{ open = false, title, position = \"start\", size = \"small\", separator = false, unmountOnClose = true, surfaceMotion, actions, children, ...props }: InlineDrawerProps",
         "callbackProps": [],
         "slots": [
           "default",
@@ -2599,7 +2610,8 @@
           "CSS custom properties",
           "host className/style",
           "named ::part hooks"
-        ]
+        ],
+        "reactRefType": "HTMLElement"
       },
       "summary": "Show a non-modal drawer in the page layout with optional separator, title, navigation, and actions."
     },
@@ -2610,7 +2622,7 @@
       "category": "feedback",
       "reactOnly": true,
       "api": {
-        "reactSignature": "{ open, defaultOpen, modalType = \"modal\", position = \"start\", size = \"small\", onOpenChange, ...props }: Omit<Parameters<typeof Drawer>[0], \"type\" | \"open\" | \"modal\" | \"position\" | \"size\" | \"onOpenChange\"> & { open?: boolean; defaultOpen?: boolean; modalType?: \"modal\" | \"non-modal\"; position?: \"start\" | \"end\" | \"bottom\"; size?: \"small\" | \"medium\" | \"large\" | \"full\"; onOpenChange?: (open: boolean) => void }",
+        "reactSignature": "{ open, defaultOpen, modalType = \"modal\", inertTrapFocus = false, position = \"start\", size = \"small\", onOpenChange, ...props }: OverlayDrawerProps",
         "callbackProps": [
           "onOpenChange",
           "onDismiss",
@@ -2769,8 +2781,14 @@
       "api": {
         "reactSignature": "{ shape = \"text\", width, height, animated = true, animation, appearance = \"opaque\", size, children, ...props }: ElementProps & { shape?: SkeletonShape; width?: string | number; height?: string | number; animated?: boolean; animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; children?: React.ReactNode }",
         "relatedReactApis": [
-          { "name": "SkeletonContextProvider", "description": "Supplies animation, appearance, size, and shape defaults to nested SkeletonItem components." },
-          { "name": "useSkeletonContext", "description": "Reads the nearest SkeletonContextProvider value." }
+          {
+            "name": "SkeletonContextProvider",
+            "description": "Supplies animation, appearance, size, and shape defaults to nested SkeletonItem components."
+          },
+          {
+            "name": "useSkeletonContext",
+            "description": "Reads the nearest SkeletonContextProvider value."
+          }
         ],
         "callbackProps": [],
         "slots": [],
@@ -3459,10 +3477,22 @@
       "api": {
         "reactSignature": "{ children, label, selectedLabel, selectedOptions, defaultSelectedOptions, selectedValues, defaultSelectedValues, inputValue, open, defaultOpen, positioning, disableAutoFocus = false, inline = false, noPopover = false, disabled, onOpenChange, onOptionSelect, onInputValueChange, onChange, ...props }: TagPickerProps",
         "relatedReactApis": [
-          { "name": "TagPickerProps.selectedLabel", "description": "Names the selected-options group; defaults to SharePointUIProvider.strings.selectedOptionsLabel." },
-          { "name": "TagPickerProps.selectedOptions", "description": "Controls the selected option values; use defaultSelectedOptions for an uncontrolled initial selection." },
-          { "name": "TagPickerProps.positioning", "description": "Positions the options surface relative to the control; supports placement shorthands, alignment, fallbacks, and offsets." },
-          { "name": "TagPickerProps.disableAutoFocus", "description": "Keeps the first matching option inactive until keyboard navigation selects one." }
+          {
+            "name": "TagPickerProps.selectedLabel",
+            "description": "Names the selected-options group; defaults to SharePointUIProvider.strings.selectedOptionsLabel."
+          },
+          {
+            "name": "TagPickerProps.selectedOptions",
+            "description": "Controls the selected option values; use defaultSelectedOptions for an uncontrolled initial selection."
+          },
+          {
+            "name": "TagPickerProps.positioning",
+            "description": "Positions the options surface relative to the control; supports placement shorthands, alignment, fallbacks, and offsets."
+          },
+          {
+            "name": "TagPickerProps.disableAutoFocus",
+            "description": "Keeps the first matching option inactive until keyboard navigation selects one."
+          }
         ],
         "callbackProps": [
           "onOpenChange",
@@ -4986,10 +5016,22 @@
       "api": {
         "reactSignature": "{ wrapper, alignContent = \"center\", appearance = \"default\", inset = false, vertical = false, ...props }: NavDividerProps",
         "relatedReactApis": [
-          { "name": "NavDividerProps.alignContent", "description": "Aligns wrapper content at the start, center, or end of the divider." },
-          { "name": "NavDividerProps.appearance", "description": "Selects the default, brand, strong, or subtle theme-derived divider line." },
-          { "name": "NavDividerProps.inset", "description": "Adds logical inline spacing around the divider." },
-          { "name": "NavDividerProps.vertical", "description": "Renders a vertical divider and sets aria-orientation accordingly." }
+          {
+            "name": "NavDividerProps.alignContent",
+            "description": "Aligns wrapper content at the start, center, or end of the divider."
+          },
+          {
+            "name": "NavDividerProps.appearance",
+            "description": "Selects the default, brand, strong, or subtle theme-derived divider line."
+          },
+          {
+            "name": "NavDividerProps.inset",
+            "description": "Adds logical inline spacing around the divider."
+          },
+          {
+            "name": "NavDividerProps.vertical",
+            "description": "Renders a vertical divider and sets aria-orientation accordingly."
+          }
         ],
         "callbackProps": [],
         "slots": [
@@ -5416,9 +5458,18 @@
       "category": "views",
       "api": {
         "relatedReactApis": [
-          { "name": "CarouselAutoplayButtonProps.checked", "description": "Controls whether autoplay is running; onCheckedChange reports the requested next value." },
-          { "name": "CarouselAutoplayButtonProps.defaultChecked", "description": "Sets the initial uncontrolled autoplay state." },
-          { "name": "CarouselAutoplayButtonProps.appearance", "description": "Uses the same appearance options as a ToggleButton." }
+          {
+            "name": "CarouselAutoplayButtonProps.checked",
+            "description": "Controls whether autoplay is running; onCheckedChange reports the requested next value."
+          },
+          {
+            "name": "CarouselAutoplayButtonProps.defaultChecked",
+            "description": "Sets the initial uncontrolled autoplay state."
+          },
+          {
+            "name": "CarouselAutoplayButtonProps.appearance",
+            "description": "Uses the same appearance options as a ToggleButton."
+          }
         ],
         "callbackProps": [
           "onCheckedChange"
@@ -5579,7 +5630,7 @@
       "module": "nav",
       "category": "navigation",
       "api": {
-        "reactSignature": "{ children, icon, open = false, label, disabled = false, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; open?: boolean; label?: string; disabled?: boolean; onClick?: React.MouseEventHandler<HTMLElement> }",
+        "reactSignature": "{ children, icon, open = false, label, disabled = false, disabledFocusable = false, appearance = \"subtle\", iconPosition = \"before\", shape = \"rounded\", size = \"medium\", ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; open?: boolean; label?: string; disabled?: boolean; disabledFocusable?: boolean; appearance?: ButtonAppearance; iconPosition?: \"before\" | \"after\"; shape?: ButtonShape; size?: ButtonSize; onClick?: React.MouseEventHandler<HTMLElement> }",
         "callbackProps": [],
         "slots": [
           "icon",

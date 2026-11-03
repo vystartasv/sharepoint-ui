@@ -3,7 +3,7 @@ import { base } from "./shared.js";
 export function defineDrawer(): void {
   if (customElements.get("spui-drawer")) return;
   class SpuiDrawer extends HTMLElement {
-    static observedAttributes = ["open", "motion", "motion-visible", "motion-exit-complete", "data-has-custom-backdrop", "title", "position", "size", "type", "modal", "dismissible", "close-label", "aria-label", "expandable", "expanded", "expand-label", "restore-label"];
+    static observedAttributes = ["open", "motion", "motion-visible", "motion-exit-complete", "data-has-custom-backdrop", "title", "position", "size", "type", "modal", "modal-type", "inert-trap-focus", "dismissible", "close-label", "aria-label", "expandable", "expanded", "expand-label", "restore-label"];
     private outsidePointer?: (event: PointerEvent) => void;
     get open(): boolean { return this.hasAttribute("open"); }
     set open(value: boolean) { this.toggleAttribute("open", Boolean(value)); }
@@ -23,7 +23,7 @@ export function defineDrawer(): void {
       const motionExiting = this.hasAttribute("motion") && this.getAttribute("motion-visible") === "false" && !this.hasAttribute("motion-exit-complete");
       const shouldOpen = this.open || motionExiting;
       if (shouldOpen && !dialog.open) {
-        if (this.getAttribute("modal") === "false") dialog.show();
+        if (this.getAttribute("modal") === "false" && this.getAttribute("modal-type") !== "alert") dialog.show();
         else dialog.showModal();
       } else if (!shouldOpen && dialog.open) dialog.close();
       dialog.inert = motionExiting;
@@ -32,7 +32,7 @@ export function defineDrawer(): void {
         if (!this.outsidePointer) {
           this.outsidePointer = event => {
             if (!this.open || this.getAttribute("motion-visible") === "false" || this.getAttribute("modal") !== "false" || this.getAttribute("dismissible") === "false" || event.composedPath().includes(dialog)) return;
-            this.dismiss();
+            this.dismiss(event, "backdropClick");
           };
           document.addEventListener("pointerdown", this.outsidePointer, true);
         }
@@ -47,7 +47,7 @@ export function defineDrawer(): void {
       const close = this.shadowRoot?.querySelector<HTMLButtonElement>(".close");
       if (close) {
         close.setAttribute("aria-label", this.getAttribute("close-label") ?? "Close");
-        close.hidden = this.getAttribute("dismissible") === "false";
+        close.hidden = this.getAttribute("dismissible") === "false" || this.getAttribute("modal-type") === "alert";
       }
       const expand = this.shadowRoot?.querySelector<HTMLButtonElement>(".expand");
       if (expand) {
@@ -59,6 +59,8 @@ export function defineDrawer(): void {
       const label = this.getAttribute("aria-label");
       if (label) dialog.setAttribute("aria-label", label);
       else dialog.removeAttribute("aria-label");
+      if (this.getAttribute("modal-type") === "alert") dialog.setAttribute("role", "alertdialog");
+      else dialog.removeAttribute("role");
     }
 
     private removeOutsidePointer(): void {
@@ -67,18 +69,18 @@ export function defineDrawer(): void {
       this.outsidePointer = undefined;
     }
 
-    private dismiss(): void {
-      if (!this.open || this.getAttribute("dismissible") === "false") return;
+    private dismiss(sourceEvent: Event, type: "escapeKeyDown" | "backdropClick" | "triggerClick"): void {
+      if (!this.open || this.getAttribute("dismissible") === "false" || this.getAttribute("modal-type") === "alert") return;
       if (this.hasAttribute("motion")) {
         if (this.getAttribute("motion-visible") === "false") return;
-        this.dispatchEvent(new CustomEvent("spui-open-change", { bubbles: true, composed: true, detail: { open: false } }));
+        this.dispatchEvent(new CustomEvent("spui-open-change", { bubbles: true, composed: true, detail: { open: false, type, event: sourceEvent } }));
         this.dispatchEvent(new CustomEvent("spui-dismiss", { bubbles: true, composed: true }));
         return;
       }
       this.removeAttribute("open");
       const dialog = this.shadowRoot?.querySelector<HTMLDialogElement>("dialog");
       if (dialog?.open) dialog.close();
-      this.dispatchEvent(new CustomEvent("spui-open-change", { bubbles: true, composed: true, detail: { open: false } }));
+      this.dispatchEvent(new CustomEvent("spui-open-change", { bubbles: true, composed: true, detail: { open: false, type, event: sourceEvent } }));
       this.dispatchEvent(new CustomEvent("spui-dismiss", { bubbles: true, composed: true }));
     }
 
@@ -113,19 +115,19 @@ export function defineDrawer(): void {
       icon.setAttribute("viewBox", "0 0 20 20"); icon.setAttribute("width", "20"); icon.setAttribute("height", "20"); icon.setAttribute("aria-hidden", "true");
       const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
       path.setAttribute("d", "m5 5 10 10M15 5 5 15"); path.setAttribute("fill", "none"); path.setAttribute("stroke", "currentColor"); path.setAttribute("stroke-width", "1.7"); path.setAttribute("stroke-linecap", "round");
-      icon.append(path); close.append(icon); close.addEventListener("click", () => this.dismiss());
+      icon.append(path); close.append(icon); close.addEventListener("click", event => this.dismiss(event, "triggerClick"));
       controls.append(headerAction, expand, close); header.append(headerMain, controls);
       const body = document.createElement("div"); body.className = "body"; body.part.add("body"); body.append(document.createElement("slot"));
       const footer = document.createElement("footer"); footer.part.add("actions"); footer.hidden = true;
       const actions = document.createElement("slot"); actions.name = "actions"; actions.addEventListener("slotchange", () => { footer.hidden = actions.assignedElements().length === 0; }); footer.append(actions);
-      const backdropSlot = document.createElement("slot"); backdropSlot.name = "backdrop"; backdropSlot.addEventListener("click", () => this.dismiss());
+      const backdropSlot = document.createElement("slot"); backdropSlot.name = "backdrop"; backdropSlot.addEventListener("click", event => { if (this.getAttribute("modal-type") !== "alert") this.dismiss(event, "backdropClick"); });
       dialog.append(backdropSlot, header, body, footer);
-      dialog.addEventListener("cancel", event => { event.preventDefault(); this.dismiss(); });
-      dialog.addEventListener("keydown", event => { if (event.key === "Escape" && this.getAttribute("modal") === "false") { event.preventDefault(); this.dismiss(); } });
+      dialog.addEventListener("cancel", event => { event.preventDefault(); });
+      dialog.addEventListener("keydown", event => { if (event.key === "Escape") { event.preventDefault(); if (this.getAttribute("modal-type") !== "alert") this.dismiss(event, "escapeKeyDown"); } });
       dialog.addEventListener("click", event => {
-        if (event.target !== dialog || this.getAttribute("dismissible") === "false") return;
+        if (event.target !== dialog || this.getAttribute("dismissible") === "false" || this.getAttribute("modal-type") === "alert") return;
         const rect = dialog.getBoundingClientRect();
-        if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) this.dismiss();
+        if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) this.dismiss(event, "backdropClick");
       });
       const style = document.createElement("style");
       style.textContent = `${base}:host{display:contents}dialog{isolation:isolate;position:fixed;inset-block:0;inset-inline-start:auto;inset-inline-end:0;box-sizing:border-box;display:flex;flex-direction:column;width:min(var(--spui-drawer-width,480px),calc(100vw - 24px));height:100dvh;max-height:100dvh;margin:0;padding:0;overflow:auto;border:1px solid var(--spui-ui-stroke,var(--spui-semantic-body-divider,#d1d1d1));border-start-start-radius:var(--spui-card-radius,12px);border-end-start-radius:var(--spui-card-radius,12px);background:var(--spui-card-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,var(--spui-semantic-body-text,#242424));box-shadow:var(--spui-card-shadow,0 16px 48px #0004)}dialog:not([open]){display:none}:host([position=start]) dialog{inset-inline-start:0;inset-inline-end:auto;border-start-start-radius:0;border-end-start-radius:0;border-start-end-radius:var(--spui-card-radius,12px);border-end-end-radius:var(--spui-card-radius,12px)}:host([position=top]) dialog{inset-block-start:0;inset-block-end:auto;width:100vw;height:min(var(--spui-drawer-height,360px),calc(100dvh - 24px));max-height:calc(100dvh - 24px);border-start-start-radius:0;border-start-end-radius:0;border-end-start-radius:var(--spui-card-radius,12px);border-end-end-radius:var(--spui-card-radius,12px)}:host([position=bottom]) dialog{inset-block-start:auto;inset-block-end:0;width:100vw;height:min(var(--spui-drawer-height,360px),calc(100dvh - 24px));max-height:calc(100dvh - 24px);border-start-start-radius:var(--spui-card-radius,12px);border-start-end-radius:var(--spui-card-radius,12px);border-end-start-radius:0;border-end-end-radius:0}:host([size=small]) dialog{--spui-drawer-width:320px;--spui-drawer-height:256px}:host([size=medium]) dialog{--spui-drawer-width:480px;--spui-drawer-height:360px}:host([size=large]) dialog{--spui-drawer-width:640px;--spui-drawer-height:480px}:host([size=full]) dialog{width:100vw;max-width:100vw;--spui-drawer-width:100vw;--spui-drawer-height:100dvh;border-radius:0}:host([position=top][size=full]) dialog,:host([position=bottom][size=full]) dialog{height:100dvh;max-height:100dvh}dialog::backdrop{background:color-mix(in srgb,var(--spui-ui-text,#242424) 42%,transparent);backdrop-filter:blur(2px)}:host([data-has-custom-backdrop]) dialog::backdrop{background:transparent;backdrop-filter:none}:host([data-has-custom-backdrop]) dialog{background:transparent}::slotted([slot=backdrop]){position:fixed;inset:0;z-index:-1;display:block;background:color-mix(in srgb,var(--spui-ui-text,#242424) 42%,transparent)}:host([data-has-custom-backdrop]) header,:host([data-has-custom-backdrop]) .body,:host([data-has-custom-backdrop]) footer{position:relative;z-index:0;background:var(--spui-card-background,var(--spui-ui-surface,#fff))}header{display:flex;align-items:start;justify-content:space-between;gap:16px;flex:none;padding:20px 20px 0}.header-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0}:host([size=small]) header{flex-wrap:wrap}:host([size=small]) .header-main{flex-basis:100%}.header-navigation{display:flex;align-items:center;flex:none}.header-navigation[hidden]{display:none}.header-navigation slot[name=header-navigation]{display:contents}h2{min-width:0;overflow-wrap:anywhere;margin:0;font-size:20px;line-height:1.3;font-weight:650}.controls{display:flex;align-items:center;gap:4px;flex:none;margin-inline-start:auto}.controls slot[name=header-action]{display:contents}.close{display:inline-grid;place-items:center;flex:none;width:var(--spui-control-height,36px);height:var(--spui-control-height,36px);margin:-5px -6px 0 0;border:0;border-radius:var(--spui-control-radius,6px);background:transparent;color:inherit;cursor:pointer}.close:hover{background:var(--spui-ui-surface-hover,#f5f5f5)}.close:focus-visible{outline:2px solid var(--spui-focus-ring,#005a9e);outline-offset:2px}.body{flex:1;min-height:0;overflow:auto;padding:16px 20px 20px;line-height:1.5}footer{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;flex:none;padding:12px 20px 20px;border-top:1px solid var(--spui-ui-stroke,var(--spui-semantic-body-divider,#d1d1d1))}footer[hidden],.close[hidden]{display:none}@media(forced-colors:active){dialog{border-color:CanvasText;box-shadow:none}dialog::backdrop{background:Canvas}.close:focus-visible{outline-color:Highlight}}`;

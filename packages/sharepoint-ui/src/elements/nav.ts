@@ -1,4 +1,5 @@
 import { base } from "./shared.js";
+import { buttonControlCss } from "./button.js";
 
 export type NavItemSelectData = { value: string; href: string | null; label: string; categoryValue?: string; event: MouseEvent; type: "click" };
 export type NavCategoryToggleData = { value: string; categoryValue?: string; open: boolean; openCategories: string[]; event: MouseEvent; type: "click" };
@@ -358,10 +359,35 @@ export function defineSplitNavItem(): void {
 export function defineHamburger(): void {
   if (customElements.get("spui-hamburger")) return;
   class SpuiHamburger extends HTMLElement {
-    static observedAttributes = ["disabled", "aria-label"];
-    connectedCallback(): void { this.setAttribute("role", "button"); this.setAttribute("tabindex", this.hasAttribute("disabled") ? "-1" : "0"); if (!this.hasAttribute("aria-label")) this.setAttribute("aria-label", "Toggle navigation"); if (!this.shadowRoot) { const shadow = this.attachShadow({ mode: "open" }); const style = document.createElement("style"); style.textContent = `${base}:host{box-sizing:border-box;display:inline-grid;place-items:center;min-width:44px;min-height:44px;padding:8px;border-radius:var(--spui-control-radius,6px);color:var(--spui-ui-text,var(--spui-semantic-body-text,inherit));cursor:pointer}:host(:hover){background:var(--spui-ui-surface-hover,var(--spui-ui-canvas,#f5f5f5))}:host(:focus-visible){outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#78716c));outline-offset:2px}:host([disabled]){opacity:.55;cursor:not-allowed}::slotted(svg){width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}@media(forced-colors:active){:host(:focus-visible){outline-color:Highlight}}`; const icon = document.createElement("slot"); icon.name = "icon"; shadow.append(style, icon, document.createElement("slot")); } }
-    attributeChangedCallback(): void { if (this.isConnected) this.setAttribute("tabindex", this.hasAttribute("disabled") ? "-1" : "0"); }
-    constructor() { super(); this.addEventListener("keydown", event => { if (this.hasAttribute("disabled")) return; if (event.key === "Enter" || event.key === " ") { event.preventDefault(); this.click(); } }); this.addEventListener("click", event => { if (this.hasAttribute("disabled")) event.preventDefault(); }); }
+    static observedAttributes = ["disabled", "disabled-focusable", "aria-label", "aria-expanded", "appearance", "size", "shape", "icon-position", "type", "title"];
+    connectedCallback(): void { if (!this.hasAttribute("aria-label")) this.setAttribute("aria-label", "Toggle navigation"); this.render(); }
+    attributeChangedCallback(): void { if (this.isConnected) this.render(); }
+    private render(): void {
+      const shadow = this.shadowRoot ?? this.attachShadow({ mode: "open", delegatesFocus: true });
+      const previous = shadow.querySelector<HTMLButtonElement>("button");
+      const restoreFocus = previous !== null && shadow.activeElement === previous;
+      const button = document.createElement("button");
+      button.className = this.getAttribute("appearance") || "secondary";
+      button.type = this.getAttribute("type") === "submit" || this.getAttribute("type") === "reset" ? this.getAttribute("type") as "submit" | "reset" : "button";
+      const disabled = this.hasAttribute("disabled");
+      const disabledFocusable = this.hasAttribute("disabled-focusable");
+      button.disabled = disabled && !disabledFocusable;
+      if (disabledFocusable) { button.tabIndex = 0; button.setAttribute("aria-disabled", "true"); }
+      for (const attribute of this.attributes) {
+        if (attribute.name.startsWith("aria-") || attribute.name === "title") button.setAttribute(attribute.name, attribute.value);
+      }
+      button.setAttribute("aria-label", this.getAttribute("aria-label") || "Toggle navigation");
+      if (disabledFocusable) button.addEventListener("click", event => { event.preventDefault(); event.stopImmediatePropagation(); });
+      const iconSlot = document.createElement("slot"); iconSlot.name = "icon";
+      const icon = document.createElement("span"); icon.className = "icon"; icon.append(iconSlot);
+      const content = document.createElement("span"); content.className = "content";
+      content.append(document.createElement("slot"));
+      const style = document.createElement("style");
+      style.textContent = `${base}${buttonControlCss}:host{display:inline-flex;vertical-align:middle}button{min-width:44px;min-height:44px;padding:8px}::slotted([slot=icon]){display:inline-flex;align-items:center;justify-content:center;line-height:0}::slotted([slot=icon]) svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}@media(forced-colors:active){button:focus-visible{outline-color:Highlight}}`;
+      button.append(icon, content);
+      shadow.replaceChildren(style, button);
+      if (restoreFocus) button.focus();
+    }
   }
   customElements.define("spui-hamburger", SpuiHamburger);
 }
