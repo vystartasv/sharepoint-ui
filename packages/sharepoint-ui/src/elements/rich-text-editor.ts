@@ -2,11 +2,12 @@ import { base, syncHostAccessibleName } from "./shared.js";
 
 export type RichTextEditorLink = { href: string; text?: string; title?: string; openInNewTab?: boolean };
 export type RichTextEditorLinkPicker = (currentLink: RichTextEditorLink | null) => Promise<RichTextEditorLink | null>;
-export type SharePointMultiLineField = { richText?: boolean; restrictedMode?: boolean; allowHyperlink?: boolean; RichText?: boolean; RestrictedMode?: boolean; AllowHyperlink?: boolean };
-export function getRichTextEditorFieldOptions(field: SharePointMultiLineField): { contentMode: "plain" | "restricted" | "rich"; allowHyperlink: boolean } {
+export type SharePointMultiLineField = { richText?: boolean; restrictedMode?: boolean; richTextMode?: string; allowHyperlink?: boolean; RichText?: boolean; RestrictedMode?: boolean; RichTextMode?: string; AllowHyperlink?: boolean };
+export function getRichTextEditorFieldOptions(field: SharePointMultiLineField): { contentMode: "plain" | "restricted" | "rich" | "html"; allowHyperlink: boolean } {
   const richText = field.RichText ?? field.richText ?? false;
   const restricted = field.RestrictedMode ?? field.restrictedMode ?? false;
-  return { contentMode: !richText ? "plain" : restricted ? "restricted" : "rich", allowHyperlink: Boolean(richText && (field.AllowHyperlink ?? field.allowHyperlink)) };
+  const richTextMode = field.RichTextMode ?? field.richTextMode;
+  return { contentMode: !richText ? "plain" : restricted ? "restricted" : richTextMode?.toLowerCase() === "fullhtml" ? "html" : "rich", allowHyperlink: Boolean(richText && !restricted && (field.AllowHyperlink ?? field.allowHyperlink)) };
 }
 
 export interface SharePointRichTextEditorElement extends HTMLElement {
@@ -44,6 +45,7 @@ const ALLOWED = new Set(["P", "DIV", "SPAN", "BR", "HR", "STRONG", "B", "EM", "I
 const HTML_ONLY = new Set(["MAIN", "SECTION", "ARTICLE", "HEADER", "FOOTER", "ASIDE", "FIGURE", "FIGCAPTION", "DETAILS", "SUMMARY", "DL", "DT", "DD", "ABBR", "CITE", "Q", "MARK", "SMALL", "TIME", "WBR"]);
 const RESTRICTED = new Set(["P", "DIV", "SPAN", "BR", "STRONG", "B", "EM", "I", "U", "S", "DEL", "INS", "UL", "OL", "LI", "H1", "H2", "H3", "H4", "H5", "H6", "BLOCKQUOTE", "PRE", "SUP", "SUB", "CODE"]);
 const DROP_CONTENT = new Set(["SCRIPT", "STYLE", "IFRAME", "OBJECT", "EMBED", "TEMPLATE"]);
+const HTML_STYLE_PROPERTIES = new Set(["background-color", "color", "direction", "font-family", "font-size", "font-style", "font-weight", "letter-spacing", "line-height", "list-style-type", "margin-block-end", "margin-block-start", "margin-inline-end", "margin-inline-start", "text-align", "text-decoration", "text-indent", "text-transform", "vertical-align", "white-space"]);
 function safeHref(value: string): boolean {
   if (/[\u0000-\u001f\u007f]/.test(value)) return false;
   try { return ["http:", "https:", "mailto:"].includes(new URL(value.trim(), document.baseURI).protocol); }
@@ -75,6 +77,14 @@ function cleanHtml(html: string, mode: "plain" | "restricted" | "rich" | "html" 
         if (DROP_CONTENT.has(element.tagName)) { child.remove(); continue; }
         if (!allowedTags.has(element.tagName) || (element.tagName === "A" && !allowHyperlink)) { clean(element); child.replaceWith(...[...child.childNodes]); continue; }
         for (const attr of [...element.attributes]) {
+          if (attr.name === "style" && mode === "html") {
+            const safeStyles = [...element.style].filter(property => {
+              const value = element.style.getPropertyValue(property).trim();
+              return HTML_STYLE_PROPERTIES.has(property) && !/(?:url|expression|@import|javascript:|var\s*\()/i.test(value) && (typeof CSS === "undefined" || CSS.supports(property, value));
+            }).map(property => `${property}: ${element.style.getPropertyValue(property).trim()}`).join("; ");
+            if (safeStyles) element.setAttribute("style", safeStyles); else element.removeAttribute("style");
+            continue;
+          }
           const link = element.tagName === "A" && attr.name === "href" && safeHref(attr.value);
           const linkTitle = element.tagName === "A" && attr.name === "title" && attr.value.length <= 512;
           const linkTarget = element.tagName === "A" && attr.name === "target" && attr.value === "_blank";

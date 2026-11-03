@@ -49,7 +49,14 @@ Use the editor's sanitized `onValueChange` value with your normal SPFx persisten
 
 ## Match the SharePoint field
 
-Set the editor's mode from the target multiline field. `RichText: false` uses plain text; `RichText: true` with `RestrictedMode: true` keeps basic formatting and pastes clipboard content as plain text; enhanced rich text allows the editor's formatting, tables, and safe links when `AllowHyperlink` is enabled. `html` mode is for an unconstrained host field and still sanitizes the markup.
+The field adapter maps SharePoint settings to the closest editing surface:
+
+| SharePoint field settings | Editor mode | What users can save |
+| --- | --- | --- |
+| `RichText: false` | `plain` | Plain text only |
+| `RestrictedMode: true` | `restricted` | Basic formatting; paste becomes plain text; no tables, images, or hyperlinks |
+| `RichText: true`, `RichTextMode: "Compatible"` (or omitted) | `rich` | Toolbar formatting and tables; hyperlinks only when `AllowHyperlink` is true |
+| `RichText: true`, `RichTextMode: "FullHtml"` | `html` | Broader semantic HTML and safe inline formatting, still sanitized |
 
 ```tsx
 import {
@@ -62,13 +69,14 @@ import {
 const field: SharePointMultiLineField = {
   RichText: true,
   RestrictedMode: false,
+  RichTextMode: "FullHtml",
   AllowHyperlink: true,
 };
 
 <RichTextEditor label="Project notes" {...getRichTextEditorFieldOptions(field)} />
 ```
 
-The helper accepts SharePoint's PascalCase metadata and camelCase equivalents. Plain mode emits plain text. Other modes emit sanitized HTML; `html` accepts additional semantic elements while still removing scripts, embedded objects, unsafe URLs, and arbitrary attributes.
+The helper accepts SharePoint's PascalCase metadata and camelCase equivalents. Plain mode emits plain text. Other modes emit sanitized HTML; `html` accepts additional semantic elements and safe text styles (such as color, font, and alignment) while still removing scripts, embedded objects, unsafe URLs, and unsupported attributes. For a non-SharePoint host with no field restrictions, pass `contentMode="html"` explicitly.
 
 ## Load the editor only when needed
 
