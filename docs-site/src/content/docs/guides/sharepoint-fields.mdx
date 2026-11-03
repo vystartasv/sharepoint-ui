@@ -102,6 +102,8 @@ const patch = serializeSharePointLookupValue(column, selectedIds);
 await saveItem({ ...otherChanges, ...patch });
 ```
 
+The focused lookup serializer also blocks writes to read-only fields and rejects empty selections for required fields. Pass `null` or an empty array only to clear an optional field.
+
 Pass numeric IDs or digit strings; malformed and non-positive IDs throw instead of becoming a display-name write. For people fields, this serializes selected user/group IDs but does not search the tenant directory. Use an SPFx people-picker service appropriate to your tenant and permissions; a site's existing users are not a substitute for directory search. SharePoint REST requires lookup values to be selected/expanded explicitly and returns related values through `$select`/`$expand`; see Microsoft's [OData query guidance](https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/use-odata-query-operations-in-sharepoint-rest-requests) and the [`LookupList`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.sharepoint.client.fieldlookup.lookuplist?view=sharepoint-csom) / [`LookupField`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.sharepoint.client.fieldlookup.lookupfield?view=sharepoint-csom) metadata.
 
 ## Save choice values
@@ -117,7 +119,7 @@ serializeSharePointChoiceValue(categoryField, ["Finance", "Operations"]);
 // { Categories: { results: ["Finance", "Operations"] } }
 ```
 
-Pass `null` to clear a single field or a MultiChoice field. Unknown values throw when the field disallows fill-in choices; duplicate multi-values are removed while preserving their order.
+Pass `null` to clear an optional Choice or MultiChoice field. Required fields reject empty values, and read-only fields reject writes. Unknown values throw when the field disallows fill-in choices; duplicate multi-values are removed while preserving their order.
 
 ## Serialize the other common field types
 

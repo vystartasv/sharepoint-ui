@@ -226,6 +226,7 @@ export function serializeSharePointLookupValue(field: SharePointFieldMetadata, v
     throw new TypeError("Only SharePoint Lookup and User fields can be serialized as ID selections.");
   }
   if (!adapter.name) throw new TypeError("The SharePoint field must include InternalName.");
+  assertSharePointFieldValueWritable(adapter, value);
   const key = `${adapter.name}Id`;
 
   if (adapter.multiple) {
@@ -246,6 +247,7 @@ export function serializeSharePointChoiceValue(field: SharePointFieldMetadata, v
     throw new TypeError("Only SharePoint Choice and MultiChoice fields can be serialized as choice values.");
   }
   if (!adapter.name) throw new TypeError("The SharePoint field must include InternalName.");
+  assertSharePointFieldValueWritable(adapter, value);
   const choices = field.Choices ?? field.choices ?? [];
   const allowFillIn = booleanValue(field.FillInChoice ?? field.fillInChoice);
   const validateChoice = (choice: string): string => {
@@ -267,8 +269,6 @@ export function serializeSharePointFieldValue(field: SharePointFieldMetadata, va
   const adapter = getSharePointFieldAdapter(field);
   const type = adapter.fieldType.replace(/^SP\.Field/, "").toLowerCase();
   if (!adapter.name) throw new TypeError("The SharePoint field must include InternalName.");
-  if (adapter.readOnly) throw new TypeError(`${adapter.label} is read-only and cannot be serialized for an item update.`);
-  if (adapter.required && isEmptySharePointFieldValue(value)) throw new TypeError(`${adapter.label} is required.`);
 
   if (["lookup", "lookupmulti", "user", "usermulti"].includes(type)) {
     return serializeSharePointLookupValue(field, value as SharePointLookupValue);
@@ -276,6 +276,7 @@ export function serializeSharePointFieldValue(field: SharePointFieldMetadata, va
   if (["choice", "outcomechoice", "multichoice"].includes(type)) {
     return serializeSharePointChoiceValue(field, value as SharePointChoiceValue);
   }
+  assertSharePointFieldValueWritable(adapter, value);
   if (["text", "note"].includes(type)) {
     if (value != null && typeof value !== "string") throw new TypeError(`${adapter.label} requires a string value or null.`);
     return { [adapter.name]: value as string | null };
@@ -351,6 +352,11 @@ function isEmptySharePointFieldValue(value: SharePointFieldValue): boolean {
   if (typeof value === "string") return value.trim() === "";
   if (Array.isArray(value)) return value.length === 0;
   return isSharePointUrlValue(value) && value.url.trim() === "";
+}
+
+function assertSharePointFieldValueWritable(adapter: SharePointFieldAdapter, value: SharePointFieldValue): void {
+  if (adapter.readOnly) throw new TypeError(`${adapter.label} is read-only and cannot be serialized for an item update.`);
+  if (adapter.required && isEmptySharePointFieldValue(value)) throw new TypeError(`${adapter.label} is required.`);
 }
 
 function serializeSharePointDateValue(value: string): string | undefined {
