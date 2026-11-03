@@ -133,7 +133,7 @@ serializeSharePointFieldValue(dueDateField, new Date());               // ISO da
 serializeSharePointFieldValue(linkField, { url: "/sites/ops/guide", description: "Open guide" });
 ```
 
-Use `null` to clear nullable values. Read-only fields are rejected. Numeric strings are parsed as whole values; non-finite numbers and unsafe integers are rejected, and configured `Decimals` precision is enforced (trailing zeroes do not count as extra precision). URL fields accept absolute HTTP(S) or server-relative URLs and serialize to SharePoint's [`SP.FieldUrlValue`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.sharepoint.client.fieldurlvalue?view=sharepoint-csom) shape. Date-only ISO strings are preserved, date-time strings with a timezone keep that offset, and local date-time strings or `Date` objects become ISO UTC strings. The helper does not send the request or replace SharePoint-side validation.
+Use `null` to clear nullable values. Read-only fields and empty values for required fields are rejected; `false` and `0` are valid values. Numeric strings are parsed as whole values; non-finite numbers and unsafe integers are rejected, and configured `Decimals` precision is enforced (trailing zeroes do not count as extra precision). URL fields accept absolute HTTP(S) or server-relative URLs and serialize to SharePoint's [`SP.FieldUrlValue`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.sharepoint.client.fieldurlvalue?view=sharepoint-csom) shape. Date-only ISO strings are preserved, date-time strings with a timezone keep that offset, and local date-time strings or `Date` objects become ISO UTC strings. The helper does not send the request or replace SharePoint-side validation.
 
 ## Render with existing controls
 

@@ -268,6 +268,7 @@ export function serializeSharePointFieldValue(field: SharePointFieldMetadata, va
   const type = adapter.fieldType.replace(/^SP\.Field/, "").toLowerCase();
   if (!adapter.name) throw new TypeError("The SharePoint field must include InternalName.");
   if (adapter.readOnly) throw new TypeError(`${adapter.label} is read-only and cannot be serialized for an item update.`);
+  if (adapter.required && isEmptySharePointFieldValue(value)) throw new TypeError(`${adapter.label} is required.`);
 
   if (["lookup", "lookupmulti", "user", "usermulti"].includes(type)) {
     return serializeSharePointLookupValue(field, value as SharePointLookupValue);
@@ -343,6 +344,13 @@ function isSharePointFieldUrl(value: string): boolean {
 
 function isSharePointUrlValue(value: SharePointFieldValue): value is SharePointUrlValue {
   return typeof value === "object" && value !== null && !Array.isArray(value) && !(value instanceof Date) && typeof (value as SharePointUrlValue).url === "string";
+}
+
+function isEmptySharePointFieldValue(value: SharePointFieldValue): boolean {
+  if (value == null) return true;
+  if (typeof value === "string") return value.trim() === "";
+  if (Array.isArray(value)) return value.length === 0;
+  return isSharePointUrlValue(value) && value.url.trim() === "";
 }
 
 function serializeSharePointDateValue(value: string): string | undefined {
