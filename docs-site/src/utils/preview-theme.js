@@ -2,6 +2,10 @@ export function createPreviewThemeOverrides(capturedTokens, accent, derive = fal
   const overrides = {
     ...capturedTokens,
     "--spui-ui-accent": accent,
+    "--spui-ui-accent-hover": `color-mix(in srgb, ${accent} 84%, black)`,
+    "--spui-focus-ring": accent,
+    "--spui-semantic-focus-border": accent,
+    "--colorStrokeFocus2": accent,
     "--spui-semantic-primary-button-background": accent,
     "--colorBrandBackground": accent,
   };
