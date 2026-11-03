@@ -1,5 +1,17 @@
 # Fluent UI React v9 parity plan
 
+### Table shadow-root scroll event routing — local Chromium, 2026-11-03
+
+React `Table` forwarded DOM event props to its custom-element host, but the internal `.viewport` scroll event is non-bubbling and does not leave the shadow root. `onScroll` therefore never reached React for the actual Table viewport. The adapter now routes native-root DOM events through its component-specific `.viewport` bridge; scroll capture listens at the shadow root and scroll bubble at the viewport, preserving React capture-before-bubble order. The bridge preserves `UIEvent.detail`, `view`, target, and currentTarget. `verify:table` and the library TypeScript build pass in Chromium; the fixture also continues to cover sorting, selection, resizing, RTL, and narrow layout. This addresses Table's internal viewport only; other component-family event roots and media/load/error events remain open.
+
+### Card native React event root parity — Fluent 9.75.0 root contract and local Chromium, 2026-11-03
+
+Card's inherited React event props were attached to the custom-element host, which retargeted shadow clicks to `spui-card` and exposed the host as `currentTarget`. Fluent Card uses a native `div` root. Added a single internal root wrapper spanning the card body, selection checkbox, and floating action, then routed React DOM event props to that root and typed the click handlers as `HTMLDivElement`. `verify:card-selection` now asserts native `div` target/currentTarget and retains controlled selection, focus modes, RTL, nested actions, and checkbox behavior; its type fixture verifies the root event type. The verifier and library build pass in Chromium. This closes Card's root event shape only; other compound component event roots remain under review.
+
+### Toolbar native React event root and scroll parity — Fluent 9.75.0 root contract and local Chromium, 2026-11-03
+
+Toolbar's inherited React DOM handlers were attached to `spui-toolbar`, although its internal `.toolbar` div is the actual role-bearing, scrollable root and matches Fluent's root contract. The adapter now routes these handlers to that div and exposes its event type as `HTMLDivElement`. `verify:toolbar-groups` checks composed click capture/bubble with the nested native target, root currentTarget, and shadow-local non-bubbling scroll capture/bubble with preserved `UIEvent.detail` and `view`; keyboard roving, disabled-item skipping, vertical orientation, RTL, and no-loop behavior remain passing. The library build and Chromium fixture pass. This does not cover every compound component root.
+
 ### Navigation native-root event contracts — Fluent 9.75.0 declarations and local Chromium, 2026-11-03
 
 The installed Fluent Nav source declares a `div` root, NavItem an anchor root, and the category disclosure is a button. Local custom elements had direct React handlers on their hosts. Nav, NavItem, NavSubItem, AppItem, and NavCategoryItem now bridge click and capture callbacks to their native root controls; the Nav fixture checks callback target/currentTarget and compiles event types for those controls. The local Nav keeps its semantic `nav` root and NavItem uses a button when no destination exists, so its tag and types reflect that local semantic/polymorphic behavior rather than copying Fluent's element choice exactly.

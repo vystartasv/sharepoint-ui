@@ -2900,7 +2900,7 @@
       "module": "accordion",
       "category": "disclosure",
       "api": {
-        "reactSignature": "{ expandIconPosition = \"end\", inline = false, size = \"medium\", icon, expandIcon, button, children, ...props }: ElementProps & { expandIconPosition?: \"start\" | \"end\"; inline?: boolean; size?: \"small\" | \"medium\" | \"large\" | \"extra-large\"; icon?: React.ReactNode; expandIcon?: React.ReactNode; button?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; children?: React.ReactNode }",
+        "reactSignature": "{ expandIconPosition = \"end\", inline = false, size = \"medium\", icon, expandIcon, button, children, ...props }: NativeClickHostProps<HTMLDivElement> & { expandIconPosition?: \"start\" | \"end\"; inline?: boolean; size?: \"small\" | \"medium\" | \"large\" | \"extra-large\"; icon?: React.ReactNode; expandIcon?: React.ReactNode; button?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; children?: React.ReactNode }",
         "callbackProps": [],
         "slots": [
           "default",

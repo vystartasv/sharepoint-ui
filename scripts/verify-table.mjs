@@ -15,6 +15,7 @@ const bundle = await build({
       import { SharePointUIProvider, Table, TableHeader, TableBody, TableRow, TableHeaderCell, TableCell, TableCellLayout, TableCellActions, TableResizeHandle, TableSelectionCell, Button, createTableColumn } from "${resolve("packages/sharepoint-ui/src/react.tsx")}";
       import { defineTable } from "${resolve("packages/sharepoint-ui/src/elements/table.ts")}";
       window.mount = () => {
+        window.tableScrollEvents = [];
         window.testColumn = createTableColumn({ columnId: "request", compare: (left, right) => left.localeCompare(right), renderHeaderCell: () => "Request", renderCell: item => item });
         defineTable();
         const native = document.createElement("spui-table"); native.setAttribute("aria-label", "Native requests"); native.setAttribute("dir", "rtl"); native.setAttribute("size", "small");
@@ -26,7 +27,7 @@ const bundle = await build({
         const cell = document.createElement("spui-table-cell"), layout = document.createElement("spui-table-cell-layout"); for (const [slot, text] of [["media", "👤"], ["main", "Native owner"], ["description", "Account owner"]]) { const content = document.createElement("span"); content.slot = slot; content.dataset.testid = "native-cell-" + slot; content.textContent = text; layout.append(content); } cell.append(layout); row.append(selection, cell); body.append(row); native.append(head, body); document.querySelector("#native").append(native);
         function App() {
           const [selected, setSelected] = React.useState(false); const [sort, setSort] = React.useState(undefined); const [resizeValue, setResizeValue] = React.useState(120);
-          return <SharePointUIProvider appearance="ios" lang="ar" dir="rtl"><Table data-testid="react-table" aria-label="Requests" size="medium" appearance="dividers">
+          return <SharePointUIProvider appearance="ios" lang="ar" dir="rtl"><Table data-testid="react-table" aria-label="Requests" size="medium" appearance="dividers" onScrollCapture={event => window.tableScrollEvents.push(["capture", event.currentTarget.className, event.target.className, event.detail, event.view === window])} onScroll={event => window.tableScrollEvents.push(["bubble", event.currentTarget.className, event.target.className, event.detail, event.view === window])}>
             <TableHeader><TableRow><TableSelectionCell aria-label="Select all requests" checked={selected} onSelectionChange={setSelected} /><TableHeaderCell sortable columnId="owner" button={{className:"custom-owner-trigger","aria-label":"Sort owner"}} sortDirection={sort} sortIcon={<span data-testid="table-sort-icon">↑</span>} onSort={direction => { window.lastSortDirection = direction; setSort(direction); }}>Owner<TableResizeHandle value={resizeValue} min={80} max={160} label="Resize owner column" onResize={(_delta, value) => setResizeValue(value)} /></TableHeaderCell><TableHeaderCell>Request</TableHeaderCell></TableRow></TableHeader>
             <TableBody><TableRow selected={selected}><TableSelectionCell aria-label="Select request" checked={selected} checkboxIndicator={<span data-testid="react-selection-indicator">✓</span>} onSelectionChange={setSelected} /><TableCell><TableCellLayout appearance="primary" truncate media={{className:"custom-cell-media","data-testid":"cell-media",children:"👤"}} main={<span data-testid="cell-main" className="custom-cell-main">Vilius <TableCellActions visible><Button size="small">Open</Button></TableCellActions></span>} description={{className:"custom-cell-description","data-testid":"cell-description",children:"Account owner"}} /></TableCell><TableCell>Quarterly access review</TableCell></TableRow></TableBody>
           </Table><Table data-testid="flex-table" noNativeElements aria-label="Flex requests"><TableHeader><TableRow><TableHeaderCell sortable button={<button data-testid="custom-header-trigger" className="custom-title-trigger"/>} onSort={direction => {window.flexSort=direction}}>Title</TableHeaderCell></TableRow></TableHeader><TableBody><TableRow><TableCell>Flex content</TableCell></TableRow></TableBody></Table><div data-testid="default-main-layout"><TableCellLayout>Default main content</TableCellLayout></div></SharePointUIProvider>;
@@ -60,6 +61,11 @@ try {
 
   const table = page.getByTestId("react-table");
   const flexTable = page.getByTestId("flex-table");
+  await table.evaluate(host => host.shadowRoot.querySelector(".viewport").dispatchEvent(new UIEvent("scroll", { bubbles: false, view: window, detail: 9 })));
+  assert.deepEqual(await page.evaluate(() => window.tableScrollEvents), [
+    ["capture", "viewport", "viewport", 9, true],
+    ["bubble", "viewport", "viewport", 9, true],
+  ], "React scroll handlers receive native non-bubbling shadow-root UIEvents in capture/bubble order");
   for (const slot of ["media", "main", "description"]) assert.ok(await page.getByTestId(`native-cell-${slot}`).isVisible(), `native TableCellLayout ${slot} slot renders`);
   assert.ok(await page.getByTestId("cell-media").isVisible(), "TableCellLayout media slot renders");
   assert.ok(await page.getByTestId("cell-main").isVisible(), "TableCellLayout main slot renders");
@@ -140,7 +146,7 @@ try {
   assert.equal(widths.overflow, widths.viewport, "narrow table container prevents page-level horizontal overflow");
   await page.screenshot({ path: resolve("test-results/table-components.png"), fullPage: true });
   assert.deepEqual(errors, []);
-  console.log(JSON.stringify({ browser: "Chromium headless", adapters: ["React", "custom elements"], roles: { table: true, rowgroup: true, row: true, columnheader: true, cell: true }, sorting: "controlled aria-sort and sort event", selection: "native checkbox and selected row", resize: "pointer drag and keyboard separator with RTL direction", responsiveViewport: widths, pageErrors: errors }));
+  console.log(JSON.stringify({ browser: "Chromium headless", adapters: ["React", "custom elements"], roles: { table: true, rowgroup: true, row: true, columnheader: true, cell: true }, scrolling: "React UIEvent target/currentTarget with capture order", sorting: "controlled aria-sort and sort event", selection: "native checkbox and selected row", resize: "pointer drag and keyboard separator with RTL direction", responsiveViewport: widths, pageErrors: errors }));
 } finally {
   await browser?.close();
   await new Promise(done => server.close(done));

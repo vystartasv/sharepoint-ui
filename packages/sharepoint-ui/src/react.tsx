@@ -264,7 +264,7 @@ function useSpuiEvent(ref: React.RefObject<HTMLElement | null>, eventName: strin
 }
 
 type NativeMousePointerEventProps<T extends Element> = Pick<React.DOMAttributes<T>, "onAuxClick" | "onAuxClickCapture" | "onContextMenu" | "onContextMenuCapture" | "onDoubleClick" | "onDoubleClickCapture" | "onMouseDown" | "onMouseDownCapture" | "onMouseEnter" | "onMouseLeave" | "onMouseMove" | "onMouseMoveCapture" | "onMouseOut" | "onMouseOutCapture" | "onMouseOver" | "onMouseOverCapture" | "onMouseUp" | "onMouseUpCapture" | "onGotPointerCapture" | "onGotPointerCaptureCapture" | "onLostPointerCapture" | "onLostPointerCaptureCapture" | "onPointerCancel" | "onPointerCancelCapture" | "onPointerDown" | "onPointerDownCapture" | "onPointerEnter" | "onPointerLeave" | "onPointerMove" | "onPointerMoveCapture" | "onPointerOut" | "onPointerOutCapture" | "onPointerOver" | "onPointerOverCapture" | "onPointerUp" | "onPointerUpCapture">;
-type NativeAdditionalEventProps<T extends Element> = Pick<React.DOMAttributes<T>, "onInvalid" | "onInvalidCapture" | "onChange" | "onChangeCapture" | "onCopy" | "onCopyCapture" | "onCut" | "onCutCapture" | "onPaste" | "onPasteCapture" | "onCompositionEnd" | "onCompositionEndCapture" | "onCompositionStart" | "onCompositionStartCapture" | "onCompositionUpdate" | "onCompositionUpdateCapture" | "onBeforeInput" | "onBeforeInputCapture" | "onInput" | "onInputCapture" | "onDrag" | "onDragCapture" | "onDragEnd" | "onDragEndCapture" | "onDragEnter" | "onDragEnterCapture" | "onDragExit" | "onDragExitCapture" | "onDragLeave" | "onDragLeaveCapture" | "onDragOver" | "onDragOverCapture" | "onDragStart" | "onDragStartCapture" | "onDrop" | "onDropCapture" | "onTouchCancel" | "onTouchCancelCapture" | "onTouchEnd" | "onTouchEndCapture" | "onTouchMove" | "onTouchMoveCapture" | "onTouchStart" | "onTouchStartCapture" | "onWheel" | "onWheelCapture" | "onAnimationStart" | "onAnimationStartCapture" | "onAnimationEnd" | "onAnimationEndCapture" | "onAnimationIteration" | "onAnimationIterationCapture" | "onTransitionEnd" | "onTransitionEndCapture">;
+type NativeAdditionalEventProps<T extends Element> = Pick<React.DOMAttributes<T>, "onInvalid" | "onInvalidCapture" | "onChange" | "onChangeCapture" | "onScroll" | "onScrollCapture" | "onCopy" | "onCopyCapture" | "onCut" | "onCutCapture" | "onPaste" | "onPasteCapture" | "onCompositionEnd" | "onCompositionEndCapture" | "onCompositionStart" | "onCompositionStartCapture" | "onCompositionUpdate" | "onCompositionUpdateCapture" | "onBeforeInput" | "onBeforeInputCapture" | "onInput" | "onInputCapture" | "onDrag" | "onDragCapture" | "onDragEnd" | "onDragEndCapture" | "onDragEnter" | "onDragEnterCapture" | "onDragExit" | "onDragExitCapture" | "onDragLeave" | "onDragLeaveCapture" | "onDragOver" | "onDragOverCapture" | "onDragStart" | "onDragStartCapture" | "onDrop" | "onDropCapture" | "onTouchCancel" | "onTouchCancelCapture" | "onTouchEnd" | "onTouchEndCapture" | "onTouchMove" | "onTouchMoveCapture" | "onTouchStart" | "onTouchStartCapture" | "onWheel" | "onWheelCapture" | "onAnimationStart" | "onAnimationStartCapture" | "onAnimationEnd" | "onAnimationEndCapture" | "onAnimationIteration" | "onAnimationIterationCapture" | "onTransitionEnd" | "onTransitionEndCapture">;
 type NativeRootEventProps<T extends Element> = Pick<React.DOMAttributes<T>, "onKeyDown" | "onKeyDownCapture" | "onKeyUp" | "onKeyUpCapture" | "onKeyPress" | "onKeyPressCapture" | "onFocus" | "onFocusCapture" | "onBlur" | "onBlurCapture"> & NativeMousePointerEventProps<T> & NativeAdditionalEventProps<T>;
 function isComposedDescendant(root: Element, target: EventTarget | null): boolean {
   if (!(target instanceof Node)) return false;
@@ -280,7 +280,7 @@ function isComposedDescendant(root: Element, target: EventTarget | null): boolea
   }
   return false;
 }
-type NativeEventKind = "mouse" | "keyboard" | "focus" | "pointer" | "drag" | "touch" | "wheel" | "animation" | "transition" | "clipboard" | "composition" | "input" | "change" | "invalid";
+type NativeEventKind = "mouse" | "keyboard" | "focus" | "pointer" | "drag" | "touch" | "wheel" | "animation" | "transition" | "clipboard" | "composition" | "input" | "change" | "invalid" | "scroll";
 const nativeEventBindings: ReadonlyArray<{ eventName: string; prop: string; capture: boolean; kind: NativeEventKind }> = [
   ["click", "onClick", false, "mouse"], ["click", "onClickCapture", true, "mouse"],
   ["keydown", "onKeyDown", false, "keyboard"], ["keydown", "onKeyDownCapture", true, "keyboard"], ["keyup", "onKeyUp", false, "keyboard"], ["keyup", "onKeyUpCapture", true, "keyboard"], ["keypress", "onKeyPress", false, "keyboard"], ["keypress", "onKeyPressCapture", true, "keyboard"],
@@ -292,6 +292,7 @@ const nativeEventBindings: ReadonlyArray<{ eventName: string; prop: string; capt
   ["compositionend", "onCompositionEnd", false, "composition"], ["compositionend", "onCompositionEndCapture", true, "composition"], ["compositionstart", "onCompositionStart", false, "composition"], ["compositionstart", "onCompositionStartCapture", true, "composition"], ["compositionupdate", "onCompositionUpdate", false, "composition"], ["compositionupdate", "onCompositionUpdateCapture", true, "composition"],
   ["beforeinput", "onBeforeInput", false, "input"], ["beforeinput", "onBeforeInputCapture", true, "input"], ["input", "onInput", false, "input"], ["input", "onInputCapture", true, "input"],
   ["input", "onChange", false, "change"], ["input", "onChangeCapture", true, "change"],
+  ["scroll", "onScroll", false, "scroll"], ["scroll", "onScrollCapture", true, "scroll"],
   ["invalid", "onInvalid", false, "invalid"], ["invalid", "onInvalidCapture", true, "invalid"],
   ["touchcancel", "onTouchCancel", false, "touch"], ["touchcancel", "onTouchCancelCapture", true, "touch"], ["touchend", "onTouchEnd", false, "touch"], ["touchend", "onTouchEndCapture", true, "touch"], ["touchmove", "onTouchMove", false, "touch"], ["touchmove", "onTouchMoveCapture", true, "touch"], ["touchstart", "onTouchStart", false, "touch"], ["touchstart", "onTouchStartCapture", true, "touch"],
   ["wheel", "onWheel", false, "wheel"], ["wheel", "onWheelCapture", true, "wheel"],
@@ -320,6 +321,7 @@ function useNativeControlEvents<T extends Element>(ref: React.RefObject<HTMLElem
     const shadowRoot = host?.shadowRoot;
     if (!host || !shadowRoot || (!activeBindings.length && !hasMouseTransitions && !hasPointerTransitions)) return;
     const removeListeners: Array<() => void> = [];
+    const scrollControl = shadowRoot.querySelector(selector);
     for (const binding of activeBindings) {
       const listener = (event: Event): void => {
         const path = event.composedPath();
@@ -327,6 +329,7 @@ function useNativeControlEvents<T extends Element>(ref: React.RefObject<HTMLElem
         const hostInvalid = binding.kind === "invalid" && event.target === host;
         const control = nativeControl ?? (hostInvalid ? shadowRoot.querySelector(selector) : null);
         if (!control) return;
+        if (binding.kind === "scroll" && event.target !== control) return;
         const target = hostInvalid ? shadowRoot.querySelector(invalidTargetSelector ?? selector) ?? control : path.find((entry): entry is Element => entry instanceof Element && !(entry instanceof HTMLSlotElement)) ?? control;
         const bridged = createReactEventBridge(event, event, currentTargetRef?.current ?? control as T, target);
         if (binding.kind === "focus") Object.assign(bridged, { type: event.type === "focusin" ? "focus" : "blur" });
@@ -334,8 +337,10 @@ function useNativeControlEvents<T extends Element>(ref: React.RefObject<HTMLElem
         const handler = handlersRef.current[binding.prop] as ((event: React.SyntheticEvent<T>) => void) | undefined;
         handler?.(bridged);
       };
-      host.addEventListener(binding.eventName, listener, binding.capture);
-      removeListeners.push(() => host.removeEventListener(binding.eventName, listener, binding.capture));
+      const listenerRoot: EventTarget = binding.kind === "scroll" ? (binding.capture ? shadowRoot : scrollControl ?? shadowRoot) : host;
+      const listenerCapture = binding.capture;
+      listenerRoot.addEventListener(binding.eventName, listener, listenerCapture);
+      removeListeners.push(() => listenerRoot.removeEventListener(binding.eventName, listener, listenerCapture));
     }
     const control = shadowRoot.querySelector(selector);
     const transitionRoot = currentTargetRef?.current ?? control;
@@ -452,6 +457,7 @@ function createReactEventBridge<T extends Element>(sourceEvent: Event, dispatchE
     });
   }
   if (sourceEvent instanceof FocusEvent) Object.assign(bridged, { relatedTarget: sourceEvent.relatedTarget });
+  if (sourceEvent instanceof UIEvent) Object.assign(bridged, { detail: sourceEvent.detail, view: sourceEvent.view });
   return bridged;
 }
 
@@ -730,11 +736,12 @@ export const SplitButton = /* @__PURE__ */ React.forwardRef<HTMLElement, Element
 
 export type ToolbarCheckedValueChangeEvent = React.MouseEvent | React.KeyboardEvent;
 export type ToolbarCheckedValueChangeData = { name: string; checkedItems: string[] };
-export type ToolbarProps = ElementProps & { children?: React.ReactNode; label?: string; orientation?: "horizontal" | "vertical"; vertical?: boolean; loop?: boolean; size?: "small" | "medium" | "large"; checkedValues?: ToolbarCheckedValues; defaultCheckedValues?: ToolbarCheckedValues; onCheckedValueChange?: (event: ToolbarCheckedValueChangeEvent, data: ToolbarCheckedValueChangeData) => void };
+export type ToolbarProps = NativeClickHostProps<HTMLDivElement> & { children?: React.ReactNode; label?: string; orientation?: "horizontal" | "vertical"; vertical?: boolean; loop?: boolean; size?: "small" | "medium" | "large"; checkedValues?: ToolbarCheckedValues; defaultCheckedValues?: ToolbarCheckedValues; onCheckedValueChange?: (event: ToolbarCheckedValueChangeEvent, data: ToolbarCheckedValueChangeData) => void };
 
 export const Toolbar = /* @__PURE__ */ React.forwardRef<HTMLElement, ToolbarProps>(function Toolbar({ children, label, orientation = "horizontal", vertical, loop = true, size = "medium", checkedValues, defaultCheckedValues, onCheckedValueChange, ...props }: ToolbarProps, forwardedRef): React.ReactElement {
   const ref = React.useRef<(HTMLElement & { checkedValues?: ToolbarCheckedValues; defaultCheckedValues?: ToolbarCheckedValues }) | null>(null)
   useExposeHostRef(ref, forwardedRef);;
+  useNativeControlEvents(ref, ".toolbar", props.onClick, props.onClickCapture, props);
   ensureDefined(defineToolbar);
   useSpuiEvent(ref, "spui-checked-value-change", (rawDetail, event) => {
     const detail = rawDetail as SpuiEventDetail & { name?: string; checkedItems?: string[]; sourceEvent?: Event; currentTarget?: HTMLElement };
@@ -752,7 +759,7 @@ export const Toolbar = /* @__PURE__ */ React.forwardRef<HTMLElement, ToolbarProp
   const strings = React.useContext(UIContext).strings;
   const accessibleLabel = label || (typeof props["aria-label"] === "string" ? props["aria-label"] : strings.toolbarLabel || "Toolbar");
   const resolvedOrientation = vertical === undefined ? orientation : vertical ? "vertical" : "horizontal";
-  return React.createElement("spui-toolbar", useCustomElementProps({ ...props, ref, label: accessibleLabel, orientation: resolvedOrientation, size, loop: loop ? undefined : "false" }), children);
+  return React.createElement("spui-toolbar", nativeControlHostProps({ ...props, ref, label: accessibleLabel, orientation: resolvedOrientation, size, loop: loop ? undefined : "false" }), children);
 });
 
 export const ToolbarGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string }>(function ToolbarGroup({ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }, forwardedRef): React.ReactElement {
@@ -983,7 +990,7 @@ export function Overflow({ children, label, minimumVisible = 0, overflowDirectio
 }
 
 export type CardOnSelectionChangeEvent = React.MouseEvent | React.KeyboardEvent | React.ChangeEvent;
-export type CardProps = ElementProps & { appearance?: CardAppearance; orientation?: CardOrientation; size?: CardSize; focusMode?: CardFocusMode; selected?: boolean; defaultSelected?: boolean; disabled?: boolean; selectionLabel?: string; checkbox?: React.ReactElement<HTMLInputElement>; floatingAction?: React.ReactNode; onSelectionChange?: (event: CardOnSelectionChangeEvent, data: { selected: boolean }) => void };
+export type CardProps = NativeClickHostProps<HTMLDivElement> & { appearance?: CardAppearance; orientation?: CardOrientation; size?: CardSize; focusMode?: CardFocusMode; selected?: boolean; defaultSelected?: boolean; disabled?: boolean; selectionLabel?: string; checkbox?: React.ReactElement<HTMLInputElement>; floatingAction?: React.ReactNode; onSelectionChange?: (event: CardOnSelectionChangeEvent, data: { selected: boolean }) => void };
 export const Card = /* @__PURE__ */ React.forwardRef<HTMLElement, CardProps>(function Card({ children, appearance = "filled", orientation = "vertical", size = "medium", focusMode, selected, defaultSelected, disabled = false, selectionLabel, checkbox, floatingAction, onSelectionChange, ...props }: CardProps, forwardedRef): React.ReactElement {
   ensureDefined(defineCard);
   const ref = React.useRef<HTMLElement | null>(null);
@@ -992,6 +999,7 @@ export const Card = /* @__PURE__ */ React.forwardRef<HTMLElement, CardProps>(fun
     if (typeof forwardedRef === "function") forwardedRef(element);
     else if (forwardedRef) (forwardedRef as unknown as { current: HTMLElement | null }).current = element;
   }, [forwardedRef]);
+  useNativeControlEvents(ref, ".root", props.onClick, props.onClickCapture, props);
   React.useEffect(() => {
     const element = ref.current;
     if (!element || !onSelectionChange) return;
@@ -1008,7 +1016,7 @@ export const Card = /* @__PURE__ */ React.forwardRef<HTMLElement, CardProps>(fun
   const selectable = selected !== undefined || defaultSelected !== undefined || onSelectionChange !== undefined || checkbox != null;
   const interactive = !disabled && ["onClick", "onDoubleClick", "onMouseUp", "onMouseDown", "onPointerUp", "onPointerDown", "onTouchStart", "onTouchEnd", "onDragStart", "onDragEnd"].some(name => typeof props[name as keyof typeof props] === "function");
   const effectiveFocusMode = focusMode ?? (interactive ? "no-tab" : "off");
-  return React.createElement("spui-card", useCustomElementProps({ ...props, ref: attachRef, appearance, orientation, size, selectable: selectable ? "" : undefined, selected: selected ? "" : undefined, "default-selected": defaultSelected ? "" : undefined, disabled: disabled ? "" : undefined, "selection-label": selectionLabel, "focus-mode": effectiveFocusMode }), children, checkbox == null ? null : React.cloneElement(checkbox, { slot: "checkbox" }), floatingAction == null ? null : React.createElement("div", { slot: "floating-action" }, floatingAction));
+  return React.createElement("spui-card", nativeControlHostProps({ ...props, ref: attachRef, appearance, orientation, size, selectable: selectable ? "" : undefined, selected: selected ? "" : undefined, "default-selected": defaultSelected ? "" : undefined, disabled: disabled ? "" : undefined, "selection-label": selectionLabel, "focus-mode": effectiveFocusMode }), children, checkbox == null ? null : React.cloneElement(checkbox, { slot: "checkbox" }), floatingAction == null ? null : React.createElement("div", { slot: "floating-action" }, floatingAction));
 });
 
 export const SharePointCard = Card;
@@ -6085,8 +6093,11 @@ export function useTableCompositeNavigation(): TableCompositeNavigation {
 
 export const Table = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; size?: TableSize; appearance?: TableAppearance; noNativeElements?: boolean; sortable?: boolean }>(function Table({ children, size = "medium", appearance = "dividers", noNativeElements = false, sortable = false, ...props }: ElementProps & { children?: React.ReactNode; size?: TableSize; appearance?: TableAppearance; noNativeElements?: boolean; sortable?: boolean }, forwardedRef): React.ReactElement {
   ensureDefined(defineNativeTable);
+  const ref = React.useRef<HTMLElement>(null);
+  useExposeHostRef(ref, forwardedRef);
+  useNativeControlEvents(ref, ".viewport", props.onClick, props.onClickCapture, props as unknown as NativeRootEventProps<HTMLDivElement>);
   const tableContextValue = React.useMemo<TableContextValue>(() => ({ size, noNativeElements, sortable }), [size, noNativeElements, sortable]);
-  return React.createElement(TableContext.Provider, { value: tableContextValue }, React.createElement("spui-table", useCustomElementProps({ ref: forwardedRef, ...props, size, appearance, "no-native-elements": noNativeElements || undefined }), children));
+  return React.createElement(TableContext.Provider, { value: tableContextValue }, React.createElement("spui-table", nativeControlHostProps({ ref, ...props, size, appearance, "no-native-elements": noNativeElements || undefined }), children));
 });
 
 export const TableHeader = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode }>(function TableHeader({ children, ...props }: ElementProps & { children?: React.ReactNode }, forwardedRef): React.ReactElement {
@@ -6642,7 +6653,7 @@ export const AccordionItem = /* @__PURE__ */ React.forwardRef<HTMLElement, Eleme
   return React.createElement(AccordionItemOpenContext.Provider, { value: motionOpen }, React.createElement("spui-accordion-item", useCustomElementProps({ ...props, ref, value: String(value), heading, disabled, open: open ?? (defaultOpen || undefined) }), children));
 });
 
-export const AccordionHeader = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { expandIconPosition?: "start" | "end"; inline?: boolean; size?: "small" | "medium" | "large" | "extra-large"; icon?: React.ReactNode; expandIcon?: React.ReactNode; button?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; children?: React.ReactNode }>(function AccordionHeader({ expandIconPosition = "end", inline = false, size = "medium", icon, expandIcon, button, children, ...props }: ElementProps & { expandIconPosition?: "start" | "end"; inline?: boolean; size?: "small" | "medium" | "large" | "extra-large"; icon?: React.ReactNode; expandIcon?: React.ReactNode; button?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; children?: React.ReactNode }, forwardedRef): React.ReactElement {
+export const AccordionHeader = /* @__PURE__ */ React.forwardRef<HTMLElement, NativeClickHostProps<HTMLDivElement> & { expandIconPosition?: "start" | "end"; inline?: boolean; size?: "small" | "medium" | "large" | "extra-large"; icon?: React.ReactNode; expandIcon?: React.ReactNode; button?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; children?: React.ReactNode }>(function AccordionHeader({ expandIconPosition = "end", inline = false, size = "medium", icon, expandIcon, button, children, ...props }: NativeClickHostProps<HTMLDivElement> & { expandIconPosition?: "start" | "end"; inline?: boolean; size?: "small" | "medium" | "large" | "extra-large"; icon?: React.ReactNode; expandIcon?: React.ReactNode; button?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineAccordion);
   const ref = React.useRef<HTMLElement & { button?: React.ButtonHTMLAttributes<HTMLButtonElement> }>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -6650,10 +6661,18 @@ export const AccordionHeader = /* @__PURE__ */ React.forwardRef<HTMLElement, Ele
   React.useLayoutEffect(() => {
     const header = ref.current;
     if (!header) return;
-    header.button = buttonProps;
+    const root = header.shadowRoot?.querySelector<HTMLDivElement>(".header");
+    const bridge = (callback: React.MouseEventHandler<HTMLDivElement> | undefined, event: MouseEvent): void => {
+      if (callback && root) callback(createReactEventBridge(event, event, root, event.target) as React.MouseEvent<HTMLDivElement>);
+    };
+    header.button = {
+      ...buttonProps,
+      onClickCapture: event => { bridge(props.onClickCapture, event as unknown as MouseEvent); buttonProps?.onClickCapture?.(event); },
+      onClick: event => { buttonProps?.onClick?.(event); bridge(props.onClick, event as unknown as MouseEvent); },
+    };
     header.dispatchEvent(new CustomEvent("spui-header-slots-change", { bubbles: true, composed: true }));
-  }, [buttonProps]);
-  return React.createElement("spui-accordion-header", useCustomElementProps({ ...props, ref, slot: "heading", "expand-icon-position": expandIconPosition, inline: inline || undefined, size }),
+  }, [buttonProps, props.onClick, props.onClickCapture]);
+  return React.createElement("spui-accordion-header", nativeControlHostProps({ ...props, ref, slot: "heading", "expand-icon-position": expandIconPosition, inline: inline || undefined, size }),
     icon == null ? null : React.createElement("span", { slot: "icon" }, icon),
     children,
     expandIcon == null ? null : React.createElement("span", { slot: "expand-icon" }, expandIcon));

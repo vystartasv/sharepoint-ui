@@ -16,7 +16,7 @@ export function defineAccordionHeader(): void {
       const shadow = this.attachShadow({ mode: "open" });
       const style = document.createElement("style");
       style.textContent = base + ':host{display:contents}.header{display:flex;align-items:center;gap:8px}.content{min-width:0}.icon,.expand{display:inline-flex;align-items:center;justify-content:center;flex:none}.icon[hidden],.expand[hidden]{display:none}:host([expand-icon-position=start]) .expand{order:-1}:host([open]) .expand{transform:rotate(90deg)}:host(:dir(rtl)) .expand{transform:rotate(180deg)}:host([open]:dir(rtl)) .expand{transform:rotate(90deg)}@media(prefers-reduced-motion:reduce){.expand{transition:none}}';
-      const header = document.createElement("span"); header.className = "header";
+      const header = document.createElement("div"); header.className = "header";
       const icon = document.createElement("span"); icon.className = "icon"; icon.setAttribute("aria-hidden", "true");
       const iconSlot = document.createElement("slot"); iconSlot.name = "icon"; icon.append(iconSlot);
       const content = document.createElement("span"); content.className = "content"; const defaultSlot = document.createElement("slot"); content.append(defaultSlot);
@@ -143,6 +143,10 @@ export function defineAccordion(): void {
         button.append(heading, icon);
         const panel = document.createElement("div"); panel.className = "panel"; panel.part.add("panel"); panel.id = this.panelId; panel.setAttribute("role", "region"); panel.setAttribute("aria-labelledby", this.triggerId);
         const panelSlot = document.createElement("slot"); panelSlot.name = "panel"; panelSlot.append(document.createElement("slot")); panel.append(panelSlot);
+        button.addEventListener("click", event => {
+          const header = button.querySelector<HTMLSlotElement>("slot[name=heading]")?.assignedElements({ flatten: true }).find(element => element.localName === "spui-accordion-header") as (HTMLElement & { button?: { onClickCapture?: (event: MouseEvent) => void } }) | undefined;
+          header?.button?.onClickCapture?.(event);
+        }, true);
         button.addEventListener("click", event => {
           const heading = button.querySelector<HTMLSlotElement>("slot[name=heading]");
           const header = heading?.assignedElements({ flatten: true }).find(element => element.localName === "spui-accordion-header") as (HTMLElement & { button?: { onClick?: (event: MouseEvent) => void } }) | undefined;
