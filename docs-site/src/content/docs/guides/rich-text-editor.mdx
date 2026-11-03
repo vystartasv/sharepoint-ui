@@ -3,9 +3,17 @@ title: Rich text editor
 description: Connect RichTextEditor to your SharePoint page and file picker, then persist its sanitized HTML.
 ---
 
+import RichTextEditorPlayground from "../../../components/RichTextEditorPlayground.astro";
+
 `RichTextEditor` owns editing, formatting, link validation, and HTML sanitization. Your SPFx web part owns SharePoint access: provide a picker callback and save the emitted HTML through your existing list or page data service.
 
 The toolbar includes paragraph, heading, quote, and preformatted block styles; bold, italic, underline, and strikethrough; clear formatting; lists; undo/redo; tables; links; and app-managed image uploads. Restricted SharePoint fields hide unsupported table, image, and link actions.
+
+## Try the editor
+
+Edit the note directly, or switch to **HTML source** to inspect and edit its value. Source changes pass through the editor's sanitizer and update the editable note; changes made in the editor update the source and the displayed sanitized value. Choose an appearance and SharePoint palette to see the editor inherit the theme.
+
+<RichTextEditorPlayground />
 
 ## Connect your picker
 

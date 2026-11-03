@@ -5,7 +5,7 @@
   import { registerPreviewElements } from "./preview-elements.generated.js";
 
   const themePresets = themeCapture.presets;
-  const componentValueSelector = ["input[type=range]", "input[type=checkbox]", "input[type=radio]", "select", "textarea", "spui-slider", "spui-input", "spui-textarea", "spui-select", "spui-radio-group", "spui-combobox", "spui-tag-picker", "spui-color-picker", "spui-spin-button"].join(",");
+  const componentValueSelector = ["input[type=range]", "input[type=checkbox]", "input[type=radio]", "select", "textarea", "spui-slider", "spui-input", "spui-textarea", "spui-select", "spui-radio-group", "spui-combobox", "spui-tag-picker", "spui-color-picker", "spui-spin-button", "spui-rich-text-editor"].join(",");
 
   document.querySelectorAll("[data-component-demo]").forEach(async (demo) => {
     const appearance = demo.querySelector("[data-preview-appearance]");
@@ -57,7 +57,9 @@
       const value = control?.checked !== undefined && ["checkbox", "radio"].includes(control?.type)
         ? (control.checked ? "selected" : "not selected")
         : control?.value;
-      const selectedValue = value !== undefined && value !== "" ? ` · Value: ${Array.isArray(value) ? value.join(", ") : value}` : "";
+      const isRichTextValue = control?.localName === "spui-rich-text-editor" || control?.hasAttribute?.("data-html-source");
+      const displayValue = isRichTextValue && value !== undefined ? `${String(value).length} HTML characters` : Array.isArray(value) ? value.join(", ") : value;
+      const selectedValue = displayValue !== undefined && displayValue !== "" ? ` · Value: ${displayValue}` : "";
       const selection = theme?.selectedOptions?.[0]?.textContent ?? preset.label ?? "SharePoint teal";
       status.textContent = `${selection} theme · accent ${accent?.value ?? preset.accent}${selectedValue}${interactionSummary}`;
     };
@@ -82,6 +84,7 @@
         } else updateStatus(target);
       });
     }
+    stage?.addEventListener("spui-input", event => updateStatus(event.target));
     stage?.addEventListener("spui-selection-change", (event) => {
       const detail = event.detail ?? {};
       const values = Array.isArray(detail.selectedValues) ? detail.selectedValues : detail.selectedValue ? [detail.selectedValue] : [];
