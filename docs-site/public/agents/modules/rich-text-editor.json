@@ -67,6 +67,10 @@
           {
             "name": "SharePointUIProvider.strings.richText*",
             "description": "Localize the text-style menu, block names, formatting buttons, table actions, link editor, image controls, and required message."
+          },
+          {
+            "name": "RichTextEditor full HTML formatting",
+            "description": "Subscript, superscript, and left/center/right/justified paragraph alignment are available only when the effective contentMode is html. Localize them with SharePointUIProvider.strings.richTextSubscript, richTextSuperscript, richTextAlignLeft, richTextAlignCenter, richTextAlignRight, and richTextAlignJustify."
           }
         ],
         "callbackProps": [
@@ -90,6 +94,10 @@
         "Preview SharePoint page titles and destination details before inserting internal links."
       ],
       "customElementAttributes": [
+        "align-center-label",
+        "align-justify-label",
+        "align-left-label",
+        "align-right-label",
         "allow-hyperlink",
         "aria-describedby",
         "aria-description",
@@ -147,6 +155,8 @@
         "required",
         "required-message",
         "strike-label",
+        "subscript-label",
+        "superscript-label",
         "text-color-label",
         "theme-accent-label",
         "toolbar-label",

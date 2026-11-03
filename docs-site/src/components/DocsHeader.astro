@@ -6,13 +6,12 @@ import SocialIcons from "virtual:starlight/components/SocialIcons";
 import LanguageSelect from "virtual:starlight/components/LanguageSelect";
 
 const shouldRenderSearch = config.pagefind || config.components.Search !== "@astrojs/starlight/components/Search.astro";
-const isLandingPage = Astro.url.pathname.replace(/\/+$/, "") === "/sharepoint-ui";
 ---
 
 <div class="docs-header">
   <div class="docs-header__title"><SiteTitle /></div>
   <div class="docs-header__search">{shouldRenderSearch && <Search />}</div>
-  {isLandingPage && <details class="docs-mobile-nav">
+  <details class="docs-mobile-nav">
     <summary aria-label="Open site navigation" title="Open site navigation"><span aria-hidden="true">☰</span></summary>
     <nav aria-label="Site navigation">
       <a href="/sharepoint-ui/catalog/">Browse components</a>
@@ -21,7 +20,7 @@ const isLandingPage = Astro.url.pathname.replace(/\/+$/, "") === "/sharepoint-ui
       <a href="/sharepoint-ui/guides/copilot-ux/">Copilot UX example</a>
       <a href="/sharepoint-ui/agents/">Agent documentation</a>
     </nav>
-  </details>}
+  </details>
   <div class="docs-header__right">
     <div class="docs-header__social"><SocialIcons /></div>
     <button class="docs-theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme" title="Switch to dark theme">

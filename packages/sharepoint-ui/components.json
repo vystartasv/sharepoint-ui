@@ -1502,8 +1502,17 @@
           "Field label, hint, and validation states",
           "id, ARIA, data attributes, className, and style"
         ],
-        "customElementProperties": ["field", "value", "defaultValue", "options", "onValueChange", "renderUnsupported"],
-        "customElementEvents": ["spui-field-value-change"]
+        "customElementProperties": [
+          "field",
+          "value",
+          "defaultValue",
+          "options",
+          "onValueChange",
+          "renderUnsupported"
+        ],
+        "customElementEvents": [
+          "spui-field-value-change"
+        ]
       }
     },
     {
@@ -2349,6 +2358,10 @@
           {
             "name": "SharePointUIProvider.strings.richText*",
             "description": "Localize the text-style menu, block names, formatting buttons, table actions, link editor, image controls, and required message."
+          },
+          {
+            "name": "RichTextEditor full HTML formatting",
+            "description": "Subscript, superscript, and left/center/right/justified paragraph alignment are available only when the effective contentMode is html. Localize them with SharePointUIProvider.strings.richTextSubscript, richTextSuperscript, richTextAlignLeft, richTextAlignCenter, richTextAlignRight, and richTextAlignJustify."
           }
         ],
         "callbackProps": [
