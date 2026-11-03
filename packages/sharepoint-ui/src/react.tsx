@@ -222,10 +222,26 @@ function useHostProps(props: Record<string, unknown>): Record<string, unknown> {
   const className = props.className;
   return { ...props, className, "data-spui-appearance": props["data-spui-appearance"] ?? context.appearance, "data-spui-base-appearance": props["data-spui-base-appearance"] ?? context.baseAppearance, style, ...(props.lang === undefined && lang ? { lang } : {}), ...(props.dir === undefined && dir ? { dir } : {}) };
 }
+function bridgeCustomElementClick(handler: React.MouseEventHandler<HTMLElement>): React.MouseEventHandler<HTMLElement> {
+  return (event: React.MouseEvent<HTMLElement>) => {
+    const host = event.currentTarget;
+    const sourceEvent = event.nativeEvent;
+    const path = sourceEvent.composedPath();
+    const shadowRoot = host.shadowRoot;
+    const currentTarget = shadowRoot ? [...path].reverse().find((entry): entry is HTMLElement => entry instanceof HTMLElement && entry.getRootNode() === shadowRoot && !(entry instanceof HTMLSlotElement)) ?? host : host;
+    const target = path.find((entry): entry is Element => entry instanceof Element && !(entry instanceof HTMLSlotElement)) ?? host;
+    handler(createReactEventBridge(sourceEvent, sourceEvent, currentTarget, target) as React.MouseEvent<HTMLElement>);
+  };
+}
 function customElementProps(hostProps: Record<string, unknown>): Record<string, unknown> {
-  if (typeof hostProps.className !== "string") return hostProps;
-  const { className, ...attributes } = hostProps;
-  return { ...attributes, class: className };
+  const { className, onClick, onClickCapture, ...attributes } = hostProps;
+  if (typeof className !== "string" && typeof onClick !== "function" && typeof onClickCapture !== "function") return hostProps;
+  return {
+    ...attributes,
+    ...(className === undefined ? {} : typeof className === "string" ? { class: className } : { className }),
+    ...(onClick === undefined ? {} : { onClick: typeof onClick === "function" ? bridgeCustomElementClick(onClick as React.MouseEventHandler<HTMLElement>) : onClick }),
+    ...(onClickCapture === undefined ? {} : { onClickCapture: typeof onClickCapture === "function" ? bridgeCustomElementClick(onClickCapture as React.MouseEventHandler<HTMLElement>) : onClickCapture }),
+  };
 }
 function useCustomElementProps(props: Record<string, unknown>): Record<string, unknown> {
   return customElementProps(useHostProps(props));
@@ -865,7 +881,7 @@ export function Overflow({ children, label, minimumVisible = 0, overflowDirectio
 }
 
 export type CardOnSelectionChangeEvent = React.MouseEvent | React.KeyboardEvent | React.ChangeEvent;
-export type CardProps = ElementProps & { appearance?: CardAppearance; orientation?: CardOrientation; size?: CardSize; focusMode?: CardFocusMode; selected?: boolean; defaultSelected?: boolean; disabled?: boolean; selectionLabel?: string; checkbox?: React.ReactElement<HTMLInputElement>; floatingAction?: React.ReactNode; onSelectionChange?: (event: CardOnSelectionChangeEvent, data: { selected: boolean }) => void };
+export type CardProps = Omit<ElementProps, "onClick" | "onClickCapture"> & { onClick?: React.MouseEventHandler<HTMLDivElement>; onClickCapture?: React.MouseEventHandler<HTMLDivElement>; appearance?: CardAppearance; orientation?: CardOrientation; size?: CardSize; focusMode?: CardFocusMode; selected?: boolean; defaultSelected?: boolean; disabled?: boolean; selectionLabel?: string; checkbox?: React.ReactElement<HTMLInputElement>; floatingAction?: React.ReactNode; onSelectionChange?: (event: CardOnSelectionChangeEvent, data: { selected: boolean }) => void };
 export const Card = /* @__PURE__ */ React.forwardRef<HTMLElement, CardProps>(function Card({ children, appearance = "filled", orientation = "vertical", size = "medium", focusMode, selected, defaultSelected, disabled = false, selectionLabel, checkbox, floatingAction, onSelectionChange, ...props }: CardProps, forwardedRef): React.ReactElement {
   ensureDefined(defineCard);
   const ref = React.useRef<HTMLElement | null>(null);
@@ -2009,9 +2025,10 @@ export const BreadcrumbDivider = /* @__PURE__ */ React.forwardRef<HTMLElement, E
   return React.createElement("spui-breadcrumb-divider", useCustomElementProps({ ...props, ref: forwardedRef }), children);
 });
 
-export const Nav = /* @__PURE__ */ React.forwardRef<HTMLElement, Omit<ElementProps, "onSelect"> & { children?: React.ReactNode; label?: string; selectedValue?: string | null; defaultSelectedValue?: string | null; selectedCategoryValue?: string | null; defaultSelectedCategoryValue?: string | null; openCategories?: readonly string[]; defaultOpenCategories?: readonly string[]; open?: boolean; defaultOpen?: boolean; collapsed?: boolean; defaultCollapsed?: boolean; collapsible?: boolean; multiple?: boolean; density?: "small" | "medium" | "large"; tabbable?: boolean | "true" | "false"; openLabel?: string; closeLabel?: string; onItemSelect?: (value: string, href: string | null, label: string) => void; onCategoryToggle?: (value: string, open: boolean, openCategories: string[]) => void; onNavItemSelect?: (event: SharePointUIEvent, data: NavReactItemSelectData) => void; onNavCategoryItemToggle?: (event: SharePointUIEvent, data: NavReactCategoryToggleData) => void; onOpenChange?: (open: boolean) => void; onCollapsedChange?: (collapsed: boolean) => void }>(function Nav({ children, label = "Navigation", selectedValue, defaultSelectedValue, selectedCategoryValue, defaultSelectedCategoryValue, openCategories, defaultOpenCategories = [], open, defaultOpen, collapsed, defaultCollapsed, collapsible = false, multiple = true, density = "medium", openLabel, closeLabel, onItemSelect, onCategoryToggle, onNavItemSelect, onNavCategoryItemToggle, onOpenChange, onCollapsedChange, ...props }: Omit<ElementProps, "onSelect"> & { children?: React.ReactNode; label?: string; selectedValue?: string | null; defaultSelectedValue?: string | null; selectedCategoryValue?: string | null; defaultSelectedCategoryValue?: string | null; openCategories?: readonly string[]; defaultOpenCategories?: readonly string[]; open?: boolean; defaultOpen?: boolean; collapsed?: boolean; defaultCollapsed?: boolean; collapsible?: boolean; multiple?: boolean; density?: "small" | "medium" | "large"; tabbable?: boolean | "true" | "false"; openLabel?: string; closeLabel?: string; onItemSelect?: (value: string, href: string | null, label: string) => void; onCategoryToggle?: (value: string, open: boolean, openCategories: string[]) => void; onNavItemSelect?: (event: SharePointUIEvent, data: NavReactItemSelectData) => void; onNavCategoryItemToggle?: (event: SharePointUIEvent, data: NavReactCategoryToggleData) => void; onOpenChange?: (open: boolean) => void; onCollapsedChange?: (collapsed: boolean) => void }, forwardedRef): React.ReactElement {
+export const Nav = /* @__PURE__ */ React.forwardRef<HTMLElement, Omit<ElementProps, "onSelect" | "onClick" | "onClickCapture"> & { onClick?: React.MouseEventHandler<HTMLElement>; onClickCapture?: React.MouseEventHandler<HTMLElement>; children?: React.ReactNode; label?: string; selectedValue?: string | null; defaultSelectedValue?: string | null; selectedCategoryValue?: string | null; defaultSelectedCategoryValue?: string | null; openCategories?: readonly string[]; defaultOpenCategories?: readonly string[]; open?: boolean; defaultOpen?: boolean; collapsed?: boolean; defaultCollapsed?: boolean; collapsible?: boolean; multiple?: boolean; density?: "small" | "medium" | "large"; tabbable?: boolean | "true" | "false"; openLabel?: string; closeLabel?: string; onItemSelect?: (value: string, href: string | null, label: string) => void; onCategoryToggle?: (value: string, open: boolean, openCategories: string[]) => void; onNavItemSelect?: (event: SharePointUIEvent, data: NavReactItemSelectData) => void; onNavCategoryItemToggle?: (event: SharePointUIEvent, data: NavReactCategoryToggleData) => void; onOpenChange?: (open: boolean) => void; onCollapsedChange?: (collapsed: boolean) => void }>(function Nav({ children, label = "Navigation", selectedValue, defaultSelectedValue, selectedCategoryValue, defaultSelectedCategoryValue, openCategories, defaultOpenCategories = [], open, defaultOpen, collapsed, defaultCollapsed, collapsible = false, multiple = true, density = "medium", openLabel, closeLabel, onItemSelect, onCategoryToggle, onNavItemSelect, onNavCategoryItemToggle, onOpenChange, onCollapsedChange, onClick, onClickCapture, ...props }: Omit<ElementProps, "onSelect" | "onClick" | "onClickCapture"> & { onClick?: React.MouseEventHandler<HTMLElement>; onClickCapture?: React.MouseEventHandler<HTMLElement>; children?: React.ReactNode; label?: string; selectedValue?: string | null; defaultSelectedValue?: string | null; selectedCategoryValue?: string | null; defaultSelectedCategoryValue?: string | null; openCategories?: readonly string[]; defaultOpenCategories?: readonly string[]; open?: boolean; defaultOpen?: boolean; collapsed?: boolean; defaultCollapsed?: boolean; collapsible?: boolean; multiple?: boolean; density?: "small" | "medium" | "large"; tabbable?: boolean | "true" | "false"; openLabel?: string; closeLabel?: string; onItemSelect?: (value: string, href: string | null, label: string) => void; onCategoryToggle?: (value: string, open: boolean, openCategories: string[]) => void; onNavItemSelect?: (event: SharePointUIEvent, data: NavReactItemSelectData) => void; onNavCategoryItemToggle?: (event: SharePointUIEvent, data: NavReactCategoryToggleData) => void; onOpenChange?: (open: boolean) => void; onCollapsedChange?: (collapsed: boolean) => void }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
+  useNativeControlEvents(ref, "nav", onClick, onClickCapture);
   const defaultsApplied = React.useRef(false);
   const strings = React.useContext(UIContext).strings;
   ensureDefined(defineNav);
@@ -2041,9 +2058,12 @@ function renderNavAvatar(avatar?: React.ReactElement): React.ReactElement | null
   return avatar ? React.cloneElement(avatar, { slot: "avatar", ...(avatar.type === Avatar ? { decorative: true } : {}) } as React.HTMLAttributes<HTMLElement>) : null;
 }
 
-export const NavItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }>(function NavItem({ children, value, href, disabled = false, icon, avatar, ...props }: ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }, forwardedRef): React.ReactElement {
+export const NavItem = /* @__PURE__ */ React.forwardRef<HTMLElement, NativeClickHostProps<HTMLButtonElement | HTMLAnchorElement> & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }>(function NavItem({ children, value, href, disabled = false, icon, avatar, onClick, onClickCapture, ...props }: NativeClickHostProps<HTMLButtonElement | HTMLAnchorElement> & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }, forwardedRef): React.ReactElement {
+  const ref = React.useRef<HTMLElement>(null);
+  useExposeHostRef(ref, forwardedRef);
+  useNativeButtonEvents(ref, onClick, onClickCapture);
   ensureDefined(defineNavItem);
-  return React.createElement("spui-nav-item", useCustomElementProps({ ref: forwardedRef, ...props, value, href, disabled: disabled || undefined }), renderNavAvatar(avatar), icon === undefined ? null : React.createElement("span", { slot: "icon" }, icon), children);
+  return React.createElement("spui-nav-item", useCustomElementProps({ ref, ...props, value, href, disabled: disabled || undefined }), renderNavAvatar(avatar), icon === undefined ? null : React.createElement("span", { slot: "icon" }, icon), children);
 });
 
 type NavCategoryMotionContextValue = { open: boolean; setOpen: (open: boolean) => void };
@@ -2057,10 +2077,11 @@ export const NavCategory = /* @__PURE__ */ React.forwardRef<HTMLElement, Element
   return React.createElement(NavCategoryMotionContext.Provider, { value: context }, React.createElement("spui-nav-category", useCustomElementProps({ ref: forwardedRef, ...props, value, disabled: disabled || undefined }), children));
 });
 
-export const NavCategoryItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; avatar?: React.ReactElement; expandIcon?: React.ReactNode; expandIconMotion?: React.ComponentType<PresenceMotionSlotProps> }>(function NavCategoryItem({ children, icon, avatar, expandIcon, expandIconMotion, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; avatar?: React.ReactElement; expandIcon?: React.ReactNode; expandIconMotion?: React.ComponentType<PresenceMotionSlotProps> }, forwardedRef): React.ReactElement {
+export const NavCategoryItem = /* @__PURE__ */ React.forwardRef<HTMLElement, NativeButtonHostProps & { children?: React.ReactNode; icon?: React.ReactNode; avatar?: React.ReactElement; expandIcon?: React.ReactNode; expandIconMotion?: React.ComponentType<PresenceMotionSlotProps> }>(function NavCategoryItem({ children, icon, avatar, expandIcon, expandIconMotion, onClick, onClickCapture, ...props }: NativeButtonHostProps & { children?: React.ReactNode; icon?: React.ReactNode; avatar?: React.ReactElement; expandIcon?: React.ReactNode; expandIconMotion?: React.ComponentType<PresenceMotionSlotProps> }, forwardedRef): React.ReactElement {
   const category = React.useContext(NavCategoryMotionContext);
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
+  useNativeButtonEvents(ref, onClick, onClickCapture);
   ensureDefined(defineNavCategoryItem);
   React.useLayoutEffect(() => {
     const element = ref.current;
@@ -2085,9 +2106,12 @@ export const NavSubItemGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, Ele
   return React.createElement("spui-nav-sub-item-group", useCustomElementProps({ ref: forwardedRef, ...props, motion: collapseMotion ? true : undefined }), content);
 });
 
-export const NavSubItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }>(function NavSubItem({ children, value, href, disabled = false, icon, avatar, ...props }: ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }, forwardedRef): React.ReactElement {
+export const NavSubItem = /* @__PURE__ */ React.forwardRef<HTMLElement, NativeClickHostProps<HTMLButtonElement | HTMLAnchorElement> & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }>(function NavSubItem({ children, value, href, disabled = false, icon, avatar, onClick, onClickCapture, ...props }: NativeClickHostProps<HTMLButtonElement | HTMLAnchorElement> & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }, forwardedRef): React.ReactElement {
+  const ref = React.useRef<HTMLElement>(null);
+  useExposeHostRef(ref, forwardedRef);
+  useNativeButtonEvents(ref, onClick, onClickCapture);
   ensureDefined(defineNavSubItem);
-  return React.createElement("spui-nav-sub-item", useCustomElementProps({ ref: forwardedRef, ...props, value, href, disabled: disabled || undefined }), renderNavAvatar(avatar), icon === undefined ? null : React.createElement("span", { slot: "icon" }, icon), children);
+  return React.createElement("spui-nav-sub-item", useCustomElementProps({ ref, ...props, value, href, disabled: disabled || undefined }), renderNavAvatar(avatar), icon === undefined ? null : React.createElement("span", { slot: "icon" }, icon), children);
 });
 
 export type NavDividerProps = ElementProps & { wrapper?: DividerWrapper; alignContent?: "start" | "center" | "end"; appearance?: DividerAppearance; inset?: boolean; vertical?: boolean };
@@ -2101,9 +2125,12 @@ export const NavSectionHeader = /* @__PURE__ */ React.forwardRef<HTMLElement, El
   return React.createElement("spui-nav-section-header", useCustomElementProps({ ref: forwardedRef, ...props }), children);
 });
 
-export const AppItem = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }>(function AppItem({ children, value, href, disabled = false, icon, avatar, ...props }: ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }, forwardedRef): React.ReactElement {
+export const AppItem = /* @__PURE__ */ React.forwardRef<HTMLElement, NativeClickHostProps<HTMLButtonElement | HTMLAnchorElement> & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }>(function AppItem({ children, value, href, disabled = false, icon, avatar, onClick, onClickCapture, ...props }: NativeClickHostProps<HTMLButtonElement | HTMLAnchorElement> & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }, forwardedRef): React.ReactElement {
+  const ref = React.useRef<HTMLElement>(null);
+  useExposeHostRef(ref, forwardedRef);
+  useNativeButtonEvents(ref, onClick, onClickCapture);
   ensureDefined(defineAppItem);
-  return React.createElement("spui-app-item", useCustomElementProps({ ref: forwardedRef, ...props, value, href, disabled: disabled || undefined }), renderNavAvatar(avatar), icon === undefined ? null : React.createElement("span", { slot: "icon" }, icon), children);
+  return React.createElement("spui-app-item", useCustomElementProps({ ref, ...props, value, href, disabled: disabled || undefined }), renderNavAvatar(avatar), icon === undefined ? null : React.createElement("span", { slot: "icon" }, icon), children);
 });
 
 export const AppItemStatic = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode }>(function AppItemStatic({ children, icon, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode }, forwardedRef): React.ReactElement {

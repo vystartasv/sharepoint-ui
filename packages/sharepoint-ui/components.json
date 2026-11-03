@@ -614,7 +614,7 @@
       "module": "button",
       "category": "actions",
       "api": {
-        "reactSignature": "{ as = \"button\", icon, iconPosition = \"before\", disabledFocusable = false, vertical = false, download, hrefLang, referrerPolicy, formAction, formEncType, formMethod, formNoValidate, formTarget, value, ...props }: ButtonProps",
+        "reactSignature": "{ as = \"button\", icon, iconPosition = \"before\", disabledFocusable = false, vertical = false, download, hrefLang, referrerPolicy, formAction, formEncType, formMethod, formNoValidate, formTarget, value, onClick, onClickCapture, ...props }: ButtonProps",
         "reactRefType": "HTMLElement",
         "callbackProps": [],
         "slots": [],
@@ -634,7 +634,7 @@
       "module": "button-variants",
       "category": "actions",
       "api": {
-        "reactSignature": "{ children, icon, menuIcon, appearance = \"secondary\", size = \"medium\", shape = \"rounded\", disabled, disabledFocusable = false, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; menuIcon?: React.ReactNode; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; type?: \"button\" | \"submit\" | \"reset\" }",
+        "reactSignature": "{ children, icon, menuIcon, appearance = \"secondary\", size = \"medium\", shape = \"rounded\", disabled, disabledFocusable = false, onClick, onClickCapture, ...props }: NativeButtonHostProps & { children?: React.ReactNode; icon?: React.ReactNode; menuIcon?: React.ReactNode; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; type?: \"button\" | \"submit\" | \"reset\" }",
         "callbackProps": [
           "onClick"
         ],
@@ -660,7 +660,7 @@
       "module": "button-variants",
       "category": "actions",
       "api": {
-        "reactSignature": "{ children, secondaryContent, contentContainer, icon, iconPosition = \"before\", appearance = \"secondary\", size = \"medium\", shape = \"rounded\", disabled, disabledFocusable = false, ...props }: ElementProps & { children?: React.ReactNode; secondaryContent?: React.ReactNode; contentContainer?: React.ReactElement; icon?: React.ReactNode; iconPosition?: \"before\" | \"after\"; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean }",
+        "reactSignature": "{ children, secondaryContent, contentContainer, icon, iconPosition = \"before\", appearance = \"secondary\", size = \"medium\", shape = \"rounded\", disabled, disabledFocusable = false, onClick, onClickCapture, ...props }: NativeButtonHostProps & { children?: React.ReactNode; secondaryContent?: React.ReactNode; contentContainer?: React.ReactElement; icon?: React.ReactNode; iconPosition?: \"before\" | \"after\"; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean }",
         "callbackProps": [],
         "slots": [
           "default",
@@ -685,7 +685,7 @@
       "module": "button-variants",
       "category": "actions",
       "api": {
-        "reactSignature": "{ children, pressed, defaultPressed, checked, defaultChecked, isAccessible = false, onPressedChange, onCheckedChange, appearance = \"secondary\", size = \"medium\", shape = \"rounded\", disabled, disabledFocusable = false, icon, iconPosition = \"before\", ...props }: ElementProps & { children?: React.ReactNode; pressed?: boolean; defaultPressed?: boolean; checked?: boolean; defaultChecked?: boolean; isAccessible?: boolean; onPressedChange?: (pressed: boolean) => void; onCheckedChange?: (checked: boolean) => void; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; icon?: React.ReactNode; iconPosition?: \"before\" | \"after\"; name?: string; value?: string }",
+        "reactSignature": "{ children, pressed, defaultPressed, checked, defaultChecked, isAccessible = false, onPressedChange, onCheckedChange, appearance = \"secondary\", size = \"medium\", shape = \"rounded\", disabled, disabledFocusable = false, icon, iconPosition = \"before\", onClick, onClickCapture, ...props }: NativeButtonHostProps & { children?: React.ReactNode; pressed?: boolean; defaultPressed?: boolean; checked?: boolean; defaultChecked?: boolean; isAccessible?: boolean; onPressedChange?: (pressed: boolean) => void; onCheckedChange?: (checked: boolean) => void; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; icon?: React.ReactNode; iconPosition?: \"before\" | \"after\"; name?: string; value?: string }",
         "callbackProps": [
           "onPressedChange",
           "onCheckedChange"
@@ -2829,7 +2829,7 @@
       "module": "link",
       "category": "navigation",
       "api": {
-        "reactSignature": "{ href, target, rel, download, hrefLang, hreflang, media, ping, type, referrerPolicy, title, appearance = \"default\", underline = \"hover\", disabled = false, disabledFocusable = false, inline = false, as, children, ...props }: LinkProps",
+        "reactSignature": "{ href, target, rel, download, hrefLang, hreflang, media, ping, type, referrerPolicy, title, appearance = \"default\", underline = \"hover\", disabled = false, disabledFocusable = false, inline = false, as, children, onClick, onClickCapture, ...props }: LinkProps",
         "callbackProps": [],
         "slots": [
           "default"
@@ -4859,7 +4859,7 @@
       "module": "nav",
       "category": "navigation",
       "api": {
-        "reactSignature": "{ children, label = \"Navigation\", selectedValue, defaultSelectedValue, selectedCategoryValue, defaultSelectedCategoryValue, openCategories, defaultOpenCategories = [], open, defaultOpen, collapsed, defaultCollapsed, collapsible = false, multiple = true, density = \"medium\", openLabel, closeLabel, onItemSelect, onCategoryToggle, onNavItemSelect, onNavCategoryItemToggle, onOpenChange, onCollapsedChange, ...props }: Omit<ElementProps, \"onSelect\"> & { children?: React.ReactNode; label?: string; selectedValue?: string | null; defaultSelectedValue?: string | null; selectedCategoryValue?: string | null; defaultSelectedCategoryValue?: string | null; openCategories?: readonly string[]; defaultOpenCategories?: readonly string[]; open?: boolean; defaultOpen?: boolean; collapsed?: boolean; defaultCollapsed?: boolean; collapsible?: boolean; multiple?: boolean; density?: \"small\" | \"medium\" | \"large\"; tabbable?: boolean | \"true\" | \"false\"; openLabel?: string; closeLabel?: string; onItemSelect?: (value: string, href: string | null, label: string) => void; onCategoryToggle?: (value: string, open: boolean, openCategories: string[]) => void; onNavItemSelect?: (event: SharePointUIEvent, data: NavReactItemSelectData) => void; onNavCategoryItemToggle?: (event: SharePointUIEvent, data: NavReactCategoryToggleData) => void; onOpenChange?: (open: boolean) => void; onCollapsedChange?: (collapsed: boolean) => void }",
+        "reactSignature": "{ children, label = \"Navigation\", selectedValue, defaultSelectedValue, selectedCategoryValue, defaultSelectedCategoryValue, openCategories, defaultOpenCategories = [], open, defaultOpen, collapsed, defaultCollapsed, collapsible = false, multiple = true, density = \"medium\", openLabel, closeLabel, onItemSelect, onCategoryToggle, onNavItemSelect, onNavCategoryItemToggle, onOpenChange, onCollapsedChange, onClick, onClickCapture, ...props }: Omit<ElementProps, \"onSelect\" | \"onClick\" | \"onClickCapture\"> & { onClick?: React.MouseEventHandler<HTMLElement>; onClickCapture?: React.MouseEventHandler<HTMLElement>; children?: React.ReactNode; label?: string; selectedValue?: string | null; defaultSelectedValue?: string | null; selectedCategoryValue?: string | null; defaultSelectedCategoryValue?: string | null; openCategories?: readonly string[]; defaultOpenCategories?: readonly string[]; open?: boolean; defaultOpen?: boolean; collapsed?: boolean; defaultCollapsed?: boolean; collapsible?: boolean; multiple?: boolean; density?: \"small\" | \"medium\" | \"large\"; tabbable?: boolean | \"true\" | \"false\"; openLabel?: string; closeLabel?: string; onItemSelect?: (value: string, href: string | null, label: string) => void; onCategoryToggle?: (value: string, open: boolean, openCategories: string[]) => void; onNavItemSelect?: (event: SharePointUIEvent, data: NavReactItemSelectData) => void; onNavCategoryItemToggle?: (event: SharePointUIEvent, data: NavReactCategoryToggleData) => void; onOpenChange?: (open: boolean) => void; onCollapsedChange?: (collapsed: boolean) => void }",
         "callbackProps": [
           "onItemSelect",
           "onCategoryToggle",
@@ -4894,7 +4894,7 @@
       "module": "nav",
       "category": "navigation",
       "api": {
-        "reactSignature": "{ children, value, href, disabled = false, icon, avatar, ...props }: ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }",
+        "reactSignature": "{ children, value, href, disabled = false, icon, avatar, onClick, onClickCapture, ...props }: NativeClickHostProps<HTMLButtonElement | HTMLAnchorElement> & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }",
         "callbackProps": [],
         "slots": [
           "default",
@@ -4941,7 +4941,7 @@
       "module": "nav",
       "category": "navigation",
       "api": {
-        "reactSignature": "{ children, icon, avatar, expandIcon, expandIconMotion, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; avatar?: React.ReactElement; expandIcon?: React.ReactNode; expandIconMotion?: React.ComponentType<PresenceMotionSlotProps> }",
+        "reactSignature": "{ children, icon, avatar, expandIcon, expandIconMotion, onClick, onClickCapture, ...props }: NativeButtonHostProps & { children?: React.ReactNode; icon?: React.ReactNode; avatar?: React.ReactElement; expandIcon?: React.ReactNode; expandIconMotion?: React.ComponentType<PresenceMotionSlotProps> }",
         "callbackProps": [],
         "slots": [
           "default",
@@ -4990,7 +4990,7 @@
       "module": "nav",
       "category": "navigation",
       "api": {
-        "reactSignature": "{ children, value, href, disabled = false, icon, avatar, ...props }: ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }",
+        "reactSignature": "{ children, value, href, disabled = false, icon, avatar, onClick, onClickCapture, ...props }: NativeClickHostProps<HTMLButtonElement | HTMLAnchorElement> & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }",
         "callbackProps": [],
         "slots": [
           "default",
@@ -5583,7 +5583,7 @@
       "module": "nav",
       "category": "navigation",
       "api": {
-        "reactSignature": "{ children, value, href, disabled = false, icon, avatar, ...props }: ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }",
+        "reactSignature": "{ children, value, href, disabled = false, icon, avatar, onClick, onClickCapture, ...props }: NativeClickHostProps<HTMLButtonElement | HTMLAnchorElement> & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }",
         "callbackProps": [],
         "slots": [
           "default",
@@ -5630,7 +5630,7 @@
       "module": "nav",
       "category": "navigation",
       "api": {
-        "reactSignature": "{ children, icon, open = false, label, disabled = false, disabledFocusable = false, appearance = \"subtle\", iconPosition = \"before\", shape = \"rounded\", size = \"medium\", ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; open?: boolean; label?: string; disabled?: boolean; disabledFocusable?: boolean; appearance?: ButtonAppearance; iconPosition?: \"before\" | \"after\"; shape?: ButtonShape; size?: ButtonSize; onClick?: React.MouseEventHandler<HTMLElement> }",
+        "reactSignature": "{ children, icon, open = false, label, disabled = false, disabledFocusable = false, appearance = \"subtle\", iconPosition = \"before\", shape = \"rounded\", size = \"medium\", onClick, onClickCapture, ...props }: HamburgerProps",
         "callbackProps": [],
         "slots": [
           "icon",

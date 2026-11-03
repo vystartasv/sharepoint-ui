@@ -1,5 +1,15 @@
 # Fluent UI React v9 parity plan
 
+### Navigation native-root event contracts — Fluent 9.75.0 declarations and local Chromium, 2026-11-03
+
+The installed Fluent Nav source declares a `div` root, NavItem an anchor root, and the category disclosure is a button. Local custom elements had direct React handlers on their hosts. Nav, NavItem, NavSubItem, AppItem, and NavCategoryItem now bridge click and capture callbacks to their native root controls; the Nav fixture checks callback target/currentTarget and compiles event types for those controls. The local Nav keeps its semantic `nav` root and NavItem uses a button when no destination exists, so its tag and types reflect that local semantic/polymorphic behavior rather than copying Fluent's element choice exactly.
+
+### React click handlers on custom-element root slots — Fluent 9.75.0 declarations and local Chromium, 2026-11-03
+
+Most adapters inherit React event props from `ElementProps` and pass them through `useCustomElementProps`. A shared `customElementProps` bridge now maps click and capture events to the outermost element in that host's own shadow-root event path, while preserving the real event target and React-style prevent/stop behavior. This covers components without a specialized native-control bridge; Card's Fluent root is a `div`, so its React props now type `currentTarget` as `HTMLDivElement`, and its focused test checks native click/capture shape. The remaining generic event families (`pointer`, keyboard, focus, form, and drag callbacks) are not bridged by this change and remain open parity work.
+
+`scripts/sync-component-catalog-signatures.mjs` now regenerates the catalog's first React parameter signatures from the TypeScript AST. The first parity gate after the event typing changes caught 11 stale signatures; regeneration updated them and `catalog:check-signatures` now confirms all 243 match. `parity:check` passes after the update. This automates only signature freshness; slot summaries and callback documentation remain separately maintained.
+
 ### Native-root React click events across action controls — Fluent 9.75.0 contracts and local Chromium, 2026-11-03
 
 The custom-element host was receiving React click handlers for controls whose Fluent root slot is a native button, anchor, or span. Shadow retargeting therefore exposed the host as `currentTarget`, and host-level handlers could lose the native target shape. Added a shared bridge that resolves the action root from that component's own shadow tree and forwards both `onClick` and `onClickCapture` with the native event. Applied it to Button, MenuButton, CompoundButton, ToggleButton, Hamburger, and Link; Link's keyboard activation now clicks its internal span so the bridged native event follows the same path. Focused fixtures assert native target/currentTarget and callback behavior. Other components that forward inherited React event props still need a runtime audit; this is not full event or Fluent behavior parity.

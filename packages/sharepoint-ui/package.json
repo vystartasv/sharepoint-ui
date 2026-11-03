@@ -61,6 +61,8 @@
     "build": "tsc -p tsconfig.json",
     "prepublishOnly": "npm run build",
     "catalog:check": "node scripts/validate-component-catalog.mjs",
+    "catalog:sync-signatures": "node scripts/sync-component-catalog-signatures.mjs",
+    "catalog:check-signatures": "node scripts/sync-component-catalog-signatures.mjs --check",
     "tokens:generate": "node scripts/generate-token-index.mjs",
     "tokens:check": "node scripts/generate-token-index.mjs --check"
   },

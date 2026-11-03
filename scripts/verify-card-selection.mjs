@@ -7,7 +7,7 @@ import { build } from "esbuild";
 import ts from "typescript";
 
 const typeFixturePath = resolve("packages/sharepoint-ui/src/.card-selection-event-type-contract.tsx");
-const typeFixture = `import { Card, type CardProps, type CardOnSelectionChangeEvent } from "./react.js"; type Assert<T extends true> = T; type EventOf<T> = NonNullable<T> extends (event: infer E, ...args: any[]) => unknown ? E : never; type EventMatches = Assert<EventOf<CardProps["onSelectionChange"]> extends CardOnSelectionChangeEvent ? true : false>; const example = <Card onSelectionChange={(event, data) => { const typedEvent: CardOnSelectionChangeEvent = event; const target: Element = event.currentTarget; const selected: boolean = data.selected; const nativeEvent: Event = event.nativeEvent; void [typedEvent, target, selected, nativeEvent]; }} />;`;
+const typeFixture = `import { Card, type CardProps, type CardOnSelectionChangeEvent } from "./react.js"; type Assert<T extends true> = T; type EventOf<T> = NonNullable<T> extends (event: infer E, ...args: any[]) => unknown ? E : never; type EventMatches = Assert<EventOf<CardProps["onSelectionChange"]> extends CardOnSelectionChangeEvent ? true : false>; const example = <Card onClick={event => { const currentTarget: HTMLDivElement = event.currentTarget; const align: string = event.currentTarget.align; void [currentTarget, align]; }} onClickCapture={event => { const currentTarget: HTMLDivElement = event.currentTarget; void currentTarget; }} onSelectionChange={(event, data) => { const typedEvent: CardOnSelectionChangeEvent = event; const target: Element = event.currentTarget; const selected: boolean = data.selected; const nativeEvent: Event = event.nativeEvent; void [typedEvent, target, selected, nativeEvent]; }} />;`;
 const originalReadFile = ts.sys.readFile;
 const originalGetSourceFile = ts.createCompilerHost({}).getSourceFile;
 const typeOptions = { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.NodeNext, moduleResolution: ts.ModuleResolutionKind.NodeNext, jsx: ts.JsxEmit.ReactJSX, strict: true, skipLibCheck: true, noEmit: true };
@@ -23,7 +23,7 @@ const bundle = await build({
 import { createRoot } from "react-dom/client";
 import { Card, Button } from "${resolve("packages/sharepoint-ui/src/react.tsx")}";
 import { defineCard } from "${resolve("packages/sharepoint-ui/src/elements/card.ts")}";
-window.mount = () => {
+window.cardClickEvents=[];window.cardCaptureEvents=[];window.mount = () => {
   defineCard();
   const native = document.querySelector("#native");
   const defaultCard = document.createElement("spui-card"); defaultCard.setAttribute("aria-label", "Native default card"); defaultCard.setAttribute("default-selected", ""); defaultCard.setAttribute("dir", "rtl"); defaultCard.textContent = "Native content"; native.append(defaultCard);
@@ -42,7 +42,7 @@ window.mount = () => {
       <Card data-testid="no-tab" focusMode="no-tab"><Button data-testid="no-tab-first">First action</Button><a href="#last-no-tab" data-testid="no-tab-last">Last action</a></Card><button data-testid="after-no-tab">After trapped card</button>
       <Card data-testid="tab-exit" focusMode="tab-exit"><Button data-testid="tab-exit-first">First action</Button><a href="#last-tab-exit" data-testid="tab-exit-last">Last action</a></Card><button data-testid="after-tab-exit">After limited card</button>
       <Card data-testid="tab-only" focusMode="tab-only"><Button data-testid="tab-only-first">First action</Button><a href="#last-tab-only" data-testid="tab-only-last">Last action</a></Card><button data-testid="after-tab-only">After tab-only card</button>
-      <Card data-testid="interactive-inferred" onClick={() => {}}>Interactive</Card>
+      <Card data-testid="interactive-inferred" onClick={event=>window.cardClickEvents.push({target:event.target.tagName,currentTarget:event.currentTarget.tagName,nativeEventType:event.nativeEvent.type})} onClickCapture={event=>window.cardCaptureEvents.push({target:event.target.tagName,currentTarget:event.currentTarget.tagName,nativeEventType:event.nativeEvent.type})}>Interactive</Card>
       <output data-testid="changes">{changes}</output></>;
   }
   createRoot(document.querySelector("#react")).render(<App />);
@@ -204,6 +204,9 @@ try {
   await page.keyboard.press("Tab"); assert.ok((await activePath()).includes("after-tab-only"), "tab-only preserves normal exit after the last descendant");
   assert.equal(await page.getByTestId("interactive-inferred").getAttribute("focus-mode"), "no-tab", "interactive React Cards default to no-tab focus behavior");
   assert.equal(await page.getByTestId("interactive-inferred").getAttribute("tabindex"), "0");
+  await page.getByTestId("interactive-inferred").click();
+  assert.deepEqual(await page.evaluate(() => window.cardClickEvents[0]), { target: "DIV", currentTarget: "DIV", nativeEventType: "click" }, "Card onClick targets its native Fluent-like root slot");
+  assert.deepEqual(await page.evaluate(() => window.cardCaptureEvents[0]), { target: "DIV", currentTarget: "DIV", nativeEventType: "click" }, "Card onClickCapture targets its native root slot");
   assert.deepEqual(errors, [], "page has no runtime errors");
 
   const selectionDispatch = await page.evaluate(() => {
