@@ -288,6 +288,7 @@
 
 .component-demo__stage > * {
   max-width: 100%;
+  margin: 0;
 }
 
 .component-demo__status,
