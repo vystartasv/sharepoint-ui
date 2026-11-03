@@ -24,7 +24,7 @@ export function RequestList({
     <SharePointUIProvider lang={locale}>
       {requests.map(request => (
         <ViewCard key={request.id} kind="list-item" title={request.title} description={request.status}>
-          <Button slot="action" onClick={() => openRequest(request.id)}>Open</Button>
+          <Button slot="actions" onClick={() => openRequest(request.id)}>Open</Button>
         </ViewCard>
       ))}
     </SharePointUIProvider>
