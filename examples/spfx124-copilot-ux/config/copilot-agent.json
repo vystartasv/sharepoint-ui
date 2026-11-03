@@ -1,0 +1,16 @@
+{
+  "$schema": "../node_modules/@microsoft/spfx-heft-plugins/lib-commonjs/plugins/copilotAgentPlugin/copilot-agent.schema.json",
+  "agents": [
+    {
+      "name": {
+        "default": "SharePoint Access Review"
+      },
+      "description": {
+        "default": "Review and approve authorized SharePoint access review items."
+      },
+      "components": [
+        "b323fe6f-f51d-4649-a1be-b333421a8c7a"
+      ]
+    }
+  ]
+}

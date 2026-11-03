@@ -1,0 +1,15 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "access-review-copilot-component": {
+      "components": [
+        {
+          "entrypoint": "./lib/copilotComponents/accessReview/AccessReviewCopilotComponent.js",
+          "manifest": "./src/copilotComponents/accessReview/AccessReviewCopilotComponent.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {}
+}

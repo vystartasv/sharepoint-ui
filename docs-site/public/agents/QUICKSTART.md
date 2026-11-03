@@ -83,6 +83,10 @@ defineButton();
 <spui-button appearance="primary">Open</spui-button>
 ```
 
+## SPFx 1.24 Copilot UX components
+
+For a Copilot surface that reads SharePoint data, updates the visible-state context, and saves through `SPHttpClient`, use the [complete tenant-connected example](https://github.com/vystartasv/sharepoint-ui/tree/main/examples/spfx124-copilot-ux). It is framework-free and imports only the custom elements it uses.
+
 ## Build from a component page
 
 1. Copy the React export or custom-element tag and its property/slot table.

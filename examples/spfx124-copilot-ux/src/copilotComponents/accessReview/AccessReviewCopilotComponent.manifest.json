@@ -1,0 +1,25 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-component-manifest.schema.json",
+  "id": "b323fe6f-f51d-4649-a1be-b333421a8c7a",
+  "alias": "AccessReviewCopilotComponent",
+  "componentType": "CopilotComponent",
+  "copilotType": "Ux",
+  "version": "*",
+  "manifestVersion": 2,
+
+  "capabilities": {
+    "availableDisplayModes": ["inline", "fullscreen"]
+  },
+
+  "tools": [
+    {
+      "name": "AccessReviewTool",
+      "description": {
+        "default": "Read and approve items in the user's authorized SharePoint access review list."
+      },
+      "propertiesSchema": {
+        "id": "$../../../lib/copilotComponents/accessReview/AccessReviewCopilotComponentProperties.js:default;"
+      }
+    }
+  ]
+}

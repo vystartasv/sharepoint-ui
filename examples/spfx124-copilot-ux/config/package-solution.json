@@ -1,0 +1,39 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "spfx-fast-access-review-client-side-solution",
+    "id": "85fcd4b8-d9d2-4ea8-a63a-78a8bec0109a",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.24.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "Review and approve SharePoint access items inside Microsoft 365 Copilot."
+      },
+      "longDescription": {
+        "default": "An SPFx 1.24.1 Copilot UX component using SharePoint UI custom elements, tenant theme tokens, SharePoint list data, and Copilot model context updates."
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "SharePoint UI Copilot Access Review",
+        "description": "Activates the Copilot access review component.",
+        "id": "a8556135-6356-408f-8a07-1d040af14d22",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/spfx-fast-access-review.sppkg"
+  }
+}
