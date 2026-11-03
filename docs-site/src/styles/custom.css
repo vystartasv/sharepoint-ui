@@ -478,6 +478,10 @@
   display: block;
 }
 
+.component-demo__stage:has(> spui-overflow) {
+  display: block;
+}
+
 .component-demo__stage > spui-data-grid {
   display: block;
   width: 100%;
@@ -487,6 +491,11 @@
 .component-demo__stage > spui-tree {
   display: block;
   width: min(100%, 32rem);
+}
+
+.component-demo__stage > spui-overflow {
+  display: block;
+  max-width: 100%;
 }
 
 .component-demo__stage .preview-field {
