@@ -57,8 +57,9 @@ export function defineButton(): void {
         return;
       }
       if (["aria-description", "aria-describedby", "aria-pressed", "aria-expanded", "aria-haspopup", "aria-controls", "title"].includes(name)) {
-        const button = this.shadowRoot?.querySelector("button,a"); const value = this.getAttribute(name);
-        if (button) value === null ? button.removeAttribute(name) : button.setAttribute(name, value);
+        const button = this.shadowRoot?.querySelector<HTMLElement>("button,a"); const value = this.getAttribute(name);
+        if (button && (name === "aria-description" || name === "aria-describedby")) syncHostAccessibleName(this, button);
+        else if (button) value === null ? button.removeAttribute(name) : button.setAttribute(name, value);
         return;
       }
       if (name === "tabindex") {

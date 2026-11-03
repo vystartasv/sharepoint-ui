@@ -12,6 +12,14 @@ const componentNames = [
   "Input", "RadioGroup", "Rating", "RichTextEditor", "SearchBox", "Select", "Slider",
   "SpinButton", "Switch", "TagPicker", "TextArea",
 ];
+const labelledControlSelectors = new Map([
+  ["Button", "button"], ["Checkbox", "input"], ["ComboBox", "[role=combobox]"], ["Input", "input"],
+  ["RadioGroup", "fieldset"], ["SearchBox", "input"], ["Select", "select"], ["Slider", "input"],
+  ["SpinButton", "input"], ["Switch", "input"], ["TextArea", "textarea"],
+]);
+const labelledControlNames = new Set(labelledControlSelectors.keys());
+const labelledControls = [...labelledControlSelectors].map(([name, selector]) => [componentNames.indexOf(name), selector]);
+const labelledControlIndexes = labelledControls.map(([index]) => index);
 
 const program = ts.createProgram([reactPath], {
   jsx: ts.JsxEmit.ReactJSX,
@@ -43,7 +51,7 @@ import { createRoot } from "react-dom/client";
 import { ${componentNames.join(", ")} } from "${reactPath}";
 window.mount = () => createRoot(document.querySelector("#root")).render(React.createElement(React.Fragment, null,
   React.createElement("form", { id: "external-controls" }),
-  ...[${componentNames.join(", ")}].map((Component, index) => React.createElement(Component, { key: index, "data-form-check": String(index), form: "external-controls", name: "field" + index, "aria-labelledby": "form-control-label", ...(index === ${componentNames.indexOf("Input")} ? { "aria-describedby": "form-control-description" } : {}) }))));`,
+  ...[${componentNames.join(", ")}].map((Component, index) => React.createElement(Component, { key: index, "data-form-check": String(index), form: "external-controls", name: "field" + index, "aria-labelledby": "form-control-label", ...([${labelledControlIndexes.join(", ")}].includes(index) ? { "aria-describedby": "form-control-description", "aria-description": "Host description fallback" } : {}) }))));`,
     resolveDir: root,
     sourcefile: "form-associated-controls.tsx",
     loader: "tsx",
@@ -79,7 +87,6 @@ try {
   })));
   assert.equal(associations.length, componentNames.length, "all form-associated React controls rendered");
   for (const association of associations) assert.equal(association.formId, "external-controls", `${componentNames[association.index]} associates with an external form`);
-  const labelledControlNames = new Set(["Button", "Checkbox", "ComboBox", "Input", "RadioGroup", "SearchBox", "Select", "Slider", "SpinButton", "Switch", "TextArea"]);
   for (const name of labelledControlNames) {
     const host = page.locator(`[data-form-check="${componentNames.indexOf(name)}"]`);
     const resolved = await host.evaluate(element => element.shadowRoot
@@ -87,28 +94,42 @@ try {
       : false);
     assert.equal(resolved, true, `${name} resolves an external aria-labelledby reference into its shadow control`);
   }
-  assert.equal(await page.getByRole("textbox", { name: "Form control name", description: "Form control help text", exact: true }).count(), 1, "Input exposes a description referenced from outside its shadow root");
+  for (const name of labelledControlNames) {
+    const host = page.locator(`[data-form-check="${componentNames.indexOf(name)}"]`);
+    const selector = labelledControlSelectors.get(name);
+    const resolved = await host.evaluate((element, controlSelector) => element.shadowRoot?.querySelector(controlSelector)?.getAttribute("aria-description") === "Form control help text", selector);
+    assert.equal(resolved, true, `${name} exposes an external aria-describedby reference on its shadow control`);
+  }
+  assert.equal(await page.locator(`[data-form-check="${componentNames.indexOf("Input")}"]`).getByRole("textbox", { name: "Form control name", description: "Form control help text", exact: true }).count(), 1, "Input exposes a description referenced from outside its shadow root");
   await page.evaluate(() => {
     const description = document.getElementById("form-control-description");
     description.setAttribute("aria-labelledby", "nested-form-control-description");
     const nested = document.createElement("span"); nested.id = "nested-form-control-description"; nested.textContent = "Nested help text"; document.body.append(nested);
   });
-  const inputIndex = componentNames.indexOf("Input");
-  await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-description") === "Nested help text", inputIndex);
+  await page.waitForFunction(controls => controls.every(([index, selector]) => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector(selector)?.getAttribute("aria-description") === "Nested help text"), labelledControls);
   await page.evaluate(() => { document.getElementById("nested-form-control-description").textContent = "Updated nested help text"; });
-  await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-description") === "Updated nested help text", inputIndex);
+  await page.waitForFunction(controls => controls.every(([index, selector]) => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector(selector)?.getAttribute("aria-description") === "Updated nested help text"), labelledControls);
   await page.evaluate(() => {
     const replacement = document.createElement("span"); replacement.id = "nested-form-control-description"; replacement.textContent = "Replacement nested help text";
     document.getElementById("nested-form-control-description").replaceWith(replacement);
   });
-  await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-description") === "Replacement nested help text", inputIndex);
-  assert.equal(await page.getByRole("textbox", { name: "Form control name", description: "Replacement nested help text", exact: true }).count(), 1, "Input tracks nested description changes and replacement across its shadow boundary");
-  const labelledControlIndexes = [...labelledControlNames].map(name => componentNames.indexOf(name));
+  await page.waitForFunction(controls => controls.every(([index, selector]) => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector(selector)?.getAttribute("aria-description") === "Replacement nested help text"), labelledControls);
+  const inputIndex = componentNames.indexOf("Input");
+  assert.equal(await page.locator(`[data-form-check="${componentNames.indexOf("Input")}"]`).getByRole("textbox", { name: "Form control name", description: "Replacement nested help text", exact: true }).count(), 1, "Input tracks nested description changes and replacement across its shadow boundary");
+  await page.evaluate(indexes => indexes.forEach(index => document.querySelector(`[data-form-check="${index}"]`).removeAttribute("aria-describedby")), labelledControlIndexes);
+  await page.waitForTimeout(50);
+  const descriptionFallbacks = await page.evaluate(controls => controls.flatMap(([index, selector]) => {
+    const control = document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector(selector);
+    return control && (control.getAttribute("aria-description") !== "Host description fallback" || control.getAttribute("aria-describedby") === "form-control-description")
+      ? [{ index, tag: control.localName, role: control.getAttribute("role"), description: control.getAttribute("aria-description"), describedBy: control.getAttribute("aria-describedby") }]
+      : [];
+  }), labelledControls);
+  assert.deepEqual(descriptionFallbacks, [], "external aria-describedby takes precedence, then removing it restores aria-description on every control");
   await page.evaluate(() => { document.getElementById("form-control-label").textContent = "Updated form control name"; });
-  await page.waitForFunction(indexes => indexes.every(index => {
+  await page.waitForFunction(controls => controls.every(([index]) => {
     const host = document.querySelector(`[data-form-check="${index}"]`);
     return host?.shadowRoot && [...host.shadowRoot.querySelectorAll("input,select,textarea,button,fieldset,[role=combobox]")].some(control => control.getAttribute("aria-label") === "Updated form control name");
-  }), labelledControlIndexes);
+  }), labelledControls);
   for (const name of labelledControlNames) {
     const host = page.locator(`[data-form-check="${componentNames.indexOf(name)}"]`);
     const resolved = await host.evaluate(element => element.shadowRoot
@@ -116,11 +137,11 @@ try {
       : false);
     assert.equal(resolved, true, `${name} tracks changes to external aria-labelledby text`);
   }
-  await page.evaluate(indexes => indexes.forEach(index => document.querySelector(`[data-form-check="${index}"]`).removeAttribute("aria-labelledby")), labelledControlIndexes);
-  await page.waitForFunction(indexes => indexes.every(index => {
+  await page.evaluate(controls => controls.forEach(([index]) => document.querySelector(`[data-form-check="${index}"]`).removeAttribute("aria-labelledby")), labelledControls);
+  await page.waitForFunction(controls => controls.every(([index]) => {
     const host = document.querySelector(`[data-form-check="${index}"]`);
     return host?.shadowRoot && [...host.shadowRoot.querySelectorAll("input,select,textarea,button,fieldset,[role=combobox]")].every(control => control.getAttribute("aria-label") !== "Updated form control name" && control.getAttribute("aria-labelledby") !== "form-control-label");
-  }), labelledControlIndexes);
+  }), labelledControls);
   for (const name of labelledControlNames) {
     const host = page.locator(`[data-form-check="${componentNames.indexOf(name)}"]`);
     const staleName = await host.evaluate(element => element.shadowRoot
@@ -181,7 +202,7 @@ try {
   });
   await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-label") === "After input event", inputIndex);
   assert.deepEqual(errors, [], "form-associated controls render without browser errors");
-  console.log(`Verified form prop types and external ownership for ${componentNames.length} React controls, plus live and recursive accessible names for ${labelledControlNames.size} controls.`);
+  console.log(`Verified form prop types and external ownership for ${componentNames.length} React controls, plus live and recursive accessible names and descriptions for ${labelledControlNames.size} controls.`);
 } finally {
   await browser?.close();
   await new Promise((done, reject) => server.close(error => error ? reject(error) : done()));

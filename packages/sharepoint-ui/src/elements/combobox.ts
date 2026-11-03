@@ -291,10 +291,8 @@ export function defineCombobox(): void {
         else if (label && trigger.getRootNode() !== this.shadowRoot) { trigger.removeAttribute("aria-labelledby"); trigger.setAttribute("aria-label", label.textContent?.trim() ?? ""); }
         else { trigger.removeAttribute("aria-label"); if (label) trigger.setAttribute("aria-labelledby", label.id); else trigger.removeAttribute("aria-labelledby"); }
         syncHostAccessibleName(this, trigger);
-        for (const name of ["aria-description", "aria-describedby", "aria-invalid"]) {
-          const value = this.getAttribute(name);
-          if (value === null) trigger.removeAttribute(name); else trigger.setAttribute(name, value);
-        }
+        const invalid = this.getAttribute("aria-invalid");
+        if (invalid === null) trigger.removeAttribute("aria-invalid"); else trigger.setAttribute("aria-invalid", invalid);
         if (trigger.getRootNode() === list.getRootNode()) trigger.setAttribute("aria-controls", list.id);
         else trigger.removeAttribute("aria-controls");
         if (this.hasAttribute("disabled")) { trigger.setAttribute("aria-disabled", "true"); if (trigger instanceof HTMLButtonElement) trigger.disabled = true; }
