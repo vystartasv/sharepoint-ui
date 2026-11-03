@@ -291,6 +291,12 @@
   margin: 0;
 }
 
+.component-demo__stage > spui-button {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
 .component-demo__status,
 .component-demo__note {
   min-height: 1.3rem;
