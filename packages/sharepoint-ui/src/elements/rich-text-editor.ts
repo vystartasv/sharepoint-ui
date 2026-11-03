@@ -359,6 +359,7 @@ export function defineRichTextEditor(): void {
       this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
     }
     private command(command: string, value?: string): void {
+      if ((this.contentMode === "plain" && !["undo", "redo"].includes(command)) || (this.contentMode === "restricted" && ["insertTable", "insertImage", "insertRowAbove", "insertRowBelow", "insertColumnBefore", "insertColumnAfter", "deleteRow", "deleteColumn", "deleteTable"].includes(command)) || (command === "createLink" && !this.allowHyperlinks)) return;
       if (command === "insertImage") { this.imageInput?.click(); return; }
       if (["insertRowAbove", "insertRowBelow", "insertColumnBefore", "insertColumnAfter", "deleteRow", "deleteColumn", "deleteTable"].includes(command)) { this.editTable(command); return; }
       if (command === "createLink") { this.openLinkEditor(); return; }
@@ -579,7 +580,7 @@ export function defineRichTextEditor(): void {
       this.editor.addEventListener("paste", event => {
         event.preventDefault();
         const clipboard = (event as ClipboardEvent).clipboardData;
-        if (this.contentMode === "plain") {
+        if (this.contentMode === "plain" || this.contentMode === "restricted") {
           this.editor.ownerDocument.execCommand("insertText", false, clipboard?.getData("text/plain") ?? plainText(clipboard?.getData("text/html") ?? ""));
           this.sanitizeEditor(); this.syncForm();
           this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
