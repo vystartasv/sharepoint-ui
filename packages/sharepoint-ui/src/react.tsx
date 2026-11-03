@@ -1,5 +1,5 @@
 import * as React from "react";
-import { observeAccessibleNameFromIdRefs, resolveAccessibleNameFromIdRefs } from "./elements/shared.js";
+import { observeAccessibleTextFromIdRefs, resolveAccessibleTextFromIdRefs } from "./elements/shared.js";
 import { defineButton } from "./elements/button.js";
 import { defineButtonGroup } from "./elements/button-group.js";
 import { defineCompoundButton, defineMenuButton, defineSplitButton, defineToggleButton, type ButtonAppearance, type ButtonShape, type ButtonSize } from "./elements/button-variants.js";
@@ -142,6 +142,7 @@ export function useFieldControlProps_unstable<T extends object>(props: T, option
   if (next.id == null) next.id = field.generatedControlId;
   if (field.labelText && next["aria-label"] == null) next["aria-label"] = field.labelText;
   if (field.descriptionText && next["aria-description"] == null) next["aria-description"] = field.descriptionText;
+  if (field.descriptionText && next["aria-describedby"] && next["data-spui-field-description"] == null) next["data-spui-field-description"] = "";
   if (field.validationState === "error" && next["aria-invalid"] == null) next["aria-invalid"] = true;
   if (field.required) {
     if (options.supportsRequired) next.required ??= true;
@@ -527,7 +528,7 @@ export const SplitButton = /* @__PURE__ */ React.forwardRef<HTMLElement, Element
   const hasMenuButtonName = typeof menuButtonProps?.["aria-label"] === "string" || typeof menuButtonProps?.["aria-labelledby"] === "string";
   const primaryButtonProps = isReactElement(primaryActionButton) ? primaryActionButton.props : primaryActionButton;
   const primaryLabelledBy = typeof primaryButtonProps?.["aria-labelledby"] === "string" ? primaryButtonProps["aria-labelledby"] : "";
-  const primaryLabelledName = typeof document === "undefined" ? "" : resolveAccessibleNameFromIdRefs(document.documentElement, primaryLabelledBy);
+  const primaryLabelledName = typeof document === "undefined" ? "" : resolveAccessibleTextFromIdRefs(document.documentElement, primaryLabelledBy);
   const primaryAccessibleName = primaryLabelledName || (typeof primaryButtonProps?.["aria-label"] === "string" ? primaryButtonProps["aria-label"] : getVisibleText(primaryButtonProps?.children ?? children));
   React.useLayoutEffect(() => {
     if (!primaryLabelledBy || hasMenuButtonName || menuLabel) return;
@@ -541,7 +542,7 @@ export const SplitButton = /* @__PURE__ */ React.forwardRef<HTMLElement, Element
       const trigger = menu?.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')?.assignedElements().find((element): element is HTMLElement => element instanceof HTMLElement);
       if (trigger && trigger.getAttribute("aria-label") !== resolved) trigger.setAttribute("aria-label", resolved);
     };
-    const observer = observeAccessibleNameFromIdRefs(host, primaryLabelledBy, syncName);
+    const observer = observeAccessibleTextFromIdRefs(host, primaryLabelledBy, syncName);
     return () => observer.disconnect();
   }, [hasMenuButtonName, menuLabel, primaryLabelledBy, primaryLabelledName]);
   const triggerDefaults = { ...(!hasMenuButtonName ? { "aria-label": (menuLabel ?? primaryAccessibleName) || resolvedMenuLabel } : {}), disabled, disabledFocusable, iconOnly: true, size, shape, appearance: "secondary" as const };
@@ -5182,6 +5183,7 @@ export function Field({ children, label, hint, validationMessage, validationMess
     "aria-description": customControl ? customDescription : controlProps["aria-description"],
     "aria-invalid": state === "error" ? true : state === "none" ? controlProps["aria-invalid"] : undefined,
     "aria-required": required || controlProps["aria-required"] ? true : undefined,
+    "data-spui-field-description": customControl && descriptionText && customControlDescribedBy ? "" : undefined,
     required: required || controlProps.required || undefined,
     disabled: disabled || controlProps.disabled || undefined,
     "data-spui-validation-state": state,

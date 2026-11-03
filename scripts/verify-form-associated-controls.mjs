@@ -43,7 +43,7 @@ import { createRoot } from "react-dom/client";
 import { ${componentNames.join(", ")} } from "${reactPath}";
 window.mount = () => createRoot(document.querySelector("#root")).render(React.createElement(React.Fragment, null,
   React.createElement("form", { id: "external-controls" }),
-  ...[${componentNames.join(", ")}].map((Component, index) => React.createElement(Component, { key: index, "data-form-check": String(index), form: "external-controls", name: "field" + index, "aria-labelledby": "form-control-label" }))));`,
+  ...[${componentNames.join(", ")}].map((Component, index) => React.createElement(Component, { key: index, "data-form-check": String(index), form: "external-controls", name: "field" + index, "aria-labelledby": "form-control-label", ...(index === ${componentNames.indexOf("Input")} ? { "aria-describedby": "form-control-description" } : {}) }))));`,
     resolveDir: root,
     sourcefile: "form-associated-controls.tsx",
     loader: "tsx",
@@ -57,7 +57,7 @@ window.mount = () => createRoot(document.querySelector("#root")).render(React.cr
   write: false,
 });
 const server = createServer((request, response) => {
-  if (new URL(request.url, "http://localhost").pathname === "/") return response.writeHead(200, { "content-type": "text/html" }).end("<!doctype html><html><body><span id='form-control-label' hidden>Form control name</span><div id='root'></div></body></html>");
+  if (new URL(request.url, "http://localhost").pathname === "/") return response.writeHead(200, { "content-type": "text/html" }).end("<!doctype html><html><body><span id='form-control-label' hidden>Form control name</span><span id='form-control-description' hidden>Form control help text</span><div id='root'></div></body></html>");
   if (new URL(request.url, "http://localhost").pathname === "/bundle.js") return response.writeHead(200, { "content-type": "text/javascript" }).end(bundle.outputFiles[0].contents);
   response.writeHead(404).end();
 });
@@ -87,6 +87,22 @@ try {
       : false);
     assert.equal(resolved, true, `${name} resolves an external aria-labelledby reference into its shadow control`);
   }
+  assert.equal(await page.getByRole("textbox", { name: "Form control name", description: "Form control help text", exact: true }).count(), 1, "Input exposes a description referenced from outside its shadow root");
+  await page.evaluate(() => {
+    const description = document.getElementById("form-control-description");
+    description.setAttribute("aria-labelledby", "nested-form-control-description");
+    const nested = document.createElement("span"); nested.id = "nested-form-control-description"; nested.textContent = "Nested help text"; document.body.append(nested);
+  });
+  const inputIndex = componentNames.indexOf("Input");
+  await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-description") === "Nested help text", inputIndex);
+  await page.evaluate(() => { document.getElementById("nested-form-control-description").textContent = "Updated nested help text"; });
+  await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-description") === "Updated nested help text", inputIndex);
+  await page.evaluate(() => {
+    const replacement = document.createElement("span"); replacement.id = "nested-form-control-description"; replacement.textContent = "Replacement nested help text";
+    document.getElementById("nested-form-control-description").replaceWith(replacement);
+  });
+  await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-description") === "Replacement nested help text", inputIndex);
+  assert.equal(await page.getByRole("textbox", { name: "Form control name", description: "Replacement nested help text", exact: true }).count(), 1, "Input tracks nested description changes and replacement across its shadow boundary");
   const labelledControlIndexes = [...labelledControlNames].map(name => componentNames.indexOf(name));
   await page.evaluate(() => { document.getElementById("form-control-label").textContent = "Updated form control name"; });
   await page.waitForFunction(indexes => indexes.every(index => {
@@ -113,7 +129,6 @@ try {
     assert.equal(staleName, false, `${name} removes a stale external accessible name when aria-labelledby is removed`);
   }
   const inputHost = page.locator(`[data-form-check="${componentNames.indexOf("Input")}"]`);
-  const inputIndex = componentNames.indexOf("Input");
   await inputHost.evaluate(host => {
     host.setAttribute("aria-labelledby", "late-form-control-label");
     const label = document.createElement("span"); label.id = "late-form-control-label"; label.textContent = "Late form label"; document.body.append(label);

@@ -17,7 +17,7 @@ window.mountNative=()=>{defineInput();const native=document.createElement("input
 });
 const server = createServer((request, response) => request.url === "/bundle.js"
   ? response.writeHead(200, { "content-type": "text/javascript" }).end(bundle.outputFiles[0].contents)
-  : response.writeHead(200, { "content-type": "text/html" }).end("<!doctype html><html><body><div id='react'></div><div id='native'></div><script src='/bundle.js'></script></body></html>"));
+  : response.writeHead(200, { "content-type": "text/html" }).end("<!doctype html><html><body><span id='manual-help' hidden>Manual caller help.</span><div id='react'></div><div id='native'></div><script src='/bundle.js'></script></body></html>"));
 await new Promise(done => server.listen(0, "127.0.0.1", done));
 const require = createRequire(import.meta.url);
 const { chromium } = require("/Users/vilius/.t3/projects/spfx-research/node_modules/playwright");
@@ -48,8 +48,9 @@ try {
   assert.equal(await renderControl.getAttribute("aria-invalid"), null, "warning state does not mark the control invalid");
   assert.equal(await renderControl.evaluate(node => node.required), true, "render-function required state reaches the native control");
   assert.equal(await page.getByText("Code may be reused.").getAttribute("role"), "alert", "warning validation is announced as an alert");
-  assert.equal(await renderControl.getAttribute("aria-description"), "Code may be reused. Use six characters.", "render-function Field text is exposed without cross-shadow ID references");
-  assert.equal(await renderControl.getAttribute("aria-describedby"), "manual-help", "caller-provided description references remain merged");
+  assert.equal(await renderControl.getAttribute("aria-description"), "Manual caller help. Code may be reused. Use six characters.", "Field composes caller help references and its own description across the control shadow root");
+  assert.equal(await renderControl.getAttribute("aria-describedby"), null, "external description references are flattened before crossing the control shadow root");
+  assert.equal(await page.getByRole("textbox", { name: "Project code", description: "Manual caller help. Code may be reused. Use six characters.", exact: true }).count(), 1, "the accessible description contains caller help and Field hint/error text");
 
   const nestedControl = page.getByRole("textbox", { name: "Nested work item" });
   assert.equal(await nestedControl.getAttribute("aria-invalid"), "true", "Field context reaches controls under wrapper elements");

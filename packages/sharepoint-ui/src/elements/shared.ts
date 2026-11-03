@@ -13,16 +13,43 @@ export type NativeFormControlDefaults = {
   defaultChecked: boolean;
 };
 
-type AccessibleNameSyncState = { control: HTMLElement; originalLabel: string | null; originalLabelledBy: string | null; labelledBy?: string | null; observer?: Pick<MutationObserver, "disconnect"> };
+type AccessibleNameSyncState = {
+  control: HTMLElement;
+  originalLabel: string | null;
+  originalLabelledBy: string | null;
+  originalDescription: string | null;
+  originalDescribedBy: string | null;
+  labelledBy?: string | null;
+  describedBy?: string | null;
+  resolvedDescription?: string;
+  observer?: Pick<MutationObserver, "disconnect">;
+  descriptionObserver?: Pick<MutationObserver, "disconnect">;
+};
 const accessibleNameSyncStates = new WeakMap<HTMLElement, AccessibleNameSyncState>();
 
-export function stopHostAccessibleNameSync(host: HTMLElement): void {
+function stopHostAccessibleNameObserver(host: HTMLElement): void {
   const state = accessibleNameSyncStates.get(host);
   state?.observer?.disconnect();
   if (state) state.observer = undefined;
 }
 
-type AccessibleNameResolution = { name: string; targets: Set<Element>; unresolved: boolean };
+function stopHostAccessibleDescriptionObserver(host: HTMLElement): void {
+  const state = accessibleNameSyncStates.get(host);
+  state?.descriptionObserver?.disconnect();
+  if (state) state.descriptionObserver = undefined;
+}
+
+export function stopHostAccessibleNameSync(host: HTMLElement): void {
+  const state = accessibleNameSyncStates.get(host);
+  stopHostAccessibleNameObserver(host);
+  stopHostAccessibleDescriptionObserver(host);
+  if (state) {
+    state.labelledBy = undefined;
+    state.describedBy = undefined;
+  }
+}
+
+type AccessibleTextResolution = { text: string; targets: Set<Element>; unresolved: boolean };
 
 function accessibleNameRoots(context: HTMLElement | Document): Array<Document | ShadowRoot> {
   const isDocument = context.nodeType === Node.DOCUMENT_NODE;
@@ -53,7 +80,7 @@ function normalizeAccessibleText(value: string): string {
   return value.replace(/\s+/g, " ").trim();
 }
 
-function resolveAccessibleName(context: HTMLElement | Document, labelledBy: string): AccessibleNameResolution {
+function resolveAccessibleText(context: HTMLElement | Document, labelledBy: string): AccessibleTextResolution {
   const roots = accessibleNameRoots(context);
   const targets = new Set<Element>();
   const contentPath = new Set<Element>();
@@ -131,10 +158,10 @@ function resolveAccessibleName(context: HTMLElement | Document, labelledBy: stri
       if (addedContent) contentPath.delete(element);
     }
   };
-  return { name: resolveIds(labelledBy, new Set()), targets, unresolved };
+  return { text: resolveIds(labelledBy, new Set()), targets, unresolved };
 }
 
-export function observeAccessibleNameFromIdRefs(context: HTMLElement, labelledBy: string, onName: (name: string) => void): Pick<MutationObserver, "disconnect"> {
+export function observeAccessibleTextFromIdRefs(context: HTMLElement, labelledBy: string, onText: (text: string) => void): Pick<MutationObserver, "disconnect"> {
   const view = context.ownerDocument.defaultView;
   const Observer = view?.MutationObserver ?? MutationObserver;
   const observer = new Observer(() => update());
@@ -149,8 +176,8 @@ export function observeAccessibleNameFromIdRefs(context: HTMLElement, labelledBy
   };
   const disconnectNative = observer.disconnect.bind(observer);
   const update = (): void => {
-    const result = resolveAccessibleName(context, labelledBy);
-    onName(result.name);
+    const result = resolveAccessibleText(context, labelledBy);
+    onText(result.text);
     disconnectNative();
     removeValueListeners();
     const subscriptions = new Map<Node, MutationObserverInit>();
@@ -185,59 +212,113 @@ export function observeAccessibleNameFromIdRefs(context: HTMLElement, labelledBy
   return { disconnect: () => { disconnectNative(); removeValueListeners(); } };
 }
 
-export function resolveAccessibleNameFromIdRefs(context: HTMLElement | Document, labelledBy: string): string {
-  return resolveAccessibleName(context, labelledBy).name;
+export function resolveAccessibleTextFromIdRefs(context: HTMLElement | Document, labelledBy: string): string {
+  return resolveAccessibleText(context, labelledBy).text;
+}
+
+function syncHostAccessibleDescription(host: HTMLElement, control: HTMLElement, state: AccessibleNameSyncState): void {
+  const description = host.getAttribute("aria-description");
+  const describedBy = host.getAttribute("aria-describedby");
+  const setResolvedDescription = (text: string): void => {
+    const value = host.hasAttribute("data-spui-field-description") ? [text, description].filter(Boolean).join(" ") : text;
+    if (value) {
+      if (control.getAttribute("aria-description") !== value) control.setAttribute("aria-description", value);
+    } else if (control.hasAttribute("aria-description")) control.removeAttribute("aria-description");
+  };
+  if (describedBy !== null) {
+    const ids = describedBy.trim().split(/\s+/).filter(Boolean);
+    const localRoot = control.getRootNode() as ShadowRoot;
+    if (ids.length && ids.every(id => localRoot.getElementById(id))) {
+      stopHostAccessibleDescriptionObserver(host);
+      state.describedBy = describedBy;
+      state.resolvedDescription = undefined;
+      if (control.getAttribute("aria-describedby") !== describedBy) control.setAttribute("aria-describedby", describedBy);
+      if (description === null) control.removeAttribute("aria-description");
+      else if (control.getAttribute("aria-description") !== description) control.setAttribute("aria-description", description);
+      return;
+    }
+    if (control.hasAttribute("aria-describedby")) control.removeAttribute("aria-describedby");
+    if (state.describedBy !== describedBy || !state.descriptionObserver) {
+      stopHostAccessibleDescriptionObserver(host);
+      state.describedBy = describedBy;
+      state.descriptionObserver = observeAccessibleTextFromIdRefs(host, describedBy, text => {
+        state.resolvedDescription = text;
+        setResolvedDescription(text);
+      });
+    } else {
+      setResolvedDescription(state.resolvedDescription ?? "");
+    }
+    return;
+  }
+  stopHostAccessibleDescriptionObserver(host);
+  state.describedBy = null;
+  state.resolvedDescription = undefined;
+  if (state.originalDescribedBy === null) control.removeAttribute("aria-describedby");
+  else if (control.getAttribute("aria-describedby") !== state.originalDescribedBy) control.setAttribute("aria-describedby", state.originalDescribedBy);
+  if (description === null) {
+    if (state.originalDescription === null) control.removeAttribute("aria-description");
+    else if (control.getAttribute("aria-description") !== state.originalDescription) control.setAttribute("aria-description", state.originalDescription);
+  } else if (control.getAttribute("aria-description") !== description) control.setAttribute("aria-description", description);
 }
 
 export function syncHostAccessibleName(host: HTMLElement, control: HTMLElement): void {
   const label = host.getAttribute("aria-label");
   const labelledBy = host.getAttribute("aria-labelledby");
+  const description = host.getAttribute("aria-description");
+  const describedBy = host.getAttribute("aria-describedby");
   const root = control.getRootNode();
   const inShadowRoot = host.shadowRoot?.contains(control) ?? false;
   if (!inShadowRoot) return;
   let state = accessibleNameSyncStates.get(host);
   if (state?.control !== control) {
     state?.observer?.disconnect();
+    state?.descriptionObserver?.disconnect();
     state = {
       control,
       originalLabel: control.getAttribute("aria-label") === label ? null : control.getAttribute("aria-label"),
       originalLabelledBy: control.getAttribute("aria-labelledby") === labelledBy ? null : control.getAttribute("aria-labelledby"),
+      originalDescription: control.getAttribute("aria-description") === description ? null : control.getAttribute("aria-description"),
+      originalDescribedBy: control.getAttribute("aria-describedby") === describedBy ? null : control.getAttribute("aria-describedby"),
     };
     accessibleNameSyncStates.set(host, state);
   }
   if (label === null && labelledBy === null) {
-    stopHostAccessibleNameSync(host);
+    stopHostAccessibleNameObserver(host);
     if (state.originalLabel === null) control.removeAttribute("aria-label"); else control.setAttribute("aria-label", state.originalLabel);
     if (state.originalLabelledBy === null) control.removeAttribute("aria-labelledby"); else control.setAttribute("aria-labelledby", state.originalLabelledBy);
-    accessibleNameSyncStates.delete(host);
+    syncHostAccessibleDescription(host, control, state);
+    if (description === null && describedBy === null) accessibleNameSyncStates.delete(host);
     return;
   }
   if (labelledBy !== null && inShadowRoot) {
     const ids = labelledBy.trim().split(/\s+/).filter(Boolean);
     const localRoot = root as ShadowRoot;
     if (ids.length && ids.every(id => localRoot.getElementById(id))) {
-      stopHostAccessibleNameSync(host);
+      stopHostAccessibleNameObserver(host);
       state.labelledBy = labelledBy;
       control.removeAttribute("aria-label");
       control.setAttribute("aria-labelledby", labelledBy);
+      syncHostAccessibleDescription(host, control, state);
       return;
     }
     control.removeAttribute("aria-labelledby");
     if (state.labelledBy !== labelledBy || !state.observer) {
-      stopHostAccessibleNameSync(host);
+      stopHostAccessibleNameObserver(host);
       state.labelledBy = labelledBy;
-      state.observer = observeAccessibleNameFromIdRefs(host, labelledBy, resolved => {
+      state.observer = observeAccessibleTextFromIdRefs(host, labelledBy, resolved => {
         if (resolved) {
           if (control.getAttribute("aria-label") !== resolved) control.setAttribute("aria-label", resolved);
         } else if (control.hasAttribute("aria-label")) control.removeAttribute("aria-label");
       });
     }
+    syncHostAccessibleDescription(host, control, state);
     return;
   }
-  stopHostAccessibleNameSync(host);
+  stopHostAccessibleNameObserver(host);
   state.labelledBy = labelledBy;
   if (labelledBy !== null) control.setAttribute("aria-labelledby", labelledBy); else control.removeAttribute("aria-labelledby");
   if (labelledBy === null && label !== null) control.setAttribute("aria-label", label); else control.removeAttribute("aria-label");
+  syncHostAccessibleDescription(host, control, state);
 }
 
 export function rememberNativeFormControlDefaults(current: NativeFormControlDefaults | undefined, control: NativeFormControl): NativeFormControlDefaults {
