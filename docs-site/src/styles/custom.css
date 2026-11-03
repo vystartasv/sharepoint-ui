@@ -27,6 +27,11 @@
   --sl-color-bg-sidebar: #152123;
   --sl-color-hairline: #304346;
   --sl-color-hairline-light: #26383b;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
 }
 
 .hero {
@@ -602,7 +607,7 @@
   border-radius: 1rem;
   background: var(--spui-ui-canvas, var(--sl-color-bg-sidebar));
   color: var(--spui-ui-text, var(--sl-color-text));
-  color-scheme: light dark;
+  color-scheme: inherit;
 }
 
 .component-demo__toolbar {
@@ -680,7 +685,7 @@
   border-radius: 0.75rem;
   background: var(--spui-ui-surface, var(--sl-color-bg));
   color: var(--spui-ui-text, var(--sl-color-text));
-  color-scheme: light;
+  color-scheme: inherit;
 }
 
 .component-demo__stage[data-spui-appearance="glass"] {

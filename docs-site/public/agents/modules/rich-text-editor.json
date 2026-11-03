@@ -42,7 +42,7 @@
           },
           {
             "name": "RichTextEditor mobile selection",
-            "description": "On touch devices, a sustained press releases typing focus so native text selection can start. Formatting controls use the saved range without refocusing the editor; tap the text again to resume typing."
+            "description": "On touch devices, press and hold text to use the browser's native selection handles. The editor does not force blur or refocus during the gesture; toolbar formatting uses the saved range."
           },
           {
             "name": "RichTextEditorProps.onImageUploadError",

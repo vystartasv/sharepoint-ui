@@ -143,7 +143,6 @@ export function defineRichTextEditor(): void {
     private customError = "";
     private savedRange?: Range;
     private preserveToolbarSelection = false;
-    private touchSelectionGesture?: { pointerId: number; x: number; y: number; timer: number };
     private probingSelection = false;
     private probedSelection?: Range;
     /** Uploads to a durable asset store and returns the image URL to persist in editor HTML. */
@@ -181,7 +180,7 @@ export function defineRichTextEditor(): void {
       else if (this.hasAttribute("value")) this.value = this.getAttribute("value") ?? "";
       this.syncForm();
     }
-    disconnectedCallback(): void { this.events?.abort(); this.clearTouchSelectionGesture(); }
+    disconnectedCallback(): void { this.events?.abort(); }
     attributeChangedCallback(name: string): void {
       if (!this.isConnected) return;
       if (name === "value") this.value = this.getAttribute("value") ?? "";
@@ -485,10 +484,6 @@ export function defineRichTextEditor(): void {
       if (!selection || !this.savedRange || !this.editor.contains(this.savedRange.commonAncestorContainer)) return;
       selection.removeAllRanges();
       selection.addRange(this.savedRange);
-    }
-    private clearTouchSelectionGesture(): void {
-      if (this.touchSelectionGesture) clearTimeout(this.touchSelectionGesture.timer);
-      this.touchSelectionGesture = undefined;
     }
     private wrapUnfocusedSelection(range: Range, createWrapper: () => HTMLElement): boolean {
       const selectionRoot = range.commonAncestorContainer.nodeType === Node.TEXT_NODE
@@ -878,22 +873,7 @@ export function defineRichTextEditor(): void {
       this.editor.addEventListener("input", () => this.commitEditorValue());
       this.editor.addEventListener("pointerdown", event => {
         this.preserveToolbarSelection = false;
-        this.clearTouchSelectionGesture();
-        if (event.pointerType !== "touch" || !this.editor.matches(":focus")) return;
-        const gesture = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, timer: 0 };
-        gesture.timer = window.setTimeout(() => {
-          if (this.touchSelectionGesture !== gesture) return;
-          this.touchSelectionGesture = undefined;
-          this.editor.blur();
-        }, 350);
-        this.touchSelectionGesture = gesture;
       });
-      this.editor.addEventListener("pointermove", event => {
-        const gesture = this.touchSelectionGesture;
-        if (gesture?.pointerId === event.pointerId && Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y) > 10) this.clearTouchSelectionGesture();
-      });
-      this.editor.addEventListener("pointerup", event => { if (this.touchSelectionGesture?.pointerId === event.pointerId) this.clearTouchSelectionGesture(); });
-      this.editor.addEventListener("pointercancel", event => { if (this.touchSelectionGesture?.pointerId === event.pointerId) this.clearTouchSelectionGesture(); });
       this.editor.addEventListener("mouseup", this.onSelectionChange);
       this.editor.addEventListener("keyup", this.onSelectionChange);
       this.editor.addEventListener("click", this.onEditorClick);
