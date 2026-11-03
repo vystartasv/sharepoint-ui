@@ -53,6 +53,7 @@
     "dist",
     "LICENSE",
     "README.md",
+    "QUICKSTART.md",
     "AGENTS.md",
     "components.json",
     "tokens.json",

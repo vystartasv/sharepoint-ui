@@ -34,6 +34,7 @@ for (const [module, components] of modules) {
 }
 
 const skillRoot = resolve(packageRoot, "skills/sharepoint-ui");
+await copyFile(resolve(packageRoot, "QUICKSTART.md"), join(output, "QUICKSTART.md"));
 const sourceAgentGuide = await readFile(resolve(packageRoot, "AGENTS.md"), "utf8");
 const agentGuide = sourceAgentGuide.replace("](../../investigation/FLUENT-V9-PARITY-PLAN.md)", "](https://github.com/vystartasv/sharepoint-ui/blob/main/investigation/FLUENT-V9-PARITY-PLAN.md)");
 await writeFile(join(output, "AGENTS.md"), agentGuide);
@@ -60,6 +61,6 @@ const full = [
 await writeFile(resolve(siteRoot, "public/llms-full.txt"), `${full.trim()}\n`);
 
 const moduleLinks = [...modules.keys()].sort().map(module => `- [${module} JSON slice](https://vystartasv.github.io/sharepoint-ui/agents/modules/${slug(module)}.json)`).join("\n");
-const agentIndex = `# SharePoint UI agent references\n\n- [Agent instructions](https://vystartasv.github.io/sharepoint-ui/agents/AGENTS.md)\n- [SharePoint UI skill](https://vystartasv.github.io/sharepoint-ui/agents/SKILL.md)\n- [Full component catalog JSON](https://vystartasv.github.io/sharepoint-ui/agents/components.json)\n- [Full context pack](https://vystartasv.github.io/sharepoint-ui/llms-full.txt)\n- [Browsable human documentation](https://vystartasv.github.io/sharepoint-ui/)\n\n## Module slices\n\n${moduleLinks}\n`;
+const agentIndex = `# SharePoint UI agent references\n\n- [Quickstart](https://vystartasv.github.io/sharepoint-ui/agents/QUICKSTART.md)\n- [Agent instructions](https://vystartasv.github.io/sharepoint-ui/agents/AGENTS.md)\n- [SharePoint UI skill](https://vystartasv.github.io/sharepoint-ui/agents/SKILL.md)\n- [Full component catalog JSON](https://vystartasv.github.io/sharepoint-ui/agents/components.json)\n- [Full context pack](https://vystartasv.github.io/sharepoint-ui/llms-full.txt)\n- [Browsable human documentation](https://vystartasv.github.io/sharepoint-ui/)\n\n## Module slices\n\n${moduleLinks}\n`;
 await writeFile(resolve(siteRoot, "public/llms.txt"), agentIndex);
 console.log(JSON.stringify({ components: catalog.components.length, modules: modules.size, componentSlices: catalog.components.length, output: "public/agents" }));

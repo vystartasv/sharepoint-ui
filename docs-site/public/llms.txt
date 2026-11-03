@@ -1,5 +1,6 @@
 # SharePoint UI agent references
 
+- [Quickstart](https://vystartasv.github.io/sharepoint-ui/agents/QUICKSTART.md)
 - [Agent instructions](https://vystartasv.github.io/sharepoint-ui/agents/AGENTS.md)
 - [SharePoint UI skill](https://vystartasv.github.io/sharepoint-ui/agents/SKILL.md)
 - [Full component catalog JSON](https://vystartasv.github.io/sharepoint-ui/agents/components.json)

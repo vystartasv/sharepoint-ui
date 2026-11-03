@@ -75,11 +75,20 @@ The React adapter is convenient for SPFx projects. For other frameworks, import 
 ```tsx
 import { Button, SharePointUIProvider, ViewCard } from "@spfx-fast/sharepoint-ui/react";
 
-<SharePointUIProvider lang={pageContext.cultureInfo.currentUICultureName}>
-  <ViewCard kind="list-item" title={item.Title} subtitle={item.Modified} description={item.Status}>
-    <Button slot="action" appearance="primary">Open item</Button>
-  </ViewCard>
-</SharePointUIProvider>
+export function RequestList({ items, locale, openItem }) {
+  return (
+    <SharePointUIProvider lang={locale}>
+      {items.map(item => (
+        <ViewCard key={item.Id} kind="list-item" title={item.Title} subtitle={item.Modified} description={item.Status}>
+          <Button slot="action" appearance="primary" onClick={() => openItem(item.Id)}>Open item</Button>
+        </ViewCard>
+      ))}
+    </SharePointUIProvider>
+  );
+}
+
+// From the SPFx web part's render method, pass:
+// locale={this.context.pageContext.cultureInfo.currentUICultureName}
 ```
 
 The `lang` value controls localization and direction. Components inherit the site theme and stay within the SharePoint section that owns them. Keep SharePoint data access and persistence in the web part; the UI components expose the interaction and value changes.

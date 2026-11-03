@@ -3,6 +3,10 @@ title: Agent documentation
 description: Give coding agents concise instructions, the full API catalog, or only the component slice needed for a SharePoint task.
 ---
 
+## Start here
+
+[Open the quickstart](/sharepoint-ui/agents/QUICKSTART.md) for the install, the standard React and custom-element patterns, and the host-app boundary. For a focused task, give the agent the relevant component page and its linked JSON slice; the same pattern applies across the catalog.
+
 ## Choose the context size
 
 Keep the prompt small for a focused task. Start with the agent guide, then attach the exact module or component slice. Use the full pack when the task crosses several component families.
@@ -32,7 +36,7 @@ Keep the prompt small for a focused task. Start with the agent guide, then attac
 
 ## Use a component slice
 
-For a Button task, send the guide plus [`button.json`](/sharepoint-ui/agents/components/button/button.json). For all controls in a module, use a module slice such as [`input.json`](/sharepoint-ui/agents/modules/input.json). The full manifest is available when the task needs cross-family composition.
+For a Button task, send [`button.json`](/sharepoint-ui/agents/components/button/button.json). Component pages link directly to their JSON slice. For all controls in a module, use a module slice such as [`input.json`](/sharepoint-ui/agents/modules/input.json). Add the agent guide only when the task spans app-level conventions; use the full manifest for cross-family composition.
 
 Rich text editing is part of the normal component API and has a dedicated [`Rich Text Editor` JSON slice](/sharepoint-ui/agents/components/rich-text-editor/rich-text-editor.json), a [live human-readable component page](/sharepoint-ui/components/rich-text-editor/rich-text-editor/), and a [SharePoint persistence guide](/sharepoint-ui/guides/rich-text-editor/).
 
@@ -46,4 +50,4 @@ slots and callbacks, inherit the current theme, and set lang so RTL follows
 the content locale. Do not import the full element registry for a small view.
 ```
 
-The short machine index at [`/llms.txt`](/sharepoint-ui/llms.txt) links to the full catalog and every module slice. Human docs remain the authority for examples and behavior; the package's TypeScript declarations are the final API authority.
+The short machine index at [`/llms.txt`](/sharepoint-ui/llms.txt) links to the quickstart, full catalog, and every module slice. Human docs explain behavior; package TypeScript declarations define the API.

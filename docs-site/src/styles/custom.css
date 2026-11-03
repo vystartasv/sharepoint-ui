@@ -426,7 +426,7 @@
   min-height: 7rem;
   gap: var(--spui-control-gap, 0.5rem);
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   overflow-x: auto;
   padding: clamp(1rem, 3vw, 2rem);
   border: 1px solid var(--spui-ui-stroke, var(--sl-color-hairline));
@@ -536,10 +536,6 @@
 
   .component-demo {
     padding: 0.75rem;
-  }
-
-  .component-demo__stage {
-    justify-content: flex-start;
   }
 }
 

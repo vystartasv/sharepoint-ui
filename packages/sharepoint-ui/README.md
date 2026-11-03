@@ -32,7 +32,7 @@ defineButton();
 <spui-button appearance="primary">Save</spui-button>
 ```
 
-**Docs:** [component catalog](https://vystartasv.github.io/sharepoint-ui/) · **Agent references:** [instructions, full catalog, and slices](https://vystartasv.github.io/sharepoint-ui/agents/)
+**Docs:** [component catalog](https://vystartasv.github.io/sharepoint-ui/) · **Agent quickstart:** [build from a component page](https://vystartasv.github.io/sharepoint-ui/agents/QUICKSTART.md) · **Agent references:** [instructions and API slices](https://vystartasv.github.io/sharepoint-ui/agents/)
 
 The docs cover theming, RTL, accessibility, forms, rich-text persistence, and every component. See [AGENTS.md](./AGENTS.md) for agent guidance and [components.json](./components.json) for the API catalog.
 

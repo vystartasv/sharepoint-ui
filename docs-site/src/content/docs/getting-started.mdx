@@ -16,14 +16,18 @@ React consumers can import the adapter. Framework-neutral consumers can import o
 ```tsx
 import { SharePointUIProvider, Button, TextField } from "@spfx-fast/sharepoint-ui/react";
 
-export function RequestForm() {
+export function RequestForm({ locale }: { locale: string }) {
   return (
-    <SharePointUIProvider lang={this.context.pageContext.cultureInfo.currentUICultureName}>
+    <SharePointUIProvider lang={locale}>
       <TextField label="Request title" name="title" required />
       <Button appearance="primary" type="submit">Create request</Button>
     </SharePointUIProvider>
   );
 }
+
+// In the SPFx web part's render method:
+const locale = this.context.pageContext.cultureInfo.currentUICultureName;
+return <RequestForm locale={locale} />;
 ```
 
 Use the SPFx locale instead of hard-coding direction. Arabic and other right-to-left locales receive RTL layout from the language value. Add `dir` explicitly if the culture identifier does not follow the browser's locale direction mapping.
