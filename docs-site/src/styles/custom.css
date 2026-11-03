@@ -501,7 +501,7 @@
   background: var(--sl-color-accent-low);
 }
 
-:focus-visible {
+:focus-visible:not([slot]) {
   outline: 2px solid var(--spui-ui-accent, #007780);
   outline-offset: 3px;
 }
