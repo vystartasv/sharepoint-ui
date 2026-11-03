@@ -3,7 +3,7 @@
   "version": "0.4.2",
   "license": "MIT",
   "description": "Host-aware, framework-independent UI elements for SharePoint Framework",
-  "homepage": "https://vystartasv.github.io/sharepoint-ui-docs/",
+  "homepage": "https://vystartasv.github.io/sharepoint-ui/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vystartasv/sharepoint-ui.git"

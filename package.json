@@ -10,7 +10,6 @@
     "build:spfx": "npm run build:library && npm run build --prefix examples/spfx124-webpart",
     "build:spfx:measured": "npm run build:spfx && npm run measure:spfx",
     "build:docs": "npm run build:library && npm run build --workspace @vilius/sharepoint-ui-docs",
-    "publish:docs": "npm run build:docs && node scripts/publish-docs-site.mjs",
     "dev:docs": "npm run dev --workspace @vilius/sharepoint-ui-docs",
     "setup:spfx": "npm install --prefix examples/spfx124-webpart",
     "version:spfx:patch": "node scripts/bump-spfx-version.mjs patch",

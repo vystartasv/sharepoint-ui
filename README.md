@@ -10,7 +10,7 @@ npm run setup:spfx
 npm run build:spfx
 ```
 
-Build and publish the Astro documentation site to the public GitHub Pages repository with `npm run publish:docs`. The command builds the component catalog, syncs only the static site output, and lets that repository's Pages workflow deploy it.
+Build the Astro documentation site locally with `npm run build:docs`. Pushes to `main` automatically build and deploy it to [GitHub Pages](https://vystartasv.github.io/sharepoint-ui/).
 
 Before packaging a new tenant checkpoint, run `npm run version:spfx:patch` to advance the SPFx component, solution, feature, and lockfile versions together. This prevents SharePoint from retaining the previous web-part manifest after a solution-only version bump.
 
