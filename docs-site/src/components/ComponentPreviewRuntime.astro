@@ -79,6 +79,16 @@
     for (const type of ["click", "input", "change"]) {
       stage?.addEventListener(type, (event) => {
         const target = event.target;
+        if (type === "click") {
+          const dismissButton = event.composedPath().find(node => node instanceof HTMLElement && node.localName === "spui-button" && node.textContent?.trim() === "Dismiss");
+          const messageBar = dismissButton instanceof HTMLElement ? dismissButton.closest("spui-message-bar") : null;
+          if (messageBar) {
+            messageBar.remove();
+            const remaining = stage?.querySelectorAll("spui-message-bar-group > spui-message-bar:not([data-spui-exiting])").length ?? 0;
+            if (status) status.textContent = `Message dismissed · ${remaining} remaining`;
+            return;
+          }
+        }
         if (type === "click" && target?.value === undefined && target?.checked === undefined) {
           if (status) status.textContent = `${demo.dataset.label ?? "Component"} activated · ${themePresets[theme?.value ?? "sharepoint"]?.label ?? "SharePoint"} theme`;
         } else updateStatus(target);

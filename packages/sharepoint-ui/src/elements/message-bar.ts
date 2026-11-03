@@ -58,7 +58,10 @@ function definePart(tag: string, content: string, css: string, observed: string[
                 this.resizeObserver?.observe(node);
               }
             }
-            for (const node of record.removedNodes) if (node instanceof HTMLElement && node.localName === "spui-message-bar" && !node.hasAttribute("data-spui-exiting")) this.animateExit(node);
+            for (const node of record.removedNodes) if (node instanceof HTMLElement && node.localName === "spui-message-bar" && !node.hasAttribute("data-spui-exiting")) {
+              this.resizeObserver?.unobserve(node);
+              this.animateExit(node);
+            }
           }
         });
         this.childObserver.observe(this, { childList: true });
@@ -68,11 +71,30 @@ function definePart(tag: string, content: string, css: string, observed: string[
     private animateExit(bar: HTMLElement): void {
       const view = this.ownerDocument.defaultView;
       const rect = this.childRects.get(bar);
-      if (!view || !rect || this.getAttribute("animate") === "none") return;
+      if (!view || !rect || this.getAttribute("animate") === "none" || view.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       const groupRect = this.getBoundingClientRect();
+      for (const sibling of this.querySelectorAll<HTMLElement>(":scope > spui-message-bar:not([data-spui-exiting])")) {
+        const previous = this.childRects.get(sibling);
+        const current = sibling.getBoundingClientRect();
+        this.childRects.set(sibling, current);
+        const offset = previous ? previous.top - current.top : 0;
+        if (Math.abs(offset) < 1) continue;
+        sibling.style.setProperty("--spui-message-shift", `${offset}px`);
+        sibling.setAttribute("data-spui-shifting", "");
+        const clearShift = (): void => {
+          sibling.removeAttribute("data-spui-shifting");
+          sibling.style.removeProperty("--spui-message-shift");
+          sibling.removeEventListener("animationend", clearShift);
+          sibling.removeEventListener("animationcancel", clearShift);
+        };
+        sibling.addEventListener("animationend", clearShift);
+        sibling.addEventListener("animationcancel", clearShift);
+      }
       const clone = bar.cloneNode(true) as HTMLElement;
       clone.setAttribute("data-spui-exiting", "");
       clone.setAttribute("aria-hidden", "true");
+      clone.removeAttribute("data-spui-shifting");
+      clone.style.removeProperty("--spui-message-shift");
       clone.inert = true;
       clone.removeAttribute("id");
       clone.querySelectorAll("[id], [data-testid]").forEach(node => { node.removeAttribute("id"); node.removeAttribute("data-testid"); });
@@ -86,9 +108,15 @@ function definePart(tag: string, content: string, css: string, observed: string[
         pointerEvents: "none",
         zIndex: "1",
       });
-      clone.addEventListener("animationend", () => clone.remove(), { once: true });
+      const removeClone = (): void => {
+        clone.removeEventListener("animationend", removeClone);
+        clone.removeEventListener("animationcancel", removeClone);
+        clone.remove();
+      };
+      clone.addEventListener("animationend", removeClone);
+      clone.addEventListener("animationcancel", removeClone);
       this.append(clone);
-      view.setTimeout(() => clone.remove(), 300);
+      view.setTimeout(removeClone, 300);
     }
   }
   customElements.define(tag, SpuiMessageBarPart);
@@ -107,7 +135,7 @@ export function defineMessageBarTitle(): void {
 }
 
 export function defineMessageBarGroup(): void {
-  definePart("spui-message-bar-group", "<slot></slot>", ":host{position:relative;display:grid;gap:8px}:host([data-animate=both]) ::slotted(spui-message-bar:not([data-spui-exiting])){animation:spui-message-enter 160ms cubic-bezier(.2,0,0,1) both}::slotted(spui-message-bar[data-spui-exiting]){animation:spui-message-exit 250ms ease-in both}@keyframes spui-message-enter{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}@keyframes spui-message-exit{to{opacity:0}}@media(prefers-reduced-motion:reduce){:host([data-animate=both]) ::slotted(spui-message-bar:not([data-spui-exiting])),::slotted(spui-message-bar[data-spui-exiting]){animation:none}}", ["animate"]);
+  definePart("spui-message-bar-group", "<slot></slot>", ":host{position:relative;display:grid;gap:8px}:host([data-animate=both]) ::slotted(spui-message-bar:not([data-spui-exiting])){animation:spui-message-enter 160ms cubic-bezier(.2,0,0,1) both}::slotted(spui-message-bar[data-spui-exiting]){animation:spui-message-exit 250ms ease-in both}:host([data-animate]) ::slotted(spui-message-bar[data-spui-shifting]){animation:spui-message-shift 180ms cubic-bezier(.2,0,0,1) both}@keyframes spui-message-enter{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}@keyframes spui-message-exit{to{opacity:0}}@keyframes spui-message-shift{from{transform:translateY(var(--spui-message-shift,0px))}to{transform:translateY(0)}}@media(prefers-reduced-motion:reduce){:host([data-animate=both]) ::slotted(spui-message-bar:not([data-spui-exiting])),::slotted(spui-message-bar[data-spui-exiting]),:host([data-animate]) ::slotted(spui-message-bar[data-spui-shifting]){animation:none}}", ["animate"]);
 }
 
 export function defineMessageBar(): void {

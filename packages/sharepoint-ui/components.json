@@ -2469,7 +2469,7 @@
         ],
         "reactRefType": "HTMLElement"
       },
-      "summary": "Group related messages with consistent spacing and optional entry motion."
+      "summary": "Stack related status messages with optional entry, exit, and reflow motion."
     },
     {
       "react": "MessageBarTitle",

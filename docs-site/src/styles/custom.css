@@ -464,6 +464,11 @@
   padding: 0.5rem;
 }
 
+.component-demo__stage:has(> spui-message-bar-group) {
+  display: block;
+  padding: 0.5rem;
+}
+
 .component-demo__stage > spui-virtual-list {
   display: block;
   width: 100%;

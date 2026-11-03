@@ -5353,8 +5353,8 @@
       "reactCompositionUsedInDemo": false,
       "tenantDeployment": false
     },
-    "remainingGap": "Implement and validate MessageBarGroup exit animations and compare visual variants, contrast, reduced motion, assistive technology, and tenant behavior.",
-    "caveat": "Local Chromium composition check only; animation currently supports entry motion for animate=both. Tree-shaken slices exclude CSS, React runtime, and SharePoint host cost."
+    "remainingGap": "Compare visual variants, contrast, assistive technology, and authenticated tenant behavior.",
+    "caveat": "Local Chromium review confirms the exit fade, sibling reflow, reduced-motion immediate removal, and error-free interaction. Tree-shaken slices exclude CSS, React runtime, and SharePoint host cost."
   },
   "skeletonItemParityLocal": {
     "measuredOn": "2026-11-01",
