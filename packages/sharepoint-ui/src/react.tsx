@@ -263,6 +263,22 @@ function useSpuiEvent(ref: React.RefObject<HTMLElement | null>, eventName: strin
   }, [ref, eventName, Boolean(callback), capture]);
 }
 
+function useNativeControlEvents<T extends Element>(ref: React.RefObject<HTMLElement | null>, selector: string, onClick?: React.MouseEventHandler<T>, onClickCapture?: React.MouseEventHandler<T>): void {
+  const bridgeClick = React.useCallback((handler: React.MouseEventHandler<T>) => (_detail: SpuiEventDetail, event: Event) => {
+    const path = event.composedPath();
+    const shadowRoot = ref.current?.shadowRoot;
+    const control = path.find((entry): entry is Element => entry instanceof Element && entry.getRootNode() === shadowRoot && entry.matches(selector));
+    if (!control) return;
+    const target = path.find((entry): entry is Element => entry instanceof Element && !(entry instanceof HTMLSlotElement)) ?? control;
+    handler(createReactEventBridge(event, event, control, target) as React.MouseEvent<T>);
+  }, [ref, selector]);
+  useSpuiEvent(ref, "click", onClick ? bridgeClick(onClick) : undefined);
+  useSpuiEvent(ref, "click", onClickCapture ? bridgeClick(onClickCapture) : undefined, true);
+}
+function useNativeButtonEvents<T extends HTMLButtonElement | HTMLAnchorElement>(ref: React.RefObject<HTMLElement | null>, onClick?: React.MouseEventHandler<T>, onClickCapture?: React.MouseEventHandler<T>): void {
+  useNativeControlEvents(ref, "button,a", onClick, onClickCapture);
+}
+
 function createReactEventBridge<T extends Element>(sourceEvent: Event, dispatchEvent: Event, currentTarget: T, target = sourceEvent.target): React.SyntheticEvent<T> {
   let propagationStopped = false;
   const bridged = {
@@ -473,22 +489,15 @@ export type ButtonContextValue = { size?: ButtonSize };
 const ButtonContext = React.createContext<ButtonContextValue | undefined>(undefined);
 export const ButtonContextProvider = ButtonContext.Provider;
 export function useButtonContext(): ButtonContextValue { return React.useContext(ButtonContext) ?? {}; }
+type NativeClickHostProps<T extends Element> = Omit<ElementProps, "onClick" | "onClickCapture"> & { onClick?: React.MouseEventHandler<T>; onClickCapture?: React.MouseEventHandler<T> };
+type NativeButtonHostProps = NativeClickHostProps<HTMLButtonElement>;
 
 export type ButtonProps = Omit<ElementProps, "onClick" | "onClickCapture"> & { onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>; onClickCapture?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>; as?: "button" | "a"; href?: string; target?: string; rel?: string; download?: string | boolean; hrefLang?: string; referrerPolicy?: string; form?: string; formAction?: string; formEncType?: string; formMethod?: string; formNoValidate?: boolean; formTarget?: string; name?: string; value?: string | number | readonly string[]; type?: "button" | "submit" | "reset"; variant?: "primary" | "default"; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; iconOnly?: boolean; disabled?: boolean; disabledFocusable?: boolean; vertical?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after" };
 
 export const Button = /* @__PURE__ */ React.forwardRef<HTMLElement, ButtonProps>(function Button({ as = "button", icon, iconPosition = "before", disabledFocusable = false, vertical = false, download, hrefLang, referrerPolicy, formAction, formEncType, formMethod, formNoValidate, formTarget, value, onClick, onClickCapture, ...props }: ButtonProps, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null);
   useExposeHostRef(ref, forwardedRef);
-  const bridgeClick = React.useCallback((handler: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>) => (_detail: SpuiEventDetail, event: Event) => {
-    const path = event.composedPath();
-    const control = path.find((entry): entry is HTMLButtonElement | HTMLAnchorElement => entry instanceof HTMLButtonElement || entry instanceof HTMLAnchorElement);
-    if (!control) return;
-    const target = path.find((entry): entry is Element => entry instanceof Element && !(entry instanceof HTMLSlotElement)) ?? control;
-    const bridged = createReactEventBridge(event, event, control, target) as React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>;
-    handler(bridged);
-  }, []);
-  useSpuiEvent(ref, "click", onClick ? bridgeClick(onClick) : undefined);
-  useSpuiEvent(ref, "click", onClickCapture ? bridgeClick(onClickCapture) : undefined, true);
+  useNativeButtonEvents(ref, onClick, onClickCapture);
   ensureDefined(defineButton);
   const buttonContext = useButtonContext();
   const iconOnly = props.iconOnly ?? (icon != null && props.children == null);
@@ -515,9 +524,12 @@ export const Button = /* @__PURE__ */ React.forwardRef<HTMLElement, ButtonProps>
 });
 
 /** A themed menu trigger. Compose it as Menu's trigger; Menu owns open state, focus, and dismissal. */
-export const MenuButton = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; menuIcon?: React.ReactNode; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; type?: "button" | "submit" | "reset" }>(function MenuButton({ children, icon, menuIcon, appearance = "secondary", size = "medium", shape = "rounded", disabled, disabledFocusable = false, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; menuIcon?: React.ReactNode; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; type?: "button" | "submit" | "reset" }, forwardedRef): React.ReactElement {
+export const MenuButton = /* @__PURE__ */ React.forwardRef<HTMLElement, NativeButtonHostProps & { children?: React.ReactNode; icon?: React.ReactNode; menuIcon?: React.ReactNode; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; type?: "button" | "submit" | "reset" }>(function MenuButton({ children, icon, menuIcon, appearance = "secondary", size = "medium", shape = "rounded", disabled, disabledFocusable = false, onClick, onClickCapture, ...props }: NativeButtonHostProps & { children?: React.ReactNode; icon?: React.ReactNode; menuIcon?: React.ReactNode; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; type?: "button" | "submit" | "reset" }, forwardedRef): React.ReactElement {
+  const ref = React.useRef<HTMLElement>(null);
+  useExposeHostRef(ref, forwardedRef);
+  useNativeButtonEvents(ref, onClick, onClickCapture);
   ensureDefined(defineMenuButton);
-  return React.createElement("spui-menu-button", useCustomElementProps({ ref: forwardedRef, ...props, appearance, size, shape, disabled: disabled || undefined, "disabled-focusable": disabledFocusable || undefined }),
+  return React.createElement("spui-menu-button", useCustomElementProps({ ref, ...props, appearance, size, shape, disabled: disabled || undefined, "disabled-focusable": disabledFocusable || undefined }),
     icon == null ? null : React.createElement("span", { slot: "icon", "aria-hidden": true }, icon),
     children,
     menuIcon == null ? null : React.createElement("span", { slot: "menu-icon", "aria-hidden": true }, menuIcon));
@@ -528,20 +540,24 @@ export const ButtonGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, Element
   return React.createElement("spui-button-group", useCustomElementProps({ ref: forwardedRef, ...props, orientation, "aria-label": label ?? props["aria-label"] }), children);
 });
 
-export const CompoundButton = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; secondaryContent?: React.ReactNode; contentContainer?: React.ReactElement; icon?: React.ReactNode; iconPosition?: "before" | "after"; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean }>(function CompoundButton({ children, secondaryContent, contentContainer, icon, iconPosition = "before", appearance = "secondary", size = "medium", shape = "rounded", disabled, disabledFocusable = false, ...props }: ElementProps & { children?: React.ReactNode; secondaryContent?: React.ReactNode; contentContainer?: React.ReactElement; icon?: React.ReactNode; iconPosition?: "before" | "after"; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean }, forwardedRef): React.ReactElement {
+export const CompoundButton = /* @__PURE__ */ React.forwardRef<HTMLElement, NativeButtonHostProps & { children?: React.ReactNode; secondaryContent?: React.ReactNode; contentContainer?: React.ReactElement; icon?: React.ReactNode; iconPosition?: "before" | "after"; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean }>(function CompoundButton({ children, secondaryContent, contentContainer, icon, iconPosition = "before", appearance = "secondary", size = "medium", shape = "rounded", disabled, disabledFocusable = false, onClick, onClickCapture, ...props }: NativeButtonHostProps & { children?: React.ReactNode; secondaryContent?: React.ReactNode; contentContainer?: React.ReactElement; icon?: React.ReactNode; iconPosition?: "before" | "after"; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean }, forwardedRef): React.ReactElement {
+  const ref = React.useRef<HTMLElement>(null);
+  useExposeHostRef(ref, forwardedRef);
+  useNativeButtonEvents(ref, onClick, onClickCapture);
   ensureDefined(defineCompoundButton);
   const customContent = contentContainer == null ? null : React.cloneElement(contentContainer, { slot: "content-container" },
     React.createElement("span", { className: "title", "data-content-title": "", style: { fontWeight: 600 } }, children),
     secondaryContent == null ? null : React.createElement("span", { id: "description", className: "description", "data-content-description": "", style: { color: "var(--spui-ui-muted,var(--spui-semantic-body-subtext,#605e5c))", fontSize: 12, lineHeight: 1.35 } }, secondaryContent));
-  return React.createElement("spui-compound-button", useCustomElementProps({ ref: forwardedRef, ...props, appearance, size, shape, disabled: disabled || undefined, "disabled-focusable": disabledFocusable || undefined, "icon-position": iconPosition }),
+  return React.createElement("spui-compound-button", useCustomElementProps({ ref, ...props, appearance, size, shape, disabled: disabled || undefined, "disabled-focusable": disabledFocusable || undefined, "icon-position": iconPosition }),
     icon == null ? null : React.createElement("span", { slot: "icon", "aria-hidden": true }, icon),
     customContent ?? children,
     customContent == null && secondaryContent != null ? React.createElement("span", { slot: "secondary-content" }, secondaryContent) : null);
 });
 
-export const ToggleButton = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; pressed?: boolean; defaultPressed?: boolean; checked?: boolean; defaultChecked?: boolean; isAccessible?: boolean; onPressedChange?: (pressed: boolean) => void; onCheckedChange?: (checked: boolean) => void; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after"; name?: string; value?: string }>(function ToggleButton({ children, pressed, defaultPressed, checked, defaultChecked, isAccessible = false, onPressedChange, onCheckedChange, appearance = "secondary", size = "medium", shape = "rounded", disabled, disabledFocusable = false, icon, iconPosition = "before", ...props }: ElementProps & { children?: React.ReactNode; pressed?: boolean; defaultPressed?: boolean; checked?: boolean; defaultChecked?: boolean; isAccessible?: boolean; onPressedChange?: (pressed: boolean) => void; onCheckedChange?: (checked: boolean) => void; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after"; name?: string; value?: string }, forwardedRef): React.ReactElement {
+export const ToggleButton = /* @__PURE__ */ React.forwardRef<HTMLElement, NativeButtonHostProps & { children?: React.ReactNode; pressed?: boolean; defaultPressed?: boolean; checked?: boolean; defaultChecked?: boolean; isAccessible?: boolean; onPressedChange?: (pressed: boolean) => void; onCheckedChange?: (checked: boolean) => void; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after"; name?: string; value?: string }>(function ToggleButton({ children, pressed, defaultPressed, checked, defaultChecked, isAccessible = false, onPressedChange, onCheckedChange, appearance = "secondary", size = "medium", shape = "rounded", disabled, disabledFocusable = false, icon, iconPosition = "before", onClick, onClickCapture, ...props }: NativeButtonHostProps & { children?: React.ReactNode; pressed?: boolean; defaultPressed?: boolean; checked?: boolean; defaultChecked?: boolean; isAccessible?: boolean; onPressedChange?: (pressed: boolean) => void; onCheckedChange?: (checked: boolean) => void; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; icon?: React.ReactNode; iconPosition?: "before" | "after"; name?: string; value?: string }, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
+  useNativeButtonEvents(ref, onClick, onClickCapture);
   ensureDefined(defineToggleButton);
   const controlledChecked = checked ?? pressed;
   const initialChecked = defaultChecked ?? defaultPressed;
@@ -2095,12 +2111,16 @@ export const AppItemStatic = /* @__PURE__ */ React.forwardRef<HTMLElement, Eleme
   return React.createElement("spui-app-item-static", useCustomElementProps({ ...props, ref: forwardedRef }), icon === undefined ? null : React.createElement("span", { slot: "icon" }, icon), children);
 });
 
-export const Hamburger = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; open?: boolean; label?: string; disabled?: boolean; disabledFocusable?: boolean; appearance?: ButtonAppearance; iconPosition?: "before" | "after"; shape?: ButtonShape; size?: ButtonSize; onClick?: React.MouseEventHandler<HTMLElement> }>(function Hamburger({ children, icon, open = false, label, disabled = false, disabledFocusable = false, appearance = "subtle", iconPosition = "before", shape = "rounded", size = "medium", ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; open?: boolean; label?: string; disabled?: boolean; disabledFocusable?: boolean; appearance?: ButtonAppearance; iconPosition?: "before" | "after"; shape?: ButtonShape; size?: ButtonSize; onClick?: React.MouseEventHandler<HTMLElement> }, forwardedRef): React.ReactElement {
+export type HamburgerProps = Omit<ElementProps, "onClick" | "onClickCapture"> & { children?: React.ReactNode; icon?: React.ReactNode; open?: boolean; label?: string; disabled?: boolean; disabledFocusable?: boolean; appearance?: ButtonAppearance; iconPosition?: "before" | "after"; shape?: ButtonShape; size?: ButtonSize; onClick?: React.MouseEventHandler<HTMLButtonElement>; onClickCapture?: React.MouseEventHandler<HTMLButtonElement> };
+export const Hamburger = /* @__PURE__ */ React.forwardRef<HTMLElement, HamburgerProps>(function Hamburger({ children, icon, open = false, label, disabled = false, disabledFocusable = false, appearance = "subtle", iconPosition = "before", shape = "rounded", size = "medium", onClick, onClickCapture, ...props }: HamburgerProps, forwardedRef): React.ReactElement {
+  const ref = React.useRef<HTMLElement>(null);
+  useExposeHostRef(ref, forwardedRef);
+  useNativeButtonEvents(ref, onClick, onClickCapture);
   ensureDefined(defineHamburger);
   const strings = React.useContext(UIContext).strings;
   const resolvedLabel = label ?? strings.navigationToggle ?? "Toggle navigation";
   const defaultIcon = React.createElement("svg", { viewBox: "0 0 24 24", width: 22, height: 22, "aria-hidden": true }, React.createElement("path", { d: "M4 6h16M4 12h16M4 18h16" }));
-  return React.createElement("spui-hamburger", useCustomElementProps({ ref: forwardedRef, ...props, appearance, size, shape, "icon-position": iconPosition, disabled: disabled || undefined, "disabled-focusable": disabledFocusable || undefined, "aria-label": props["aria-label"] ?? resolvedLabel, "aria-expanded": open }), renderIconSlot(icon ?? (children == null ? defaultIcon : null)), children);
+  return React.createElement("spui-hamburger", useCustomElementProps({ ref, ...props, appearance, size, shape, "icon-position": iconPosition, disabled: disabled || undefined, "disabled-focusable": disabledFocusable || undefined, "aria-label": props["aria-label"] ?? resolvedLabel, "aria-expanded": open }), renderIconSlot(icon ?? (children == null ? defaultIcon : null)), children);
 });
 
 export type NavDrawerProps = Omit<React.ComponentProps<typeof Nav>, "children" | "open" | "defaultOpen" | "onOpenChange"> & {
@@ -6403,10 +6423,13 @@ export const SkeletonItem = /* @__PURE__ */ React.forwardRef<HTMLElement, Elemen
   return React.createElement("spui-skeleton-item", useCustomElementProps({ ...props, ref: forwardedRef, animation: animation ?? context.animation, appearance: appearance ?? context.appearance, size: size ?? context.size ?? 16, shape: shape ?? context.shape ?? "rectangle" }));
 });
 
-export type LinkProps = ElementProps & { href?: string; target?: string; rel?: string; download?: string | boolean; hrefLang?: string; hreflang?: string; media?: string; ping?: string; type?: string; referrerPolicy?: string; title?: string; appearance?: "default" | "subtle"; underline?: "always" | "hover" | "none"; disabled?: boolean; disabledFocusable?: boolean; inline?: boolean; as?: "a" | "button" | "span"; children?: React.ReactNode };
-export const Link = /* @__PURE__ */ React.forwardRef<HTMLElement, LinkProps>(function Link({ href, target, rel, download, hrefLang, hreflang, media, ping, type, referrerPolicy, title, appearance = "default", underline = "hover", disabled = false, disabledFocusable = false, inline = false, as, children, ...props }: LinkProps, forwardedRef): React.ReactElement {
+export type LinkProps = NativeClickHostProps<HTMLAnchorElement | HTMLButtonElement | HTMLSpanElement> & { href?: string; target?: string; rel?: string; download?: string | boolean; hrefLang?: string; hreflang?: string; media?: string; ping?: string; type?: string; referrerPolicy?: string; title?: string; appearance?: "default" | "subtle"; underline?: "always" | "hover" | "none"; disabled?: boolean; disabledFocusable?: boolean; inline?: boolean; as?: "a" | "button" | "span"; children?: React.ReactNode };
+export const Link = /* @__PURE__ */ React.forwardRef<HTMLElement, LinkProps>(function Link({ href, target, rel, download, hrefLang, hreflang, media, ping, type, referrerPolicy, title, appearance = "default", underline = "hover", disabled = false, disabledFocusable = false, inline = false, as, children, onClick, onClickCapture, ...props }: LinkProps, forwardedRef): React.ReactElement {
+  const ref = React.useRef<HTMLElement>(null);
+  useExposeHostRef(ref, forwardedRef);
+  useNativeControlEvents(ref, "a,button,span", onClick, onClickCapture);
   ensureDefined(defineLink);
-  return React.createElement("spui-link", useCustomElementProps({ ...props, ref: forwardedRef, href, target, rel, download, hreflang: hrefLang ?? hreflang, media, ping, type, "referrerpolicy": referrerPolicy, title, appearance, underline, as, disabled: disabled || undefined, "disabled-focusable": disabledFocusable || undefined, inline: inline || undefined }), children);
+  return React.createElement("spui-link", useCustomElementProps({ ...props, ref, href, target, rel, download, hreflang: hrefLang ?? hreflang, media, ping, type, "referrerpolicy": referrerPolicy, title, appearance, underline, as, disabled: disabled || undefined, "disabled-focusable": disabledFocusable || undefined, inline: inline || undefined }), children);
 });
 
 export const Divider = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { orientation?: "horizontal" | "vertical"; vertical?: boolean; align?: "start" | "center" | "end"; alignContent?: "start" | "center" | "end"; appearance?: DividerAppearance; inset?: boolean; wrapper?: React.ReactNode; children?: React.ReactNode }>(function Divider({ orientation = "horizontal", vertical = false, align, alignContent, appearance = "default", inset = false, wrapper, children, ...props }: ElementProps & { orientation?: "horizontal" | "vertical"; vertical?: boolean; align?: "start" | "center" | "end"; alignContent?: "start" | "center" | "end"; appearance?: DividerAppearance; inset?: boolean; wrapper?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {

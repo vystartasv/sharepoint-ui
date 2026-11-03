@@ -7,7 +7,7 @@ import { build } from "esbuild";
 const root = resolve(process.cwd());
 const bundle = await build({
   stdin: {
-    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{Menu,MenuButton,MenuItem}from"${resolve(root, "packages/sharepoint-ui/src/react.tsx")}";createRoot(document.querySelector("#root")).render(<><Menu data-testid="menu" trigger={<MenuButton data-testid="trigger" icon={<b>+</b>}>Actions</MenuButton>}><MenuItem value="new">New item</MenuItem></Menu><Menu data-testid="custom-menu" trigger={<MenuButton data-testid="custom-trigger" menuIcon={<svg data-testid="custom-icon" viewBox="0 0 16 16"><path d="m4 6 4 4 4-4"/></svg>}>Options</MenuButton>}><MenuItem>Rename</MenuItem></Menu><MenuButton data-testid="disabled" disabled>Unavailable</MenuButton><MenuButton data-testid="disabled-focusable" disabled disabledFocusable>Unavailable but focusable</MenuButton></>);`,
+    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{Menu,MenuButton,MenuItem}from"${resolve(root, "packages/sharepoint-ui/src/react.tsx")}";window.menuButtonEvents=[];createRoot(document.querySelector("#root")).render(<><Menu data-testid="menu" trigger={<MenuButton data-testid="trigger" icon={<b>+</b>} onClick={event=>window.menuButtonEvents.push({target:event.target.tagName,currentTarget:event.currentTarget.tagName,nativeEventType:event.nativeEvent.type})}>Actions</MenuButton>}><MenuItem value="new">New item</MenuItem></Menu><Menu data-testid="custom-menu" trigger={<MenuButton data-testid="custom-trigger" menuIcon={<svg data-testid="custom-icon" viewBox="0 0 16 16"><path d="m4 6 4 4 4-4"/></svg>}>Options</MenuButton>}><MenuItem>Rename</MenuItem></Menu><MenuButton data-testid="disabled" disabled>Unavailable</MenuButton><MenuButton data-testid="disabled-focusable" disabled disabledFocusable>Unavailable but focusable</MenuButton></>);`,
     resolveDir: root,
     sourcefile: "menu-button-parity.tsx",
     loader: "tsx",
@@ -42,6 +42,7 @@ try {
   assert.equal(await triggerHost.locator(".menu-icon svg").count(), 1, "default menu chevron is present");
   await trigger.click();
   assert.equal(await trigger.getAttribute("aria-expanded"), "true", "click opens the composed Menu");
+  assert.deepEqual(await page.evaluate(() => window.menuButtonEvents), [{ target: "SPAN", currentTarget: "BUTTON", nativeEventType: "click" }], "MenuButton onClick receives the native button event");
   assert.equal(await page.getByRole("menuitem", { name: "New item" }).isVisible(), true);
   await page.keyboard.press("Escape");
   assert.equal(await trigger.getAttribute("aria-expanded"), "false", "Escape closes the Menu");

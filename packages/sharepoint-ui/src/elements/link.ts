@@ -44,7 +44,7 @@ export function defineLink(): void {
       shadow.append(style);
       this.renderRoot(this.getAttribute("as") || (this.getAttribute("href") ? "a" : "button"));
       this.addEventListener("click", event => { if (this.isDisabled()) { event.preventDefault(); event.stopImmediatePropagation(); } }, true);
-      this.addEventListener("keydown", event => { if (this.isDisabled() && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); event.stopImmediatePropagation(); } else if (this.shadowRoot?.querySelector("span") && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); (event.currentTarget as HTMLElement).click(); } }, true);
+      this.addEventListener("keydown", event => { if (this.isDisabled() && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); event.stopImmediatePropagation(); } else if (this.shadowRoot?.querySelector("span") && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); this.shadowRoot.querySelector("span")?.click(); } }, true);
     }
     private isDisabled(): boolean { const href = this.getAttribute("href")?.trim() ?? ""; return this.hasAttribute("disabled") || this.hasAttribute("disabled-focusable") || (this.getAttribute("as") === "a" || (!this.hasAttribute("as") && !!href)) && (!href || unsafeSchemes.test(href)); }
     private renderRoot(as: string): void {

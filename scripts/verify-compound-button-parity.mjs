@@ -7,7 +7,7 @@ import { build } from "esbuild";
 const root = resolve(process.cwd());
 const bundle = await build({
   stdin: {
-    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{CompoundButton}from"${resolve(root, "packages/sharepoint-ui/src/react.tsx")}";window.enabledClicks=0;window.disabledClicks=0;createRoot(document.querySelector("#root")).render(<><CompoundButton data-testid="before" icon={<b>+</b>} secondaryContent="Create a new record" onClick={()=>window.enabledClicks++}>Add record</CompoundButton><CompoundButton data-testid="after" icon={<b>+</b>} iconPosition="after">Review record</CompoundButton><CompoundButton data-testid="custom-content" secondaryContent="Custom description" contentContainer={<div data-testid="custom-content-root"/>}>Custom title</CompoundButton><CompoundButton data-testid="disabled" disabled>Unavailable</CompoundButton><CompoundButton data-testid="disabled-focusable" disabled disabledFocusable onClick={()=>window.disabledClicks++}>Unavailable but focusable</CompoundButton></>);`,
+    contents: `import * as React from "react";import{createRoot}from"react-dom/client";import{CompoundButton}from"${resolve(root, "packages/sharepoint-ui/src/react.tsx")}";window.enabledClicks=0;window.disabledClicks=0;window.clickEvents=[];window.captureEvents=[];createRoot(document.querySelector("#root")).render(<><CompoundButton data-testid="before" icon={<b>+</b>} secondaryContent="Create a new record" onClick={event=>{window.enabledClicks++;window.clickEvents.push({target:event.target.tagName,currentTarget:event.currentTarget.tagName,nativeEventType:event.nativeEvent.type})}} onClickCapture={event=>window.captureEvents.push({currentTarget:event.currentTarget.tagName,nativeEventType:event.nativeEvent.type})}>Add record</CompoundButton><CompoundButton data-testid="after" icon={<b>+</b>} iconPosition="after">Review record</CompoundButton><CompoundButton data-testid="custom-content" secondaryContent="Custom description" contentContainer={<div data-testid="custom-content-root"/>}>Custom title</CompoundButton><CompoundButton data-testid="disabled" disabled>Unavailable</CompoundButton><CompoundButton data-testid="disabled-focusable" disabled disabledFocusable onClick={()=>window.disabledClicks++}>Unavailable but focusable</CompoundButton></>);`,
     resolveDir: root,
     sourcefile: "compound-button-parity.tsx",
     loader: "tsx",
@@ -67,6 +67,8 @@ try {
   assert.equal(await page.evaluate(() => window.disabledClicks), 0, "disabledFocusable blocks React activation");
   await before.click();
   assert.equal(await page.evaluate(() => window.enabledClicks), 1, "enabled CompoundButton still activates");
+  assert.deepEqual(await page.evaluate(() => window.clickEvents), [{ target: "SPAN", currentTarget: "BUTTON", nativeEventType: "click" }], "CompoundButton onClick receives the native control event");
+  assert.deepEqual(await page.evaluate(() => window.captureEvents), [{ currentTarget: "BUTTON", nativeEventType: "click" }], "CompoundButton onClickCapture receives the native control event");
 
   await page.evaluate(() => {
     const button = document.createElement("spui-compound-button"); button.id = "native-compound";
