@@ -202,7 +202,16 @@ export function defineRichTextEditor(): void {
     }
     private syncEditorLabel(): void { this.editor.setAttribute("aria-label", this.getAttribute("aria-label") ?? this.getAttribute("label") ?? this.getAttribute("editor-label") ?? "Rich text"); }
     get value(): string { return this.editor ? (this.contentMode === "plain" ? plainText(this.editor.innerHTML) : cleanHtml(this.editor.innerHTML, this.contentMode, this.allowHyperlinks)) : this.pendingValue ?? this.getAttribute("value") ?? ""; }
-    set value(value: string) { this.pendingValue = value; if (this.editor) { if (this.contentMode === "plain") this.editor.textContent = plainText(value); else this.editor.innerHTML = cleanHtml(value, this.contentMode, this.allowHyperlinks); this.syncForm(); } }
+    set value(value: string) {
+      this.pendingValue = value;
+      if (!this.editor) return;
+      const normalized = this.contentMode === "plain" ? plainText(value) : cleanHtml(value, this.contentMode, this.allowHyperlinks);
+      if (this.value !== normalized) {
+        if (this.contentMode === "plain") this.editor.textContent = normalized;
+        else this.editor.innerHTML = normalized;
+      }
+      this.syncForm(normalized);
+    }
     get form(): HTMLFormElement | null { return this.internals?.form ?? null; }
     get validity(): ValidityState | undefined { return this.internals?.validity; }
     get validationMessage(): string { return this.internals?.validationMessage ?? ""; }
