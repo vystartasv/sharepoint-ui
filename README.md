@@ -18,6 +18,10 @@ For a repeatable checkpoint, preview version changes with `npm run version:spfx:
 
 The demo uses React 18.3.1, SPFx 1.24.0, Node 22, TypeScript 5.8, and the Heft build rig. It includes buttons, text inputs, checkboxes, switches, text areas, cards, badges, message bars, and spinners, with a live LTR/RTL and locale toggle.
 
+## A focused payload advantage
+
+The framework-free custom-element path keeps small SharePoint and Copilot surfaces lightweight. In a minified, tree-shaken comparison of Button, Input, Card, and Tag imports, the custom-element bundle was 11.6 KB gzip versus 44.4 KB for Fluent UI React 9.75. The React adapters measured 23.6 KB. These are component JavaScript slices, not complete-app or render-speed benchmarks. Reproduce the comparison with `npm run benchmark:no-react-payload`; see the [payload benchmark notes](docs-site/src/content/docs/guides/payload.mdx).
+
 
 ## Use selected components
 

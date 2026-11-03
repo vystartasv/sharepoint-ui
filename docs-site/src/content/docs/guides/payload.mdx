@@ -1,0 +1,30 @@
+---
+title: Component payload benchmark
+description: Compare the production-style JavaScript payload for SharePoint UI component imports and Fluent UI React v9.
+---
+
+SharePoint UI's strongest measured advantage is its framework-free custom-element path. A small no-React view can avoid shipping the React component runtime and a larger styling runtime for the components it uses.
+
+## Measured result
+
+On 2026-11-03, the repository benchmark bundled `Button`, `Input`, `Card`, and `Tag` from SharePoint UI `0.4.2` and Fluent UI React `9.75.0` as minified, tree-shaken browser ESM targeting ES2022. React and React DOM were external in both React builds.
+
+| Import path | Raw JavaScript | Gzip | Brotli | Gzip change vs Fluent |
+| --- | ---: | ---: | ---: | ---: |
+| SharePoint UI custom elements, no React | 47,858 bytes | 11,560 bytes | 10,256 bytes | 74.0% less |
+| SharePoint UI React adapters | 95,567 bytes | 23,591 bytes | 20,746 bytes | 46.9% less |
+| Fluent UI React 9.75.0 | 181,420 bytes | 44,411 bytes | 38,069 bytes | Baseline |
+
+This is a concrete advantage for compact SharePoint and Copilot task surfaces: a four-component custom-element slice compressed to 11.3 KiB, compared with 43.4 KiB for the matching Fluent imports.
+
+## Reproduce it
+
+From the repository root, run:
+
+```sh
+npm run benchmark:no-react-payload
+```
+
+The script builds the library, bundles the package's public element and React entry points, and compares them with the Fluent UI version installed by the SPFx demo. The measurement is for JavaScript imports only. It does not measure CSS files, React's host-provided runtime, SharePoint startup cost, render speed, or complete behavioral parity. The four controls are a focused payload slice, not a claim that both libraries implement identical behavior.
+
+Choose custom elements when React is unnecessary or when the same UI needs to work across multiple frameworks. Choose the React adapter when its familiar composition model is useful; it still produced a smaller four-component JavaScript slice in this measurement.
