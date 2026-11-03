@@ -19,7 +19,7 @@
 - Docs homepage direction selected: lead with the library's Fluent, iOS, Windows, Linux, and glass looks using live previews, with real accent color changes. Apply this presentation update after the UX component parity pass, then republish the static site.
 - Remaining work is runtime parity across interaction, keyboard/focus, form behavior, localization, theming, motion, and rendering details for the full catalog. Continue with known implementation gaps and source-level contract review; avoid expanding verification suites until implementation work is complete.
 
-The docs site is built as a 70-page static site and has been published to `https://vystartasv.github.io/sharepoint-ui-docs/` (docs repository commit `4f5572e`).
+The docs site is published from this repository at `https://vystartasv.github.io/sharepoint-ui/`. The current build generates 314 HTML files, including the 404 page (313 content routes); the published Rich Text Editor page is directly linked from the home page and Start here navigation.
 
 ### Menu mountNode parity — Fluent 9.75.0 contract and local Chromium
 
