@@ -80,6 +80,13 @@
       stage?.addEventListener(type, (event) => {
         const target = event.target;
         if (type === "click") {
+          const toastDismissButton = event.composedPath().find(node => node instanceof HTMLElement && node.hasAttribute("data-preview-toast-dismiss"));
+          const toast = toastDismissButton instanceof HTMLElement ? toastDismissButton.closest("spui-toast") : null;
+          if (toast && "dismiss" in toast) {
+            toast.dismiss("trigger");
+            if (status) status.textContent = "Toast dismissed by its trigger.";
+            return;
+          }
           const dismissButton = event.composedPath().find(node => node instanceof HTMLElement && node.localName === "spui-button" && node.textContent?.trim() === "Dismiss");
           const messageBar = dismissButton instanceof HTMLElement ? dismissButton.closest("spui-message-bar") : null;
           if (messageBar) {

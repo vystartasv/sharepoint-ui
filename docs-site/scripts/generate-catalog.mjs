@@ -162,6 +162,7 @@ function exampleFor(component) {
   };
   if (component.react === "Field") return { tag: "spui-field", attrs: 'label="Project code" required value="OPS-204"', content: "", related: false };
   if (component.react === "InfoLabel") return { tag: "div", markup: '<div class="preview-info-label"><label for="preview-owner">Project owner</label><spui-info-button label="About project owner" info="The person responsible for keeping this project current." placement="right"></spui-info-button></div><input id="preview-owner" value="Maria Chen" />', related: true };
+  if (component.react === "ToastTrigger") return { tag: "spui-toast", markup: '<spui-toast toast-id="preview-toast-trigger" intent="success" timeout="-1"><spui-toast-title>Changes saved</spui-toast-title><spui-toast-body>Your project details are up to date.</spui-toast-body><spui-toast-footer slot="action"><spui-button appearance="secondary" data-preview-toast-dismiss>Undo</spui-button></spui-toast-footer></spui-toast>', related: true };
   if (component.tag === "spui-data-grid" || component.module.startsWith("data-grid")) {
     return { tag: "spui-data-grid", attrs: 'aria-label="Project work items"', content: "", related: true };
   }
