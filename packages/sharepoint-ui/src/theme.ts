@@ -55,6 +55,18 @@ export type SharePointUIDesignTheme = {
   layers?: { dropdown?: string | number; popover?: string | number; toast?: string | number };
 };
 
+export type SharePointThemeColorPreset = { name: string; value: string; color: string; label: string };
+
+/** Build named swatches from the current SharePoint palette; custom tenant keys are preserved. */
+export function getSharePointThemeColorPresets(palette?: Readonly<Record<string, string | undefined>>, labelForKey?: (key: string) => string): SharePointThemeColorPreset[] {
+  return Object.entries(palette ?? {}).flatMap(([name, color]) => {
+    if (typeof color !== "string" || !color.trim()) return [];
+    const readableName = name.replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/([A-Za-z])(\d+)/g, "$1 $2").replace(/[_-]+/g, " ").replace(/^theme\s+/i, "").replace(/\s+/g, " ").trim();
+    const label = labelForKey?.(name) ?? readableName.replace(/\b[a-z]/g, character => character.toUpperCase());
+    return [{ name, value: name, color, label }];
+  });
+}
+
 /** Compose reusable theme packs left-to-right; later packs override earlier values within each group. */
 export function composeSharePointUIDesignThemes(...themes: Array<SharePointUIDesignTheme | undefined>): SharePointUIDesignTheme {
   return themes.reduce<SharePointUIDesignTheme>((merged, theme) => ({

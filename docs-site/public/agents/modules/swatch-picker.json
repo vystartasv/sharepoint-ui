@@ -35,6 +35,18 @@
           {
             "name": "SavedSwatchPalette",
             "description": "A named palette record with an id and color entries containing value, color, and optional label."
+          },
+          {
+            "name": "SharePointThemeSwatches",
+            "description": "Compose inside SwatchPicker to render every color in the nearest SharePointUIProvider theme palette. Pass palette to override the provider palette, or labelForColor to localize accessible color names."
+          },
+          {
+            "name": "getSharePointThemeColorPresets(palette, labelForKey?)",
+            "description": "Framework-neutral helper that maps every non-empty SharePoint palette entry, including custom tenant keys, to named swatch data."
+          },
+          {
+            "name": "SharePointThemeColorPreset",
+            "description": "A named palette key, controlled value, CSS color, and accessible label."
           }
         ]
       },
@@ -42,9 +54,7 @@
       "tag": "spui-swatch-picker",
       "define": "defineSwatchPicker",
       "summary": "Render accessible color and image swatches as a keyboard-operable single- or multi-selection grid or row.",
-      "highValueAdditions": [
-        "Offer built-in named SharePoint theme-color presets alongside caller-defined palettes."
-      ]
+      "highValueAdditions": []
     },
     {
       "module": "swatch-picker",

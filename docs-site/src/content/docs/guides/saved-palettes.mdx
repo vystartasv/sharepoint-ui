@@ -96,3 +96,28 @@ export function BrandPaletteEditor() {
 The hook returns `palettes`, `loading`, `error`, `reload`, `save`, and `remove`. A record has the shape `{ id, name, colors: [{ value, color, label? }] }`. Loading runs when the component mounts; successful saves and deletes refresh the list. Handle the returned promise when your page needs custom success or failure feedback.
 
 See the [SwatchPicker component page](/sharepoint-ui/components/swatch-picker/swatch-picker/) for the live color control and complete selection API.
+
+## Use the current SharePoint theme colors
+
+`SharePointThemeSwatches` reads the nearest `SharePointUIProvider` palette and renders each named color as a swatch. It includes tenant-specific palette keys instead of shipping a fixed list of brand colors. A `labelForColor` callback can translate accessible names for the current locale.
+
+```tsx
+import {
+  SharePointThemeSwatches,
+  SharePointUIProvider,
+  SwatchPicker,
+} from "@spfx-fast/sharepoint-ui/react";
+
+<SharePointUIProvider theme={{ palette: spfxTheme.palette }} lang={currentLanguage}>
+  <SwatchPicker
+    aria-label="Choose a site color"
+    onSelectionChange={(_event, data) => saveThemeColor(data.selectedValue)}
+  >
+    <SharePointThemeSwatches
+      labelForColor={key => localizedPaletteNames[key] ?? key}
+    />
+  </SwatchPicker>
+</SharePointUIProvider>
+```
+
+For framework-neutral apps, `getSharePointThemeColorPresets(palette, labelForKey?)` returns `{ name, value, color, label }` records from the same palette. Create `<spui-color-swatch>` elements from those records and place them inside `<spui-swatch-picker>`. This helper adds no React dependency and keeps custom tenant palette keys intact.

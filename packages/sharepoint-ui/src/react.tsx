@@ -94,7 +94,8 @@ export type { OverflowAxis, OverflowState } from "./elements/overflow.js";
 import { defineSwatchPicker as defineNativeSwatchPicker } from "./elements/swatch-picker.js";
 import { createTableColumn as createNativeTableColumn, defineTable as defineNativeTable } from "./elements/table.js";
 import { getSharePointUIStyleTokens, type SharePointUIAppearance, type SharePointUIBaseAppearance, type SharePointUIDensity, type SharePointUIStyleTokens } from "./appearance.js";
-import { getSharePointUIDesignTokens, type FluentThemeTokens, type SharePointUIDesignTheme } from "./theme.js";
+import { getSharePointThemeColorPresets, getSharePointUIDesignTokens, type FluentThemeTokens, type SharePointUIDesignTheme } from "./theme.js";
+export { getSharePointThemeColorPresets, type SharePointThemeColorPreset } from "./theme.js";
 export { createResizeObserverFromDocument, getRTLRootMargin, scrollToItemDynamic, scrollToItemStatic, useDynamicVirtualizerMeasure, useIntersectionObserver, useMeasureList, useResizeObserverRef_unstable, useStaticVirtualizerMeasure } from "./virtualizer-hooks.js";
 export type { IndexedResizeCallbackElement, ResizeCallbackWithRef, ScrollToItemDynamicParams, ScrollToItemStaticParams, VirtualizerContextMeasureProps, VirtualizerMeasureDynamicProps, VirtualizerMeasureProps } from "./virtualizer-hooks.js";
 export { composeSharePointUIDesignThemes } from "./theme.js";
@@ -6114,6 +6115,14 @@ export const ColorSwatch = /* @__PURE__ */ React.forwardRef<HTMLElement, Element
   ensureDefined(defineNativeSwatchPicker);
   return React.createElement("spui-color-swatch", useCustomElementProps({ ref: forwardedRef, ...props, color, value, disabled: disabled || undefined, size, shape, "border-color": borderColor }), children, icon == null ? null : React.createElement("span", { slot: "icon" }, icon), disabledIcon == null ? null : React.createElement("span", { slot: "disabled-icon" }, disabledIcon));
 });
+
+export type SharePointThemeSwatchesProps = { palette?: Readonly<Record<string, string | undefined>>; labelForColor?: (paletteKey: string) => string };
+export function SharePointThemeSwatches({ palette, labelForColor }: SharePointThemeSwatchesProps): React.ReactElement {
+  const themePalette = React.useContext(UIContext).theme?.palette;
+  const presets = getSharePointThemeColorPresets(palette ?? themePalette, labelForColor);
+  ensureDefined(defineNativeSwatchPicker);
+  return React.createElement(React.Fragment, null, presets.map(preset => React.createElement(ColorSwatch, { key: preset.name, color: preset.color, value: preset.value, "aria-label": preset.label })));
+}
 
 export const ImageSwatch = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { src: string; value: string; disabled?: boolean; size?: SwatchPickerProps["size"]; shape?: SwatchPickerProps["shape"]; children?: React.ReactNode }>(function ImageSwatch({ src, value, disabled, size, shape, children, ...props }: ElementProps & { src: string; value: string; disabled?: boolean; size?: SwatchPickerProps["size"]; shape?: SwatchPickerProps["shape"]; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(defineNativeSwatchPicker);
