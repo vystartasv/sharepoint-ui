@@ -314,6 +314,13 @@ const nativeEventBindings: ReadonlyArray<{ eventName: string; prop: string; capt
   ["transitionend", "onTransitionEnd", false, "transition"], ["transitionend", "onTransitionEndCapture", true, "transition"],
   ] as const).map(([eventName, prop, capture, kind]) => ({ eventName, prop, capture, kind })),
 ];
+const nativeEventBindingsByProp = new Map<string, typeof nativeEventBindings[number][]>();
+const nativeEventBindingOrder = new Map(nativeEventBindings.map((binding, index) => [binding, index]));
+for (const binding of nativeEventBindings) {
+  const bindings = nativeEventBindingsByProp.get(binding.prop);
+  if (bindings) bindings.push(binding);
+  else nativeEventBindingsByProp.set(binding.prop, [binding]);
+}
 const nativeEventPropNames = new Set(nativeEventBindings.map(binding => binding.prop));
 function withoutNativeControlEventProps(props: Record<string, unknown>): Record<string, unknown> {
   let hostProps: Record<string, unknown> | undefined;
@@ -331,7 +338,11 @@ function useNativeControlEvents<T extends Element>(ref: React.RefObject<HTMLElem
   const handlers = { ...events, onClick, onClickCapture } as Record<string, unknown>;
   const handlersRef = React.useRef(handlers);
   React.useLayoutEffect(() => { handlersRef.current = handlers; });
-  const activeBindings = nativeEventBindings.filter(binding => typeof handlers[binding.prop] === "function");
+  const activeBindings: typeof nativeEventBindings[number][] = [];
+  for (const prop of Object.keys(handlers)) {
+    if (typeof handlers[prop] === "function") activeBindings.push(...(nativeEventBindingsByProp.get(prop) ?? []));
+  }
+  activeBindings.sort((a, b) => nativeEventBindingOrder.get(a)! - nativeEventBindingOrder.get(b)!);
   const subscriptionKey = activeBindings.map(binding => binding.eventName + ":" + binding.prop + ":" + (binding.capture ? 1 : 0)).join("|");
   const hasMouseTransitions = typeof handlers.onMouseEnter === "function" || typeof handlers.onMouseLeave === "function";
   const hasPointerTransitions = typeof handlers.onPointerEnter === "function" || typeof handlers.onPointerLeave === "function";
