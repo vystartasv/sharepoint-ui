@@ -36,7 +36,7 @@ import { defineDatePicker } from "./elements/date-picker.js";
 import { defineCombobox } from "./elements/combobox.js";
 import { defineRichTextEditor, getRichTextEditorFieldOptions, type RichTextEditorImageUploader, type RichTextEditorLinkPicker, type SharePointMultiLineField } from "./elements/rich-text-editor.js";
 export { getRichTextEditorFieldOptions, type SharePointMultiLineField, type RichTextEditorImageUploadResult, type RichTextEditorImageUploader, type RichTextEditorLink, type RichTextEditorLinkPicker } from "./elements/rich-text-editor.js";
-import { getSharePointFieldAdapter, type SharePointFieldMetadata, type SharePointFieldValue } from "./sharepoint-fields.js";
+import { getSharePointFieldAdapter, type SharePointFieldMetadata, type SharePointTaxonomyTermValue, type SharePointFieldValue } from "./sharepoint-fields.js";
 import { defineAlert } from "./elements/alert.js";
 import { defineSkeleton, defineSkeletonItem, type SkeletonAnimation, type SkeletonAppearance, type SkeletonItemSize, type SkeletonShape } from "./elements/skeleton.js";
 import { defineLink } from "./elements/link.js";
@@ -2118,7 +2118,7 @@ type TagPickerReactOptionSelectData = { value: string; selectedOptions: string[]
   | { type: "click"; event: React.MouseEvent<HTMLDivElement> }
   | { type: "keydown"; event: React.KeyboardEvent<HTMLDivElement> }
 );
-export type TagPickerProps = Omit<ElementProps, "onChange"> & { children?: React.ReactNode; label?: string; selectedLabel?: string; requiredMessage?: string; form?: string; disabled?: boolean; selectedOptions?: readonly string[]; defaultSelectedOptions?: readonly string[]; selectedValues?: readonly string[]; defaultSelectedValues?: readonly string[]; inputValue?: string; open?: boolean; defaultOpen?: boolean; positioning?: TooltipPositioning; disableAutoFocus?: boolean; inline?: boolean; noPopover?: boolean; onOpenChange?: (event: SharePointUIEvent, data: TagPickerReactOpenChangeData) => void; onOptionSelect?: (event: SharePointUIEvent, data: TagPickerReactOptionSelectData) => void; onInputValueChange?: (value: string) => void; onChange?: (values: string[]) => void };
+export type TagPickerProps = Omit<ElementProps, "onChange"> & { children?: React.ReactNode; label?: string; name?: string; required?: boolean; selectedLabel?: string; requiredMessage?: string; form?: string; disabled?: boolean; selectedOptions?: readonly string[]; defaultSelectedOptions?: readonly string[]; selectedValues?: readonly string[]; defaultSelectedValues?: readonly string[]; inputValue?: string; open?: boolean; defaultOpen?: boolean; positioning?: TooltipPositioning; disableAutoFocus?: boolean; inline?: boolean; noPopover?: boolean; onOpenChange?: (event: SharePointUIEvent, data: TagPickerReactOpenChangeData) => void; onOptionSelect?: (event: SharePointUIEvent, data: TagPickerReactOptionSelectData) => void; onInputValueChange?: (value: string) => void; onChange?: (values: string[]) => void };
 export const TagPicker = /* @__PURE__ */ React.forwardRef<HTMLElement, TagPickerProps>(function TagPicker({ children, label, selectedLabel, requiredMessage, selectedOptions, defaultSelectedOptions, selectedValues, defaultSelectedValues, inputValue, open, defaultOpen, positioning, disableAutoFocus = false, inline = false, noPopover = false, disabled, onOpenChange, onOptionSelect, onInputValueChange, onChange, ...props }: TagPickerProps, forwardedRef): React.ReactElement {
   const ref = React.useRef<HTMLElement>(null)
   useExposeHostRef(ref, forwardedRef);;
@@ -7204,7 +7204,7 @@ export const AccordionPanel = /* @__PURE__ */ React.forwardRef<HTMLElement, Elem
   return React.createElement("spui-accordion-panel", useCustomElementProps({ ref: forwardedRef, ...props, slot: "panel", motion: collapseMotion ? true : undefined }), collapseMotion ? React.createElement(collapseMotion, { visible: open, appear: true, unmountOnExit: true }, children) : children);
 });
 
-export type SharePointFieldOption = { value: string | number; label: string; disabled?: boolean };
+export type SharePointFieldOption = { value: string | number; label: string; disabled?: boolean; wssId?: number };
 export type SharePointFieldProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children" | "defaultValue" | "onChange"> & {
   field: SharePointFieldMetadata;
   value?: SharePointFieldValue;
@@ -7235,6 +7235,9 @@ export function SharePointField({ field, value, defaultValue, options: providedO
   const name = adapter.name || undefined;
   const stringValue = adapter.control === "date-picker" ? toSharePointDateControlString(currentValue) : toSharePointControlString(currentValue);
   const choices: readonly SharePointFieldOption[] = providedOptions ?? (adapter.choices ?? []).map(choice => ({ value: choice, label: choice }));
+  const taxonomyOptions = [...choices];
+  const currentTerms = taxonomyTerms(currentValue);
+  if (adapter.control === "taxonomy") for (const term of currentTerms) if (!taxonomyOptions.some(option => String(option.value).toLowerCase() === term.termGuid.toLowerCase())) taxonomyOptions.push({ value: term.termGuid, label: term.label, wssId: term.wssId });
   const controlDisabled = disabled || (adapter.readOnly && !["input", "textarea", "rich-text-editor"].includes(adapter.control));
   let control: React.ReactNode;
 
@@ -7309,6 +7312,22 @@ export function SharePointField({ field, value, defaultValue, options: providedO
         {choices.map(option => <Option key={String(option.value)} value={String(option.value)} text={option.label} disabled={option.disabled}>{option.label}</Option>)}
       </ComboBox>;
       break;
+    case "taxonomy": {
+      const termForId = (id: string): SharePointTaxonomyTermValue => currentTerms.find(term => term.termGuid.toLowerCase() === id.toLowerCase()) ?? (() => {
+        const option = taxonomyOptions.find(item => String(item.value).toLowerCase() === id.toLowerCase());
+        return { termGuid: id, label: option?.label ?? id, ...(option?.wssId === undefined ? {} : { wssId: option.wssId }) };
+      })();
+      if (adapter.multiple) {
+        control = <TagPicker name={name} label={label} required={adapter.required} disabled={controlDisabled} selectedOptions={currentTerms.map(term => term.termGuid)} onChange={ids => updateValue(ids.map(termForId))}>
+          {taxonomyOptions.map(option => <TagPickerOption key={String(option.value)} value={String(option.value)} text={option.label} disabled={option.disabled}>{option.label}</TagPickerOption>)}
+        </TagPicker>;
+      } else {
+        control = <ComboBox name={name} selectedValue={currentTerms[0]?.termGuid} required={adapter.required} disabled={controlDisabled} placeholder={emptyOptionLabel} onOptionSelect={(_, data) => updateValue(data.optionValue ? termForId(data.optionValue) : null)}>
+          {taxonomyOptions.map(option => <Option key={String(option.value)} value={String(option.value)} text={option.label} disabled={option.disabled}>{option.label}</Option>)}
+        </ComboBox>;
+      }
+      break;
+    }
     case "read-only":
       control = <TextField name={name} value={stringValue} readOnly />;
       break;
@@ -7324,6 +7343,9 @@ export function SharePointField({ field, value, defaultValue, options: providedO
       <SharePointMultiChoiceGroup label={label} required={adapter.required} disabled={disabled}>{control}</SharePointMultiChoiceGroup>
     </Field>;
   }
+  if (adapter.control === "taxonomy" && adapter.multiple) {
+    return <Field {...hostProps} hint={hint ?? adapter.description} validationMessage={validationMessage} required={adapter.required} disabled={disabled} className={className} style={style}>{control}</Field>;
+  }
   return <Field {...hostProps} label={label} hint={hint ?? adapter.description} validationMessage={validationMessage} required={adapter.required} disabled={disabled} className={className} style={style}>{control}</Field>;
 }
 
@@ -7334,8 +7356,15 @@ function toSharePointControlString(value: SharePointFieldValue | undefined): str
     const pad = (part: number): string => String(part).padStart(2, "0");
     return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}T${pad(value.getHours())}:${pad(value.getMinutes())}`;
   }
+  if (Array.isArray(value)) return value.map(item => typeof item === "object" && item !== null && "termGuid" in item ? String(item.label ?? item.termGuid) : String(item)).join(", ");
+  if (typeof value === "object" && "termGuid" in value) return value.label;
   if (typeof value === "object" && "url" in value) return value.url;
   return "";
+}
+
+function taxonomyTerms(value: SharePointFieldValue | undefined): SharePointTaxonomyTermValue[] {
+  const values = Array.isArray(value) ? value : value == null ? [] : [value];
+  return values.filter((item): item is SharePointTaxonomyTermValue => typeof item === "object" && item !== null && "termGuid" in item && "label" in item);
 }
 
 function SharePointMultiChoiceGroup({ label, required, disabled, children }: { label: string; required: boolean; disabled: boolean; children: React.ReactNode }): React.ReactElement {

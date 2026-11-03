@@ -72,9 +72,11 @@ export type SharePointFieldMetadata = SharePointMultiLineField & {
   lookupField?: string;
   LookupWebId?: string;
   lookupWebId?: string;
+  TermSetId?: string;
+  termSetId?: string;
 };
 
-export type SharePointFieldControl = "input" | "textarea" | "rich-text-editor" | "select" | "radio-group" | "checkbox" | "multi-choice" | "date-picker" | "combobox" | "read-only" | "unsupported";
+export type SharePointFieldControl = "input" | "textarea" | "rich-text-editor" | "select" | "radio-group" | "checkbox" | "multi-choice" | "date-picker" | "combobox" | "taxonomy" | "read-only" | "unsupported";
 
 export type SharePointFieldAdapter = {
   control: SharePointFieldControl;
@@ -97,6 +99,7 @@ export type SharePointFieldAdapter = {
   allowFillIn?: boolean;
   richText?: ReturnType<typeof getRichTextEditorFieldOptions>;
   lookupSource?: { listId: string; displayField: string; webId?: string };
+  termSetId?: string;
   unsupportedReason?: string;
 };
 
@@ -106,8 +109,11 @@ export type SharePointLookupUpdate = Record<string, number | null | { results: n
 export type SharePointChoiceValue = string | readonly string[] | null;
 export type SharePointChoiceUpdate = Record<string, string | null | { results: string[] }>;
 export type SharePointUrlValue = { url: string; description?: string };
-export type SharePointFieldValue = string | number | boolean | Date | SharePointUrlValue | readonly string[] | readonly SharePointLookupId[] | null;
+export type SharePointTaxonomyTermValue = { label: string; termGuid: string; wssId?: number };
+export type SharePointTaxonomyValue = SharePointTaxonomyTermValue | readonly SharePointTaxonomyTermValue[] | null;
+export type SharePointFieldValue = string | number | boolean | Date | SharePointUrlValue | SharePointTaxonomyTermValue | readonly string[] | readonly SharePointLookupId[] | readonly SharePointTaxonomyTermValue[] | null;
 export type SharePointFieldValues = Readonly<Record<string, SharePointFieldValue | undefined>>;
+export type SharePointTaxonomyFieldFormValue = { FieldName: string; FieldValue: string };
 export type SharePointFieldUpdateValue = string | number | boolean | null | { results: Array<string | number> } | { __metadata: { type: "SP.FieldUrlValue" }; Url: string; Description: string };
 export type SharePointFieldUpdate = Record<string, SharePointFieldUpdateValue>;
 
@@ -151,6 +157,9 @@ export function getSharePointFieldAdapter(field: SharePointFieldMetadata): Share
       control.max = getConfiguredNumber(field.MaximumValue ?? field.maximumValue ?? field.Max ?? field.max);
     }
     return control;
+  }
+  if (normalized === "taxonomyfieldtype" || normalized === "taxonomyfieldtypemulti") {
+    return { ...finish("taxonomy"), multiple: normalized.endsWith("multi") || booleanValue(field.AllowMultipleValues ?? field.allowMultipleValues), termSetId: field.TermSetId ?? field.termSetId };
   }
   if (normalized === "note") {
     const richText = getRichTextEditorFieldOptions(field);
@@ -208,6 +217,11 @@ export function getSharePointListItemUrl(webUrl: string, listId: string, itemId:
   url.search = "";
   url.hash = "";
   return url.toString();
+}
+
+/** Build the item endpoint used by SharePoint's ValidateUpdateListItem form-value API. */
+export function getSharePointValidateUpdateListItemUrl(webUrl: string, listId: string, itemId: number): string {
+  return `${getSharePointListItemUrl(webUrl, listId, itemId)}/ValidateUpdateListItem()`;
 }
 
 /** Build a paged REST URL for options in a lookup field's source list. Pass that list's web URL. */
@@ -298,6 +312,10 @@ export function serializeSharePointFieldValue(field: SharePointFieldMetadata, va
   const type = adapter.fieldType.replace(/^SP\.Field/, "").toLowerCase();
   if (!adapter.name) throw new TypeError("The SharePoint field must include InternalName.");
 
+  if (type === "taxonomyfieldtype" || type === "taxonomyfieldtypemulti") {
+    throw new TypeError(`${adapter.label} is a managed-metadata field; use serializeSharePointTaxonomyFieldFormValue() with ValidateUpdateListItem.`);
+  }
+
   if (["lookup", "lookupmulti", "user", "usermulti"].includes(type)) {
     return serializeSharePointLookupValue(field, value as SharePointLookupValue);
   }
@@ -358,6 +376,31 @@ export function serializeSharePointFieldValue(field: SharePointFieldMetadata, va
   }
 
   throw new TypeError(adapter.unsupportedReason ?? `${adapter.fieldType} fields cannot be serialized by this helper.`);
+}
+
+/** Serialize a managed-metadata field for the ValidateUpdateListItem formValues array. */
+export function serializeSharePointTaxonomyFieldFormValue(field: SharePointFieldMetadata, value: SharePointTaxonomyValue): SharePointTaxonomyFieldFormValue {
+  const adapter = getSharePointFieldAdapter(field);
+  const type = adapter.fieldType.replace(/^SP\.Field/, "").toLowerCase();
+  if (adapter.control !== "taxonomy" || (type !== "taxonomyfieldtype" && type !== "taxonomyfieldtypemulti")) {
+    throw new TypeError(`${adapter.label} is not a SharePoint managed-metadata field.`);
+  }
+  if (!adapter.name) throw new TypeError("The SharePoint field must include InternalName.");
+  assertSharePointFieldValueWritable(adapter, value);
+
+  const terms = adapter.multiple
+    ? value == null ? [] : Array.isArray(value) ? value : (() => { throw new TypeError(`${adapter.label} requires an array of selected terms.`); })()
+    : value == null ? [] : Array.isArray(value) ? (() => { throw new TypeError(`${adapter.label} accepts one selected term or null.`); })() : [value as SharePointTaxonomyTermValue];
+  const serialized = terms.map(term => {
+    if (!term || typeof term.label !== "string" || !term.label.trim()) throw new TypeError(`${adapter.label} terms require a non-empty label.`);
+    const termGuid = normalizeSharePointListId(term.termGuid, `${adapter.label} terms require a valid term GUID.`);
+    if (term.label.includes(";#") || term.label.includes("|")) throw new TypeError(`${adapter.label} term labels cannot contain “;#” or “|”.`);
+    const wssId = term.wssId ?? -1;
+    if (!Number.isSafeInteger(wssId) || wssId < -1) throw new RangeError(`${adapter.label} term WssId must be -1 or a non-negative safe integer.`);
+    return `${wssId};#${term.label.trim()}|${termGuid}`;
+  });
+  if (!adapter.multiple && serialized.length > 1) throw new TypeError(`${adapter.label} accepts one selected term.`);
+  return { FieldName: adapter.name, FieldValue: serialized.join(";#") };
 }
 
 /** Build one SharePoint item patch from values keyed by field InternalName; omitted values stay untouched. */

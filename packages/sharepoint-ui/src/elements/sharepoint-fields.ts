@@ -1,12 +1,13 @@
 import {
   getSharePointFieldAdapter,
   type SharePointFieldMetadata,
+  type SharePointTaxonomyTermValue,
   type SharePointFieldValue,
 } from "../sharepoint-fields.js";
 import { createFormField } from "./field-composition.js";
 import { defineSharePointFieldBasicControls } from "./sharepoint-field-basic-controls.js";
 
-export type SharePointFieldOption = { value: string | number; label: string; disabled?: boolean };
+export type SharePointFieldOption = { value: string | number; label: string; disabled?: boolean; wssId?: number };
 export type SharePointFieldValueChangeDetail = { field: SharePointFieldMetadata; value: SharePointFieldValue };
 export type SharePointFieldElement = HTMLElement & {
   field: SharePointFieldMetadata | undefined;
@@ -23,8 +24,8 @@ declare global {
   interface HTMLElementEventMap { "spui-field-value-change": CustomEvent<SharePointFieldValueChangeDetail>; }
 }
 
-type FieldControl = HTMLElement & { value?: string; checked?: boolean | "mixed"; defaultChecked?: boolean | "mixed"; selectedValue?: string; selectedOptions?: string[] };
-type FieldChange = Event & { detail?: { value?: string; checked?: boolean | "mixed"; selectedValue?: string; selectedOptions?: string[] } };
+type FieldControl = HTMLElement & { value?: string | string[]; checked?: boolean | "mixed"; defaultChecked?: boolean | "mixed"; selectedValue?: string; selectedOptions?: string[] };
+type FieldChange = Event & { detail?: { value?: string; checked?: boolean | "mixed"; selectedValue?: string; selectedOptions?: string[]; values?: string[] } };
 
 const textValue = (value: SharePointFieldValue | undefined): string => {
   if (value == null) return "";
@@ -32,9 +33,25 @@ const textValue = (value: SharePointFieldValue | undefined): string => {
     const pad = (part: number): string => String(part).padStart(2, "0");
     return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}${value.getHours() || value.getMinutes() ? `T${pad(value.getHours())}:${pad(value.getMinutes())}` : ""}`;
   }
+  if (Array.isArray(value)) return value.map(item => typeof item === "object" && item !== null && "termGuid" in item ? String(item.label ?? item.termGuid) : String(item)).join(", ");
+  if (typeof value === "object" && "termGuid" in value) return value.label;
   if (typeof value === "object" && "url" in value) return value.url;
   return String(value);
 };
+
+function taxonomyTerms(value: SharePointFieldValue | undefined): SharePointTaxonomyTermValue[] {
+  const values = Array.isArray(value) ? value : value == null ? [] : [value];
+  return values.filter((item): item is SharePointTaxonomyTermValue => typeof item === "object" && item !== null && "termGuid" in item && "label" in item);
+}
+
+function taxonomyValuesFromIds(ids: readonly string[], currentValue: SharePointFieldValue | undefined, options: readonly SharePointFieldOption[], multiple: boolean): SharePointFieldValue {
+  const current = taxonomyTerms(currentValue);
+  const values = ids.map(id => current.find(term => term.termGuid.toLowerCase() === id.toLowerCase()) ?? (() => {
+    const option = options.find(item => String(item.value).toLowerCase() === id.toLowerCase());
+    return { termGuid: id, label: option?.label ?? id, ...(option?.wssId === undefined ? {} : { wssId: option.wssId }) };
+  })());
+  return multiple ? values : values[0] ?? null;
+}
 
 function makeOption(tag: string, option: SharePointFieldOption): HTMLElement {
   const element = document.createElement(tag);
@@ -67,6 +84,11 @@ async function loadFieldControl(adapter: ReturnType<typeof getSharePointFieldAda
       break;
     case "combobox":
       if (!customElements.get("spui-combobox")) (await import(/* webpackChunkName: "spui-sharepoint-field-lookup" */ "./combobox.js")).defineCombobox();
+      break;
+    case "taxonomy":
+      if (adapter.multiple) {
+        if (!customElements.get("spui-tag-picker")) (await import(/* webpackChunkName: "spui-sharepoint-field-taxonomy" */ "./tag-picker.js")).defineTagPicker();
+      } else if (!customElements.get("spui-combobox")) (await import(/* webpackChunkName: "spui-sharepoint-field-taxonomy" */ "./combobox.js")).defineCombobox();
       break;
   }
 }
@@ -145,6 +167,9 @@ export function defineSharePointField(): void {
         const options = this.hasProvidedOptions ? this.currentOptions : (adapter.choices ?? []).map(value => ({ value, label: value }));
         const label = adapter.label || adapter.name || adapter.fieldType;
         const value = this.currentValue;
+        const terms = taxonomyTerms(value);
+        const fieldOptions = [...options];
+        if (adapter.control === "taxonomy") for (const term of terms) if (!fieldOptions.some(option => String(option.value).toLowerCase() === term.termGuid.toLowerCase())) fieldOptions.push({ value: term.termGuid, label: term.label, wssId: term.wssId });
         const valueText = textValue(value);
         const defaultValueText = textValue(this.initialValue);
         const name = adapter.name || undefined;
@@ -161,7 +186,7 @@ export function defineSharePointField(): void {
           if (tag === "option") {
             const empty = document.createElement("option"); empty.value = ""; empty.textContent = this.getAttribute("empty-option-label") ?? "Select an option"; empty.disabled = adapter.required;
             element.append(empty, ...options.map(option => makeOption(tag, option)));
-          } else element.append(...options.map(option => makeOption(tag, option)));
+          } else element.append(...fieldOptions.map(option => makeOption(tag, option)));
         };
 
         switch (adapter.control) {
@@ -251,7 +276,8 @@ export function defineSharePointField(): void {
               const fillIn = document.createElement("spui-input"); fillIn.setAttribute("type", "text"); fillIn.setAttribute("aria-label", this.getAttribute("add-choice-label") ?? "Add another choice");
               const add = document.createElement("spui-button"); add.setAttribute("appearance", "secondary"); add.textContent = this.getAttribute("add-choice-label") ?? "Add another choice"; if (controlDisabled) add.setAttribute("disabled", "");
               const addFillIn = (): void => {
-                const choice = (fillIn as FieldControl).value?.trim() ?? "";
+                const rawChoice = (fillIn as FieldControl).value;
+                const choice = typeof rawChoice === "string" ? rawChoice.trim() : "";
                 if (!choice || selected.includes(choice)) return;
                 this.acceptValue([...selected, choice]);
                 (fillIn as FieldControl).value = "";
@@ -286,6 +312,29 @@ export function defineSharePointField(): void {
             control = combo;
             break;
           }
+          case "taxonomy": {
+            if (adapter.multiple) {
+              const picker = setBasics(document.createElement("spui-tag-picker") as FieldControl);
+              picker.setAttribute("label", label);
+              picker.setAttribute("placeholder", this.getAttribute("empty-option-label") ?? "Select terms");
+              picker.setAttribute("input-aria-label", label);
+              selectOptions(picker, "spui-tag-picker-option");
+              const initialTerms = taxonomyTerms(this.initialValue);
+              if (initialTerms.length) picker.setAttribute("default-selected-options", JSON.stringify(initialTerms.map(term => term.termGuid)));
+              picker.selectedOptions = terms.map(term => term.termGuid);
+              control = picker;
+            } else {
+              const combo = setBasics(document.createElement("spui-combobox") as FieldControl);
+              combo.setAttribute("placeholder", this.getAttribute("empty-option-label") ?? "Select a term");
+              selectOptions(combo, "spui-combobox-option");
+              const term = terms[0];
+              if (term) { combo.setAttribute("selected-value", term.termGuid); combo.setAttribute("value", term.label); }
+              combo.selectedValue = term?.termGuid ?? "";
+              combo.value = term?.label ?? "";
+              control = combo;
+            }
+            break;
+          }
           case "read-only": {
             const readonly = setBasics(document.createElement("spui-input") as FieldControl);
             readonly.setAttribute("type", "text"); readonly.setAttribute("read-only", ""); readonly.value = valueText;
@@ -304,7 +353,7 @@ export function defineSharePointField(): void {
         const wrapper = createFormField(control, {
           id: this.id ? `${this.id}-field` : undefined,
           className: this.getAttribute("class") ?? undefined,
-          label: adapter.control === "multi-choice" ? undefined : label,
+          label: adapter.control === "multi-choice" || (adapter.control === "taxonomy" && adapter.multiple) ? undefined : label,
           hint: this.getAttribute("hint") ?? adapter.description,
           validationMessage: this.getAttribute("validation-message") ?? undefined,
           required: adapter.required,
@@ -333,6 +382,7 @@ export function defineSharePointField(): void {
         control.querySelectorAll<FieldControl>("spui-checkbox").forEach(checkbox => { checkbox.checked = selected.has(checkbox.getAttribute("value") ?? ""); });
       } else if (control.localName === "spui-checkbox") control.checked = this.currentValue === true || this.currentValue === "true";
       else if (control.localName === "spui-combobox" && control.hasAttribute("multiselect")) control.selectedOptions = Array.isArray(this.currentValue) ? this.currentValue.map(String) : [];
+      else if (control.localName === "spui-tag-picker") control.selectedOptions = taxonomyTerms(this.currentValue).map(term => term.termGuid);
       else if ("value" in control) control.value = textValue(this.currentValue);
     }
 
@@ -354,6 +404,7 @@ export function defineSharePointField(): void {
       }
       this.addEventListener("spui-input", event => {
         const target = event.target as HTMLElement | null;
+        if (target?.localName === "spui-tag-picker") return;
         if ((target?.localName === "spui-combobox" && !target.hasAttribute("allow-freeform")) || (target?.localName === "spui-input" && target.closest("fieldset"))) return;
         const value = (event as FieldChange).detail?.value;
         if (value !== undefined) this.acceptValue(value);
@@ -369,8 +420,18 @@ export function defineSharePointField(): void {
             if (detail.checked === true) selected.add(choice); else selected.delete(choice);
             this.acceptValue([...selected]);
           } else this.acceptValue(detail.checked === true);
-        } else if (detail.selectedOptions) this.acceptValue(detail.selectedOptions);
-        else if (detail.selectedValue !== undefined) this.acceptValue(detail.selectedValue || null);
+        } else if (detail.selectedOptions || detail.values) {
+          const selected = detail.selectedOptions ?? detail.values!;
+          const field = this.fieldValue;
+          const adapter = field ? getSharePointFieldAdapter(field) : undefined;
+          this.acceptValue(adapter?.control === "taxonomy" ? taxonomyValuesFromIds(selected, this.currentValue, this.currentOptions, adapter.multiple === true) : selected);
+        } else if (detail.selectedValue !== undefined) {
+          const field = this.fieldValue;
+          const adapter = field ? getSharePointFieldAdapter(field) : undefined;
+          this.acceptValue(adapter?.control === "taxonomy"
+            ? taxonomyValuesFromIds(detail.selectedValue ? [detail.selectedValue] : [], this.currentValue, this.currentOptions, false)
+            : detail.selectedValue || null);
+        }
         else if (detail.value !== undefined) this.acceptValue(detail.value || null);
       });
     }
