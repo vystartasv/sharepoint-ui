@@ -11060,5 +11060,15 @@
       "demoBundle": { "rawBytes": 1003316, "gzipBytes": 229044, "brotliBytes": 172722 }
     },
     "limits": "Local Chromium and SPFx 1.24 production package validation; no authenticated tenant deployment or assistive-technology review was run."
+  },
+  "carouselThumbnailNavigationCheckpoint": {
+    "measuredOn": "2026-11-03",
+    "scope": "Carousel, CarouselNav with thumbnails appearance, and CarouselNavImageButton grouped import",
+    "command": "npm run measure:component -- Carousel CarouselNav CarouselNavImageButton",
+    "componentSlices": {
+      "customElement": { "rawBytes": 52693, "gzipBytes": 11776, "brotliBytes": 10407, "includedModules": 4 },
+      "reactAdapter": { "rawBytes": 92637, "gzipBytes": 21729, "brotliBytes": 19127, "includedModules": 6, "reactExternalized": true }
+    },
+    "limits": "Minified tree-shaken JavaScript slices only; excludes CSS, React runtime, image transfer, rendering time, and SharePoint host costs."
   }
 }

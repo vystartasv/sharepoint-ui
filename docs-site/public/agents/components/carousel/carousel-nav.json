@@ -20,7 +20,7 @@
         "host className/style",
         "named ::part hooks"
       ],
-      "reactSignature": "{ children, label, appearance, slot = \"navigation\", ...props }: ElementProps & { children?: React.ReactNode; label?: string; appearance?: \"brand\"; slot?: string }",
+      "reactSignature": "{ children, label, appearance, slot = \"navigation\", ...props }: ElementProps & { children?: React.ReactNode; label?: string; appearance?: \"brand\" | \"thumbnails\"; slot?: string }",
       "slots": [
         "navigation buttons"
       ],
@@ -29,10 +29,10 @@
     "react": "CarouselNav",
     "tag": "spui-carousel-nav",
     "define": "defineCarouselNav",
-    "signature": "{ children, label, appearance, ...props }: ElementProps & { children?: React.ReactNode; label?: string; appearance?: \"brand\" }",
+    "signature": "{ children, label, appearance, ...props }: ElementProps & { children?: React.ReactNode; label?: string; appearance?: \"brand\" | \"thumbnails\" }",
     "slots": [
       "navigation buttons"
     ],
-    "summary": "Group carousel position buttons with RTL-aware roving keyboard focus."
+    "summary": "Group carousel position buttons with RTL-aware roving keyboard focus; use the scrollable thumbnails appearance with image buttons for gallery navigation."
   }
 }

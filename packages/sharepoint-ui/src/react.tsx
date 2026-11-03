@@ -2308,7 +2308,7 @@ export const CarouselCard = /* @__PURE__ */ React.forwardRef<HTMLElement, Elemen
   return React.createElement("spui-carousel-card", useCustomElementProps({ ref: forwardedRef, ...props, "auto-size": autoSize || undefined }), children);
 });
 
-export const CarouselNav = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string; appearance?: "brand"; slot?: string }>(function CarouselNav({ children, label, appearance, slot = "navigation", ...props }: ElementProps & { children?: React.ReactNode; label?: string; appearance?: "brand"; slot?: string }, forwardedRef): React.ReactElement {
+export const CarouselNav = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { children?: React.ReactNode; label?: string; appearance?: "brand" | "thumbnails"; slot?: string }>(function CarouselNav({ children, label, appearance, slot = "navigation", ...props }: ElementProps & { children?: React.ReactNode; label?: string; appearance?: "brand" | "thumbnails"; slot?: string }, forwardedRef): React.ReactElement {
   const strings = React.useContext(UIContext).strings;
   ensureDefined(defineCarouselNav); ensureDefined(defineCarouselNavButton); ensureDefined(defineCarouselNavImageButton);
   return React.createElement("spui-carousel-nav", useCustomElementProps({ ref: forwardedRef, ...props, slot, "aria-label": label || strings.carouselNavigation, appearance }), children);

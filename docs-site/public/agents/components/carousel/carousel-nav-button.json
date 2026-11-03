@@ -18,7 +18,8 @@
         "SharePointUIProvider tokens",
         "CSS custom properties",
         "host className/style",
-        "named ::part hooks"
+        "named ::part hooks",
+        "appearance: brand or thumbnails"
       ],
       "reactSignature": "{ children, index, label, selected = false, disabled = false, ...props }: ElementProps & { children?: React.ReactNode; index: number; label?: string; selected?: boolean; disabled?: boolean }",
       "slots": [

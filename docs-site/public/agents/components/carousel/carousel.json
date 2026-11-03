@@ -35,7 +35,8 @@
         "motion accepts slide attraction physics: { kind: \"slide\", duration?: number }; duration follows Embla’s 20–60 recommendation"
       ],
       "highValueAdditions": [
-        "Enable drag with keyboard-equivalent announcements and preserve end padding when slides are centered."
+        "Enable drag with keyboard-equivalent announcements and preserve end padding when slides are centered.",
+        "Use CarouselNav appearance=thumbnails with CarouselNavImageButton for a horizontally scrollable image-preview strip."
       ],
       "reactRefType": "HTMLElement"
     },

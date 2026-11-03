@@ -99,7 +99,7 @@ export function defineCarouselNav(): void {
       if (this.shadowRoot) return;
       const root = this.attachShadow({ mode: "open" });
       const style = document.createElement("style");
-      style.textContent = `${base}:host{display:flex;align-items:center;justify-content:center;gap:4px;min-width:0}:host([appearance=brand]){--spui-carousel-indicator:var(--spui-ui-accent,#0078d4)}slot{display:contents}`;
+      style.textContent = `${base}:host{display:flex;align-items:center;justify-content:center;gap:4px;min-width:0}:host([appearance=brand]){--spui-carousel-indicator:var(--spui-ui-accent,#0078d4)}:host([appearance=thumbnails]){justify-content:flex-start;max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:inline mandatory;scrollbar-width:thin;padding-block:4px}:host([appearance=thumbnails]) div[role=group]{display:flex;align-items:center;gap:8px;width:max-content;min-width:100%}:host([appearance=thumbnails]) ::slotted(spui-carousel-nav-image-button){scroll-snap-align:start}slot{display:contents}`;
       const group = document.createElement("div"); group.setAttribute("role", "group"); group.setAttribute("aria-label", this.getAttribute("aria-label") || "Slide navigation");
       const slot = document.createElement("slot"); group.append(slot); root.append(style, group);
     }
@@ -125,7 +125,7 @@ function defineCarouselNavControl(tag: "spui-carousel-nav-button" | "spui-carous
         const style = document.createElement("style");
         style.textContent = `${base}:host{display:inline-flex;min-width:0}button{box-sizing:border-box;display:grid;place-items:center;min-width:44px;min-height:44px;padding:4px;border:1px solid var(--spui-ui-stroke,#d1d1d1);border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface,#fff);color:var(--spui-ui-text,inherit);font:inherit;cursor:pointer}button[aria-current=step]{border-color:var(--spui-ui-accent,#0078d4);box-shadow:inset 0 0 0 1px var(--spui-ui-accent,#0078d4)}button:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#0078d4));outline-offset:2px}img{display:block;width:56px;height:40px;object-fit:cover;border-radius:calc(var(--spui-control-radius,6px) - 2px)}slot{display:contents}@media(forced-colors:active){button{border-color:ButtonText}button[aria-current=step]{outline:2px solid Highlight}}`;
         this.button = document.createElement("button"); this.button.type = "button";
-        if (image) { this.picture = document.createElement("img"); const imageSlot = document.createElement("slot"); imageSlot.name = "image"; imageSlot.append(this.picture); this.button.append(imageSlot); }
+        if (image) { this.picture = document.createElement("img"); this.picture.loading = "lazy"; this.picture.decoding = "async"; this.picture.draggable = false; const imageSlot = document.createElement("slot"); imageSlot.name = "image"; imageSlot.append(this.picture); this.button.append(imageSlot); }
         const content = document.createElement("slot"); this.button.append(content);
         this.button.addEventListener("click", event => this.dispatchEvent(new CustomEvent("spui-carousel-nav-select", { bubbles: true, composed: true, detail: { index: this.index, event } })));
         this.button.addEventListener("keydown", event => {
