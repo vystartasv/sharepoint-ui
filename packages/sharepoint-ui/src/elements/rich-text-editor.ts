@@ -256,12 +256,21 @@ export function defineRichTextEditor(): void {
       }
       if (this.linkPickerStatus) this.linkPickerStatus.textContent = this.pickingLink ? this.getAttribute("link-picker-loading-label") ?? "Opening picker…" : "";
     }
-    private syncForm(): void { const value = this.value; this.pendingValue = value; this.internals?.setFormValue(value || null); const active = this.willValidate; const missing = active && this.hasAttribute("required") && !this.editor?.textContent?.trim(); const customError = active && Boolean(this.customError); const flags: ValidityStateFlags = { ...(missing ? { valueMissing: true } : {}), ...(customError ? { customError: true } : {}) }; const message = customError ? this.customError : missing ? this.getAttribute("required-message") ?? "Enter some text." : ""; try { this.internals?.setValidity(flags, message); } catch { /* Engines without form association remain editable. */ } }
-    private sanitizeEditor(): void {
+    private syncForm(value = this.value): void { this.pendingValue = value; this.internals?.setFormValue(value || null); const active = this.willValidate; const missing = active && this.hasAttribute("required") && !this.editor?.textContent?.trim(); const customError = active && Boolean(this.customError); const flags: ValidityStateFlags = { ...(missing ? { valueMissing: true } : {}), ...(customError ? { customError: true } : {}) }; const message = customError ? this.customError : missing ? this.getAttribute("required-message") ?? "Enter some text." : ""; try { this.internals?.setValidity(flags, message); } catch { /* Engines without form association remain editable. */ } }
+    private commitEditorValue(eventName: "spui-input" | "spui-change" = "spui-input"): void {
+      const value = this.sanitizeEditor();
+      this.onSelectionChange();
+      this.syncForm(value);
+      const event = eventName === "spui-change"
+        ? new CustomEvent("spui-change", { detail: { value }, bubbles: true, composed: true })
+        : new CustomEvent("spui-input", { detail: { value }, bubbles: true, composed: true });
+      this.dispatchEvent(event);
+    }
+    private sanitizeEditor(): string {
       const html = this.editor.innerHTML;
       const value = cleanHtml(html, this.contentMode, this.allowHyperlinks);
-      if (this.contentMode === "plain") { if (this.editor.textContent !== value) this.editor.textContent = value; return; }
-      if (value === html) return;
+      if (this.contentMode === "plain") { if (this.editor.textContent !== value) this.editor.textContent = value; return value; }
+      if (value === html) return value;
       const cell = this.selectedCell();
       const tableIndex = cell ? [...this.editor.querySelectorAll("table")].indexOf(cell.closest("table")!) : -1;
       const rowIndex = cell?.closest("tr")?.rowIndex ?? -1;
@@ -278,6 +287,7 @@ export function defineRichTextEditor(): void {
         this.savedRange = range;
       } else this.savedRange = undefined;
       this.syncTableActions();
+      return value;
     }
     private selectedCell(): HTMLTableCellElement | undefined {
       const node = this.savedRange?.startContainer;
@@ -370,11 +380,7 @@ export function defineRichTextEditor(): void {
       document.execCommand("styleWithCSS", false, "true");
       const applied = document.execCommand(command, false, value);
       if (command === "hiliteColor" && !applied) document.execCommand("backColor", false, value);
-      this.onSelectionChange();
-      this.sanitizeEditor();
-      this.syncForm();
-      this.onSelectionChange();
-      this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
+      this.commitEditorValue();
     }
     private editTable(command: string): void {
       const cell = this.selectedCell();
@@ -425,9 +431,7 @@ export function defineRichTextEditor(): void {
         this.savedRange = range;
         this.restoreSelection();
       } else this.editor.focus();
-      this.syncForm();
-      this.syncTableActions();
-      this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
+      this.commitEditorValue();
     }
     private command(command: string, value?: string): void {
       if ((this.contentMode === "plain" && !["undo", "redo"].includes(command)) || (this.contentMode === "restricted" && ["insertTable", "insertImage", "insertRowAbove", "insertRowBelow", "insertColumnBefore", "insertColumnAfter", "deleteRow", "deleteColumn", "deleteTable", "foreColor", "hiliteColor", "fontFamily", "fontSize"].includes(command)) || (command === "createLink" && !this.allowHyperlinks)) return;
@@ -439,10 +443,7 @@ export function defineRichTextEditor(): void {
       if (command === "insertTable") value = '<table><caption><br></caption><thead><tr><th scope="col"><br></th><th scope="col"><br></th></tr></thead><tbody><tr><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td></tr></tbody></table><p><br></p>';
       const applied = this.editor.ownerDocument.execCommand(command === "insertTable" ? "insertHTML" : command, false, command === "formatBlock" ? `<${value?.toLowerCase() ?? "p"}>` : value);
       if (command === "hiliteColor" && !applied) this.editor.ownerDocument.execCommand("backColor", false, value);
-      this.sanitizeEditor();
-      this.syncForm();
-      this.onSelectionChange();
-      this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
+      this.commitEditorValue();
     }
     private linkAtRange(range?: Range): HTMLAnchorElement | undefined {
       const node = range?.startContainer;
@@ -560,18 +561,14 @@ export function defineRichTextEditor(): void {
         this.savedRange = caret;
       }
       this.closeLinkEditor(true);
-      this.sanitizeEditor();
-      this.syncForm();
-      this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
+      this.commitEditorValue();
     }
     private removeLink(): void {
       const link = this.linkAtRange(this.savedRange);
       if (!link) return;
       link.replaceWith(...link.childNodes);
       this.closeLinkEditor(true);
-      this.sanitizeEditor();
-      this.syncForm();
-      this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
+      this.commitEditorValue();
     }
     private async insertUploadedImage(file: File): Promise<void> {
       if (!this.imageUploader || !file.type.startsWith("image/") || file.size > 10 * 1024 * 1024 || this.uploadingImage) return;
@@ -584,8 +581,7 @@ export function defineRichTextEditor(): void {
         const selection = this.selection(); const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
         if (range && this.editor.contains(range.commonAncestorContainer)) { range.deleteContents(); range.insertNode(image); range.setStartAfter(image); range.collapse(true); selection!.removeAllRanges(); selection!.addRange(range); }
         else this.editor.append(image);
-        this.savedRange = range?.cloneRange(); this.syncForm();
-        this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
+        this.savedRange = range?.cloneRange(); this.commitEditorValue();
       } catch (error) {
         this.dispatchEvent(new CustomEvent("spui-image-upload-error", { detail: { fileName: file.name, error }, bubbles: true, composed: true }));
       } finally { this.uploadingImage = false; this.syncImageButton(); }
@@ -690,7 +686,7 @@ export function defineRichTextEditor(): void {
       });
       this.editor = document.createElement("div"); this.editor.setAttribute("role", "textbox"); this.editor.setAttribute("aria-multiline", "true"); this.syncEditorLabel(); const invalid = this.getAttribute("aria-invalid"); if (invalid !== null) this.editor.setAttribute("aria-invalid", invalid); this.editor.contentEditable = this.hasAttribute("disabled") || this.hasAttribute("read-only") ? "false" : this.contentMode === "plain" ? "plaintext-only" : "true"; this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only"))); this.editor.setAttribute("aria-disabled", String(this.hasAttribute("disabled"))); this.editor.setAttribute("aria-required", String(this.hasAttribute("required"))); this.editor.dataset.placeholder = this.getAttribute("placeholder") ?? "Write something…"; this.editor.part.add("editor");
       this.editor.addEventListener("keydown", event => { const key = (event as KeyboardEvent).key.toLowerCase(); const shortcut = (event as KeyboardEvent).metaKey || (event as KeyboardEvent).ctrlKey; if (!shortcut) return; if (key === "z") { event.preventDefault(); this.command((event as KeyboardEvent).shiftKey ? "redo" : "undo"); } else if (key === "y") { event.preventDefault(); this.command("redo"); } });
-      this.editor.addEventListener("input", () => { this.sanitizeEditor(); this.syncForm(); this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true })); });
+      this.editor.addEventListener("input", () => this.commitEditorValue());
       this.editor.addEventListener("mouseup", this.onSelectionChange);
       this.editor.addEventListener("keyup", this.onSelectionChange);
       this.editor.addEventListener("click", this.onEditorClick);
@@ -700,8 +696,7 @@ export function defineRichTextEditor(): void {
         const clipboard = (event as ClipboardEvent).clipboardData;
         if (this.contentMode === "plain" || this.contentMode === "restricted") {
           this.editor.ownerDocument.execCommand("insertText", false, clipboard?.getData("text/plain") ?? plainText(clipboard?.getData("text/html") ?? ""));
-          this.sanitizeEditor(); this.syncForm();
-          this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
+          this.commitEditorValue();
           return;
         }
         const imageFile = [...(clipboard?.files ?? [])].find(file => file.type.startsWith("image/"));
@@ -710,13 +705,12 @@ export function defineRichTextEditor(): void {
         const text = clipboard?.getData("text/plain") ?? "";
         if (html) this.editor.ownerDocument.execCommand("insertHTML", false, html);
         else this.editor.ownerDocument.execCommand("insertText", false, text);
-        this.sanitizeEditor();
-        this.syncForm();
-        this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true }));
+        this.commitEditorValue();
       });
-      this.editor.addEventListener("blur", () => { this.sanitizeEditor(); this.syncForm(); this.dispatchEvent(new CustomEvent("spui-change", { detail: { value: this.value }, bubbles: true, composed: true })); });
+      this.editor.addEventListener("blur", () => this.commitEditorValue("spui-change"));
       const style = document.createElement("style"); style.textContent = `${base}:host{display:grid;min-width:0;max-width:100%;container-type:inline-size;gap:6px}label{font-weight:600;color:var(--spui-ui-muted,var(--spui-semantic-body-text,inherit))}[role=toolbar]{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:6px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface,#fff)}[role=toolbar][hidden],button[hidden]{display:none}.toolbar-group{display:flex;flex:0 1 auto;flex-wrap:wrap;align-items:center;gap:2px;min-width:0;padding-inline-start:6px;border-inline-start:1px solid var(--spui-ui-stroke,#c8c8c8)}.toolbar-group[hidden]{display:none}button{box-sizing:border-box;display:inline-grid;place-items:center;flex:none;width:36px;min-width:36px;min-height:36px;padding:0;border:0;border-radius:var(--spui-control-radius,4px);background:transparent;color:var(--spui-ui-text,inherit);font:inherit;cursor:pointer}.toolbar-format{box-sizing:border-box;max-width:172px;min-width:116px;min-height:36px;padding:0 8px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit}.toolbar-format:hover{background:var(--spui-ui-surface-hover,#eee)}button svg{display:block;width:18px;height:18px}button:hover:not(:disabled){background:var(--spui-ui-surface-hover,#eee)}button[aria-pressed=true]{background:color-mix(in srgb,var(--spui-ui-accent,#0078d4) 14%,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,var(--spui-semantic-body-text,#323130))}button:disabled{opacity:.42;cursor:not-allowed}button:focus-visible,select:focus-visible,[role=textbox]:focus-visible,input:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}[role=textbox]{min-width:0;min-height:150px;box-sizing:border-box;padding:10px 12px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit;line-height:1.5;overflow:auto;caret-color:var(--spui-focus-ring,var(--spui-ui-accent,#005a9e))}[role=textbox]:empty:before{content:attr(data-placeholder);color:var(--spui-ui-muted,#666);pointer-events:none}table{border-collapse:collapse;max-width:100%;margin-block:8px}caption{text-align:start;font-weight:600}td,th{min-width:56px;padding:6px 9px;border:1px solid var(--spui-ui-stroke,#c8c8c8);text-align:start}th{background:var(--spui-ui-surface-hover,#f5f5f5);font-weight:600}a{color:var(--spui-semantic-link,#0f6cbd)}@media(pointer:coarse){[role=toolbar] button{width:44px;min-width:44px;min-height:44px}[role=toolbar] select{min-height:44px}}@container (max-width: 64rem){[role=toolbar]{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px}.toolbar-format{flex:1 0 100%;width:100%;max-width:none;min-width:0;min-height:40px}.toolbar-group{display:flex;flex:0 1 auto;flex-wrap:wrap;align-items:center;gap:4px;min-width:0;padding:0;border:0}.toolbar-group--fonts{display:grid;flex:1 0 100%;grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar-font-select{width:100%;max-width:none;min-width:0;min-height:44px}.toolbar-group button{width:44px;min-width:44px;min-height:44px}.toolbar-group--table{flex:1 0 100%}[role=textbox]{min-height:12rem;overflow-wrap:anywhere}table{display:block;overflow-x:auto}}@media(forced-colors:active){select{border:1px solid ButtonText;background:Field;color:FieldText}button{border:1px solid ButtonText}button[aria-pressed=true]{color:Highlight;border-color:Highlight}td,th{border-color:CanvasText}}`;
       style.textContent += `.link-editor{display:flex;flex-wrap:wrap;align-items:end;gap:8px;padding:8px;border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface-hover,var(--spui-ui-surface,#fff))}.link-editor[hidden]{display:none}.link-field{display:grid;flex:1 1 150px;gap:4px;min-width:0;color:var(--spui-ui-text,inherit);font-size:13px}.link-field input{box-sizing:border-box;width:100%;min-width:0;min-height:32px;padding:5px 8px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#8a8886));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit)}.link-actions{display:flex;flex-wrap:wrap;gap:4px}.link-actions button{border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,4px);background:var(--spui-ui-surface,#fff)}.link-actions [data-link-action=apply]{border-color:transparent;background:var(--spui-semantic-primary-button-background,var(--spui-ui-accent,#0078d4));color:var(--spui-ui-accent-text,#fff)}.link-error{flex:1 0 100%;color:var(--spui-ui-danger,var(--spui-semantic-error-text,#c50f1f));font-size:13px}`;
+      style.textContent += `[role=textbox],[role=textbox] *{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default;touch-action:auto}`;
       style.textContent += `.toolbar-group--fonts{gap:4px}.toolbar-font-select{width:100%;min-width:0}.toolbar-group--color{gap:6px;padding-inline:8px}.toolbar-color{position:relative;min-width:0}.toolbar-color>summary{box-sizing:border-box;display:flex;align-items:center;gap:5px;min-height:36px;padding:4px 7px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,5px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font-size:11px;font-weight:600;cursor:pointer;list-style:none}.toolbar-color>summary::-webkit-details-marker{display:none}.toolbar-color__glyph{font-size:17px;line-height:1}.toolbar-color[data-command=foreColor] .toolbar-color__glyph{border-bottom:3px solid var(--spui-picked-color)}.toolbar-color[data-command=hiliteColor] .toolbar-color__glyph{color:var(--spui-picked-color);text-shadow:0 0 0 var(--spui-picked-color)}.toolbar-color__current{width:16px;height:16px;border:1px solid color-mix(in srgb,var(--spui-ui-text,#323130) 22%,transparent);border-radius:4px;background:var(--spui-picked-color);flex:none}.toolbar-color__name{white-space:nowrap}.toolbar-color__palette{position:absolute;z-index:10;inset-block-start:calc(100% + 4px);inset-inline-start:0;display:grid;grid-template-columns:repeat(6,28px);gap:4px;min-width:196px;padding:8px;border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:8px;background:var(--spui-ui-surface,#fff);box-shadow:0 8px 24px #0003}.toolbar-color__swatch{width:28px;min-width:28px;height:28px;min-height:28px;padding:0;border:1px solid color-mix(in srgb,var(--spui-ui-text,#323130) 22%,transparent);border-radius:50%;background:var(--spui-picked-color);cursor:pointer}.toolbar-color__swatch:hover{outline:2px solid var(--spui-ui-accent,#0078d4);outline-offset:1px}.toolbar-color__custom{grid-column:1/-1;display:flex;align-items:center;gap:8px;padding-block-start:6px;border-block-start:1px solid var(--spui-ui-stroke,#ddd);font-size:12px;font-weight:500}.toolbar-color__custom input{box-sizing:border-box;width:42px;height:34px;min-height:34px;padding:2px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:5px;background:var(--spui-control-background,var(--spui-ui-surface,#fff));cursor:pointer}.toolbar-color input:disabled{opacity:.42;cursor:not-allowed}@container (max-width:64rem){.toolbar-group--fonts{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar-font-select{width:100%;min-width:0;max-width:none;min-height:44px}.toolbar-group--color{display:flex;flex-wrap:wrap;justify-content:start;padding:0}.toolbar-color>summary{min-height:44px;padding-inline:9px}.toolbar-color__palette{grid-template-columns:repeat(6,32px);min-width:220px}.toolbar-color__swatch{width:32px;min-width:32px;height:32px;min-height:32px}}`;
       style.textContent += `.link-new-tab{display:inline-flex;flex:1 0 100%;align-items:center;gap:8px;color:var(--spui-ui-text,inherit);font-size:13px}.link-new-tab input{width:16px;height:16px;min-height:16px;margin:0;accent-color:var(--spui-ui-accent,#0078d4)}`;
       style.textContent += `.link-picker-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}.toolbar-color>summary[aria-disabled=true]{opacity:.42;cursor:not-allowed}`;
