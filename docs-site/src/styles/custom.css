@@ -467,6 +467,8 @@
 
 .preview-request {
   min-width: 0;
+  height: 100%;
+  align-self: stretch;
 }
 
 .preview-request-meta {
