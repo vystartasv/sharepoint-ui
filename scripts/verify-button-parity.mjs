@@ -87,6 +87,19 @@ try {
   });
   assert.equal(await page.getByTestId("split-labelledby").getByRole("button", { name: "Approve invoice", exact: true }).count(), 2, "both SplitButton names follow later changes to the referenced label");
   assert.equal(await page.getByTestId("menu-button-labelledby").getByRole("button", { name: "Approve invoice", exact: true }).count(), 1, "MenuButton follows later changes to the referenced label");
+  await page.evaluate(() => {
+    const target = document.querySelector("#split-primary-label-late");
+    target.setAttribute("aria-labelledby", "split-primary-label-inner");
+    const inner = document.createElement("span"); inner.id = "split-primary-label-inner"; inner.textContent = "Approve nested invoice"; document.body.append(inner);
+  });
+  await page.waitForFunction(() => document.querySelector('[data-testid="split-labelledby"]')?.querySelector('[slot="primary"]')?.getAttribute("aria-label") === "Approve nested invoice");
+  assert.equal(await page.getByTestId("split-labelledby").getByRole("button", { name: "Approve nested invoice", exact: true }).count(), 2, "SplitButton resolves a nested aria-labelledby reference for both actions");
+  await page.evaluate(() => {
+    const replacement = document.createElement("span"); replacement.id = "split-primary-label-inner"; replacement.textContent = "Replacement nested invoice";
+    document.getElementById("split-primary-label-inner").replaceWith(replacement);
+  });
+  await page.waitForFunction(() => document.querySelector('[data-testid="split-labelledby"]')?.querySelector('[slot="primary"]')?.getAttribute("aria-label") === "Replacement nested invoice");
+  assert.equal(await page.getByTestId("split-labelledby").getByRole("button", { name: "Replacement nested invoice", exact: true }).count(), 2, "SplitButton follows replacement of a nested aria-labelledby target");
   await page.getByTestId("menu-button-labelledby").evaluate(host => host.removeAttribute("aria-labelledby"));
   assert.equal(await page.getByTestId("menu-button-labelledby").getByRole("button", { name: "More", exact: true }).count(), 1, "MenuButton restores its content name when the external reference is removed");
   assert.equal(await page.getByTestId("split").getByRole("button", { name: "Copy", exact: true }).count(), 2, "local SplitButton matches Fluent accessible names");

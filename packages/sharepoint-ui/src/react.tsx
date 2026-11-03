@@ -1,4 +1,5 @@
 import * as React from "react";
+import { observeAccessibleNameFromIdRefs, resolveAccessibleNameFromIdRefs } from "./elements/shared.js";
 import { defineButton } from "./elements/button.js";
 import { defineButtonGroup } from "./elements/button-group.js";
 import { defineCompoundButton, defineMenuButton, defineSplitButton, defineToggleButton, type ButtonAppearance, type ButtonShape, type ButtonSize } from "./elements/button-variants.js";
@@ -526,17 +527,13 @@ export const SplitButton = /* @__PURE__ */ React.forwardRef<HTMLElement, Element
   const hasMenuButtonName = typeof menuButtonProps?.["aria-label"] === "string" || typeof menuButtonProps?.["aria-labelledby"] === "string";
   const primaryButtonProps = isReactElement(primaryActionButton) ? primaryActionButton.props : primaryActionButton;
   const primaryLabelledBy = typeof primaryButtonProps?.["aria-labelledby"] === "string" ? primaryButtonProps["aria-labelledby"] : "";
-  const primaryLabelledName = typeof document === "undefined" ? "" : primaryLabelledBy.split(/\s+/).filter(Boolean).map(id => document.getElementById(id)?.getAttribute("aria-label") || document.getElementById(id)?.textContent?.trim() || "").filter(Boolean).join(" ");
+  const primaryLabelledName = typeof document === "undefined" ? "" : resolveAccessibleNameFromIdRefs(document.documentElement, primaryLabelledBy);
   const primaryAccessibleName = primaryLabelledName || (typeof primaryButtonProps?.["aria-label"] === "string" ? primaryButtonProps["aria-label"] : getVisibleText(primaryButtonProps?.children ?? children));
   React.useLayoutEffect(() => {
     if (!primaryLabelledBy || hasMenuButtonName || menuLabel) return;
     const host = splitButtonRef.current;
     if (!host) return;
-    const syncName = (): void => {
-      const resolved = primaryLabelledBy.split(/\s+/).filter(Boolean).map(id => {
-        const target = host.ownerDocument.getElementById(id);
-        return target?.getAttribute("aria-label") || target?.textContent?.trim() || "";
-      }).filter(Boolean).join(" ");
+    const syncName = (resolved: string): void => {
       if (!resolved) return;
       const primary = host.querySelector<HTMLElement>('[slot="primary"]');
       if (primary && primary.getAttribute("aria-label") !== resolved) primary.setAttribute("aria-label", resolved);
@@ -544,19 +541,7 @@ export const SplitButton = /* @__PURE__ */ React.forwardRef<HTMLElement, Element
       const trigger = menu?.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')?.assignedElements().find((element): element is HTMLElement => element instanceof HTMLElement);
       if (trigger && trigger.getAttribute("aria-label") !== resolved) trigger.setAttribute("aria-label", resolved);
     };
-    const ids = primaryLabelledBy.split(/\s+/).filter(Boolean);
-    let observedTargets: (Element | null)[] = [];
-    const observer = new MutationObserver(() => { syncName(); syncObservedTargets(); });
-    const syncObservedTargets = (): void => {
-      const targets = ids.map(id => host.ownerDocument.getElementById(id));
-      if (targets.every((target, index) => target === observedTargets[index])) return;
-      observer.disconnect();
-      for (const target of targets) if (target) observer.observe(target, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ["aria-label", "aria-labelledby", "title"] });
-      if (targets.some(target => !target)) observer.observe(host.ownerDocument.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ["id"] });
-      observedTargets = targets;
-    };
-    syncName();
-    syncObservedTargets();
+    const observer = observeAccessibleNameFromIdRefs(host, primaryLabelledBy, syncName);
     return () => observer.disconnect();
   }, [hasMenuButtonName, menuLabel, primaryLabelledBy, primaryLabelledName]);
   const triggerDefaults = { ...(!hasMenuButtonName ? { "aria-label": (menuLabel ?? primaryAccessibleName) || resolvedMenuLabel } : {}), disabled, disabledFocusable, iconOnly: true, size, shape, appearance: "secondary" as const };

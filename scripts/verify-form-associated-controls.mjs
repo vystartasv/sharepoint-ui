@@ -113,6 +113,7 @@ try {
     assert.equal(staleName, false, `${name} removes a stale external accessible name when aria-labelledby is removed`);
   }
   const inputHost = page.locator(`[data-form-check="${componentNames.indexOf("Input")}"]`);
+  const inputIndex = componentNames.indexOf("Input");
   await inputHost.evaluate(host => {
     host.setAttribute("aria-labelledby", "late-form-control-label");
     const label = document.createElement("span"); label.id = "late-form-control-label"; label.textContent = "Late form label"; document.body.append(label);
@@ -120,8 +121,52 @@ try {
   await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-label") === "Late form label", componentNames.indexOf("Input"));
   await page.evaluate(() => { document.getElementById("late-form-control-label").textContent = "Updated late form label"; });
   await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-label") === "Updated late form label", componentNames.indexOf("Input"));
+  await page.evaluate(() => {
+    document.getElementById("late-form-control-label").setAttribute("aria-labelledby", "nested-form-control-label");
+    const nested = document.createElement("span"); nested.id = "nested-form-control-label"; nested.setAttribute("aria-labelledby", "final-form-control-label"); nested.textContent = "ignored intermediate name";
+    const final = document.createElement("span"); final.id = "final-form-control-label"; final.textContent = "Recursive form label";
+    document.body.append(nested, final);
+  });
+  await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-label") === "Recursive form label", componentNames.indexOf("Input"));
+  await page.evaluate(() => { document.getElementById("final-form-control-label").textContent = "Updated recursive form label"; });
+  await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-label") === "Updated recursive form label", componentNames.indexOf("Input"));
+  await page.evaluate(() => {
+    const replacement = document.createElement("span"); replacement.id = "final-form-control-label"; replacement.textContent = "Replaced recursive form label";
+    document.getElementById("final-form-control-label").replaceWith(replacement);
+  });
+  await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-label") === "Replaced recursive form label", componentNames.indexOf("Input"));
+  await page.evaluate(index => {
+    const visible = document.createElement("span"); visible.id = "visible-form-control-label"; visible.append("Visible name", Object.assign(document.createElement("span"), { textContent: "ignored hidden name" }));
+    visible.lastElementChild.setAttribute("aria-hidden", "true");
+    const hidden = document.createElement("span"); hidden.id = "hidden-form-control-label"; hidden.hidden = true; hidden.textContent = "Direct hidden name";
+    document.body.append(visible, hidden);
+    document.querySelector(`[data-form-check="${index}"]`).setAttribute("aria-labelledby", visible.id);
+  }, inputIndex);
+  await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-label") === "Visible name", componentNames.indexOf("Input"));
+  await page.evaluate(index => document.querySelector(`[data-form-check="${index}"]`).setAttribute("aria-labelledby", "hidden-form-control-label"), inputIndex);
+  await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-label") === "Direct hidden name", componentNames.indexOf("Input"));
+  await page.evaluate(index => {
+    const first = document.createElement("span"); first.id = "cycle-form-label-first"; first.setAttribute("aria-labelledby", "cycle-form-label-second"); first.setAttribute("aria-label", "Cycle fallback name");
+    const second = document.createElement("span"); second.id = "cycle-form-label-second"; second.setAttribute("aria-labelledby", "cycle-form-label-first"); second.textContent = "Cycle content";
+    const before = document.createElement("span"); before.id = "ordered-form-label-before"; before.textContent = "First phrase";
+    const after = document.createElement("span"); after.id = "ordered-form-label-after"; after.textContent = "Second phrase";
+    document.body.append(first, second, before, after);
+    document.querySelector(`[data-form-check="${index}"]`).setAttribute("aria-labelledby", first.id);
+  }, inputIndex);
+  await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-label") === "Cycle fallback name", inputIndex);
+  await page.evaluate(index => document.querySelector(`[data-form-check="${index}"]`).setAttribute("aria-labelledby", "ordered-form-label-after ordered-form-label-before"), inputIndex);
+  await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-label") === "Second phrase First phrase", inputIndex);
+  await page.evaluate(index => {
+    const value = document.createElement("input"); value.id = "referenced-form-control-value"; value.value = "Before input event"; document.body.append(value);
+    document.querySelector(`[data-form-check="${index}"]`).setAttribute("aria-labelledby", value.id);
+  }, inputIndex);
+  await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-label") === "Before input event", inputIndex);
+  await page.evaluate(() => {
+    const value = document.getElementById("referenced-form-control-value"); value.value = "After input event"; value.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  await page.waitForFunction(index => document.querySelector(`[data-form-check="${index}"]`)?.shadowRoot?.querySelector("input")?.getAttribute("aria-label") === "After input event", inputIndex);
   assert.deepEqual(errors, [], "form-associated controls render without browser errors");
-  console.log(`Verified form prop types and external form ownership for ${componentNames.length} React controls, plus dynamic external labels for ${labelledControlNames.size} controls.`);
+  console.log(`Verified form prop types and external ownership for ${componentNames.length} React controls, plus live and recursive accessible names for ${labelledControlNames.size} controls.`);
 } finally {
   await browser?.close();
   await new Promise((done, reject) => server.close(error => error ? reject(error) : done()));
