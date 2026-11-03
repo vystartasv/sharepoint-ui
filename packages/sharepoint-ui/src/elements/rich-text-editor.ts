@@ -86,6 +86,7 @@ export function defineRichTextEditor(): void {
     private linkTitleInput?: HTMLInputElement;
     private linkNewTabInput?: HTMLInputElement;
     private linkError?: HTMLElement;
+    private linkPickerStatus?: HTMLElement;
     private linkRemoveButton?: HTMLButtonElement;
     private uploadingImage = false;
     private savedCell?: HTMLTableCellElement;
@@ -153,11 +154,14 @@ export function defineRichTextEditor(): void {
     private syncLinkPickerButton(): void {
       if (this.linkPickerButton) {
         this.linkPickerButton.hidden = !this.linkPickerValue;
-        this.linkPickerButton.disabled = this.formDisabled || this.hasAttribute("disabled") || this.hasAttribute("read-only") || this.pickingLink;
+        this.linkPickerButton.disabled = this.formDisabled || this.hasAttribute("disabled") || this.hasAttribute("read-only");
+        this.linkPickerButton.setAttribute("aria-disabled", String(this.pickingLink));
+        this.linkPickerButton.setAttribute("aria-busy", String(this.pickingLink));
         this.linkPickerButton.textContent = this.pickingLink
           ? this.getAttribute("link-picker-loading-label") ?? "Opening picker…"
           : this.getAttribute("link-picker-label") ?? "Browse SharePoint";
       }
+      if (this.linkPickerStatus) this.linkPickerStatus.textContent = this.pickingLink ? this.getAttribute("link-picker-loading-label") ?? "Opening picker…" : "";
     }
     private syncForm(): void { const value = this.value; this.pendingValue = value; this.internals?.setFormValue(value || null); const active = this.willValidate; const missing = active && this.hasAttribute("required") && !this.editor?.textContent?.trim(); const customError = active && Boolean(this.customError); const flags: ValidityStateFlags = { ...(missing ? { valueMissing: true } : {}), ...(customError ? { customError: true } : {}) }; const message = customError ? this.customError : missing ? this.getAttribute("required-message") ?? "Enter some text." : ""; try { this.internals?.setValidity(flags, message); } catch { /* Engines without form association remain editable. */ } }
     private sanitizeEditor(): void {
@@ -355,7 +359,7 @@ export function defineRichTextEditor(): void {
       this.syncLinkPickerButton();
       try {
         const result = await picker(currentLink);
-        if (!result || version !== this.linkEditorVersion || this.linkForm?.hidden) return;
+        if (!result || !this.isConnected || version !== this.linkEditorVersion || this.linkForm?.hidden) return;
         if (typeof result.href !== "string" || !safeHref(result.href)) throw new Error(this.getAttribute("link-invalid-message") ?? "Enter a valid HTTP, HTTPS, or mailto link.");
         this.linkUrlInput!.value = result.href;
         if (typeof result.text === "string") this.linkTextInput!.value = result.text;
@@ -363,7 +367,7 @@ export function defineRichTextEditor(): void {
         if (typeof result.openInNewTab === "boolean") this.linkNewTabInput!.checked = result.openInNewTab;
         this.linkTextInput!.focus();
       } catch (error) {
-        if (version !== this.linkEditorVersion || this.linkForm?.hidden) return;
+        if (!this.isConnected || version !== this.linkEditorVersion || this.linkForm?.hidden) return;
         this.linkError!.textContent = this.getAttribute("link-picker-error-message") ?? "Unable to open the SharePoint link picker.";
         this.linkError!.hidden = false;
         this.dispatchEvent(new CustomEvent("spui-link-picker-error", { detail: { error }, bubbles: true, composed: true }));
@@ -465,6 +469,7 @@ export function defineRichTextEditor(): void {
       this.linkNewTabInput = document.createElement("input"); this.linkNewTabInput.type = "checkbox"; this.linkNewTabInput.part.add("link-new-tab-checkbox");
       const newTabText = document.createElement("span"); newTabText.textContent = this.getAttribute("link-new-tab-label") ?? "Open in new tab"; newTabLabel.append(this.linkNewTabInput, newTabText); linkForm.append(newTabLabel);
       this.linkError = document.createElement("div"); this.linkError.className = "link-error"; this.linkError.part.add("link-error"); this.linkError.id = `rich-text-link-error-${crypto.randomUUID()}`; this.linkError.setAttribute("role", "alert"); this.linkError.hidden = true; linkForm.append(this.linkError);
+      this.linkPickerStatus = document.createElement("div"); this.linkPickerStatus.className = "link-picker-status"; this.linkPickerStatus.setAttribute("role", "status"); this.linkPickerStatus.setAttribute("aria-live", "polite"); linkForm.append(this.linkPickerStatus);
       this.linkUrlInput.setAttribute("aria-describedby", this.linkError.id);
       const linkActions = document.createElement("div"); linkActions.className = "link-actions";
       const makeLinkAction = (action: "apply" | "remove" | "cancel" | "browse", attribute: string, fallback: string, onClick: () => void): HTMLButtonElement => {
@@ -512,6 +517,7 @@ export function defineRichTextEditor(): void {
       const style = document.createElement("style"); style.textContent = `${base}:host{display:grid;gap:6px}label{font-weight:600;color:var(--spui-ui-muted,var(--spui-semantic-body-text,inherit))}[role=toolbar]{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface,#fff)}button{border:0;border-radius:4px;background:transparent;color:var(--spui-ui-text,inherit);padding:6px 8px;font:inherit;cursor:pointer}button:hover:not(:disabled){background:var(--spui-ui-surface-hover,#eee)}button:disabled{opacity:.55;cursor:not-allowed}button:focus-visible,[role=textbox]:focus-visible,input:focus-visible{outline:2px solid var(--spui-focus-ring,#005a9e);outline-offset:2px}[role=textbox]{min-height:120px;box-sizing:border-box;padding:10px 12px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit;line-height:1.5;overflow:auto;caret-color:var(--spui-focus-ring,#005a9e)}[role=textbox]:empty:before{content:attr(data-placeholder);color:var(--spui-ui-muted,#666);pointer-events:none}table{border-collapse:collapse;max-width:100%;margin-block:8px}caption{text-align:start;font-weight:600}td,th{min-width:56px;padding:6px 9px;border:1px solid var(--spui-ui-stroke,#c8c8c8);text-align:start}th{background:var(--spui-ui-surface-hover,#f5f5f5);font-weight:600}a{color:var(--spui-semantic-link,#0f6cbd)}@media(forced-colors:active){button{border:1px solid ButtonText}td,th{border-color:CanvasText}}`;
       style.textContent += `.link-editor{display:flex;flex-wrap:wrap;align-items:end;gap:8px;padding:8px;border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface-hover,var(--spui-ui-surface,#fff))}.link-editor[hidden]{display:none}.link-field{display:grid;flex:1 1 150px;gap:4px;min-width:0;color:var(--spui-ui-text,inherit);font-size:13px}.link-field input{box-sizing:border-box;width:100%;min-width:0;min-height:32px;padding:5px 8px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#8a8886));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit)}.link-actions{display:flex;flex-wrap:wrap;gap:4px}.link-actions button{border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,4px);background:var(--spui-ui-surface,#fff)}.link-actions [data-link-action=apply]{border-color:transparent;background:var(--spui-semantic-primary-button-background,var(--spui-ui-accent,#0078d4));color:var(--spui-ui-accent-text,#fff)}.link-error{flex:1 0 100%;color:var(--spui-ui-danger,var(--spui-semantic-error-text,#c50f1f));font-size:13px}`;
       style.textContent += `.link-new-tab{display:inline-flex;flex:1 0 100%;align-items:center;gap:8px;color:var(--spui-ui-text,inherit);font-size:13px}.link-new-tab input{width:16px;height:16px;min-height:16px;margin:0;accent-color:var(--spui-ui-accent,#0078d4)}`;
+      style.textContent += `.link-picker-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}`;
       shadow.replaceChildren(style,label,toolbar,linkForm,this.editor);
       syncHostAccessibleName(this, this.editor);
       this.syncDisabled();
