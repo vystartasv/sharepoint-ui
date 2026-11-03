@@ -10,6 +10,20 @@
       "composed": "always"
     },
     {
+      "name": "spui-cell-edit-error",
+      "detailProperties": [
+        "columnId",
+        "error",
+        "item",
+        "previousValue",
+        "rowId",
+        "value"
+      ],
+      "detailPropertiesComplete": true,
+      "bubbles": "always",
+      "composed": "always"
+    },
+    {
       "name": "spui-cells-edit",
       "detailProperties": [
         "edits"

@@ -795,8 +795,10 @@ export function defineDataGrid(): void {
         requestAnimationFrame(() => this.viewport?.querySelector<HTMLElement>(`[data-row-id="${CSS.escape(rowId)}"][data-col-index="${columnIndex}"]`)?.focus());
       } catch (reason) {
         editing.saving = false;
-        editing.error = reason instanceof Error ? reason.message : String(reason || this.getAttribute("edit-error-label") || "The value could not be saved.");
+        const message = reason instanceof Error ? reason.message : String(reason || "The value could not be saved.");
+        editing.error = this.getAttribute("edit-error-label") || "The value could not be saved.";
         if (input) { input.disabled = false; input.removeAttribute("aria-busy"); }
+        this.dispatchEvent(new CustomEvent("spui-cell-edit-error", { detail: { item: edit.item, rowId: edit.rowId, columnId: edit.columnId, previousValue: edit.previousValue, value: edit.value, error: message }, bubbles: true, composed: true }));
         this.showEditError(editing);
       }
     }
