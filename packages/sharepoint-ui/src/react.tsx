@@ -6564,6 +6564,8 @@ export function useTableCompositeNavigation(): TableCompositeNavigation {
 
     const activeRole = activeElement.getAttribute("role");
     const isRtl = document.defaultView?.getComputedStyle(event.currentTarget).direction === "rtl";
+    const inlineStartKey = isRtl ? "ArrowRight" : "ArrowLeft";
+    const inlineEndKey = isRtl ? "ArrowLeft" : "ArrowRight";
     if (event.key === (isRtl ? "ArrowLeft" : "ArrowRight") && activeRole === "row" && activeElement instanceof HTMLElement) {
       const firstFocusable = activeElement.querySelector<HTMLElement>('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])');
       firstFocusable?.focus();
@@ -6588,13 +6590,13 @@ export function useTableCompositeNavigation(): TableCompositeNavigation {
       if (focusable) focusable.focus();
       else { targetCell.tabIndex = -1; targetCell.focus(); }
     };
-    if (event.key === "ArrowLeft" && isInCell) {
+    if (event.key === inlineStartKey && isInCell) {
       activeElement.dispatchEvent(new CustomEvent("tabster:groupper:movefocus", { detail: { action: 2 } }));
-      if (document.activeElement === eventTarget) moveToCell(isRtl ? 1 : -1, false);
+      if (document.activeElement === eventTarget) moveToCell(-1, false);
       return;
     }
-    if (event.key === "ArrowRight" && isInCell) {
-      moveToCell(isRtl ? -1 : 1, false);
+    if (event.key === inlineEndKey && isInCell) {
+      moveToCell(1, false);
       return;
     }
     if ((event.key === "ArrowDown" || event.key === "ArrowUp") && isInCell) {
