@@ -1,0 +1,26 @@
+---
+title: Use custom elements without React
+description: Register only the SharePoint UI elements your page needs and compose them in HTML or another framework.
+---
+
+The custom elements are the shared implementation layer. Import a leaf definition and register it once before rendering its tag:
+
+```ts
+import { defineButton } from "@vilius/sharepoint-ui/elements/button";
+
+defineButton();
+```
+
+```html
+<spui-button appearance="primary">Create request</spui-button>
+```
+
+In plain HTML, add the package's emitted module through your bundler. In another framework, use that framework's normal custom-element integration and listen to the documented `spui-*` events. The [Button API page](/sharepoint-ui-docs/components/button/) lists its tag, slots, callbacks, and styling hooks.
+
+## Register a selection of elements
+
+Prefer leaf imports when a web part uses a small set of components. `defineSharePointUIElements()` registers the whole catalog for apps that genuinely need it. Avoid importing the entire catalog just to use a button or a field.
+
+## Forms and labels
+
+Form-associated elements participate in native form value and reset behavior where the component supports it. For a visible label, use `TextField` in React or the native label factory documented on the [Label page](/sharepoint-ui-docs/components/label/). A label outside a shadow root cannot label an internal control by ID; use the component's own label API or provide `aria-label` / `aria-labelledby` as documented.

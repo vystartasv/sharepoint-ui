@@ -1,0 +1,24 @@
+---
+title: A fast workflow for coding agents
+description: Give an agent the component catalog, the smallest entry point, and a concrete SharePoint task.
+---
+
+## Start with the API index
+
+The package's [`components.json`](https://github.com/vystartasv/sharepoint-ui/blob/main/packages/sharepoint-ui/components.json) is the machine-readable API index. Each entry records the React export, custom-element module, summary, slots, callbacks, and styling hooks. Use it with the [searchable catalog](/sharepoint-ui-docs/catalog/) to select a component before writing markup.
+
+## Give the agent a narrow task
+
+Include the framework, the SharePoint data shape, the required user action, and the relevant component page. For example:
+
+> Build a React 18 SPFx 1.24 view for these request records. Use `DataGrid` for sortable rows and `ViewCard` for the compact layout. Keep list reads and writes in the web part, pass the page culture to `SharePointUIProvider`, and include loading, empty, and save-error states.
+
+This gives the agent a clear boundary: the library owns presentation and interaction; the web part owns SharePoint data operations and business rules.
+
+## Keep the implementation small
+
+Ask the agent to import only the required components, use their documented slots and callbacks, and follow the current theme and locale. For plain JavaScript or other frameworks, use leaf custom-element imports. Avoid asking it to inspect the full source tree when the API entry and component page answer the task.
+
+## Check the result
+
+Review the generated component API page for the props and slots the agent chose. Confirm it preserves the web part's SharePoint save path, labels every control, and derives direction from the UI culture. For deeper integration and build guidance, see the [SPFx guide](/sharepoint-ui-docs/guides/spfx/).

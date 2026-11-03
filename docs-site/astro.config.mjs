@@ -11,6 +11,7 @@ export default defineConfig({
     customCss: ["./src/styles/custom.css"],
     sidebar: [
       { label: "Start here", items: ["index", "getting-started", "catalog"] },
+      { label: "Guides", items: ["guides/spfx", "guides/theming-and-direction", "guides/custom-elements", "guides/agent-workflow"] },
       { label: "Component catalog", items: [{ autogenerate: { directory: "components" } }] },
     ],
   })],
