@@ -1,5 +1,5 @@
 import { base, syncHostAccessibleName } from "./shared.js";
-import { getFloatingPosition, type FloatingAlign, type FloatingPlacement } from "./floating-position.js";
+import { getFloatingBoundary, getFloatingPosition, type FloatingAlign, type FloatingPlacement } from "./floating-position.js";
 import type { TooltipPositioning, TooltipPositioningOptions } from "./tooltip.js";
 
 type PickerOption = { value: string; label: string; group: string; disabled: boolean; selected: boolean; element: Element };
@@ -192,22 +192,31 @@ export function defineTagPicker(): void {
         try { popup.showPopover(); } catch { /* Fixed positioning remains a fallback for browsers without Popover API support. */ }
       }
       const rect = anchor.getBoundingClientRect();
-      const width = Math.min(rect.width, window.innerWidth - 8);
+      const view = this.ownerDocument.defaultView ?? window;
+      const viewport = { width: view.innerWidth, height: view.innerHeight };
+      const config = this.positioningValue ?? this.getAttribute("positioning") ?? undefined;
+      const options = typeof config === "object" ? config as TooltipPositioningOptions : undefined;
+      const flipBoundary = getFloatingBoundary(options?.flipBoundary === undefined ? "clippingParents" : options.flipBoundary, this, viewport);
+      const overflowBoundary = getFloatingBoundary(options?.overflowBoundary === undefined ? "clippingParents" : options.overflowBoundary, this, viewport);
+      const bounds = overflowBoundary ?? { left: 0, top: 0, right: viewport.width, bottom: viewport.height };
+      const maxWidth = Math.max(0, Math.min(viewport.width - 8, bounds.right - bounds.left - 16));
+      const maxHeight = Math.max(0, Math.min(240, bounds.bottom - bounds.top - 16));
+      const width = Math.min(rect.width, maxWidth);
       popup.style.width = `${width}px`;
+      popup.style.maxWidth = `${maxWidth}px`;
+      popup.style.maxHeight = `${maxHeight}px`;
       const direction = getComputedStyle(this).direction === "rtl" ? "rtl" : "ltr";
-      const config = this.positioningValue;
       const raw = typeof config === "string" ? config : config?.position ?? "below";
       const [side = "below", suffix] = raw.split("-");
       const placementMap: Record<string, FloatingPlacement> = { above: "top", below: "bottom", before: "start", after: "end", top: "top", bottom: "bottom", left: "left", right: "right", start: "start", end: "end" };
       const placement = placementMap[side] ?? "bottom";
       const align = (typeof config === "object" && config ? config.align : undefined) ?? (suffix === "start" || suffix === "end" || suffix === "top" || suffix === "bottom" ? suffix as FloatingAlign : "start");
-      const options = typeof config === "object" && config ? config as TooltipPositioningOptions : undefined;
       const offset = typeof options?.offset === "number" ? options.offset : typeof options?.offset === "object" ? options.offset.mainAxis : 4;
       const fallback = (options?.fallbackPositions ?? []).map(value => {
         const [fallbackSide, fallbackAlign] = value.split("-");
         return { placement: placementMap[fallbackSide] ?? "bottom", align: fallbackAlign as FloatingAlign | undefined };
       });
-      const position = getFloatingPosition(rect, { width: popup.offsetWidth, height: popup.offsetHeight }, placement, direction, offset, undefined, align, fallback, options?.pinned, undefined, undefined, { coverTarget: options?.coverTarget });
+      const position = getFloatingPosition(rect, { width: popup.offsetWidth, height: popup.offsetHeight }, placement, direction, offset, viewport, align, fallback, options?.pinned, flipBoundary, overflowBoundary, { coverTarget: options?.coverTarget });
       popup.dataset.placement = position.placement;
       popup.style.left = `${position.left}px`;
       popup.style.top = `${position.top}px`;

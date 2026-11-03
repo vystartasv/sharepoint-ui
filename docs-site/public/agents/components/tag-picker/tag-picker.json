@@ -23,7 +23,7 @@
         },
         {
           "name": "TagPickerProps.positioning",
-          "description": "Positions the options surface relative to the control; supports placement shorthands, alignment, fallbacks, and offsets."
+          "description": "Positions and sizes the options surface within viewport or clipping-ancestor boundaries; supports placement, alignment, fallbacks, offsets, and custom bounds."
         },
         {
           "name": "TagPickerProps.disableAutoFocus",
@@ -48,10 +48,9 @@
       ],
       "reactRefType": "HTMLElement"
     },
-    "summary": "Search, choose, and remove multiple values with keyboard and native form support.",
+    "summary": "Search, choose, and remove multiple values with keyboard, native form support, and popup placement that adapts to SharePoint sections.",
     "highValueAdditions": [
-      "Add composed control, input, selected-tag group, and list primitives while preserving the single state engine.",
-      "Position the options surface against viewport and clipping ancestors, including SharePoint sections."
+      "Add composed control, input, selected-tag group, and list primitives while preserving the single state engine."
     ]
   }
 }
