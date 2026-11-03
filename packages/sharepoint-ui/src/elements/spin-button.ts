@@ -18,6 +18,11 @@ export function defineSpinButton(): void {
     private slotInputDefaults?: NativeFormControlDefaults;
     private boundDecrement?: HTMLButtonElement;
     private boundIncrement?: HTMLButtonElement;
+    private heldStepDirection = 0;
+    private heldStepInput?: HTMLInputElement;
+    private heldStepEvent?: Event;
+    private heldStepElapsed = 0;
+    private heldStepTimer?: ReturnType<typeof setTimeout>;
 
     get form(): HTMLFormElement | null { return this.internals?.form ?? null; }
 
@@ -27,6 +32,7 @@ export function defineSpinButton(): void {
     }
 
     connectedCallback(): void { this.render(); }
+    disconnectedCallback(): void { this.clearHeldStep(); }
 
     attributeChangedCallback(name: string, _oldValue: string | null, value: string | null): void {
       if (!this.isConnected) return;
@@ -218,7 +224,13 @@ export function defineSpinButton(): void {
       if (decrementFallback) { const assigned = decrement !== decrementFallback; decrementFallback.hidden = assigned; decrementFallback.setAttribute("aria-hidden", String(assigned)); }
       if (this.boundDecrement !== decrement) {
         this.boundDecrement?.removeEventListener("click", this.handleDecrement);
+        this.boundDecrement?.removeEventListener("mousedown", this.handleDecrement);
+        this.boundDecrement?.removeEventListener("mouseup", this.handleHeldStepEnd);
+        this.boundDecrement?.removeEventListener("mouseleave", this.handleHeldStepEnd);
         decrement?.addEventListener("click", this.handleDecrement);
+        decrement?.addEventListener("mousedown", this.handleDecrement);
+        decrement?.addEventListener("mouseup", this.handleHeldStepEnd);
+        decrement?.addEventListener("mouseleave", this.handleHeldStepEnd);
         this.boundDecrement = decrement;
       }
       const increment = this.getStepper("increment");
@@ -227,7 +239,13 @@ export function defineSpinButton(): void {
       if (incrementFallback) { const assigned = increment !== incrementFallback; incrementFallback.hidden = assigned; incrementFallback.setAttribute("aria-hidden", String(assigned)); }
       if (this.boundIncrement !== increment) {
         this.boundIncrement?.removeEventListener("click", this.handleIncrement);
+        this.boundIncrement?.removeEventListener("mousedown", this.handleIncrement);
+        this.boundIncrement?.removeEventListener("mouseup", this.handleHeldStepEnd);
+        this.boundIncrement?.removeEventListener("mouseleave", this.handleHeldStepEnd);
         increment?.addEventListener("click", this.handleIncrement);
+        increment?.addEventListener("mousedown", this.handleIncrement);
+        increment?.addEventListener("mouseup", this.handleHeldStepEnd);
+        increment?.addEventListener("mouseleave", this.handleHeldStepEnd);
         this.boundIncrement = increment;
       }
     }
@@ -266,8 +284,40 @@ export function defineSpinButton(): void {
     private handleDecrement = (event: Event): void => this.handleStepButton(event, -1);
     private handleIncrement = (event: Event): void => this.handleStepButton(event, 1);
     private handleStepButton(event: Event, direction: number): void {
+      if (event.type === "click" && (event as MouseEvent).detail !== 0) return;
       const input = this.getInput(); if (!input || input.disabled || input.readOnly) return;
+      if (event.type === "mousedown" && (event as MouseEvent).button !== 0) return;
+      this.clearHeldStep();
       this.commit(input, event); this.step(input, event, direction); input.focus();
+      if (event.type !== "mousedown") return;
+      this.heldStepDirection = direction;
+      this.heldStepInput = input;
+      this.heldStepEvent = event;
+      this.heldStepElapsed = 0;
+      this.scheduleHeldStep(300);
+    }
+    private handleHeldStepEnd = (): void => this.clearHeldStep();
+    private scheduleHeldStep(delay: number): void {
+      this.heldStepTimer = setTimeout(() => {
+        const input = this.heldStepInput;
+        const stepper = this.getStepper(this.heldStepDirection > 0 ? "increment" : "decrement");
+        if (!this.heldStepDirection || !input || !stepper || stepper.disabled || input.disabled || input.readOnly) {
+          this.clearHeldStep();
+          return;
+        }
+        this.step(input, this.heldStepEvent ?? new Event("mousedown"), this.heldStepDirection);
+        this.heldStepElapsed += delay;
+        const progress = Math.min(1, this.heldStepElapsed / 1000);
+        this.scheduleHeldStep(300 + (80 - 300) * progress);
+      }, delay);
+    }
+    private clearHeldStep(): void {
+      if (this.heldStepTimer !== undefined) clearTimeout(this.heldStepTimer);
+      this.heldStepTimer = undefined;
+      this.heldStepDirection = 0;
+      this.heldStepInput = undefined;
+      this.heldStepEvent = undefined;
+      this.heldStepElapsed = 0;
     }
 
     private render(): void {
