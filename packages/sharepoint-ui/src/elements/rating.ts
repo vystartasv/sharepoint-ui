@@ -1,11 +1,11 @@
-import { base } from "./shared.js";
+import { base, syncHostAccessibleName } from "./shared.js";
 
 /** Selectable, form-associated star rating with optional half steps. */
 export function defineRating(): void {
   if (customElements.get("spui-rating")) return;
   class SpuiRating extends HTMLElement {
     static formAssociated = true;
-    static observedAttributes = ["value", "default-value", "max", "step", "size", "color", "label", "item-label", "name", "disabled", "readonly", "required", "aria-label", "aria-describedby"];
+    static observedAttributes = ["value", "default-value", "max", "step", "size", "color", "label", "item-label", "name", "disabled", "readonly", "required", "aria-label", "aria-labelledby", "aria-description", "aria-describedby"];
     private internals?: ElementInternals;
     private readonly instanceName = `spui-rating-${crypto.randomUUID()}`;
     private rating = 0;
@@ -102,7 +102,6 @@ export function defineRating(): void {
       const label = document.createElement("span"); label.className = "label"; label.part.add("label"); label.textContent = this.getAttribute("label") ?? "";
       label.hidden = !this.getAttribute("label");
       const group = document.createElement("div"); group.className = "items"; group.setAttribute("role", "radiogroup"); group.setAttribute("aria-label", labelText); group.part.add("items");
-      if (this.hasAttribute("aria-describedby")) group.setAttribute("aria-describedby", this.getAttribute("aria-describedby")!);
       if (this.hasAttribute("readonly")) group.setAttribute("aria-readonly", "true");
       if (this.hasAttribute("disabled")) group.setAttribute("aria-disabled", "true");
       const half = this.stepValue === 0.5;
@@ -135,6 +134,7 @@ export function defineRating(): void {
         templates.append(slot);
       }
       shadow.append(style, templates, label, group);
+      syncHostAccessibleName(this, group);
       this.syncIcons();
     }
 

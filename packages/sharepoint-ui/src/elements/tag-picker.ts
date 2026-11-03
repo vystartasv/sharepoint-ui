@@ -1,4 +1,4 @@
-import { base } from "./shared.js";
+import { base, syncHostAccessibleName } from "./shared.js";
 import { getFloatingPosition, type FloatingAlign, type FloatingPlacement } from "./floating-position.js";
 import type { TooltipPositioning, TooltipPositioningOptions } from "./tooltip.js";
 
@@ -20,7 +20,7 @@ export function defineTagPicker(): void {
   if (customElements.get("spui-tag-picker")) return;
   class SpuiTagPicker extends HTMLElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "placeholder", "selected-values", "selected-options", "default-selected-options", "input-value", "input-appearance", "input-disabled", "input-aria-label", "input-aria-describedby", "clearable", "selected-label", "inline", "no-popover", "disabled", "required", "name", "no-results", "remove-label", "open", "default-open", "positioning", "disable-auto-focus", "aria-label", "aria-describedby"];
+    static observedAttributes = ["label", "placeholder", "selected-values", "selected-options", "default-selected-options", "input-value", "input-appearance", "input-disabled", "input-aria-label", "input-aria-describedby", "clearable", "selected-label", "inline", "no-popover", "disabled", "required", "name", "no-results", "remove-label", "open", "default-open", "positioning", "disable-auto-focus", "aria-label", "aria-labelledby", "aria-description", "aria-describedby"];
     private internals?: ElementInternals;
     private observer?: MutationObserver;
     private resizeObserver?: ResizeObserver;
@@ -94,9 +94,9 @@ export function defineTagPicker(): void {
         if (input) this.hasAttribute(name) ? input.setAttribute(target, this.getAttribute(name)!) : input.removeAttribute(target);
       } else if (name === "clearable") {
         const input = this.input(); if (input) input.type = this.hasAttribute("clearable") ? "search" : "text";
-      } else if (name === "aria-label" || name === "aria-describedby") {
+      } else if (name === "aria-label" || name === "aria-labelledby" || name === "aria-description" || name === "aria-describedby") {
         const input = this.input();
-        if (input) this.getAttribute(name) === null ? input.removeAttribute(name) : input.setAttribute(name, this.getAttribute(name)!);
+        if (input) syncHostAccessibleName(this, input);
       } else if (name === "positioning") {
         this.positionList();
       } else if (name === "open") {
@@ -405,7 +405,7 @@ export function defineTagPicker(): void {
       const input = document.createElement("input"); input.id = `${this.instanceId}-input`; input.type = this.hasAttribute("clearable") ? "search" : "text"; input.role = "combobox"; input.autocomplete = "off";
       input.setAttribute("aria-autocomplete", "list"); input.setAttribute("aria-haspopup", "listbox"); input.setAttribute("aria-expanded", "false");
       input.placeholder = this.getAttribute("placeholder") ?? ""; input.value = this.getAttribute("input-value") ?? ""; input.disabled = this.isDisabled() || this.hasAttribute("input-disabled"); input.part.add("input");
-      for (const name of ["aria-label", "aria-describedby", "input-aria-label", "input-aria-describedby"]) { const value = this.getAttribute(name); if (value !== null) input.setAttribute(name.replace("input-", ""), value); }
+      for (const name of ["input-aria-label", "input-aria-describedby"]) { const value = this.getAttribute(name); if (value !== null) input.setAttribute(name.replace("input-", ""), value); }
       const popup = document.createElement("div"); popup.className = "popup"; popup.setAttribute("popover", "manual"); popup.hidden = true; popup.part.add("popup");
       const list = document.createElement("ul"); list.id = `${this.instanceId}-listbox`; list.setAttribute("role", "listbox"); list.setAttribute("aria-multiselectable", "true"); list.part.add("listbox");
       const empty = document.createElement("div"); empty.className = "empty"; empty.setAttribute("role", "status"); empty.hidden = true;
@@ -424,6 +424,7 @@ export function defineTagPicker(): void {
       style.textContent += `.popup{position:fixed;inset:auto;z-index:var(--spui-layer-popover,10000);box-sizing:border-box;max-width:calc(100vw - 8px);max-height:min(240px,calc(100dvh - 8px));overflow:auto;margin:0;padding:4px;border:1px solid var(--spui-ui-stroke,#d1d1d1);border-radius:var(--spui-card-radius,8px);background:var(--spui-ui-surface,#fff);color:var(--spui-ui-text,inherit);box-shadow:var(--spui-card-shadow,0 4px 14px #0002)}.popup[hidden]{display:none}.popup ul{position:static;inset:auto;z-index:auto;max-height:none;overflow:visible;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}.popup .empty{position:static;inset:auto;z-index:auto;margin:0;padding:12px;border:0;border-radius:0;background:transparent;box-shadow:none}`;
       const slot = document.createElement("slot"); slot.hidden = true;
       shadow.append(style, label, control, slot);
+      syncHostAccessibleName(this, input);
       this.renderOptions();
     }
   }

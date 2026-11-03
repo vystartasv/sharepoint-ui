@@ -1,4 +1,4 @@
-import { base } from "./shared.js";
+import { base, syncHostAccessibleName } from "./shared.js";
 
 export type ColorPickerSize = "small" | "medium" | "large";
 export type ColorPickerShape = "rounded" | "square";
@@ -529,11 +529,11 @@ export function defineColorPicker(): void {
       const colorLabel = this.getAttribute("color-input-label") || "Choose color";
       if (color) color.setAttribute("aria-label", colorLabel);
       if (hex) hex.setAttribute("aria-label", this.getAttribute("hex-input-label") || "Hex color");
-      const picker = this.shadowRoot?.querySelector(".picker");
-      if (picker) picker.setAttribute("aria-label", this.getAttribute("aria-label") || this.getAttribute("label") || "Color picker");
-      if (picker) for (const name of ["aria-labelledby", "aria-description", "aria-describedby", "aria-invalid"]) {
-        const value = this.getAttribute(name);
-        if (value === null) picker.removeAttribute(name); else picker.setAttribute(name, value);
+      const picker = this.shadowRoot?.querySelector<HTMLElement>(".picker");
+      if (picker) syncHostAccessibleName(this, picker);
+      if (picker) {
+        const invalid = this.getAttribute("aria-invalid");
+        if (invalid === null) picker.removeAttribute("aria-invalid"); else picker.setAttribute("aria-invalid", invalid);
       }
       const describedBy = this.getAttribute("aria-describedby");
       const hue = this.shadowRoot?.querySelector<HTMLInputElement>(".hue");
@@ -690,6 +690,7 @@ export function defineColorPicker(): void {
       style.textContent += ".picker:focus-within{outline:none}input.hex{direction:ltr;text-align:left}";
       style.textContent += "slot[name=area],slot[name=sliders],slot[name=alpha]{display:block;max-width:100%}slot[name=sliders]{display:flex;align-items:center;gap:var(--spui-control-gap,8px);flex-wrap:wrap}slot[name=area]>spui-color-area,slot[name=sliders]>spui-color-slider,slot[name=alpha]>spui-alpha-slider{max-width:100%}";
       shadow.append(style, label, picker, areaSlot, sliderSlot, formatLabel, channels, alphaSlot, swatches);
+      syncHostAccessibleName(this, picker);
       this.syncInputLabels(); this.syncGroupLabels(); this.syncDisabled(); this.renderSwatches(); this.syncPickerArea(); this.syncFormat(); this.syncForm(); this.syncComposedControls();
     }
 

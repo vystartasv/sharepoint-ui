@@ -17,14 +17,17 @@ const componentCatalog = JSON.parse(await readFile(resolve(root, "packages/share
 const nativeTags = componentNames.map(name => componentCatalog.components.find(component => component.react === name)?.tag);
 assert.ok(nativeTags.every(Boolean), "all form-associated controls have registered custom-element tags");
 const labelledControlSelectors = new Map([
-  ["Button", "button"], ["Checkbox", "input"], ["ComboBox", "[role=combobox]"], ["Input", "input"],
-  ["RadioGroup", "fieldset"], ["SearchBox", "input"], ["Select", "select"], ["Slider", "input"],
-  ["SpinButton", "input"], ["Switch", "input"], ["TextArea", "textarea"],
+  ["Button", "button"], ["Checkbox", "input"], ["ColorPicker", ".picker"], ["ComboBox", "[role=combobox]"],
+  ["DatePicker", "input"], ["Dropdown", "[role=combobox]"], ["FileUpload", "input"], ["Input", "input"],
+  ["RadioGroup", "fieldset"], ["Rating", "[role=radiogroup]"], ["RichTextEditor", "[role=textbox]"],
+  ["SearchBox", "input"], ["Select", "select"], ["Slider", "input"], ["SpinButton", "input"],
+  ["Switch", "input"], ["TagPicker", "input"], ["TextArea", "textarea"],
 ]);
 const labelledControlNames = new Set(labelledControlSelectors.keys());
 const labelledControls = [...labelledControlSelectors].map(([name, selector]) => [componentNames.indexOf(name), selector]);
 const labelledControlIndexes = labelledControls.map(([index]) => index);
 const descriptionPaths = labelledControls.flatMap(([index, selector]) => [["data-form-check", index, selector], ["data-native-check", index, selector]]);
+const namePaths = descriptionPaths;
 
 const program = ts.createProgram([reactPath], {
   jsx: ts.JsxEmit.ReactJSX,
@@ -108,24 +111,16 @@ try {
   })));
   assert.equal(associations.length, componentNames.length, "all form-associated React controls rendered");
   for (const association of associations) assert.equal(association.formId, "external-controls", `${componentNames[association.index]} associates with an external form`);
-  for (const name of labelledControlNames) {
-    const host = page.locator(`[data-form-check="${componentNames.indexOf(name)}"]`);
-    const resolved = await host.evaluate(element => element.shadowRoot
-      ? [...element.shadowRoot.querySelectorAll("input,select,textarea,button,fieldset,[role=combobox]")].some(control => control.getAttribute("aria-label") === "Form control name")
-      : false);
-    assert.equal(resolved, true, `${name} resolves an external aria-labelledby reference into its shadow control`);
-  }
-  for (const name of labelledControlNames) {
-    const host = page.locator(`[data-form-check="${componentNames.indexOf(name)}"]`);
-    const selector = labelledControlSelectors.get(name);
-    const resolved = await host.evaluate((element, controlSelector) => element.shadowRoot?.querySelector(controlSelector)?.getAttribute("aria-description") === "Form control help text", selector);
-    assert.equal(resolved, true, `${name} exposes an external aria-describedby reference on its shadow control`);
-  }
-  for (const [index, selector] of labelledControls) {
-    const host = page.locator(`[data-native-check="${index}"]`);
-    const resolved = await host.evaluate((element, controlSelector) => element.shadowRoot?.querySelector(controlSelector)?.getAttribute("aria-description") === "Form control help text", selector);
-    assert.equal(resolved, true, `${nativeTags[index]} exposes an external aria-describedby reference on its custom-element control`);
-  }
+  const unresolvedNames = await page.evaluate(paths => paths.flatMap(([attribute, index, selector]) => {
+    const control = document.querySelector(`[${attribute}="${index}"]`)?.shadowRoot?.querySelector(selector);
+    return control && control.getAttribute("aria-label") !== "Form control name" && control.getAttribute("aria-labelledby") !== "form-control-label" ? [{ attribute, index, tag: control.localName }] : [];
+  }), namePaths);
+  assert.deepEqual(unresolvedNames, [], "React and native primary controls inherit aria-labelledby from the host");
+  const unresolvedDescriptions = await page.evaluate(paths => paths.flatMap(([attribute, index, selector]) => {
+    const control = document.querySelector(`[${attribute}="${index}"]`)?.shadowRoot?.querySelector(selector);
+    return control?.getAttribute("aria-description") === "Form control help text" ? [] : [{ attribute, index, tag: control?.localName, description: control?.getAttribute("aria-description"), describedBy: control?.getAttribute("aria-describedby") }];
+  }), descriptionPaths);
+  assert.deepEqual(unresolvedDescriptions, [], "React and native primary controls resolve external aria-describedby references");
   assert.equal(await page.locator(`[data-form-check="${componentNames.indexOf("Input")}"]`).getByRole("textbox", { name: "Form control name", description: "Form control help text", exact: true }).count(), 1, "Input exposes a description referenced from outside its shadow root");
   await page.evaluate(() => {
     const description = document.getElementById("form-control-description");
@@ -152,29 +147,15 @@ try {
   }), descriptionPaths);
   assert.deepEqual(descriptionFallbacks, [], "external aria-describedby takes precedence, then removing it restores aria-description on React and native controls");
   await page.evaluate(() => { document.getElementById("form-control-label").textContent = "Updated form control name"; });
-  await page.waitForFunction(controls => controls.every(([index]) => {
-    const host = document.querySelector(`[data-form-check="${index}"]`);
-    return host?.shadowRoot && [...host.shadowRoot.querySelectorAll("input,select,textarea,button,fieldset,[role=combobox]")].some(control => control.getAttribute("aria-label") === "Updated form control name");
-  }), labelledControls);
-  for (const name of labelledControlNames) {
-    const host = page.locator(`[data-form-check="${componentNames.indexOf(name)}"]`);
-    const resolved = await host.evaluate(element => element.shadowRoot
-      ? [...element.shadowRoot.querySelectorAll("input,select,textarea,button,fieldset,[role=combobox]")].some(control => control.getAttribute("aria-label") === "Updated form control name")
-      : false);
-    assert.equal(resolved, true, `${name} tracks changes to external aria-labelledby text`);
-  }
-  await page.evaluate(controls => controls.forEach(([index]) => document.querySelector(`[data-form-check="${index}"]`).removeAttribute("aria-labelledby")), labelledControls);
-  await page.waitForFunction(controls => controls.every(([index]) => {
-    const host = document.querySelector(`[data-form-check="${index}"]`);
-    return host?.shadowRoot && [...host.shadowRoot.querySelectorAll("input,select,textarea,button,fieldset,[role=combobox]")].every(control => control.getAttribute("aria-label") !== "Updated form control name" && control.getAttribute("aria-labelledby") !== "form-control-label");
-  }), labelledControls);
-  for (const name of labelledControlNames) {
-    const host = page.locator(`[data-form-check="${componentNames.indexOf(name)}"]`);
-    const staleName = await host.evaluate(element => element.shadowRoot
-      ? [...element.shadowRoot.querySelectorAll("input,select,textarea,button,fieldset,[role=combobox]")].some(control => control.getAttribute("aria-label") === "Updated form control name" || control.getAttribute("aria-labelledby") === "form-control-label")
-      : false);
-    assert.equal(staleName, false, `${name} removes a stale external accessible name when aria-labelledby is removed`);
-  }
+  await page.waitForFunction(paths => paths.every(([attribute, index, selector]) => {
+    const control = document.querySelector(`[${attribute}="${index}"]`)?.shadowRoot?.querySelector(selector);
+    return control?.getAttribute("aria-label") === "Updated form control name" || control?.getAttribute("aria-labelledby") === "form-control-label";
+  }), namePaths);
+  await page.evaluate(paths => paths.forEach(([attribute, index]) => document.querySelector(`[${attribute}="${index}"]`).removeAttribute("aria-labelledby")), namePaths);
+  await page.waitForFunction(paths => paths.every(([attribute, index, selector]) => {
+    const control = document.querySelector(`[${attribute}="${index}"]`)?.shadowRoot?.querySelector(selector);
+    return control && control.getAttribute("aria-label") !== "Updated form control name" && control.getAttribute("aria-labelledby") !== "form-control-label";
+  }), namePaths);
   const inputHost = page.locator(`[data-form-check="${componentNames.indexOf("Input")}"]`);
   await inputHost.evaluate(host => {
     host.setAttribute("aria-labelledby", "late-form-control-label");

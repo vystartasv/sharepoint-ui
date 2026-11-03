@@ -1,4 +1,4 @@
-import { base } from "./shared.js";
+import { base, syncHostAccessibleName } from "./shared.js";
 
 const isoDate = (date: Date): string => `${date.getFullYear().toString().padStart(4, "0")}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
 const fromIso = (value: string): Date | undefined => {
@@ -14,7 +14,7 @@ export function defineDatePicker(): void {
   if (customElements.get("spui-date-picker")) return;
   class SpuiDatePicker extends HTMLElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "value", "min", "max", "disabled", "required", "read-only", "name", "placeholder", "aria-label", "aria-description", "aria-describedby", "aria-invalid", "previous-month-label", "next-month-label", "calendar-label", "invalid-date-message", "required-message"];
+    static observedAttributes = ["label", "value", "min", "max", "disabled", "required", "read-only", "name", "placeholder", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "previous-month-label", "next-month-label", "calendar-label", "invalid-date-message", "required-message"];
     private internals: ElementInternals | undefined;
     private currentValue: string | undefined;
     private formDisabled = false;
@@ -40,7 +40,7 @@ export function defineDatePicker(): void {
       else if (name === "disabled" || name === "read-only") this.syncDisabled();
       else if (name === "required") { const input = this.shadowRoot?.querySelector<HTMLInputElement>(".control input"); if (input) { input.required = this.hasAttribute("required"); if (input.required) input.setAttribute("aria-required", "true"); else input.removeAttribute("aria-required"); } }
       else if (name === "placeholder") this.syncPlaceholder();
-      else if (name === "aria-label" || name === "aria-description" || name === "aria-describedby" || name === "aria-invalid") this.syncInputAttributes();
+      else if (name === "aria-label" || name === "aria-labelledby" || name === "aria-description" || name === "aria-describedby" || name === "aria-invalid") this.syncInputAttributes();
       else if (name === "calendar-label") this.shadowRoot?.querySelector(".calendar-button")?.setAttribute("aria-label", this.labelText("calendar"));
       else this.renderCalendar();
       this.syncFormState();
@@ -168,7 +168,9 @@ export function defineDatePicker(): void {
     private syncInputAttributes(): void {
       const input = this.shadowRoot?.querySelector<HTMLInputElement>(".control input");
       if (!input) return;
-      for (const name of ["aria-label", "aria-description", "aria-describedby"]) { const value = this.getAttribute(name); if (value === null) input.removeAttribute(name); else input.setAttribute(name, value); }
+      syncHostAccessibleName(this, input);
+      const invalid = this.getAttribute("aria-invalid");
+      if (invalid === null) input.removeAttribute("aria-invalid"); else input.setAttribute("aria-invalid", invalid);
     }
     private syncPlaceholder(): void { const input = this.shadowRoot?.querySelector<HTMLInputElement>(".control input"); if (input) input.placeholder = this.getAttribute("placeholder") ?? this.placeholder(); }
     private syncDisabled(): void {

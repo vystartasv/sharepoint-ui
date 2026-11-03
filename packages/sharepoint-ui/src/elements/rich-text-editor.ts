@@ -1,4 +1,4 @@
-import { base } from "./shared.js";
+import { base, syncHostAccessibleName } from "./shared.js";
 
 export interface SharePointRichTextEditorElement extends HTMLElement {
   value: string;
@@ -90,11 +90,10 @@ export function defineRichTextEditor(): void {
         if (label) { label.textContent = this.getAttribute("label") ?? ""; label.hidden = !this.hasAttribute("label"); }
         this.syncEditorLabel();
         this.refreshStrings();
-      } else if ((name === "aria-label" || name === "editor-label") && this.editor) this.syncEditorLabel();
-      else if (["aria-labelledby", "aria-description", "aria-describedby", "aria-invalid"].includes(name) && this.editor) {
-        const value = this.getAttribute(name);
-        if (value === null) this.editor.removeAttribute(name); else this.editor.setAttribute(name, value);
-      } else this.refreshStrings();
+      } else if (name === "editor-label" && this.editor) this.syncEditorLabel();
+      else if (["aria-label", "aria-labelledby", "aria-description", "aria-describedby"].includes(name) && this.editor) syncHostAccessibleName(this, this.editor);
+      else if (name === "aria-invalid" && this.editor) { const value = this.getAttribute(name); if (value === null) this.editor.removeAttribute(name); else this.editor.setAttribute(name, value); }
+      else this.refreshStrings();
     }
     private syncEditorLabel(): void { this.editor.setAttribute("aria-label", this.getAttribute("aria-label") ?? this.getAttribute("label") ?? this.getAttribute("editor-label") ?? "Rich text"); }
     get value(): string { return this.editor ? cleanHtml(this.editor.innerHTML) : this.pendingValue ?? this.getAttribute("value") ?? ""; }
@@ -298,7 +297,7 @@ export function defineRichTextEditor(): void {
         if (index < 0 || !buttons[index]) return;
         event.preventDefault(); buttons[index].tabIndex = 0; buttons.forEach((button, buttonIndex) => { if (buttonIndex !== index) button.tabIndex = -1; }); buttons[index].focus();
       });
-      this.editor = document.createElement("div"); this.editor.setAttribute("role", "textbox"); this.editor.setAttribute("aria-multiline", "true"); this.syncEditorLabel(); for (const name of ["aria-labelledby", "aria-description", "aria-describedby", "aria-invalid"]) { const value = this.getAttribute(name); if (value !== null) this.editor.setAttribute(name, value); } this.editor.contentEditable = String(!this.hasAttribute("disabled") && !this.hasAttribute("read-only")); this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only"))); this.editor.setAttribute("aria-disabled", String(this.hasAttribute("disabled"))); this.editor.setAttribute("aria-required", String(this.hasAttribute("required"))); this.editor.dataset.placeholder = this.getAttribute("placeholder") ?? "Write something…"; this.editor.part.add("editor");
+      this.editor = document.createElement("div"); this.editor.setAttribute("role", "textbox"); this.editor.setAttribute("aria-multiline", "true"); this.syncEditorLabel(); const invalid = this.getAttribute("aria-invalid"); if (invalid !== null) this.editor.setAttribute("aria-invalid", invalid); this.editor.contentEditable = String(!this.hasAttribute("disabled") && !this.hasAttribute("read-only")); this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only"))); this.editor.setAttribute("aria-disabled", String(this.hasAttribute("disabled"))); this.editor.setAttribute("aria-required", String(this.hasAttribute("required"))); this.editor.dataset.placeholder = this.getAttribute("placeholder") ?? "Write something…"; this.editor.part.add("editor");
       this.editor.addEventListener("keydown", event => { const key = (event as KeyboardEvent).key.toLowerCase(); const shortcut = (event as KeyboardEvent).metaKey || (event as KeyboardEvent).ctrlKey; if (!shortcut) return; if (key === "z") { event.preventDefault(); this.command((event as KeyboardEvent).shiftKey ? "redo" : "undo"); } else if (key === "y") { event.preventDefault(); this.command("redo"); } });
       this.editor.addEventListener("input", () => { this.sanitizeEditor(); this.syncForm(); this.dispatchEvent(new CustomEvent("spui-input", { detail: { value: this.value }, bubbles: true, composed: true })); });
       this.editor.addEventListener("mouseup", this.onSelectionChange);
@@ -321,6 +320,7 @@ export function defineRichTextEditor(): void {
       this.editor.addEventListener("blur", () => { this.sanitizeEditor(); this.syncForm(); this.dispatchEvent(new CustomEvent("spui-change", { detail: { value: this.value }, bubbles: true, composed: true })); });
       const style = document.createElement("style"); style.textContent = `${base}:host{display:grid;gap:6px}label{font-weight:600;color:var(--spui-ui-muted,var(--spui-semantic-body-text,inherit))}[role=toolbar]{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface,#fff)}button{border:0;border-radius:4px;background:transparent;color:var(--spui-ui-text,inherit);padding:6px 8px;font:inherit;cursor:pointer}button:hover:not(:disabled){background:var(--spui-ui-surface-hover,#eee)}button:disabled{opacity:.55;cursor:not-allowed}button:focus-visible,[role=textbox]:focus-visible{outline:2px solid var(--spui-focus-ring,#005a9e);outline-offset:2px}[role=textbox]{min-height:120px;box-sizing:border-box;padding:10px 12px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit;line-height:1.5;overflow:auto;caret-color:var(--spui-focus-ring,#005a9e)}[role=textbox]:empty:before{content:attr(data-placeholder);color:var(--spui-ui-muted,#666);pointer-events:none}table{border-collapse:collapse;max-width:100%;margin-block:8px}caption{text-align:start;font-weight:600}td,th{min-width:56px;padding:6px 9px;border:1px solid var(--spui-ui-stroke,#c8c8c8);text-align:start}th{background:var(--spui-ui-surface-hover,#f5f5f5);font-weight:600}a{color:var(--spui-semantic-link,#0f6cbd)}@media(forced-colors:active){button{border:1px solid ButtonText}td,th{border-color:CanvasText}}`;
       shadow.replaceChildren(style,label,toolbar,this.editor);
+      syncHostAccessibleName(this, this.editor);
       this.syncDisabled();
       this.refreshStrings();
       this.onSelectionChange();

@@ -1,4 +1,4 @@
-import { base } from "./shared.js";
+import { base, syncHostAccessibleName } from "./shared.js";
 
 export type FileUploadError = { code: "too-many-files" | "file-too-large" | "file-type-not-accepted"; file?: File };
 
@@ -52,10 +52,9 @@ export function defineFileUpload(): void {
       if (!this.hasAttribute("role")) this.setAttribute("role", "group");
       const labelElement = this.shadowRoot?.querySelector<HTMLLabelElement>(".label"); if (labelElement) { labelElement.textContent = this.getAttribute("label") || ""; labelElement.hidden = !this.hasAttribute("label"); }
       this.input.setAttribute("aria-label", label);
-      for (const name of ["aria-labelledby", "aria-description", "aria-describedby", "aria-invalid"]) {
-        const value = this.getAttribute(name);
-        if (value === null) this.input.removeAttribute(name); else this.input.setAttribute(name, value);
-      }
+      syncHostAccessibleName(this, this.input);
+      const invalid = this.getAttribute("aria-invalid");
+      if (invalid === null) this.input.removeAttribute("aria-invalid"); else this.input.setAttribute("aria-invalid", invalid);
       const hint = this.shadowRoot?.querySelector<HTMLElement>(".hint"); if (hint) hint.textContent = this.getAttribute("drop-label") || "Drag files here or browse to select";
       const button = this.shadowRoot?.querySelector<HTMLButtonElement>(".browse"); if (button) { button.textContent = browse; button.disabled = disabled; button.setAttribute("aria-label", browse); }
       this.list?.setAttribute("aria-label", `${label}: ${this.getAttribute("selected-label") || "selected files"}`);
