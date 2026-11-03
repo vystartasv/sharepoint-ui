@@ -506,7 +506,7 @@
   background: var(--sl-color-accent-low);
 }
 
-:focus-visible:not([slot]) {
+:where(a, button, input, select, textarea):focus-visible:not([slot]) {
   outline: 2px solid var(--spui-ui-accent, #007780);
   outline-offset: 3px;
 }
