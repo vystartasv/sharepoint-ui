@@ -197,6 +197,12 @@ try {
   await page.waitForFunction(() => !document.querySelector("[data-testid=fallback]")?.shadowRoot?.querySelector("dialog")?.open);
   await page.waitForTimeout(50);
   assert.equal(await fallbackTrigger.evaluate(element => element.matches(":focus")), true, "closing restores focus to the trigger");
+  await page.evaluate(() => { const element = document.createElement("spui-dialog"); element.dataset.testid = "native-label"; element.setAttribute("dialog-label", "Native details"); element.setAttribute("modal", "false"); element.setAttribute("open", ""); document.body.append(element); });
+  const nativeLabelDialog = page.getByTestId("native-label");
+  assert.equal(await nativeLabelDialog.evaluate(element => element.shadowRoot.querySelector(".fallback-title").textContent), "Native details", "framework-neutral dialog-label names the fallback heading");
+  await nativeLabelDialog.evaluate(element => element.setAttribute("dialog-label", "Updated native details"));
+  assert.equal(await nativeLabelDialog.evaluate(element => element.shadowRoot.querySelector(".fallback-title").textContent), "Updated native details", "framework-neutral dialog-label updates after connection");
+  await nativeLabelDialog.evaluate(element => element.remove());
   assert.deepEqual(errors, [], "no browser errors");
   console.log(JSON.stringify({ status: "passed", reactComposition: true, nativeComposition: true, triggerAndAccessibleName: true, controlledOpenAndClose: true, defaultOpenAndAlertMode: true, triggerActionAndEnhancement: true, unmountOnClose: true, dialogActionsPositionAndFluid: true, inertTrapFocusOptOut: true, focusContainmentAndRestoration: true, shadowRootTabOrder: true, axeViolations: 0, legacyApi: true, forcedColors: { system: dialogSystemColors, rendered: dialogForcedColors }, noPageErrors: true, screenshot: "test-results/dialog-composition.png" }, null, 2));
 } finally {

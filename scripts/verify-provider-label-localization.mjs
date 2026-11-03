@@ -12,9 +12,12 @@ const bundle = await build({
     contents: `
       import * as React from "react";
       import { createRoot } from "react-dom/client";
-      import { Breadcrumb, ComboBox, ComboOption, DataGridSelectionCell, Hamburger, MenuBar, SharePointUIProvider, SplitButton, SplitNavItem, TableResizeHandle, Toolbar, VirtualList, Virtualizer, DataGrid, TagPicker, TagPickerOption } from "${resolve("packages/sharepoint-ui/src/react.tsx")}";
+      import { Breadcrumb, ComboBox, ComboOption, DataGridSelectionCell, Dialog, Hamburger, MenuBar, SharePointUIProvider, SplitButton, SplitNavItem, TableResizeHandle, Toolbar, VirtualList, Virtualizer, DataGrid, TagPicker, TagPickerOption } from "${resolve("packages/sharepoint-ui/src/react.tsx")}";
       function App() {
-        return <SharePointUIProvider lang="lt" strings={{ toolbarLabel: "Įrankių juosta", breadcrumbLabel: "Naršymo kelias", menuBarLabel: "Meniu juosta", splitButtonMenuLabel: "Daugiau parinkčių", navigationToggle: "Perjungti navigaciją", splitNavItemActionLabel: "Daugiau veiksmų", virtualizerLabel: "Elementai", dataGridSelectRow: "Pasirinkti eilutę", tableResizeHandle: "Keisti stulpelio dydį", dataGridLabel: "Duomenų tinklelis", dataGridFilterLabel: "Ieškoti eilučių", dataGridSelectAll: "Pasirinkti visas eilutes", dataGridRowLabel: "eilutė", dataGridResizeLabel: "Keisti stulpelio dydį", dataGridReorderLabel: "Perkelti stulpelį", dataGridEmptyLabel: "Nėra įrašų", selectedOptionsLabel: "Pasirinktos parinktys" }}>
+        return <SharePointUIProvider lang="lt" strings={{ toolbarLabel: "Įrankių juosta", breadcrumbLabel: "Naršymo kelias", menuBarLabel: "Meniu juosta", splitButtonMenuLabel: "Daugiau parinkčių", navigationToggle: "Perjungti navigaciją", splitNavItemActionLabel: "Daugiau veiksmų", virtualizerLabel: "Elementai", dataGridSelectRow: "Pasirinkti eilutę", tableResizeHandle: "Keisti stulpelio dydį", dataGridLabel: "Duomenų tinklelis", dataGridFilterLabel: "Ieškoti eilučių", dataGridSelectAll: "Pasirinkti visas eilutes", dataGridRowLabel: "eilutė", dataGridResizeLabel: "Keisti stulpelio dydį", dataGridReorderLabel: "Perkelti stulpelį", dataGridEmptyLabel: "Nėra įrašų", selectedOptionsLabel: "Pasirinktos parinktys", dialogLabel: "Dialogas" }}>
+          <Dialog data-testid="localized-dialog" open modal={false} />
+          <Dialog data-testid="override-dialog" open modal={false} dialogLabel="Custom confirmation" />
+          <Dialog data-testid="title-dialog" open modal={false} title="Import details" />
           <Toolbar data-testid="localized-toolbar" />
           <Toolbar data-testid="override-toolbar" label="Custom toolbar" />
           <Toolbar data-testid="aria-toolbar" aria-label="Custom toolbar aria" />
@@ -96,6 +99,9 @@ try {
   assert.equal(await page.getByTestId("override-tag-picker").evaluate(element => element.shadowRoot.querySelector(".selected").getAttribute("aria-label")), "Custom selected options", "TagPicker selectedLabel overrides provider strings");
   assert.equal(await page.getByTestId("localized-combobox").evaluate(element => element.shadowRoot.querySelector(".selected").getAttribute("aria-label")), "Pasirinktos parinktys", "ComboBox selected options group uses provider localization");
   assert.equal(await page.getByTestId("override-combobox").evaluate(element => element.shadowRoot.querySelector(".selected").getAttribute("aria-label")), "Custom selected options", "ComboBox selectedLabel overrides provider strings");
+  assert.equal(await page.getByTestId("localized-dialog").evaluate(element => element.shadowRoot.querySelector(".fallback-title").textContent), "Dialogas", "Dialog fallback heading uses provider localization");
+  assert.equal(await page.getByTestId("override-dialog").evaluate(element => element.shadowRoot.querySelector(".fallback-title").textContent), "Custom confirmation", "Dialog dialogLabel overrides provider strings");
+  assert.equal(await page.getByTestId("title-dialog").evaluate(element => element.shadowRoot.querySelector(".fallback-title").textContent), "Import details", "Dialog title prop takes precedence over its fallback label");
   const localizedGrid = page.getByTestId("localized-data-grid");
   assert.equal(await localizedGrid.getByRole("grid").getAttribute("aria-label"), "Duomenų tinklelis");
   assert.equal(await localizedGrid.getByRole("searchbox").getAttribute("aria-label"), "Ieškoti eilučių");
@@ -104,7 +110,7 @@ try {
   assert.equal(await localizedGrid.getByRole("button", { name: "Perkelti stulpelį Name" }).count(), 1);
   assert.equal(await localizedGrid.getByRole("separator", { name: "Keisti stulpelio dydį Name" }).count(), 1);
   assert.deepEqual(errors, []);
-  console.log(JSON.stringify({ status: "passed", localizedDefaults: ["Toolbar", "Breadcrumb", "MenuBar", "SplitButton", "Hamburger", "SplitNavItem", "VirtualList", "Virtualizer", "DataGridSelectionCell", "TableResizeHandle", "TagPicker", "ComboBox"], explicitLabelOverrides: true, ariaLabelOverrides: true, pageErrors: errors }));
+  console.log(JSON.stringify({ status: "passed", localizedDefaults: ["Toolbar", "Breadcrumb", "MenuBar", "SplitButton", "Hamburger", "SplitNavItem", "VirtualList", "Virtualizer", "DataGridSelectionCell", "TableResizeHandle", "TagPicker", "ComboBox", "Dialog"], explicitLabelOverrides: true, ariaLabelOverrides: true, pageErrors: errors }));
 } finally {
   await browser?.close();
   await new Promise(done => server.close(done));

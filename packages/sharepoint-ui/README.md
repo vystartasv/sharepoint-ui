@@ -466,6 +466,8 @@ import { DatePicker } from "@vilius/sharepoint-ui/react";
 
 `Dialog` reports open changes as `(event, data)`, where `data` includes `open`, the originating browser event, and Fluent's `type` reason: `triggerClick`, `escapeKeyDown`, or `backdropClick`. The same object is emitted in the native `spui-open-change` event detail. Programmatic controlled prop changes do not synthesize user interaction callbacks.
 
+When no title is supplied, the fallback heading uses `dialogLabel` or `SharePointUIProvider.strings.dialogLabel` (default: `Dialog`). A supplied `title`, composed `DialogTitle`, or `aria-label` takes precedence.
+
 Set `closeLabel` to localize or override the built-in close button's accessible name; it defaults to the provider's shared close string. Framework-neutral consumers can set the `close-label` attribute.
 
 `DialogTitle` accepts an optional `action` slot for a control aligned after the heading. Provide `action` in React or a child with `slot="action"` in framework-neutral markup.

@@ -59,7 +59,7 @@ export function defineDialog(): void {
   defineDialogSurface(); defineDialogTitle(); defineDialogContent(); defineDialogBody(); defineDialogActions(); defineDialogTrigger();
   if (customElements.get("spui-dialog")) return;
   class SpuiDialog extends HTMLElement {
-    static observedAttributes = ["open", "default-open", "motion", "motion-visible", "motion-exit-complete", "title", "modal", "modal-type", "inert-trap-focus", "dismissible", "close-label", "aria-label"];
+    static observedAttributes = ["open", "default-open", "motion", "motion-visible", "motion-exit-complete", "title", "dialog-label", "modal", "modal-type", "inert-trap-focus", "dismissible", "close-label", "aria-label"];
     private titleObserver?: MutationObserver;
     private previousFocus?: HTMLElement;
     private fallbackTrapActive = false;
@@ -122,7 +122,7 @@ export function defineDialog(): void {
       else dialog.removeAttribute("role");
       const title = this.getAttribute("title");
       const fallbackTitle = this.shadowRoot?.querySelector<HTMLElement>(".fallback-title");
-      if (fallbackTitle) fallbackTitle.textContent = title ?? "Dialog";
+      if (fallbackTitle) fallbackTitle.textContent = title ?? this.getAttribute("dialog-label") ?? "Dialog";
       const titleSlot = this.shadowRoot?.querySelector<HTMLSlotElement>("slot[name=title]");
       if (fallbackTitle && titleSlot) fallbackTitle.hidden = titleSlot.assignedNodes().length > 0;
       const close = this.shadowRoot?.querySelector<HTMLButtonElement>(".close");
@@ -191,7 +191,7 @@ export function defineDialog(): void {
       dialog.setAttribute("aria-labelledby", "title");
       const header = document.createElement("header");
       const heading = document.createElement("h2"); heading.id = "title";
-      const fallbackTitle = document.createElement("span"); fallbackTitle.className = "fallback-title"; fallbackTitle.textContent = this.getAttribute("title") ?? "Dialog";
+      const fallbackTitle = document.createElement("span"); fallbackTitle.className = "fallback-title"; fallbackTitle.textContent = this.getAttribute("title") ?? this.getAttribute("dialog-label") ?? "Dialog";
       const titleSlot = document.createElement("slot"); titleSlot.name = "title"; titleSlot.addEventListener("slotchange", () => { fallbackTitle.hidden = titleSlot.assignedNodes().length > 0; });
       heading.append(fallbackTitle, titleSlot);
       const close = document.createElement("button"); close.type = "button"; close.className = "close"; close.part.add("close-button"); const closeMark = document.createElement("span"); closeMark.setAttribute("aria-hidden", "true"); closeMark.textContent = "×"; close.append(closeMark); close.addEventListener("click", event => this.closeDialog("triggerClick", event));

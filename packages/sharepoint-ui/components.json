@@ -2391,7 +2391,10 @@
       "module": "dialog",
       "category": "overlays",
       "api": {
-        "reactSignature": "{ open, defaultOpen = false, title, modal = true, modalType, inertTrapFocus = false, dismissible = true, closeLabel, unmountOnClose = true, surfaceMotion, actions, onOpenChange, children, ...props }: ElementProps & { open?: boolean; defaultOpen?: boolean; title?: string; modal?: boolean; modalType?: \"modal\" | \"non-modal\" | \"alert\"; inertTrapFocus?: boolean; dismissible?: boolean; closeLabel?: string; unmountOnClose?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>; actions?: React.ReactNode; onOpenChange?: (event: DialogOpenChangeEvent, data: DialogOnOpenChangeData) => void; children?: React.ReactNode }",
+        "reactSignature": "{ open, defaultOpen = false, title, dialogLabel, modal = true, modalType, inertTrapFocus = false, dismissible = true, closeLabel, unmountOnClose = true, surfaceMotion, actions, onOpenChange, children, ...props }: ElementProps & { open?: boolean; defaultOpen?: boolean; title?: string; dialogLabel?: string; modal?: boolean; modalType?: \"modal\" | \"non-modal\" | \"alert\"; inertTrapFocus?: boolean; dismissible?: boolean; closeLabel?: string; unmountOnClose?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>; actions?: React.ReactNode; onOpenChange?: (event: DialogOpenChangeEvent, data: DialogOnOpenChangeData) => void; children?: React.ReactNode }",
+        "relatedReactApis": [
+          { "name": "DialogProps.dialogLabel", "description": "Names the fallback heading when no title is supplied; defaults to SharePointUIProvider.strings.dialogLabel." }
+        ],
         "callbackProps": [
           "onOpenChange"
         ],
