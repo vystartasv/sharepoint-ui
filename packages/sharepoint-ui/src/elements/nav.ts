@@ -10,7 +10,7 @@ export function defineNav(): void {
   defineNavItem(); defineAppItem(); defineAppItemStatic(); defineSplitNavItem(); defineHamburger(); defineNavDrawer(); defineNavDrawerHeader(); defineNavDrawerBody(); defineNavDrawerFooter(); defineNavCategory(); defineNavCategoryItem(); defineNavSubItemGroup(); defineNavSubItem(); defineNavDivider(); defineNavSectionHeader();
   if (customElements.get("spui-nav")) return;
   class SpuiNav extends HTMLElement {
-    static observedAttributes = ["label", "aria-label", "density", "multiple", "tabbable", "open", "open-label", "close-label", "collapsible", "collapsed", "expand-label", "collapse-label"];
+    static observedAttributes = ["label", "aria-label", "density", "multiple", "tabbable", "open", "open-label", "close-label", "collapsible", "collapsed", "full-width", "expand-label", "collapse-label"];
     private observer?: MutationObserver;
     private events?: AbortController;
     private breakpoint?: MediaQueryList;
@@ -34,6 +34,8 @@ export function defineNav(): void {
     set collapsed(value: boolean) { this.collapsedControlled = true; this.setCollapsed(Boolean(value)); }
     get defaultCollapsed(): boolean { return this.collapsed; }
     set defaultCollapsed(value: boolean) { if (!this.collapsedControlled) this.setCollapsed(Boolean(value)); }
+    get fullWidth(): boolean { return this.hasAttribute("full-width"); }
+    set fullWidth(value: boolean) { this.toggleAttribute("full-width", Boolean(value)); }
     connectedCallback(): void {
       if (!this.shadowRoot) this.render();
       this.observer = new MutationObserver(() => this.sync());
@@ -262,6 +264,7 @@ export function defineNav(): void {
       const style = document.createElement("style");
       style.textContent = `${base}
         :host{display:block;width:var(--spui-nav-width,260px);max-width:100%;min-width:0;color:var(--spui-ui-text,var(--spui-semantic-body-text,#242424));font:inherit}:host([data-collapsed]){width:var(--spui-nav-collapsed-width,64px)}
+        @media(min-width:641px){:host([full-width]:not([data-collapsed])){width:100%}}
         nav{display:grid;grid-template-columns:minmax(0,1fr);gap:2px;width:100%;min-width:0;font-family:var(--spui-font-family,inherit);font-size:var(--spui-nav-font-size,14px);color:inherit}nav[hidden]{display:none}nav slot{min-width:0}
         :host([density=small]) nav{--spui-nav-item-block:5px;--spui-nav-font-size:13px}
         :host([density=large]) nav{--spui-nav-item-block:10px;--spui-nav-font-size:15px}
