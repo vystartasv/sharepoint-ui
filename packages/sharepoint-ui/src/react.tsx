@@ -48,7 +48,8 @@ import { defineAvatarGroup } from "./elements/avatar-group.js";
 import { defineAvatarGroupItem } from "./elements/avatar-group-primitives.js";
 import { definePersona, type PersonaPresence, type PersonaSize } from "./elements/persona.js";
 import { VariableSizeIndex, type VirtualListDataSource } from "./elements/virtual-list.js";
-import { clampDataGridColumnWidth, clampDataGridRowHeight, dataGridColumnVar, filterDataGridItems, fitDataGridColumnWidths, formatDataGridClipboard, getDataGridColumnSizing, getDataGridColumnWindow, getDataGridCellValue, groupDataGridItems, isDataGridRowSelected, parseDataGridClipboard, parseDataGridClipboardValue, parseDataGridInputValue, sortDataGridItems, toDataGridInputValue, writeDataGridClipboardText, type DataGridCellEdit, type DataGridColumn, getDataGridDataSourceRow, type DataGridDataSource, type DataGridDataSourceRow, type DataGridColumnSizingOptions, type DataGridColumnWidths, type DataGridEditValue, type DataGridFocusMode, type DataGridGroup, type DataGridSelectionAppearance, type DataGridSelectionModel, setDataGridRowSelected, type DataGridSort, type DataGridSortState } from "./elements/data-grid-model.js";
+import { clampDataGridColumnWidth, clampDataGridRowHeight, dataGridColumnVar, filterDataGridItems, fitDataGridColumnWidths, formatDataGridClipboard, getDataGridColumnSizing, getDataGridColumnWindow, getDataGridCellValue, groupDataGridItems, isDataGridRowSelected, parseDataGridClipboard, parseDataGridClipboardValue, parseDataGridInputValue, sortDataGridItems, toDataGridInputValue, writeDataGridClipboardText, type DataGridCellEdit, type DataGridCellEditError, type DataGridColumn, getDataGridDataSourceRow, type DataGridDataSource, type DataGridDataSourceRow, type DataGridColumnSizingOptions, type DataGridColumnWidths, type DataGridEditValue, type DataGridFocusMode, type DataGridGroup, type DataGridSelectionAppearance, type DataGridSelectionModel, setDataGridRowSelected, type DataGridSort, type DataGridSortState } from "./elements/data-grid-model.js";
+export type { DataGridCellEditError } from "./elements/data-grid-model.js";
 import { flattenAllTree, flattenTree, type TreeNode, type VisibleTreeNode } from "./elements/tree-model.js";
 import { defineInteractionTag, defineInteractionTagPrimary, defineInteractionTagSecondary, defineTag, defineTagGroup, type InteractionTagSelectData, type TagAppearance, type TagGroupSelectData, type TagSize } from "./elements/tags.js";
 import { defineTagPicker, type TagPickerOpenChangeType, type TagPickerOnOpenChangeData, type TagPickerOnOptionSelectData } from "./elements/tag-picker.js";
@@ -4286,7 +4287,7 @@ function VirtualDataGrid<T>({ items, dataSource, onDataLoadError, onDataSourceGr
     } catch (reason) {
       const message = reason instanceof Error ? reason.message : String(reason || "The value could not be saved.");
       updateEditingCell({ ...current, draft, saving: false, error: uiStrings.dataGridEditError ?? defaultStrings.dataGridEditError! });
-      viewport.current?.dispatchEvent(new CustomEvent("spui-cell-edit-error", { detail: { item: edit.item, rowId: edit.rowId, columnId: edit.columnId, previousValue: edit.previousValue, value: edit.value, error: message }, bubbles: true, composed: true }));
+      viewport.current?.dispatchEvent(new CustomEvent<DataGridCellEditError<T>>("spui-cell-edit-error", { detail: { item: edit.item, rowId: edit.rowId, columnId: edit.columnId, previousValue: edit.previousValue, value: edit.value, error: message }, bubbles: true, composed: true }));
       requestAnimationFrame(() => viewport.current?.querySelector<HTMLInputElement>("[data-testid='spui-data-grid-editor']")?.focus());
     }
   };
@@ -5368,7 +5369,7 @@ function ComposedDataGridCell({ children, item, context, cellKey, rowIndex = 1, 
     } catch (reason) {
       const message = reason instanceof Error ? reason.message : String(reason || "The value could not be saved.");
       setError(uiStrings.dataGridEditError ?? defaultStrings.dataGridEditError!);
-      cell.current?.dispatchEvent(new CustomEvent("spui-cell-edit-error", { bubbles: true, composed: true, detail: { item: edit.item, rowId: edit.rowId, columnId: edit.columnId, previousValue: edit.previousValue, value: edit.value, error: message } }));
+      cell.current?.dispatchEvent(new CustomEvent<DataGridCellEditError<unknown>>("spui-cell-edit-error", { bubbles: true, composed: true, detail: { item: edit.item, rowId: edit.rowId, columnId: edit.columnId, previousValue: edit.previousValue, value: edit.value, error: message } }));
       requestAnimationFrame(() => input.current?.focus());
     } finally { savingRef.current = false; setSaving(false); }
   };

@@ -129,6 +129,7 @@ export function fitDataGridColumnWidths<T>(columns: readonly DataGridColumn<T>[]
 export type DataGridGroup<T = unknown> = { key: string; label: string; value: string | number | Date | null | undefined; items: T[]; indices: number[] };
 export type DataGridEditValue = string | number | null;
 export type DataGridCellEdit<T = unknown> = { item: T; rowId: string; columnId: string; previousValue: unknown; value: DataGridEditValue };
+export type DataGridCellEditError<T = unknown> = DataGridCellEdit<T> & { error: string };
 
 /** Bound row sizes to keep a consumer callback from creating pathological virtual scroll extents. */
 export function clampDataGridRowHeight(height: number | undefined, estimate: number): number {

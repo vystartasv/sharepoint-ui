@@ -1,6 +1,6 @@
 import { base } from "./shared.js";
 import { VariableSizeIndex } from "./virtual-list.js";
-import { clampDataGridColumnWidth, clampDataGridRowHeight, dataGridColumnVar, filterDataGridItems, fitDataGridColumnWidths, formatDataGridClipboard, getDataGridCellValue, getDataGridColumnSizing, getDataGridColumnWindow, groupDataGridItems, parseDataGridClipboard, parseDataGridClipboardValue, parseDataGridInputValue, sortDataGridItems, toDataGridInputValue, writeDataGridClipboardText, type DataGridCellEdit, type DataGridColumn, getDataGridDataSourceRow, type DataGridDataSource, type DataGridDataSourceRow, type DataGridColumnSizingOptions, type DataGridColumnWidths, type DataGridEditValue, type DataGridFocusMode, type DataGridGroup, type DataGridSelectionAppearance, type DataGridSelectionModel, type DataGridSort, type DataGridSortDirection } from "./data-grid-model.js";
+import { clampDataGridColumnWidth, clampDataGridRowHeight, dataGridColumnVar, filterDataGridItems, fitDataGridColumnWidths, formatDataGridClipboard, getDataGridCellValue, getDataGridColumnSizing, getDataGridColumnWindow, groupDataGridItems, parseDataGridClipboard, parseDataGridClipboardValue, parseDataGridInputValue, sortDataGridItems, toDataGridInputValue, writeDataGridClipboardText, type DataGridCellEdit, type DataGridCellEditError, type DataGridColumn, getDataGridDataSourceRow, type DataGridDataSource, type DataGridDataSourceRow, type DataGridColumnSizingOptions, type DataGridColumnWidths, type DataGridEditValue, type DataGridFocusMode, type DataGridGroup, type DataGridSelectionAppearance, type DataGridSelectionModel, type DataGridSort, type DataGridSortDirection } from "./data-grid-model.js";
 
 export type DataGridCellRenderer<T = unknown> = (item: T, column: DataGridColumn<T>, rowIndex: number) => Node | string | number | null;
 export type DataGridRowHeightGetter<T = unknown> = (item: T, rowIndex: number) => number;
@@ -798,7 +798,7 @@ export function defineDataGrid(): void {
         const message = reason instanceof Error ? reason.message : String(reason || "The value could not be saved.");
         editing.error = this.getAttribute("edit-error-label") || "The value could not be saved.";
         if (input) { input.disabled = false; input.removeAttribute("aria-busy"); }
-        this.dispatchEvent(new CustomEvent("spui-cell-edit-error", { detail: { item: edit.item, rowId: edit.rowId, columnId: edit.columnId, previousValue: edit.previousValue, value: edit.value, error: message }, bubbles: true, composed: true }));
+        this.dispatchEvent(new CustomEvent<DataGridCellEditError>("spui-cell-edit-error", { detail: { item: edit.item, rowId: edit.rowId, columnId: edit.columnId, previousValue: edit.previousValue, value: edit.value, error: message }, bubbles: true, composed: true }));
         this.showEditError(editing);
       }
     }
