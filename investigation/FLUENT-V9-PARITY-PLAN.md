@@ -1830,3 +1830,5 @@ Phone selection review found that HTML normalization replaced editor descendants
 Native DataGrid already used `loading-label` when rendering async rows, but omitted it from `observedAttributes`; changing a label for a locale switch therefore left mounted loading rows stale. The attribute is now observed and appears in generated component metadata. Library and docs builds pass.
 
 The FullHtml sanitizer previously discarded per-element `lang` and `dir`, erasing mixed-language and mixed-direction spans during round trips. It now preserves valid BCP 47 language tags and `ltr`/`rtl`/`auto` direction values across rich, restricted, and FullHtml content, with the behavior documented in the editor guide.
+
+The native DataGrid now accepts observed label attributes for range-load errors, edit-save fallback errors, and copy/paste success and failure announcements. Templates support `{message}` and paste counts support `{count}`; changing a label after mount updates the status copy. The human and agent catalogs expose these names and their purpose from the same source scanner.
