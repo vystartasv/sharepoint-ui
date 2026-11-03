@@ -24,7 +24,7 @@ const adapter = getSharePointFieldAdapter(field);
 | Choice | `select` or `radio-group` | Reads `Choices` and `EditFormat` in the order SharePoint provides. |
 | MultiChoice | `multi-choice` | Includes the choices and fill-in setting; render as a checkbox list. |
 | Boolean | `checkbox` | Uses the library Checkbox. |
-| DateTime | `date-picker` | `dateMode` is `date` or `date-time`; use a date-time input when time entry is enabled. |
+| DateTime | `date-picker` or `input` | Date-only fields use `date-picker`; fields with time enabled use `input` with `inputType: "datetime-local"` so hours and minutes are editable. |
 | Lookup, User | `combobox` | `multiple` follows field metadata. Lookup fields can expose `lookupSource` when SharePoint supplied its source-list metadata. |
 | Counter, Computed, Calculated | `read-only` | SharePoint calculates or manages these values. |
 | Other types | `unsupported` | Includes the source `fieldType` and a reason; use a specialized renderer. |

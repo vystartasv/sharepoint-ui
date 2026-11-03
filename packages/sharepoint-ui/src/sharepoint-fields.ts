@@ -76,7 +76,7 @@ export type SharePointFieldAdapter = {
   readOnly: boolean;
   hidden: boolean;
   multiple?: boolean;
-  inputType?: "text" | "number" | "url";
+  inputType?: "text" | "number" | "url" | "datetime-local";
   step?: number | "any";
   dateMode?: "date" | "date-time";
   choices?: readonly string[];
@@ -149,7 +149,10 @@ export function getSharePointFieldAdapter(field: SharePointFieldMetadata): Share
   if (normalized === "boolean") return finish("checkbox");
   if (normalized === "datetime") {
     const displayFormat = field.DisplayFormat ?? field.displayFormat;
-    return { ...finish("date-picker"), dateMode: displayFormat === 1 || String(displayFormat).toLowerCase() === "1" || String(displayFormat).toLowerCase() === "datetime" ? "date-time" : "date" };
+    const dateMode = displayFormat === 1 || String(displayFormat).toLowerCase() === "1" || String(displayFormat).toLowerCase() === "datetime" ? "date-time" : "date";
+    return dateMode === "date-time"
+      ? { ...finish("input"), inputType: "datetime-local", dateMode }
+      : { ...finish("date-picker"), dateMode };
   }
   if (["lookup", "lookupmulti", "user", "usermulti"].includes(normalized)) {
     const lookupList = field.LookupList ?? field.lookupList;
