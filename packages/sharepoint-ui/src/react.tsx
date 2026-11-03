@@ -266,7 +266,7 @@ function useSpuiEvent(ref: React.RefObject<HTMLElement | null>, eventName: strin
 }
 
 type NativeMousePointerEventProps<T extends Element> = Pick<React.DOMAttributes<T>, "onAuxClick" | "onAuxClickCapture" | "onContextMenu" | "onContextMenuCapture" | "onDoubleClick" | "onDoubleClickCapture" | "onMouseDown" | "onMouseDownCapture" | "onMouseEnter" | "onMouseLeave" | "onMouseMove" | "onMouseMoveCapture" | "onMouseOut" | "onMouseOutCapture" | "onMouseOver" | "onMouseOverCapture" | "onMouseUp" | "onMouseUpCapture" | "onGotPointerCapture" | "onGotPointerCaptureCapture" | "onLostPointerCapture" | "onLostPointerCaptureCapture" | "onPointerCancel" | "onPointerCancelCapture" | "onPointerDown" | "onPointerDownCapture" | "onPointerEnter" | "onPointerLeave" | "onPointerMove" | "onPointerMoveCapture" | "onPointerOut" | "onPointerOutCapture" | "onPointerOver" | "onPointerOverCapture" | "onPointerUp" | "onPointerUpCapture">;
-type NativeAdditionalEventProps<T extends Element> = Pick<React.DOMAttributes<T>, "onInvalid" | "onInvalidCapture" | "onChange" | "onChangeCapture" | "onScroll" | "onScrollCapture" | "onCopy" | "onCopyCapture" | "onCut" | "onCutCapture" | "onPaste" | "onPasteCapture" | "onCompositionEnd" | "onCompositionEndCapture" | "onCompositionStart" | "onCompositionStartCapture" | "onCompositionUpdate" | "onCompositionUpdateCapture" | "onBeforeInput" | "onBeforeInputCapture" | "onInput" | "onInputCapture" | "onDrag" | "onDragCapture" | "onDragEnd" | "onDragEndCapture" | "onDragEnter" | "onDragEnterCapture" | "onDragExit" | "onDragExitCapture" | "onDragLeave" | "onDragLeaveCapture" | "onDragOver" | "onDragOverCapture" | "onDragStart" | "onDragStartCapture" | "onDrop" | "onDropCapture" | "onTouchCancel" | "onTouchCancelCapture" | "onTouchEnd" | "onTouchEndCapture" | "onTouchMove" | "onTouchMoveCapture" | "onTouchStart" | "onTouchStartCapture" | "onWheel" | "onWheelCapture" | "onAnimationStart" | "onAnimationStartCapture" | "onAnimationEnd" | "onAnimationEndCapture" | "onAnimationIteration" | "onAnimationIterationCapture" | "onTransitionEnd" | "onTransitionEndCapture">;
+type NativeAdditionalEventProps<T extends Element> = Pick<React.DOMAttributes<T>, "onInvalid" | "onInvalidCapture" | "onChange" | "onChangeCapture" | "onScroll" | "onScrollCapture" | "onCopy" | "onCopyCapture" | "onCut" | "onCutCapture" | "onPaste" | "onPasteCapture" | "onCompositionEnd" | "onCompositionEndCapture" | "onCompositionStart" | "onCompositionStartCapture" | "onCompositionUpdate" | "onCompositionUpdateCapture" | "onBeforeInput" | "onBeforeInputCapture" | "onInput" | "onInputCapture" | "onDrag" | "onDragCapture" | "onDragEnd" | "onDragEndCapture" | "onDragEnter" | "onDragEnterCapture" | "onDragExit" | "onDragExitCapture" | "onDragLeave" | "onDragLeaveCapture" | "onDragOver" | "onDragOverCapture" | "onDragStart" | "onDragStartCapture" | "onDrop" | "onDropCapture" | "onTouchCancel" | "onTouchCancelCapture" | "onTouchEnd" | "onTouchEndCapture" | "onTouchMove" | "onTouchMoveCapture" | "onTouchStart" | "onTouchStartCapture" | "onWheel" | "onWheelCapture" | "onAnimationStart" | "onAnimationStartCapture" | "onAnimationEnd" | "onAnimationEndCapture" | "onAnimationIteration" | "onAnimationIterationCapture" | "onTransitionEnd" | "onTransitionEndCapture" | "onAbort" | "onAbortCapture" | "onCanPlay" | "onCanPlayCapture" | "onCanPlayThrough" | "onCanPlayThroughCapture" | "onDurationChange" | "onDurationChangeCapture" | "onEmptied" | "onEmptiedCapture" | "onEncrypted" | "onEncryptedCapture" | "onEnded" | "onEndedCapture" | "onLoadedData" | "onLoadedDataCapture" | "onLoadedMetadata" | "onLoadedMetadataCapture" | "onLoadStart" | "onLoadStartCapture" | "onPause" | "onPauseCapture" | "onPlay" | "onPlayCapture" | "onPlaying" | "onPlayingCapture" | "onProgress" | "onProgressCapture" | "onRateChange" | "onRateChangeCapture" | "onSeeked" | "onSeekedCapture" | "onSeeking" | "onSeekingCapture" | "onStalled" | "onStalledCapture" | "onSuspend" | "onSuspendCapture" | "onTimeUpdate" | "onTimeUpdateCapture" | "onVolumeChange" | "onVolumeChangeCapture" | "onWaiting" | "onWaitingCapture" | "onLoad" | "onLoadCapture" | "onError" | "onErrorCapture">;
 type NativeRootEventProps<T extends Element> = Pick<React.DOMAttributes<T>, "onKeyDown" | "onKeyDownCapture" | "onKeyUp" | "onKeyUpCapture" | "onKeyPress" | "onKeyPressCapture" | "onFocus" | "onFocusCapture" | "onBlur" | "onBlurCapture"> & NativeMousePointerEventProps<T> & NativeAdditionalEventProps<T>;
 function isComposedDescendant(root: Element, target: EventTarget | null): boolean {
   if (!(target instanceof Node)) return false;
@@ -282,8 +282,16 @@ function isComposedDescendant(root: Element, target: EventTarget | null): boolea
   }
   return false;
 }
-type NativeEventKind = "mouse" | "keyboard" | "focus" | "pointer" | "drag" | "touch" | "wheel" | "animation" | "transition" | "clipboard" | "composition" | "input" | "change" | "invalid" | "scroll";
+type NativeEventKind = "mouse" | "keyboard" | "focus" | "pointer" | "drag" | "touch" | "wheel" | "animation" | "transition" | "clipboard" | "composition" | "input" | "change" | "invalid" | "scroll" | "resource";
+const nativeResourceEventNames = ([
+  ["abort", "onAbort"], ["canplay", "onCanPlay"], ["canplaythrough", "onCanPlayThrough"], ["durationchange", "onDurationChange"], ["emptied", "onEmptied"], ["encrypted", "onEncrypted"], ["ended", "onEnded"], ["error", "onError"], ["loadeddata", "onLoadedData"], ["loadedmetadata", "onLoadedMetadata"], ["load", "onLoad"], ["loadstart", "onLoadStart"], ["pause", "onPause"], ["play", "onPlay"], ["playing", "onPlaying"], ["progress", "onProgress"], ["ratechange", "onRateChange"], ["seeked", "onSeeked"], ["seeking", "onSeeking"], ["stalled", "onStalled"], ["suspend", "onSuspend"], ["timeupdate", "onTimeUpdate"], ["volumechange", "onVolumeChange"], ["waiting", "onWaiting"],
+] as const).flatMap(([eventName, prop]) => [
+  { eventName, prop: `${prop}Capture`, capture: true, kind: "resource" as const },
+  { eventName, prop, capture: false, kind: "resource" as const },
+]);
 const nativeEventBindings: ReadonlyArray<{ eventName: string; prop: string; capture: boolean; kind: NativeEventKind }> = [
+  ...nativeResourceEventNames,
+  ...([
   ["click", "onClick", false, "mouse"], ["click", "onClickCapture", true, "mouse"],
   ["keydown", "onKeyDown", false, "keyboard"], ["keydown", "onKeyDownCapture", true, "keyboard"], ["keyup", "onKeyUp", false, "keyboard"], ["keyup", "onKeyUpCapture", true, "keyboard"], ["keypress", "onKeyPress", false, "keyboard"], ["keypress", "onKeyPressCapture", true, "keyboard"],
   ["focusin", "onFocus", false, "focus"], ["focusin", "onFocusCapture", true, "focus"], ["focusout", "onBlur", false, "focus"], ["focusout", "onBlurCapture", true, "focus"],
@@ -300,7 +308,8 @@ const nativeEventBindings: ReadonlyArray<{ eventName: string; prop: string; capt
   ["wheel", "onWheel", false, "wheel"], ["wheel", "onWheelCapture", true, "wheel"],
   ["animationstart", "onAnimationStart", false, "animation"], ["animationstart", "onAnimationStartCapture", true, "animation"], ["animationend", "onAnimationEnd", false, "animation"], ["animationend", "onAnimationEndCapture", true, "animation"], ["animationiteration", "onAnimationIteration", false, "animation"], ["animationiteration", "onAnimationIterationCapture", true, "animation"],
   ["transitionend", "onTransitionEnd", false, "transition"], ["transitionend", "onTransitionEndCapture", true, "transition"],
-].map(([eventName, prop, capture, kind]) => ({ eventName, prop, capture, kind })) as ReadonlyArray<{ eventName: string; prop: string; capture: boolean; kind: NativeEventKind }>;
+  ] as const).map(([eventName, prop, capture, kind]) => ({ eventName, prop, capture, kind })),
+];
 const nativeEventPropNames = new Set(nativeEventBindings.map(binding => binding.prop));
 function withoutNativeControlEventProps(props: Record<string, unknown>): Record<string, unknown> {
   const hostProps = { ...props };
@@ -339,8 +348,8 @@ function useNativeControlEvents<T extends Element>(ref: React.RefObject<HTMLElem
         const handler = handlersRef.current[binding.prop] as ((event: React.SyntheticEvent<T>) => void) | undefined;
         handler?.(bridged);
       };
-      const listenerRoot: EventTarget = binding.kind === "scroll" ? (binding.capture ? shadowRoot : scrollControl ?? shadowRoot) : host;
-      const listenerCapture = binding.capture;
+      const listenerRoot: EventTarget = binding.kind === "resource" ? shadowRoot : binding.kind === "scroll" ? (binding.capture ? shadowRoot : scrollControl ?? shadowRoot) : host;
+      const listenerCapture = binding.kind === "resource" || binding.capture;
       listenerRoot.addEventListener(binding.eventName, listener, listenerCapture);
       removeListeners.push(() => listenerRoot.removeEventListener(binding.eventName, listener, listenerCapture));
     }
@@ -3268,7 +3277,10 @@ export const MenuGroupHeader = /* @__PURE__ */ React.forwardRef<HTMLElement, Ele
 export type AvatarProps = ElementProps & { name?: string; image?: string; initials?: string; size?: number | string; shape?: "circular" | "square"; color?: AvatarColor; active?: "active" | "inactive" | "unset"; activeAppearance?: "ring" | "shadow" | "ring-shadow"; idForColor?: string; decorative?: boolean; icon?: React.ReactNode; badge?: React.ReactNode; children?: React.ReactNode };
 export const Avatar = /* @__PURE__ */ React.forwardRef<HTMLElement, AvatarProps>(function Avatar({ name, image, initials, size = 32, shape = "circular", color = "neutral", active, activeAppearance = "ring", idForColor, decorative = false, icon, badge, children, ...props }: AvatarProps, forwardedRef): React.ReactElement {
   ensureDefined(defineAvatar);
-  return React.createElement("spui-avatar", useCustomElementProps({ ...props, ref: forwardedRef, name, image, initials, size, shape, color, active: active === "unset" ? undefined : active, "active-appearance": activeAppearance, "id-for-color": idForColor, decorative: decorative || undefined }),
+  const ref = React.useRef<HTMLElement | null>(null);
+  useExposeHostRef(ref, forwardedRef);
+  useNativeControlEvents(ref, ".surface", props.onClick, props.onClickCapture, props as NativeRootEventProps<HTMLElement>);
+  return React.createElement("spui-avatar", nativeControlHostProps({ ...props, ref, name, image, initials, size, shape, color, active: active === "unset" ? undefined : active, "active-appearance": activeAppearance, "id-for-color": idForColor, decorative: decorative || undefined }),
     icon || children ? React.createElement("span", { slot: "icon" }, icon ?? children) : null,
     badge ? React.createElement("span", { slot: "badge" }, badge) : null);
 });
@@ -3284,12 +3296,13 @@ export const AvatarGroup = /* @__PURE__ */ React.forwardRef<HTMLElement, Element
   const resolvedLayout = layout ?? groupContext?.layout ?? "stack";
   const ref = React.useRef<HTMLElement & { expanded: boolean }>(null)
   useExposeHostRef(ref, forwardedRef);;
+  useNativeControlEvents(ref, ".group", props.onClick, props.onClickCapture, props as NativeRootEventProps<HTMLElement>);
   ensureDefined(defineAvatarGroup);
   useSpuiEvent(ref, "spui-avatar-group-expanded-change", detail => onExpandedChange?.(Boolean(detail.expanded)));
   React.useLayoutEffect(() => {
     if (ref.current && expanded !== undefined) ref.current.expanded = expanded;
   }, [expanded]);
-  return React.createElement(AvatarGroupSizeContext.Provider, { value: resolvedSize }, React.createElement("spui-avatar-group", useCustomElementProps({
+  return React.createElement(AvatarGroupSizeContext.Provider, { value: resolvedSize }, React.createElement("spui-avatar-group", nativeControlHostProps({
     ...props,
     ref,
     label: label ?? context.strings.people ?? "People",
@@ -3373,10 +3386,13 @@ export function AvatarGroupPopover({ children, count, indicator, label, triggerL
 
 export const Persona = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { name: string; image?: string; initials?: string; primaryText?: React.ReactNode; secondaryText?: React.ReactNode; tertiaryText?: React.ReactNode; quaternaryText?: React.ReactNode; presence?: PersonaPresence; presenceLabel?: string; size?: PersonaSize; color?: AvatarColor; textPosition?: "after" | "before" | "below"; textAlignment?: "start" | "center"; presenceOnly?: boolean; avatar?: React.ReactNode; children?: React.ReactNode }>(function Persona({ name, image, initials, primaryText, secondaryText, tertiaryText, quaternaryText, presence, presenceLabel, size = "medium", color = "neutral", textPosition = "after", textAlignment = "start", presenceOnly = false, avatar, children, ...props }: ElementProps & { name: string; image?: string; initials?: string; primaryText?: React.ReactNode; secondaryText?: React.ReactNode; tertiaryText?: React.ReactNode; quaternaryText?: React.ReactNode; presence?: PersonaPresence; presenceLabel?: string; size?: PersonaSize; color?: AvatarColor; textPosition?: "after" | "before" | "below"; textAlignment?: "start" | "center"; presenceOnly?: boolean; avatar?: React.ReactNode; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   ensureDefined(definePersona);
+  const ref = React.useRef<HTMLElement | null>(null);
+  useExposeHostRef(ref, forwardedRef);
+  useNativeControlEvents(ref, ".layout", props.onClick, props.onClickCapture, props as NativeRootEventProps<HTMLElement>);
   const textSlot = (node: React.ReactNode, slot: "primary-text" | "secondary-text" | "tertiary-text" | "quaternary-text"): React.ReactNode => node == null ? null : React.isValidElement(node)
     ? React.cloneElement(node as React.ReactElement<{ slot?: string }>, { slot })
     : React.createElement("span", { slot }, node);
-  return React.createElement("spui-persona", useCustomElementProps({ ref: forwardedRef, ...props, name, image, initials, "secondary-text": typeof secondaryText === "string" ? secondaryText : undefined, "tertiary-text": typeof tertiaryText === "string" ? tertiaryText : undefined, presence, "presence-label": presenceLabel, size, color, "text-position": textPosition, "text-alignment": textAlignment, "presence-only": presenceOnly || undefined }),
+  return React.createElement("spui-persona", nativeControlHostProps({ ref, ...props, name, image, initials, "secondary-text": typeof secondaryText === "string" ? secondaryText : undefined, "tertiary-text": typeof tertiaryText === "string" ? tertiaryText : undefined, presence, "presence-label": presenceLabel, size, color, "text-position": textPosition, "text-alignment": textAlignment, "presence-only": presenceOnly || undefined }),
     textSlot(primaryText, "primary-text"), textSlot(secondaryText, "secondary-text"), textSlot(tertiaryText, "tertiary-text"), textSlot(quaternaryText, "quaternary-text"),
     avatar === undefined ? null : React.createElement("span", { slot: "avatar" }, avatar),
     children === undefined ? null : React.createElement("span", { slot: "details" }, children));
