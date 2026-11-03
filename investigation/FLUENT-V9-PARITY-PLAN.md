@@ -242,7 +242,7 @@ React `SwatchPicker` had no `aria-label` fallback from `SharePointUIProvider`, a
 
 ### Persona presence labels from provider strings — 2026-11-03
 
-React `Persona` previously used the custom element's English status label unless each instance supplied `presenceLabel`. The provider string contract now accepts translations for available, busy, do-not-disturb, away, offline, and unknown; explicit per-Persona labels keep precedence. The component-pattern guide documents the provider path. TypeScript build passes; no tests were added or run. Provider-free custom elements continue to accept `presence-label` directly.
+React `Persona` and `PresenceBadge` previously used English status labels unless each instance supplied `presenceLabel` or `aria-label`. The provider string contract now accepts translations for available, busy, do-not-disturb, away, offline, unknown, out-of-office, and blocked, plus a `{status}` template for the out-of-office modifier. Explicit labels keep precedence. The component-pattern guide documents the provider path. TypeScript build passes; no tests were added or run. Provider-free custom elements continue to accept `presence-label` or `aria-label` directly.
 
 ### RichTextEditor image-picker localization — local Chromium, 2026-11-02
 
