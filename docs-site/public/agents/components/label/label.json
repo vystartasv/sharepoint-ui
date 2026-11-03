@@ -18,7 +18,7 @@
     "registered": false,
     "note": "Uses a native HTML label to preserve browser label association and click-to-focus behavior; createLabel returns an HTMLLabelElement for non-React consumers.",
     "api": {
-      "reactSignature": "{ htmlFor, size = \"medium\", weight = \"regular\", required = false, disabled = false, children, style, ...props }: React.LabelHTMLAttributes<HTMLLabelElement> & { size?: LabelSize; weight?: LabelWeight; required?: LabelRequired; disabled?: boolean }",
+      "reactSignature": "{ htmlFor, size = \"medium\", weight = \"regular\", required = false, disabled = false, children, style, ...props }: LabelProps",
       "reactRefType": "HTMLLabelElement",
       "callbackProps": [],
       "slots": [

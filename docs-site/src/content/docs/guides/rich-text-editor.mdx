@@ -51,7 +51,7 @@ Use the editor's sanitized `onValueChange` value with your normal SPFx persisten
 
 ## Match the SharePoint field
 
-When no mode is supplied, the editor uses sanitized `html` mode so an unconstrained host can retain the richest supported content. For SharePoint, pass the field metadata helper to keep editing aligned with the destination. Explicit field restrictions take priority; if the metadata does not include a restriction, the helper leaves the editor in `html` mode instead of silently flattening content to text. It maps SharePoint settings to the closest editing surface:
+When no mode or field is supplied, the editor uses sanitized `html` mode so an unconstrained host can retain the richest supported content. In React, pass SharePoint field metadata as `field`; the editor derives its mode and enabled actions on every render. The field is a capability ceiling: an explicit `contentMode` can choose a narrower mode, but cannot enable richer content than the destination permits; `allowHyperlink={false}` can further disable links, while `true` cannot override a field's explicit prohibition. For framework-neutral elements, use `getRichTextEditorFieldOptions(field)` to get the same field-derived options. Missing restrictions do not silently flatten content to text. The mapping is:
 
 | SharePoint field settings | Editor mode | What users can save |
 | --- | --- | --- |
@@ -63,7 +63,6 @@ When no mode is supplied, the editor uses sanitized `html` mode so an unconstrai
 
 ```tsx
 import {
-  getRichTextEditorFieldOptions,
   RichTextEditor,
   type SharePointMultiLineField,
 } from "@spfx-fast/sharepoint-ui/react";
@@ -77,10 +76,10 @@ const field: SharePointMultiLineField = {
   AllowHyperlink: true,
 };
 
-<RichTextEditor label="Project notes" {...getRichTextEditorFieldOptions(field)} />
+<RichTextEditor label="Project notes" field={field} />
 ```
 
-The helper accepts SharePoint's PascalCase metadata and camelCase equivalents. An explicit `AllowHyperlink: false` disables link creation and strips link wrappers in every rich mode; when the property is absent, the helper leaves links available. Plain mode emits plain text. Other modes emit sanitized HTML; `html` accepts additional semantic elements and safe text styles (such as color, font, and alignment) while still removing scripts, embedded objects, unsafe URLs, and unsupported attributes. Set `contentMode="plain"`, `"restricted"`, or `"rich"` explicitly when a non-SharePoint host imposes those limits. Sanitization intentionally does not preserve arbitrary active HTML, scripts, embeds, or unsafe attributes.
+The field accepts SharePoint's PascalCase metadata and camelCase equivalents. An explicit `AllowHyperlink: false` disables link creation and strips link wrappers in every rich mode; when the property is absent, safe links remain available. Plain mode emits plain text. Other modes emit sanitized HTML; `html` accepts additional semantic elements and safe text styles (such as color, font, and alignment) while still removing scripts, embedded objects, unsafe URLs, and unsupported attributes. Set `contentMode="plain"`, `"restricted"`, or `"rich"` explicitly to narrow an unconstrained host or a field's available mode. Sanitization intentionally does not preserve arbitrary active HTML, scripts, embeds, or unsafe attributes. For custom elements, spread `getRichTextEditorFieldOptions(field)` onto `<spui-rich-text-editor>`.
 
 ## Load the editor only when needed
 

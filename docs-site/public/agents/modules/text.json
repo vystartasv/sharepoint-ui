@@ -13,7 +13,7 @@
       "module": "text",
       "category": "typography",
       "api": {
-        "reactSignature": "{ as = \"span\", size = 300, weight, font = \"base\", align = \"start\", italic = false, underline = false, strikethrough = false, truncate = false, wrap = true, block = false, children, ...props }: TextProps",
+        "reactSignature": "{ as = \"span\", size = 300, weight, font = \"base\", align = \"start\", italic = false, underline = false, strikethrough = false, truncate = false, wrap = true, block = false, children, style, ...props }: TextProps",
         "callbackProps": [],
         "slots": [
           "default"

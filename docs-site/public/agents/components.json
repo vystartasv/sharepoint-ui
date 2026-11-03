@@ -1511,7 +1511,7 @@
       "module": "text",
       "category": "typography",
       "api": {
-        "reactSignature": "{ as = \"span\", size = 300, weight, font = \"base\", align = \"start\", italic = false, underline = false, strikethrough = false, truncate = false, wrap = true, block = false, children, ...props }: TextProps",
+        "reactSignature": "{ as = \"span\", size = 300, weight, font = \"base\", align = \"start\", italic = false, underline = false, strikethrough = false, truncate = false, wrap = true, block = false, children, style, ...props }: TextProps",
         "callbackProps": [],
         "slots": [
           "default"
@@ -1841,7 +1841,7 @@
       "registered": false,
       "note": "Uses a native HTML label to preserve browser label association and click-to-focus behavior; createLabel returns an HTMLLabelElement for non-React consumers.",
       "api": {
-        "reactSignature": "{ htmlFor, size = \"medium\", weight = \"regular\", required = false, disabled = false, children, style, ...props }: React.LabelHTMLAttributes<HTMLLabelElement> & { size?: LabelSize; weight?: LabelWeight; required?: LabelRequired; disabled?: boolean }",
+        "reactSignature": "{ htmlFor, size = \"medium\", weight = \"regular\", required = false, disabled = false, children, style, ...props }: LabelProps",
         "reactRefType": "HTMLLabelElement",
         "callbackProps": [],
         "slots": [
@@ -2269,12 +2269,16 @@
         "reactSignature": "inputProps: RichTextEditorProps",
         "relatedReactApis": [
           {
+            "name": "RichTextEditorProps.field",
+            "description": "Pass SharePoint Note metadata directly; the editor derives its capability ceiling. contentMode and allowHyperlink may narrow that ceiling, but cannot enable features the field forbids."
+          },
+          {
             "name": "RichTextEditorProps.contentMode",
-            "description": "Choose plain, restricted, rich, or sanitized html output to match the destination field. Omit it for unconstrained sanitized html; use getRichTextEditorFieldOptions(field) to map SharePoint Note settings."
+            "description": "Choose plain, restricted, rich, or sanitized html output. With field metadata, this prop may narrow but cannot exceed the destination field's capabilities. Omit it for field-derived mode or unconstrained sanitized html."
           },
           {
             "name": "getRichTextEditorFieldOptions(field)",
-            "description": "Maps SharePoint RichText, RestrictedMode, RichTextMode, and AllowHyperlink metadata to editor capabilities. Explicit restrictions are preserved; missing restrictions default to sanitized html."
+            "description": "Maps SharePoint RichText, RestrictedMode, RichTextMode, and AllowHyperlink metadata to editor capabilities. Explicit restrictions are preserved; missing restrictions default to sanitized html. React consumers can pass field={metadata} directly."
           },
           {
             "name": "RichTextEditorProps.editorLabel",
