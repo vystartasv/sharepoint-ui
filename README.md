@@ -20,7 +20,7 @@ The SharePoint page demo uses React 18.3.1, SPFx 1.24.0, Node 22, TypeScript 5.8
 
 ## A focused payload advantage
 
-The framework-free custom-element path is our performance specialty. A minified, tree-shaken four-component slice (Button, Input, Card, Tag) measured 11,560 gzip bytes, 74% less JavaScript than the equivalent Fluent UI React 9.75 imports (44,411 bytes); the React adapters measured 23,591 bytes. This is a component-payload comparison, not a complete-app or render-speed claim. Reproduce it with `npm run benchmark:no-react-payload`; see the [payload benchmark notes](docs-site/src/content/docs/guides/payload.mdx).
+The framework-free custom-element path is our performance specialty. A minified, tree-shaken four-component slice (Button, Input, Card, Tag) measured 11,560 gzip bytes, 74% less JavaScript than the equivalent Fluent UI React 9.75 imports (44,411 bytes). The metadata-driven SharePoint field renderer measured 46,356 gzip bytes without React, 25.4% less than its React adapter. These are component-payload comparisons, not complete-app or render-speed claims. Reproduce them with `npm run benchmark:no-react-payload`; see the [payload benchmark notes](docs-site/src/content/docs/guides/payload.mdx).
 
 
 ## Use selected components

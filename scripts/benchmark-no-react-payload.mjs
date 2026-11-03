@@ -39,8 +39,26 @@ console.log(Button, Input, Card, Tag);`,
   },
 ];
 
-const results = [];
-for (const item of cases) {
+const sharePointFieldCases = [
+  {
+    name: "SharePointField custom element (no React)",
+    resolveDir: root,
+    sourcefile: "sharepoint-field-element.ts",
+    loader: "ts",
+    source: `import { defineSharePointField } from "@spfx-fast/sharepoint-ui/elements/sharepoint-fields";
+defineSharePointField();`,
+  },
+  {
+    name: "SharePointField React adapter",
+    resolveDir: root,
+    sourcefile: "sharepoint-field-react.tsx",
+    loader: "tsx",
+    source: `import { SharePointField } from "@spfx-fast/sharepoint-ui/react";
+console.log(SharePointField);`,
+  },
+];
+
+async function measure(item) {
   const result = await build({
     stdin: { contents: item.source, resolveDir: item.resolveDir, sourcefile: item.sourcefile, loader: item.loader },
     bundle: true,
@@ -56,16 +74,20 @@ for (const item of cases) {
   });
   const bytes = result.outputFiles[0].contents;
   const output = Object.values(result.metafile.outputs)[0];
-  results.push({
+  return {
     implementation: item.name,
     rawBytes: bytes.length,
     gzipBytes: gzipSync(bytes).length,
     brotliBytes: brotliCompressSync(bytes).length,
     includedModules: Object.values(output.inputs).filter(input => input.bytesInOutput > 0).length,
-  });
+  };
 }
 
+const results = await Promise.all(cases.map(measure));
+const sharePointFieldResults = await Promise.all(sharePointFieldCases.map(measure));
+
 const fluent = results.at(-1);
+const sharePointFieldReact = sharePointFieldResults.at(-1);
 console.log(JSON.stringify({
   measuredOn: new Date().toISOString().slice(0, 10),
   sharePointUiVersion: libraryPackage.version,
@@ -77,5 +99,13 @@ console.log(JSON.stringify({
     ...result,
     gzipReductionVsFluentPercent: result === fluent ? 0 : Number(((1 - result.gzipBytes / fluent.gzipBytes) * 100).toFixed(1)),
   })),
+  sharePointFieldSlice: {
+    components: ["SharePointField"],
+    results: sharePointFieldResults.map(result => ({
+      ...result,
+      gzipReductionVsReactPercent: result === sharePointFieldReact ? 0 : Number(((1 - result.gzipBytes / sharePointFieldReact.gzipBytes) * 100).toFixed(1)),
+    })),
+    caveat: "This measures the imported SharePointField API and its registered control dependencies, not a rendered form, network request, or complete SPFx application.",
+  },
   caveat: "JavaScript payload for these four component imports only. React and React DOM are external in both React builds; this does not measure CSS files, host/runtime cost, rendering speed, or complete behavioral parity.",
 }, null, 2));
