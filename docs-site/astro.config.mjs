@@ -26,6 +26,17 @@ const componentSidebar = [...componentsByModule.entries()].sort(([a], [b]) => a.
 export default defineConfig({
   site: "https://vystartasv.github.io",
   base: "/sharepoint-ui",
+  vite: {
+    build: {
+      rolldownOptions: {
+        onwarn(warning, defaultHandler) {
+          // ponytail: Astro generates this internal directive once per MDX page; the completed static build confirms it is handled by Astro.
+          if (warning.code === "MODULE_LEVEL_DIRECTIVE" && warning.message.includes("use astro:head-inject") && warning.id?.includes("?astroPropagatedAssets")) return;
+          defaultHandler(warning);
+        },
+      },
+    },
+  },
   integrations: [starlight({
     title: "SharePoint UI",
     description: "Theme-aware components and reusable views for SharePoint Framework 1.24.",
