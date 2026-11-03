@@ -7,7 +7,7 @@ import RichTextEditorPlayground from "../../../components/RichTextEditorPlaygrou
 
 `RichTextEditor` uses the browser's native `contenteditable` surface; it is not based on Draft.js. The library supplies the toolbar, selection handling, SharePoint field constraints, link validation, and HTML sanitization. Your SPFx web part owns SharePoint access: provide a picker callback and save the emitted HTML through your existing list or page data service.
 
-The toolbar includes paragraph, heading, quote, and preformatted block styles; bold, italic, underline, and strikethrough; clear formatting; lists; undo/redo; tables; links; and app-managed image uploads. Enhanced rich-text fields also expose font family, size, text color, and highlight color. The color controls include a quick palette with the active SharePoint accent plus a custom color picker. `SharePointUIProvider.strings` localizes these controls and their palette names (`richTextTextColor`, `richTextHighlightColor`, `richTextCustomColor`, `richTextThemeAccent`, and `colorSwatch`). Restricted SharePoint fields hide unsupported table, image, link, font, and color actions.
+The compact toolbar keeps bold, italic, underline, and link in view. Open **More formatting** for text styles, lists, alignment, history, tables, images, and color controls. Text and highlight colors use the device's native color picker; choose text first, then open a color control to apply it to that selection. `SharePointUIProvider.strings` localizes the controls, including `richTextTextColor` and `richTextHighlightColor`. Restricted SharePoint fields hide unsupported table, image, link, font, and color actions.
 
 ## Try the editor
 
@@ -15,7 +15,7 @@ Edit the note directly, or switch to **HTML source** to inspect and edit its val
 
 <RichTextEditorPlayground />
 
-On touch screens, press and hold text to use the browser's native selection handles. The editor does not blur or refocus during the gesture; toolbar formatting uses the saved selection range.
+On touch screens, press and hold text to use the browser's native selection handles. The toolbar keeps that text selection while you choose a formatting command.
 
 ## Connect your picker
 
