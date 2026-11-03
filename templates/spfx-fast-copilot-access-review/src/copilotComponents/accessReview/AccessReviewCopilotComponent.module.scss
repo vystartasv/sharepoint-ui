@@ -1,0 +1,51 @@
+.accessReview {
+  display: grid;
+  gap: 12px;
+  color: var(--spui-ui-text, #242424);
+  font-family: var(--spui-font-family, "Segoe UI", sans-serif);
+}
+
+.accessReview h2 {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.description,
+.feedback {
+  margin: 0;
+  color: var(--spui-ui-muted, #5b5b5b);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.items {
+  display: grid;
+  gap: 10px;
+}
+
+.items spui-view-card {
+  --spui-card-radius: 14px;
+}
+
+.items spui-button {
+  min-height: 36px;
+}
+
+.feedback:empty {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .items spui-view-card {
+    animation: item-arrive 180ms ease-out both;
+  }
+
+  .items spui-view-card:nth-child(2) { animation-delay: 25ms; }
+  .items spui-view-card:nth-child(3) { animation-delay: 50ms; }
+}
+
+@keyframes item-arrive {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

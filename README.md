@@ -138,6 +138,21 @@ spfx create \
 
 The generated app depends on `@spfx-fast/sharepoint-ui@^0.4.2`.
 
+For a no-React Microsoft 365 Copilot UX component, use the framework-free access-review template:
+
+```sh
+npx --yes @microsoft/spfx-cli@0.1.0-pre.3 create \
+  --template spfx-fast-copilot-access-review \
+  --library-name spfx-fast-access-review \
+  --component-name "Access review" \
+  --component-description "Review SharePoint access items in Copilot" \
+  --solution-name spfx-fast-access-review \
+  --package-manager npm \
+  --local-source ./templates
+```
+
+The generated Copilot app reads and updates a SharePoint list, inherits tenant theme tokens, follows the current locale's text direction, and syncs visible state with Copilot. See [the template setup](templates/README.md) for remote-source usage and the current CLI category limitation.
+
 ## Theme contract
 
 `applySharePointTheme()` forwards every enumerable classic SPFx palette and semantic color value. It also forwards every Fluent UI v9 token provided by SPFx `ThemeProvider.tryGetThemeV2()`. The prototype does not maintain a hand-curated allowlist.

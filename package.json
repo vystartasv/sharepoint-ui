@@ -12,6 +12,7 @@
     "build:docs": "npm run build:library && npm run build --workspace @vilius/sharepoint-ui-docs",
     "dev:docs": "npm run dev --workspace @vilius/sharepoint-ui-docs",
     "setup:spfx": "npm install --prefix examples/spfx124-webpart",
+    "sync:spfx-cli-template": "node scripts/sync-spfx-cli-template.mjs",
     "version:spfx:patch": "node scripts/bump-spfx-version.mjs patch",
     "version:spfx:dry-run": "node scripts/bump-spfx-version.mjs patch --dry-run",
     "parity:report": "node scripts/report-parity-gaps.mjs",

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "<%= solution_name %>-client-side-solution",
+    "id": "<%= solutionId %>",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.24.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "Review and approve SharePoint access items inside Microsoft 365 Copilot."
+      },
+      "longDescription": {
+        "default": "An SPFx 1.24.1 Copilot UX component using SharePoint UI custom elements, tenant theme tokens, SharePoint list data, and Copilot model context updates."
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "SharePoint UI Copilot Access Review",
+        "description": "Activates the Copilot access review component.",
+        "id": "<%= featureId %>",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/<%= solution_name %>.sppkg"
+  }
+}

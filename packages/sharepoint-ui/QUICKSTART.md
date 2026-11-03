@@ -85,7 +85,7 @@ defineButton();
 
 ## SPFx 1.24 Copilot UX components
 
-For a Copilot surface that reads SharePoint data, updates the visible-state context, and saves through `SPHttpClient`, use the [complete tenant-connected example](https://github.com/vystartasv/sharepoint-ui/tree/main/examples/spfx124-copilot-ux). It is framework-free and imports only the custom elements it uses.
+For a Copilot surface that reads SharePoint data, updates the visible-state context, and saves through `SPHttpClient`, use the [SPFx CLI template](https://github.com/vystartasv/sharepoint-ui/tree/main/templates/spfx-fast-copilot-access-review) or the [complete tenant-connected example](https://github.com/vystartasv/sharepoint-ui/tree/main/examples/spfx124-copilot-ux). Both are framework-free and import only the custom elements they use.
 
 ## Build from a component page
 

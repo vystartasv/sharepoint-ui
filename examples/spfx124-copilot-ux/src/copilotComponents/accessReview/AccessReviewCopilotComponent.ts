@@ -1,7 +1,7 @@
 import { BaseCopilotComponent, createCopilotTextContent } from '@microsoft/sp-copilot-component';
 import { ThemeProvider, type ThemeChangedEventArgs } from '@microsoft/sp-component-base';
 import { SPHttpClient } from '@microsoft/sp-http';
-import { applySharePointTheme, type FluentThemeTokens, type SharePointTheme } from '@spfx-fast/sharepoint-ui/theme';
+import { applySharePointTheme, type FluentThemeTokens, type SharePointTheme } from '@spfx-fast/sharepoint-ui';
 import { defineButton } from '@spfx-fast/sharepoint-ui/elements/button';
 import { defineSearchBox } from '@spfx-fast/sharepoint-ui/elements/search';
 import { defineTag } from '@spfx-fast/sharepoint-ui/elements/tags';
