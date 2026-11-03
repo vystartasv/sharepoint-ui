@@ -189,8 +189,13 @@
 
 .preview-actions {
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   margin-top: 1.5rem;
+}
+
+.preview-actions > spui-button {
+  min-height: var(--spui-control-height, 32px);
+  align-self: flex-start;
 }
 
 .preview-surface {
