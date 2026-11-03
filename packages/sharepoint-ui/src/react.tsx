@@ -1396,10 +1396,11 @@ export function DrawerHeader({ children }: { children?: React.ReactNode }): Reac
   return React.createElement(React.Fragment, null, children);
 }
 
-export function DrawerHeaderNavigation({ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }): React.ReactElement {
+export type DrawerHeaderNavigationProps = ElementProps & { children?: React.ReactNode; label?: string };
+export const DrawerHeaderNavigation = /* @__PURE__ */ React.forwardRef<HTMLElement, DrawerHeaderNavigationProps>(function DrawerHeaderNavigation({ children, label, ...props }: DrawerHeaderNavigationProps, forwardedRef): React.ReactElement {
   const context = React.useContext(UIContext);
-  return React.createElement("nav", useHostProps({ ...props, slot: "header-navigation", "aria-label": props["aria-label"] ?? label ?? context.strings.drawerNavigation ?? "Drawer navigation", style: { display: "flex", alignItems: "center", gap: 8, ...props.style } }), children);
-}
+  return React.createElement("nav", useHostProps({ ...props, ref: forwardedRef, slot: "header-navigation", "aria-label": props["aria-label"] ?? label ?? context.strings.drawerNavigation ?? "Drawer navigation", style: { display: "flex", alignItems: "center", gap: 8, ...props.style } }), children);
+});
 
 export type DrawerHeaderTitleHeadingSlot = React.ReactElement<any> | Omit<React.HTMLAttributes<HTMLElement>, "children">;
 
@@ -1413,13 +1414,15 @@ export function DrawerHeaderTitle({ children, action, heading, ...props }: Eleme
     action == null ? null : React.createElement("span", { slot: "header-action", style: { display: "inline-flex", alignItems: "center" } }, action));
 }
 
-export function DrawerBody({ children, ...props }: ElementProps & { children?: React.ReactNode }): React.ReactElement {
-  return React.createElement("div", useHostProps({ ...props, style: { minWidth: 0, ...props.style } }), children);
-}
+export type DrawerBodyProps = ElementProps & { children?: React.ReactNode };
+export const DrawerBody = /* @__PURE__ */ React.forwardRef<HTMLDivElement, DrawerBodyProps>(function DrawerBody({ children, ...props }: DrawerBodyProps, forwardedRef): React.ReactElement {
+  return React.createElement("div", useHostProps({ ...props, ref: forwardedRef, style: { minWidth: 0, ...props.style } }), children);
+});
 
-export function DrawerFooter({ children, ...props }: ElementProps & { children?: React.ReactNode }): React.ReactElement {
-  return React.createElement("div", useHostProps({ ...props, slot: "actions", style: { display: "flex", alignItems: "center", justifyContent: "flex-end", flexWrap: "wrap", gap: 8, ...props.style } }), children);
-}
+export type DrawerFooterProps = ElementProps & { children?: React.ReactNode };
+export const DrawerFooter = /* @__PURE__ */ React.forwardRef<HTMLDivElement, DrawerFooterProps>(function DrawerFooter({ children, ...props }: DrawerFooterProps, forwardedRef): React.ReactElement {
+  return React.createElement("div", useHostProps({ ...props, ref: forwardedRef, slot: "actions", style: { display: "flex", alignItems: "center", justifyContent: "flex-end", flexWrap: "wrap", gap: 8, ...props.style } }), children);
+});
 
 export type InlineDrawerProps = ElementProps & { open?: boolean; title?: string; position?: "start" | "end" | "top" | "bottom"; size?: "small" | "medium" | "large" | "full"; separator?: boolean; unmountOnClose?: boolean; surfaceMotion?: React.ComponentType<DrawerSurfaceMotionSlotProps>; actions?: React.ReactNode; children?: React.ReactNode };
 export const InlineDrawer = /* @__PURE__ */ React.forwardRef<HTMLElement, InlineDrawerProps>(function InlineDrawer({ open = false, title, position = "start", size = "small", separator = false, unmountOnClose = true, surfaceMotion, actions, children, ...props }: InlineDrawerProps, forwardedRef): React.ReactElement {
@@ -2137,9 +2140,16 @@ export function TagPickerList({ children }: ElementProps & { children?: React.Re
   return React.createElement(React.Fragment, null, children);
 }
 
-export function TagPickerButton({ children, appearance = "outline", size = "medium", disabled = false, ...props }: ElementProps & { children?: React.ReactNode; appearance?: "filled-darker" | "filled-lighter" | "outline" | "underline"; size?: "small" | "medium" | "large"; disabled?: boolean }): React.ReactElement {
-  return React.createElement("button", useCustomElementProps({ ...props, slot: "button", type: "button", "data-appearance": appearance, "data-size": size, disabled: disabled || undefined }), children);
-}
+export type TagPickerButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "size" | "type"> & {
+  [attribute: `data-${string}`]: string | number | boolean | undefined;
+  children?: React.ReactNode;
+  appearance?: "filled-darker" | "filled-lighter" | "outline" | "underline";
+  size?: "small" | "medium" | "large";
+  disabled?: boolean;
+};
+export const TagPickerButton = /* @__PURE__ */ React.forwardRef<HTMLButtonElement, TagPickerButtonProps>(function TagPickerButton({ children, appearance = "outline", size = "medium", disabled = false, ...props }: TagPickerButtonProps, forwardedRef): React.ReactElement {
+  return React.createElement("button", useHostProps({ ...props, ref: forwardedRef, slot: "button", type: "button", "data-appearance": appearance, "data-size": size, disabled: disabled || undefined }), children);
+});
 
 export const TagPickerOption = /* @__PURE__ */ React.forwardRef<HTMLElement, ElementProps & { value: string; text?: string; label?: string; group?: string; media?: React.ReactNode; secondaryContent?: React.ReactNode; disabled?: boolean; children?: React.ReactNode }>(function TagPickerOption({ value, text, label, group, media, secondaryContent, disabled = false, children, ...props }: ElementProps & { value: string; text?: string; label?: string; group?: string; media?: React.ReactNode; secondaryContent?: React.ReactNode; disabled?: boolean; children?: React.ReactNode }, forwardedRef): React.ReactElement {
   return React.createElement("spui-tag-picker-option", useCustomElementProps({ ref: forwardedRef, ...props, value, text, label, group, disabled: disabled || undefined }),

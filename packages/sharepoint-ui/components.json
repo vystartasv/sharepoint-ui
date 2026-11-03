@@ -2675,7 +2675,8 @@
       "category": "feedback",
       "reactOnly": true,
       "api": {
-        "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+        "reactSignature": "{ children, ...props }: DrawerFooterProps",
+        "reactRefType": "HTMLDivElement",
         "callbackProps": [],
         "slots": [
           "actions"
@@ -2695,7 +2696,8 @@
       "category": "feedback",
       "reactOnly": true,
       "api": {
-        "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+        "reactSignature": "{ children, ...props }: DrawerBodyProps",
+        "reactRefType": "HTMLDivElement",
         "callbackProps": [],
         "slots": [
           "default"
@@ -2710,7 +2712,7 @@
     },
     {
       "react": "DrawerHeaderTitle",
-      "tag": "span",
+      "tag": "fragment",
       "module": "drawer",
       "category": "feedback",
       "reactOnly": true,
@@ -2737,7 +2739,8 @@
       "category": "feedback",
       "reactOnly": true,
       "api": {
-        "reactSignature": "{ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }",
+        "reactSignature": "{ children, label, ...props }: DrawerHeaderNavigationProps",
+        "reactRefType": "HTMLElement",
         "callbackProps": [],
         "slots": [
           "default"
@@ -3552,7 +3555,8 @@
       "reactOnly": true,
       "category": "form-trigger",
       "api": {
-        "reactSignature": "{ children, appearance = \"outline\", size = \"medium\", disabled = false, ...props }: ElementProps & { children?: React.ReactNode; appearance?: \"filled-darker\" | \"filled-lighter\" | \"outline\" | \"underline\"; size?: \"small\" | \"medium\" | \"large\"; disabled?: boolean }",
+        "reactSignature": "{ children, appearance = \"outline\", size = \"medium\", disabled = false, ...props }: TagPickerButtonProps",
+        "reactRefType": "HTMLButtonElement",
         "callbackProps": [],
         "slots": [
           "button"
