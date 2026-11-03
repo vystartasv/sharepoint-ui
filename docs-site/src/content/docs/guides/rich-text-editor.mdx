@@ -49,7 +49,7 @@ Use the editor's sanitized `onValueChange` value with your normal SPFx persisten
 
 ## Match the SharePoint field
 
-The field adapter maps SharePoint settings to the closest editing surface:
+When no mode is supplied, the editor uses sanitized `html` mode so an unconstrained host can retain the richest supported content. For SharePoint, pass the field metadata helper to keep editing aligned with the destination. It maps SharePoint settings to the closest editing surface:
 
 | SharePoint field settings | Editor mode | What users can save |
 | --- | --- | --- |
@@ -76,7 +76,7 @@ const field: SharePointMultiLineField = {
 <RichTextEditor label="Project notes" {...getRichTextEditorFieldOptions(field)} />
 ```
 
-The helper accepts SharePoint's PascalCase metadata and camelCase equivalents. Plain mode emits plain text. Other modes emit sanitized HTML; `html` accepts additional semantic elements and safe text styles (such as color, font, and alignment) while still removing scripts, embedded objects, unsafe URLs, and unsupported attributes. For a non-SharePoint host with no field restrictions, pass `contentMode="html"` explicitly.
+The helper accepts SharePoint's PascalCase metadata and camelCase equivalents. Plain mode emits plain text. Other modes emit sanitized HTML; `html` accepts additional semantic elements and safe text styles (such as color, font, and alignment) while still removing scripts, embedded objects, unsafe URLs, and unsupported attributes. Set `contentMode="plain"`, `"restricted"`, or `"rich"` explicitly when a non-SharePoint host imposes those limits.
 
 ## Load the editor only when needed
 

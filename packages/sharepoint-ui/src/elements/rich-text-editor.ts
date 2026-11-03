@@ -66,7 +66,7 @@ function plainText(html: string): string {
   }).join("");
   return read(doc.body).replace(/[\t ]*\n[\t ]*/g, "\n").replace(/\n{3,}/g, "\n\n").replace(/\n$/, "");
 }
-function cleanHtml(html: string, mode: "plain" | "restricted" | "rich" | "html" = "rich", allowHyperlink = true): string {
+function cleanHtml(html: string, mode: "plain" | "restricted" | "rich" | "html" = "html", allowHyperlink = true): string {
   const doc = new DOMParser().parseFromString(html, "text/html");
   if (mode === "plain") return plainText(html);
   const allowedTags = mode === "restricted" ? RESTRICTED : mode === "html" ? new Set([...ALLOWED, ...HTML_ONLY]) : ALLOWED;
@@ -140,7 +140,7 @@ export function defineRichTextEditor(): void {
     private savedCell?: HTMLTableCellElement;
     private selectedTablePath?: { table: number; row: number; cell: number };
     private events?: AbortController;
-    private get contentMode(): "plain" | "restricted" | "rich" | "html" { const mode = this.getAttribute("content-mode"); return mode === "plain" || mode === "restricted" || mode === "html" ? mode : "rich"; }
+    private get contentMode(): "plain" | "restricted" | "rich" | "html" { const mode = this.getAttribute("content-mode"); return mode === "plain" || mode === "restricted" || mode === "rich" || mode === "html" ? mode : "html"; }
     private get allowHyperlinks(): boolean { return this.contentMode !== "plain" && this.getAttribute("allow-hyperlink") !== "false"; }
     constructor() { super(); try { this.internals = this.attachInternals(); } catch { /* Editing remains available in engines without form association. */ } }
     connectedCallback(): void {
