@@ -7,7 +7,7 @@ import RichTextEditorPlayground from "../../../components/RichTextEditorPlaygrou
 
 `RichTextEditor` owns editing, formatting, link validation, and HTML sanitization. Your SPFx web part owns SharePoint access: provide a picker callback and save the emitted HTML through your existing list or page data service.
 
-The toolbar includes paragraph, heading, quote, and preformatted block styles; bold, italic, underline, and strikethrough; clear formatting; lists; undo/redo; tables; links; and app-managed image uploads. Enhanced rich-text fields also expose font family, size, text color, and highlight color. The color controls include a quick palette with the active SharePoint accent plus a custom color picker. Restricted SharePoint fields hide unsupported table, image, link, font, and color actions.
+The toolbar includes paragraph, heading, quote, and preformatted block styles; bold, italic, underline, and strikethrough; clear formatting; lists; undo/redo; tables; links; and app-managed image uploads. Enhanced rich-text fields also expose font family, size, text color, and highlight color. The color controls include a quick palette with the active SharePoint accent plus a custom color picker. `SharePointUIProvider.strings` localizes these controls and their palette names (`richTextTextColor`, `richTextHighlightColor`, `richTextCustomColor`, `richTextThemeAccent`, and `colorSwatch`). Restricted SharePoint fields hide unsupported table, image, link, font, and color actions.
 
 ## Try the editor
 
