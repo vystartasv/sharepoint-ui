@@ -6987,21 +6987,18 @@ export const AccordionHeader = /* @__PURE__ */ React.forwardRef<HTMLElement, Nat
   ensureDefined(defineAccordion);
   const ref = React.useRef<HTMLElement & { button?: React.ButtonHTMLAttributes<HTMLButtonElement> }>(null)
   useExposeHostRef(ref, forwardedRef);;
+  useNativeControlEvents(ref, ".header", props.onClick, props.onClickCapture, props);
   const buttonProps = React.isValidElement(button) ? button.props : button;
   React.useLayoutEffect(() => {
     const header = ref.current;
     if (!header) return;
-    const root = header.shadowRoot?.querySelector<HTMLDivElement>(".header");
-    const bridge = (callback: React.MouseEventHandler<HTMLDivElement> | undefined, event: MouseEvent): void => {
-      if (callback && root) callback(createReactEventBridge(event, event, root, event.target) as React.MouseEvent<HTMLDivElement>);
-    };
     header.button = {
       ...buttonProps,
-      onClickCapture: event => { bridge(props.onClickCapture, event as unknown as MouseEvent); buttonProps?.onClickCapture?.(event); },
-      onClick: event => { buttonProps?.onClick?.(event); bridge(props.onClick, event as unknown as MouseEvent); },
+      onClickCapture: buttonProps?.onClickCapture,
+      onClick: buttonProps?.onClick,
     };
     header.dispatchEvent(new CustomEvent("spui-header-slots-change", { bubbles: true, composed: true }));
-  }, [buttonProps, props.onClick, props.onClickCapture]);
+  }, [buttonProps]);
   return React.createElement("spui-accordion-header", nativeControlHostProps({ ...props, ref, slot: "heading", "expand-icon-position": expandIconPosition, inline: inline || undefined, size }),
     icon == null ? null : React.createElement("span", { slot: "icon" }, icon),
     children,
