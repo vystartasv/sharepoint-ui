@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "OptionGroup",
+    "tag": "spui-combobox-option-group",
+    "module": "combobox",
+    "category": "forms",
+    "reactOnly": true,
+    "api": {
+      "reactSignature": "{ label, children, ...props }: OptionGroupProps",
+      "callbackProps": [],
+      "slots": [
+        "label",
+        "default options"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Group related options and expose the group label to assistive technology."
+  }
+}

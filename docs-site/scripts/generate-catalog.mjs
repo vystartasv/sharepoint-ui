@@ -172,11 +172,12 @@ function exampleFor(component) {
   const attrs = [];
   if (["spui-button", "spui-compound-button", "spui-menu-button", "spui-split-button"].includes(tag)) attrs.push('appearance="primary"');
   if (["spui-input", "spui-search-box", "spui-text-area"].includes(tag)) attrs.push('value="Quarterly access review"', 'placeholder="Enter a value"');
-  if (tag === "spui-progress-bar") attrs.push('value="68"', 'aria-label="Upload progress"');
+    if (tag === "spui-progress-bar") attrs.push('value="68"', 'aria-label="Upload progress"');
+    if (tag === "spui-slider") attrs.push('value="64"', 'min="0"', 'max="100"', 'step="1"', 'label="Review completion"');
   if (tag === "spui-rating") attrs.push('value="4"', 'aria-label="Rating"');
   if (tag === "spui-counter-badge") attrs.push('count="12"');
   if (tag === "spui-tooltip") return { tag, attrs: "", content: "", related: true, kind: "tooltip" };
-  const content = tag === "spui-button" ? "Save changes" : titleForComponent(component);
+  const content = tag === "spui-button" ? "Save changes" : tag === "spui-slider" ? "" : titleForComponent(component);
   return { tag, attrs: attrs.join(" "), content, related: false };
 }
 
@@ -232,7 +233,7 @@ for (const [module, entries] of familyIndex) {
         ? `This API provides shared state or behavior and has no standalone visual. The preview shows the related ${titleFor(module)} surface.`
         : `This React composition API renders inside its parent. The preview shows the related ${titleFor(module)} surface; its signature and composition details are below.`
       : "Interact with the component below. Change its appearance or accent to see the theme tokens update live.";
-    const preview = markup ? `\n<div class="component-demo" data-component-demo data-default-appearance="ios" data-label="${escapeHtml(name)}">\n  <div class="component-demo__toolbar">\n    <label>Appearance <select data-preview-appearance aria-label="Preview appearance"><option value="ios" selected>iOS</option><option value="fluent">Fluent</option><option value="windows">Windows</option><option value="linux">Linux</option><option value="glass">Glass</option></select></label>\n    <label>Accent <input data-preview-accent type="color" value="#78716c" aria-label="Preview accent color" /></label>\n  </div>\n  <div class="component-demo__stage">${markup}</div>\n  <output class="component-demo__status" aria-live="polite">${escapeHtml(previewNote)}</output>\n</div>\n` : `\n<div class="component-demo__note">${escapeHtml(previewNote)}</div>\n`;
+    const preview = markup ? `\n<div class="component-demo" data-component-demo data-default-appearance="ios" data-label="${escapeHtml(name)}">\n  <div class="component-demo__toolbar">\n    <label>Appearance <select data-preview-appearance aria-label="Preview appearance"><option value="ios" selected>iOS</option><option value="fluent">Fluent</option><option value="windows">Windows</option><option value="linux">Linux</option><option value="glass">Glass</option></select></label>\n    <label>Theme <select data-preview-theme aria-label="Preview SharePoint theme"><option value="sharepoint" selected>SharePoint teal</option><option value="blue">Blue</option><option value="green">Green</option><option value="pink">Pink</option><option value="custom">Custom</option></select></label>\n    <label>Accent <input data-preview-accent type="color" value="#007780" aria-label="Preview accent color" /></label>\n  </div>\n  <div class="component-demo__stage">${markup}</div>\n  <div class="component-demo__token-readout" data-preview-tokens aria-label="Applied theme token values"></div>\n  <output class="component-demo__status" aria-live="polite">${escapeHtml(previewNote)}</output>\n</div>\n` : `\n<div class="component-demo__note">${escapeHtml(previewNote)}</div>\n`;
     const customExample = entry.tag?.startsWith("spui-") && markup ? `\n<details>\n<summary>${example.related ? "Composed custom element example" : "Custom element markup"}</summary>\n\n\`\`\`html\n${markup}\n\`\`\`\n\n</details>` : "";
     const relatedPreview = !entry.tag?.startsWith("spui-") && markup ? `\n<details>\n<summary>Related live preview markup</summary>\n\n\`\`\`html\n${markup}\n\`\`\`\n\n</details>` : "";
     const page = `---\ntitle: ${quote(name)}\ndescription: ${quote(entry.summary ?? firstSummary)}\n---\n\nimport ComponentPreviewRuntime from "../../../../components/ComponentPreviewRuntime.astro";\n\n<ComponentPreviewRuntime />\n\n${entry.summary ?? ""}\n\n${preview}\n${properties}\n${slotTable}\n<div class="api-entry">\n  <p class="api-meta"><span>${react}</span><span>${reactRoot}</span><span>${customElement}</span></p>\n  <p><strong>Callbacks:</strong> ${callbacks}</p>\n  <p><strong>Styling:</strong> ${styling}</p>\n  ${signature}\n  ${relatedApis}\n</div>\n${customExample}${relatedPreview}\n`;
@@ -246,6 +247,6 @@ for (const [module, entries] of familyIndex) {
   await writeFile(join(familyDir, "index.mdx"), familyPage);
 }
 
-const index = `---\ntitle: Component catalog\ndescription: Browse ${catalog.components.length} component exports across ${grouped.size} modules.\n---\n\n# Component catalog\n\nBrowse the complete component set in the sidebar, or search the component names, API signatures, callbacks, slots, and summaries. Each visual component page includes a live preview with appearance and accent controls. Context providers and hooks link to their related rendered component.\n\n${catalogLinks.join("\n")}\n`;
+const index = `---\ntitle: Component catalog\ndescription: Browse ${catalog.components.length} component exports across ${grouped.size} modules.\n---\n\n# Component catalog\n\nBrowse the complete component set in the sidebar, or search the component names, API signatures, callbacks, slots, and summaries. Every visual component page includes a live preview with appearance and SharePoint theme controls, a visible semantic-token readout, and live component values. Context providers and hooks link to their related rendered component.\n\n${catalogLinks.join("\n")}\n`;
 await writeFile(resolve(siteRoot, "src/content/docs/catalog.mdx"), index);
 console.log(JSON.stringify({ components: catalog.components.length, modules: grouped.size, componentPages: generatedPages, generatedPages: generatedPages + grouped.size + 1 }));

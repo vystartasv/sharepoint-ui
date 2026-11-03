@@ -1,0 +1,37 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Rating",
+    "tag": "spui-rating",
+    "define": "defineRating",
+    "module": "rating",
+    "category": "forms",
+    "api": {
+      "reactSignature": "{ value, defaultValue = 0, max = 5, step = 1, size = \"extra-large\", color = \"neutral\", label, requiredMessage, itemLabel, iconFilled, iconOutline, fullValueInput, halfValueInput, name, disabled = false, readOnly = false, required = false, onChange, ...props }: RatingProps",
+      "relatedReactApis": [
+        {
+          "name": "RatingProps.requiredMessage",
+          "description": "Sets the native form validation message; defaults to SharePointUIProvider.strings.required."
+        }
+      ],
+      "callbackProps": [
+        "itemLabel",
+        "onChange"
+      ],
+      "slots": [
+        "icon-filled",
+        "icon-outline",
+        "fullValueInput",
+        "halfValueInput"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Choose a whole-step or half-step score using accessible radio controls."
+  }
+}

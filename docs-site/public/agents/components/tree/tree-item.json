@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "TreeItem",
+    "module": "tree",
+    "reactOnly": true,
+    "category": "tree-item",
+    "api": {
+      "reactSignature": "_props: TreeItemProps",
+      "callbackProps": [
+        "onOpenChange"
+      ],
+      "slots": [
+        "TreeItemLayout",
+        "TreeItemPersonaLayout",
+        "nested Tree"
+      ],
+      "styling": [
+        "Composed Tree state"
+      ]
+    },
+    "summary": "Declare a leaf or branch in a composable Tree; the Tree owns rendering, hierarchy, focus, selection, and expansion."
+  }
+}

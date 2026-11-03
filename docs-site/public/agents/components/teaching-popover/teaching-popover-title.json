@@ -1,0 +1,23 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "teaching-popover",
+    "category": "text",
+    "react": "TeachingPopoverTitle",
+    "tag": "spui-teaching-popover-title",
+    "factory": "defineTeachingPopover",
+    "registered": true,
+    "summary": "Give a teaching surface its visible heading.",
+    "api": {
+      "reactSignature": "{ children, dismissButton, ...props }: ElementProps & { children?: React.ReactNode; dismissButton?: TeachingPopoverButtonSlot }",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "dismiss-button"
+      ],
+      "styling": [
+        "host className/style"
+      ]
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ToastTitle",
+    "tag": "spui-toast-title",
+    "define": "defineToastTitle",
+    "module": "toast",
+    "category": "feedback",
+    "api": {
+      "reactSignature": "{ media, action, children, ...props }: ElementProps & { media?: React.ReactNode; action?: React.ReactNode; children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "title",
+        "media",
+        "action"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Compose a toast title with intent media and a trailing title action."
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "TextArea",
+    "tag": "spui-textarea",
+    "define": "defineTextArea",
+    "module": "textarea",
+    "category": "forms",
+    "api": {
+      "reactSignature": "inputProps: TextAreaProps",
+      "reactRefType": "HTMLElement",
+      "callbackProps": [
+        "onValueChange",
+        "onChange"
+      ],
+      "slots": [
+        "textarea"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "valueProps": [
+        "value",
+        "defaultValue"
+      ],
+      "sizing": [
+        "appearance: outline | filled-darker | filled-lighter | filled-darker-shadow | filled-lighter-shadow",
+        "size: small | medium | large",
+        "resize: none | horizontal | vertical | both"
+      ]
+    },
+    "summary": "Edit multi-line text with controlled or default values, Fluent appearances and sizes, native resize control, and change callbacks."
+  }
+}

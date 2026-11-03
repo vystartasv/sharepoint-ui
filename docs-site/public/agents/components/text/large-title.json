@@ -1,0 +1,21 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "LargeTitle",
+    "module": "text",
+    "reactOnly": true,
+    "category": "typography",
+    "api": {
+      "reactSignature": "props: TextPresetProps",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "Fluent typography tokens",
+        "host className/style"
+      ]
+    },
+    "summary": "Fluent LargeTitle typography preset (hero 900, semibold)."
+  }
+}

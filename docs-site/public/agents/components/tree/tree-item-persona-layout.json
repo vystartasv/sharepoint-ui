@@ -1,0 +1,28 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "TreeItemPersonaLayout",
+    "module": "tree",
+    "reactOnly": true,
+    "category": "tree-layout",
+    "api": {
+      "reactSignature": "{ children, media, main, description, actions, aside, expandIcon, selector, className, ...props }: TreeItemPersonaLayoutProps",
+      "callbackProps": [],
+      "slots": [
+        "media",
+        "main",
+        "description",
+        "actions",
+        "aside",
+        "expandIcon",
+        "selector"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ]
+    },
+    "summary": "Compose a person-style TreeItem with media, primary and secondary text, aside, and actions."
+  }
+}

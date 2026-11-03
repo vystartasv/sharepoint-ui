@@ -1,0 +1,124 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "swatch-picker",
+  "components": [
+    {
+      "module": "swatch-picker",
+      "category": "inputs",
+      "api": {
+        "callbackProps": [
+          "onSelectionChange"
+        ],
+        "slots": [
+          "swatches"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ],
+        "reactSignature": "{ children, selectedValue, defaultSelectedValue, selectedValues, defaultSelectedValues, selectionMode = \"single\", layout = \"grid\", size = \"medium\", shape = \"square\", spacing = \"medium\", focusMode = \"arrow\", columns = 6, onSelectionChange, ...props }: SwatchPickerProps",
+        "reactRefType": "HTMLElement"
+      },
+      "react": "SwatchPicker",
+      "tag": "spui-swatch-picker",
+      "define": "defineSwatchPicker",
+      "summary": "Render accessible color and image swatches as a keyboard-operable single- or multi-selection grid or row.",
+      "highValueAdditions": [
+        "Offer reusable named theme-color presets alongside caller-defined palettes."
+      ]
+    },
+    {
+      "module": "swatch-picker",
+      "category": "inputs",
+      "api": {
+        "callbackProps": [
+          "onCheckedChange"
+        ],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactSignature": "{ color, value, disabled, borderColor, size, shape, icon, disabledIcon, children, ...props }: ElementProps & { color: string; value: string; disabled?: boolean; borderColor?: string; size?: SwatchPickerProps[\"size\"]; shape?: SwatchPickerProps[\"shape\"]; icon?: React.ReactNode; disabledIcon?: React.ReactNode; children?: React.ReactNode }",
+        "reactRefType": "HTMLElement"
+      },
+      "react": "ColorSwatch",
+      "tag": "spui-color-swatch",
+      "define": "defineColorSwatch",
+      "summary": "Represent one selectable color with an accessible name and selected state."
+    },
+    {
+      "module": "swatch-picker",
+      "category": "inputs",
+      "api": {
+        "callbackProps": [],
+        "slots": [
+          "default",
+          "icon",
+          "disabled-icon"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactSignature": "{ src, value, disabled, size, shape, children, ...props }: ElementProps & { src: string; value: string; disabled?: boolean; size?: SwatchPickerProps[\"size\"]; shape?: SwatchPickerProps[\"shape\"]; children?: React.ReactNode }",
+        "reactRefType": "HTMLElement"
+      },
+      "react": "ImageSwatch",
+      "tag": "spui-image-swatch",
+      "define": "defineImageSwatch",
+      "summary": "Represent one selectable image or texture swatch with a caller-provided accessible name."
+    },
+    {
+      "module": "swatch-picker",
+      "category": "inputs",
+      "api": {
+        "callbackProps": [
+          "onAdd"
+        ],
+        "slots": [],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactSignature": "{ onAdd, disabled, size, shape, ...props }: ElementProps & { onAdd?: () => void; disabled?: boolean; size?: SwatchPickerProps[\"size\"]; shape?: SwatchPickerProps[\"shape\"] }",
+        "reactRefType": "HTMLElement"
+      },
+      "react": "EmptySwatch",
+      "tag": "spui-empty-swatch",
+      "define": "defineEmptySwatch",
+      "summary": "Offer an accessible add-color action within a swatch set."
+    },
+    {
+      "module": "swatch-picker",
+      "category": "inputs",
+      "api": {
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+        "reactRefType": "HTMLElement"
+      },
+      "react": "SwatchPickerRow",
+      "tag": "spui-swatch-picker-row",
+      "define": "defineSwatchPickerRow",
+      "summary": "Group swatches into an explicit visual and semantic row within a picker."
+    }
+  ]
+}

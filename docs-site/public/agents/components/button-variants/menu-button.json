@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "MenuButton",
+    "tag": "spui-menu-button",
+    "define": "defineMenuButton",
+    "module": "button-variants",
+    "category": "actions",
+    "api": {
+      "reactSignature": "{ children, icon, menuIcon, appearance = \"secondary\", size = \"medium\", shape = \"rounded\", disabled, disabledFocusable = false, onClick, onClickCapture, onKeyDown, onKeyDownCapture, onKeyUp, onKeyUpCapture, onKeyPress, onKeyPressCapture, onFocus, onFocusCapture, onBlur, onBlurCapture, onAuxClick, onAuxClickCapture, onContextMenu, onContextMenuCapture, onDoubleClick, onDoubleClickCapture, onMouseDown, onMouseDownCapture, onMouseMove, onMouseMoveCapture, onMouseOut, onMouseOutCapture, onMouseOver, onMouseOverCapture, onMouseUp, onMouseUpCapture, onGotPointerCapture, onGotPointerCaptureCapture, onLostPointerCapture, onLostPointerCaptureCapture, onPointerCancel, onPointerCancelCapture, onPointerDown, onPointerDownCapture, onPointerMove, onPointerMoveCapture, onPointerOut, onPointerOutCapture, onPointerOver, onPointerOverCapture, onPointerUp, onPointerUpCapture, onMouseEnter, onMouseLeave, onPointerEnter, onPointerLeave, ...props }: NativeButtonHostProps & { children?: React.ReactNode; icon?: React.ReactNode; menuIcon?: React.ReactNode; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; type?: \"button\" | \"submit\" | \"reset\" }",
+      "callbackProps": [
+        "onClick"
+      ],
+      "slots": [
+        "default",
+        "icon",
+        "menu-icon"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "A themed menu trigger that composes with Menu for open state, keyboard focus, and dismissal."
+  }
+}

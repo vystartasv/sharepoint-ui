@@ -1,0 +1,28 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "CompoundButton",
+    "tag": "spui-compound-button",
+    "define": "defineCompoundButton",
+    "module": "button-variants",
+    "category": "actions",
+    "api": {
+      "reactSignature": "{ children, secondaryContent, contentContainer, icon, iconPosition = \"before\", appearance = \"secondary\", size = \"medium\", shape = \"rounded\", disabled, disabledFocusable = false, onClick, onClickCapture, onKeyDown, onKeyDownCapture, onKeyUp, onKeyUpCapture, onKeyPress, onKeyPressCapture, onFocus, onFocusCapture, onBlur, onBlurCapture, onAuxClick, onAuxClickCapture, onContextMenu, onContextMenuCapture, onDoubleClick, onDoubleClickCapture, onMouseDown, onMouseDownCapture, onMouseMove, onMouseMoveCapture, onMouseOut, onMouseOutCapture, onMouseOver, onMouseOverCapture, onMouseUp, onMouseUpCapture, onGotPointerCapture, onGotPointerCaptureCapture, onLostPointerCapture, onLostPointerCaptureCapture, onPointerCancel, onPointerCancelCapture, onPointerDown, onPointerDownCapture, onPointerMove, onPointerMoveCapture, onPointerOut, onPointerOutCapture, onPointerOver, onPointerOverCapture, onPointerUp, onPointerUpCapture, onMouseEnter, onMouseLeave, onPointerEnter, onPointerLeave, ...props }: NativeButtonHostProps & { children?: React.ReactNode; secondaryContent?: React.ReactNode; contentContainer?: React.ReactElement; icon?: React.ReactNode; iconPosition?: \"before\" | \"after\"; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean }",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "icon",
+        "secondary-content",
+        "content-container"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Present a primary action with a descriptive second line and optional decorative icon."
+  }
+}

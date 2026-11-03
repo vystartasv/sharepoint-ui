@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ToolbarToggleButton",
+    "tag": "spui-toggle-button",
+    "define": "defineToggleButton",
+    "module": "button-variants",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ children, icon, name, value, appearance = \"subtle\", size = \"medium\", shape = \"rounded\", ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; name: string; value: string; appearance?: \"primary\" | \"secondary\" | \"outline\" | \"subtle\" | \"transparent\"; size?: \"small\" | \"medium\" | \"large\"; shape?: \"rounded\" | \"circular\" | \"square\"; pressed?: boolean; defaultPressed?: boolean; onPressedChange?: (pressed: boolean) => void }",
+      "callbackProps": [
+        "onPressedChange"
+      ],
+      "slots": [
+        "icon",
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ]
+    },
+    "summary": "Toggle toolbar command with the library ToggleButton pressed state and subtle appearance by default."
+  }
+}

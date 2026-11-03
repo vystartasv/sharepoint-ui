@@ -1,0 +1,28 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "RadioGroup",
+    "tag": "spui-radio-group",
+    "define": "defineRadioGroup",
+    "module": "radio-group",
+    "category": "forms",
+    "api": {
+      "reactSignature": "inputProps: RadioGroupProps",
+      "callbackProps": [
+        "onValueChange",
+        "onChange"
+      ],
+      "slots": [
+        "default Radio children"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Choose one value from related radio options with controlled or default state, stacked or horizontal layout, native form participation, validity, reset, and keyboard behavior."
+  }
+}

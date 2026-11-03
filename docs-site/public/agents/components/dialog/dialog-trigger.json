@@ -1,0 +1,23 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "DialogTrigger",
+    "tag": "spui-dialog-trigger",
+    "define": "defineDialogTrigger",
+    "module": "dialog",
+    "category": "overlays",
+    "api": {
+      "reactSignature": "{ children, action, disableButtonEnhancement = false, onClick: triggerOnClick, onKeyDown: triggerOnKeyDown, onKeyUp: triggerOnKeyUp, className: triggerClassName, style: triggerStyle, ...props }: DialogTriggerProps",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "trigger"
+      ],
+      "styling": [
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Open the parent dialog when its slotted interactive child is activated."
+  }
+}

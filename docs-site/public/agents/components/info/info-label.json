@@ -1,0 +1,27 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "InfoLabel",
+    "tag": "native-label+spui-info-button",
+    "factory": "createInfoLabel",
+    "module": "info",
+    "category": "forms",
+    "registered": false,
+    "note": "Combines a native associated label with a separately focusable information button.",
+    "api": {
+      "reactRefType": "HTMLSpanElement",
+      "reactSignature": "{ children, info, htmlFor, size = \"medium\", weight = \"regular\", required = false, disabled = false, infoButtonLabel, placement = \"top\", label, infoButton, style, ...props }: InfoLabelProps",
+      "callbackProps": [],
+      "slots": [
+        "label",
+        "infoButton"
+      ],
+      "styling": [
+        "SharePoint and Fluent typography tokens",
+        "CSS custom properties",
+        "host className/style"
+      ]
+    },
+    "summary": "Pair a form label with accessible supplementary guidance without putting the help button inside the clickable label."
+  }
+}

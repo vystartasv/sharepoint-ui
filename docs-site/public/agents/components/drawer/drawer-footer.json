@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "DrawerFooter",
+    "tag": "div",
+    "module": "drawer",
+    "category": "feedback",
+    "reactOnly": true,
+    "api": {
+      "reactSignature": "{ children, ...props }: DrawerFooterProps",
+      "reactRefType": "HTMLDivElement",
+      "callbackProps": [],
+      "slots": [
+        "actions"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ]
+    },
+    "summary": "Place secondary actions in the drawer’s logical-end footer region."
+  }
+}

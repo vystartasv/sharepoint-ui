@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "teaching-popover",
+    "category": "feedback",
+    "react": "TeachingPopoverFooter",
+    "tag": "spui-teaching-popover-footer",
+    "factory": "defineTeachingPopover",
+    "registered": true,
+    "summary": "Arrange primary and secondary actions below teaching content.",
+    "api": {
+      "reactSignature": "{ children, primary, secondary, footerLayout = \"horizontal\", ...props }: ElementProps & { children?: React.ReactNode; primary: React.ReactNode | Parameters<typeof Button>[0]; secondary?: React.ReactNode | Parameters<typeof Button>[0]; footerLayout?: \"horizontal\" | \"vertical\" }",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "primary",
+        "secondary"
+      ],
+      "styling": [
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "CarouselSlider",
+    "tag": "spui-carousel-slider",
+    "define": "defineCarouselSlider",
+    "module": "carousel",
+    "category": "views",
+    "summary": "Provide the scroll track and optional arrow-key focus group for CarouselCard slides.",
+    "api": {
+      "reactSignature": "{ children, cardFocus = false, ...props }: ElementProps & { children?: React.ReactNode; cardFocus?: boolean }",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "DataGrid",
+    "tag": "spui-data-grid",
+    "define": "defineDataGrid",
+    "module": "data-grid",
+    "category": "data-display",
+    "api": {
+      "generic": "T",
+      "reactSignature": "props: DataGridProps<T>",
+      "callbackProps": [
+        "getRowId",
+        "onSelectionChange",
+        "onSortChange",
+        "onColumnResize",
+        "onColumnOrderChange",
+        "renderCell",
+        "onRenderedRange",
+        "onCollapsedGroupKeysChange",
+        "onMultiSortChange",
+        "onFilterValueChange",
+        "onCellEdit",
+        "validateCellEdit",
+        "getRowHeight",
+        "onCellsEdit",
+        "onDataLoadError",
+        "onDataSourceGroupToggle",
+        "onDataSourceSelectionChange"
+      ],
+      "slots": [],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "editing": {
+        "columnOptions": "editable?: boolean; editType?: text | number | date",
+        "activation": "Enter, F2, or double-click",
+        "commit": "Enter or focus leaving the editor; async onCellEdit errors keep the editor open",
+        "cancel": "Escape",
+        "validation": "validateCellEdit returns an accessible error message",
+        "persistence": "Callback receives row id, column id, previous value, new value, and item. The host owns SharePoint persistence and should supply refreshed items after save."
+      },
+      "dataSource": {
+        "contract": "Length counts displayed rows, including group headers. Implement length, loadRange(start,end,signal), optional selectableCount and subscribe, plus getItem(index) or getRow(index). getRow returns {kind:item,item,rowId?,itemIndex?} or {kind:group,key,label,count,expanded}. Optional selectionScopeKey binds all-matching selection to the active query; copySelection(selection,columns,signal) can return remote TSV. Paste calls loadRange only for missing destination rows before validating edits.",
+        "queryOwnership": "The source owns filter, sort, and group ordering. Grid controls emit callbacks; update the source and notify subscribers after query changes.",
+        "retry": "A failed range is retried after source subscription notification; native custom elements also expose refreshDataSource().",
+        "selection": "DataGridSelectionModel is {mode:explicit,keys} or {mode:all,excludedKeys}. The all model selects every item matching the current provider query without enumerating keys; row deselection adds an exclusion. Use onDataSourceSelectionChange (React), the native callback property, or spui-selection-change event. selectedItems only contains loaded records; apply the compact model for remote bulk operations. When supplied, DataGridSelectionModel.scopeKey records the selectionScopeKey and selection stops applying after that query key changes.",
+        "grouping": "The provider owns grouping and visible row order. The accessible group toggle invokes onDataSourceGroupToggle(groupKey, expanded) or emits spui-data-source-group-toggle; update source rows and notify subscribers.",
+        "selectableCount": "Supply exact selectable item count when source.length includes group headers; header select-all is disabled when zero.",
+        "clipboard": "copySelection returns TSV for remote selection; paste preloads missing rows, validates the complete range, and commits through onCellsEdit atomically.",
+        "composition": "For Fluent-style React composition, pass either items or an indexed dataSource, columns from createTableColumn, getRowId, and children containing DataGridHeader, DataGridBody, DataGridRow, DataGridHeaderCell, DataGridCell, and optional DataGridSelectionCell. The body callback receives loaded { item, rowId, index } rows; provide renderGroupRow for custom provider group rows. Composed rows are windowed for indexed sources and local collections over 100 items, with abortable range loading, loading/error states, query-scoped select-all, accessible group toggles, roving focus with scroll reveal, shared resizing/reordering, and validated async editing."
+      },
+      "sizing": "containerWidthOffset adjusts the available track width during resizable-column auto-fit in virtual React, composed React, and the native custom element.",
+      "selection": "Accepts selectionMode multiselect in the React virtual grid and native selection-mode attribute; multiple remains a supported alias.",
+      "reactHelpers": [
+        "DataGridContextValue",
+        "useDataGridContext_unstable"
+      ]
+    },
+    "summary": "Use a virtualized data/columns API or compose accessible grid parts with local or indexed async data, bounded row rendering, selection, resizing, editing, and custom layouts.",
+    "highValueAdditions": [
+      "Bring async range-backed composition to the existing composable rendering and selection model for large SharePoint lists.",
+      "Add broad assistive-technology and layout performance checks to each composed DataGrid interaction."
+    ]
+  }
+}

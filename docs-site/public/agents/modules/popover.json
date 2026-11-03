@@ -1,0 +1,90 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "popover",
+  "components": [
+    {
+      "react": "Popover",
+      "tag": "spui-popover",
+      "define": "definePopover",
+      "module": "popover",
+      "category": "feedback",
+      "api": {
+        "reactSignature": "{ children, trigger, label, placement = \"bottom\", positioning, open, defaultOpen = false, openOnContext, openOnHover, mouseLeaveDelay, closeOnIframeFocus = true, onOpenChange, inline, trapFocus, inertTrapFocus, legacyTrapFocus, unstable_disableAutoFocus = false, arrow, withArrow, appearance, size, closeOnScroll = false, surfaceMotion, mountNode, ...props }: ElementProps & { children?: React.ReactNode; trigger?: React.ReactElement; label?: string; placement?: \"top\" | \"bottom\" | \"start\" | \"end\"; positioning?: PopoverPositioning; open?: boolean; defaultOpen?: boolean; openOnContext?: boolean; openOnHover?: boolean; mouseLeaveDelay?: number; closeOnIframeFocus?: boolean; onOpenChange?: (event: PopoverOpenChangeEvent, data: PopoverOpenChangeData) => void; inline?: boolean; trapFocus?: boolean; inertTrapFocus?: boolean; legacyTrapFocus?: boolean; unstable_disableAutoFocus?: boolean; arrow?: boolean; withArrow?: boolean; appearance?: \"brand\" | \"inverted\"; size?: \"small\" | \"medium\" | \"large\"; closeOnScroll?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>; mountNode?: PortalMountNode }",
+        "callbackProps": [
+          "onOpenChange"
+        ],
+        "slots": [
+          "trigger",
+          "title",
+          "content",
+          "surface-motion"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Show a non-modal top-layer surface anchored to a trigger, with optional mountNode portal targeting, dismissal, focus return, and Fluent positioning fallbacks, boundaries, offsets, sizing, virtual targets, and update refs."
+    },
+    {
+      "react": "PopoverProvider",
+      "module": "popover",
+      "reactOnly": true,
+      "category": "feedback",
+      "api": {
+        "reactSignature": "{ value, children }: { value: PopoverContextValue; children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "children"
+        ],
+        "styling": [
+          "React context provider"
+        ]
+      },
+      "summary": "Supply controlled open state, interaction settings, appearance, sizing, and an optional mountNode to a composed Popover."
+    },
+    {
+      "react": "PopoverTrigger",
+      "tag": "spui-popover-trigger",
+      "define": "definePopoverTrigger",
+      "module": "popover",
+      "category": "feedback",
+      "api": {
+        "reactSignature": "{ children, disableButtonEnhancement = false, ...props }: ElementProps & { children?: React.ReactNode; disableButtonEnhancement?: boolean }",
+        "callbackProps": [],
+        "slots": [
+          "trigger"
+        ],
+        "styling": [
+          "host className/style"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Provide a composable trigger slot for Popover; the actual button or link retains its native interaction."
+    },
+    {
+      "react": "PopoverSurface",
+      "tag": "spui-popover-surface",
+      "define": "definePopoverSurface",
+      "module": "popover",
+      "category": "feedback",
+      "api": {
+        "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "content"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Group and style composed Popover content inside the collision-aware top-layer surface."
+    }
+  ]
+}

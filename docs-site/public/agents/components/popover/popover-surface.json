@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "PopoverSurface",
+    "tag": "spui-popover-surface",
+    "define": "definePopoverSurface",
+    "module": "popover",
+    "category": "feedback",
+    "api": {
+      "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "content"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Group and style composed Popover content inside the collision-aware top-layer surface."
+  }
+}

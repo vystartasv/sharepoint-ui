@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "TagPickerButton",
+    "tag": "button",
+    "module": "tag-picker",
+    "reactOnly": true,
+    "category": "form-trigger",
+    "api": {
+      "reactSignature": "{ children, appearance = \"outline\", size = \"medium\", disabled = false, ...props }: TagPickerButtonProps",
+      "reactRefType": "HTMLButtonElement",
+      "callbackProps": [],
+      "slots": [
+        "button"
+      ],
+      "styling": [
+        "Button theme tokens",
+        "SharePointUIProvider tokens",
+        "host className/style"
+      ]
+    },
+    "summary": "Provide a button-only TagPicker trigger. In framework-neutral markup, place a native button in the picker’s button slot."
+  }
+}

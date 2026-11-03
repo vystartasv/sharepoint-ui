@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Listbox",
+    "tag": "div",
+    "module": "combobox",
+    "category": "forms",
+    "reactOnly": true,
+    "api": {
+      "reactSignature": "{ children, selectedOptions, defaultSelectedOptions = [], multiselect = false, disableAutoFocus = false, onOptionSelect, ...props }: ListboxProps",
+      "callbackProps": [
+        "onOptionSelect"
+      ],
+      "slots": [
+        "default Option and OptionGroup children"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLDivElement"
+    },
+    "summary": "Render a standalone single or multiselect listbox with Fluent menu semantics for multiselect, keyboard active-descendant navigation, root refs, and Option composition."
+  }
+}

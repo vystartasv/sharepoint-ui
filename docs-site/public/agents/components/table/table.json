@@ -1,0 +1,47 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "table",
+    "category": "data-display",
+    "react": "Table",
+    "tag": "spui-table",
+    "define": "defineTable",
+    "api": {
+      "reactSignature": "{ children, size = \"medium\", appearance = \"dividers\", noNativeElements = false, sortable = false, ...props }: ElementProps & { children?: React.ReactNode; size?: TableSize; appearance?: TableAppearance; noNativeElements?: boolean; sortable?: boolean }",
+      "callbackProps": [],
+      "slots": [
+        "children"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement",
+      "reactHelpers": [
+        "createTableColumn",
+        "TableColumnDefinition",
+        "TableColumnId",
+        "TableRowId",
+        "TableFeaturePlugin",
+        "TableFeaturesState",
+        "TableContextValue",
+        "TableContextProvider",
+        "useTableContext",
+        "TableHeaderContextProvider",
+        "useIsInTableHeader",
+        "TableRowIdContextProvider",
+        "useTableRowIdContext",
+        "ColumnIdContextProvider",
+        "useColumnIdContext",
+        "useTableFeatures",
+        "useTableSelection",
+        "useTableSort",
+        "useTableColumnSizing_unstable",
+        "useTableCompositeNavigation"
+      ]
+    },
+    "summary": "Render a responsive, theme-aware table surface with small, medium, and large density plus an optional flex-based non-native layout."
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Tree",
+    "tag": "spui-tree",
+    "define": "defineTree",
+    "module": "tree",
+    "category": "navigation",
+    "api": {
+      "generic": "T",
+      "reactSignature": "{ items, children, label, selectionMode = \"none\", selectedKeys, defaultSelectedKeys = [], checkedItems, defaultCheckedItems, openItems, defaultOpenItems, expandedKeys, defaultExpandedKeys = [], onSelectionChange, onCheckedChange, onExpandedChange, onOpenChange, onNavigation, navigationMode = \"tree\", appearance = \"subtle\", size = \"medium\", renderItem, collapseMotion, toggleLabel, emptyMessage, ...props }: TreeProps<T>",
+      "callbackProps": [
+        "onSelectionChange",
+        "onCheckedChange",
+        "onExpandedChange",
+        "onOpenChange",
+        "onNavigation",
+        "renderItem"
+      ],
+      "slots": [
+        "collapseMotion"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ]
+    },
+    "summary": "Browse nested folders or navigation nodes with hierarchy semantics and RTL-aware keys."
+  }
+}

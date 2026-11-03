@@ -1,0 +1,22 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "CarouselProvider",
+    "module": "carousel",
+    "category": "views",
+    "reactOnly": true,
+    "summary": "Provide Carousel state and navigation methods to React descendants through the Carousel context.",
+    "api": {
+      "reactSignature": "{ value, children }: { value: CarouselContextValue | undefined; children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "children"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ]
+    }
+  }
+}

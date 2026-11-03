@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "InteractionTagPrimary",
+    "tag": "spui-interaction-tag-primary",
+    "define": "defineInteractionTagPrimary",
+    "module": "tags",
+    "category": "data-display",
+    "api": {
+      "reactSignature": "{ children, media, icon, primaryText, secondaryText, hasSecondaryAction = false, ...props }: ElementProps & { children?: React.ReactNode; media?: React.ReactNode; icon?: React.ReactNode; primaryText?: React.ReactNode; secondaryText?: React.ReactNode; hasSecondaryAction?: boolean }",
+      "callbackProps": [],
+      "slots": [
+        "media",
+        "icon",
+        "primary-text",
+        "default",
+        "secondary-text"
+      ],
+      "styling": [
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Provide the primary button and optional media, icon, and secondary text for InteractionTag."
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "table",
+    "category": "data-display",
+    "react": "TableCell",
+    "tag": "spui-table-cell",
+    "define": "defineTableCell",
+    "api": {
+      "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "content"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Render a semantic table data cell."
+  }
+}

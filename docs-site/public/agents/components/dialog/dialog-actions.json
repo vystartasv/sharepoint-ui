@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "DialogActions",
+    "tag": "spui-dialog-actions",
+    "define": "defineDialogActions",
+    "module": "dialog",
+    "category": "overlays",
+    "api": {
+      "reactSignature": "{ children, fluid = false, position = \"end\", style, ...props }: DialogActionsProps",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "native div root className/style"
+      ],
+      "reactRefType": "HTMLDivElement"
+    },
+    "summary": "Align dialog actions consistently at the end of a composed dialog."
+  }
+}

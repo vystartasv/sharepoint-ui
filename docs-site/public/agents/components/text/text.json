@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Text",
+    "tag": "spui-text",
+    "define": "defineText",
+    "module": "text",
+    "category": "typography",
+    "api": {
+      "reactSignature": "{ as = \"span\", size = 300, weight, font = \"base\", align = \"start\", italic = false, underline = false, strikethrough = false, truncate = false, wrap = true, block = false, children, ...props }: TextProps",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePoint and Fluent typography tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Set consistent, theme-aware type size, weight, font, alignment, emphasis, and semantic element."
+  }
+}

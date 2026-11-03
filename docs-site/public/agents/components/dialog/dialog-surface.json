@@ -1,0 +1,27 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "DialogSurface",
+    "tag": "spui-dialog-surface",
+    "define": "defineDialogSurface",
+    "module": "dialog",
+    "category": "overlays",
+    "api": {
+      "reactSignature": "{ children, backdrop, backdropMotion, mountNode: _mountNode, style, tabIndex = -1, ...props }: DialogSurfaceProps",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "surface",
+        "backdrop",
+        "backdrop-motion"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "native div root className/style"
+      ],
+      "reactRefType": "HTMLDivElement"
+    },
+    "summary": "Compose the visible surface inside the native accessible dialog element."
+  }
+}

@@ -1,0 +1,49 @@
+---
+title: Agent documentation
+description: Give coding agents concise instructions, the full API catalog, or only the component slice needed for a SharePoint task.
+---
+
+## Choose the context size
+
+Keep the prompt small for a focused task. Start with the agent guide, then attach the exact module or component slice. Use the full pack when the task crosses several component families.
+
+<div class="agent-download-grid">
+  <a href="/sharepoint-ui/agents/AGENTS.md">
+    <span class="agent-format">Markdown · concise</span>
+    <strong>Agent guide</strong>
+    <span>Imports, composition patterns, accessibility, forms, theme and locale rules.</span>
+  </a>
+  <a href="/sharepoint-ui/agents/SKILL.md">
+    <span class="agent-format">Skill · reusable</span>
+    <strong>SharePoint UI skill</strong>
+    <span>Installable instructions that teach an agent how to use this package.</span>
+  </a>
+  <a href="/sharepoint-ui/agents/components.json">
+    <span class="agent-format">JSON · full catalog</span>
+    <strong>All component APIs</strong>
+    <span>Exports, custom-element tags, modules, summaries, slots, callbacks, and styling hooks.</span>
+  </a>
+  <a href="/sharepoint-ui/llms-full.txt">
+    <span class="agent-format">Text · full context</span>
+    <strong>Complete agent pack</strong>
+    <span>Guide, skill, component-selection notes, and SharePoint patterns in one file.</span>
+  </a>
+</div>
+
+## Use a component slice
+
+For a Button task, send the guide plus [`button.json`](/sharepoint-ui/agents/components/button/button.json). For all controls in a module, use a module slice such as [`input.json`](/sharepoint-ui/agents/modules/input.json). The full manifest is available when the task needs cross-family composition.
+
+Rich text editing is part of the normal component API and has a dedicated [`Rich Text Editor` JSON slice](/sharepoint-ui/agents/components/rich-text-editor/rich-text-editor.json), a [live human-readable component page](/sharepoint-ui/components/rich-text-editor/rich-text-editor/), and a [SharePoint persistence guide](/sharepoint-ui/guides/rich-text-editor/).
+
+## Give an agent a focused request
+
+```text
+Build the requested SharePoint view with @spfx-fast/sharepoint-ui.
+Use the attached AGENTS.md and the JSON slice for the components you need.
+Keep SharePoint data loading and persistence in the web part. Use documented
+slots and callbacks, inherit the current theme, and set lang so RTL follows
+the content locale. Do not import the full element registry for a small view.
+```
+
+The short machine index at [`/llms.txt`](/sharepoint-ui/llms.txt) links to the full catalog and every module slice. Human docs remain the authority for examples and behavior; the package's TypeScript declarations are the final API authority.

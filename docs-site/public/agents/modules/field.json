@@ -1,0 +1,28 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "field",
+  "components": [
+    {
+      "react": "TextField",
+      "tag": "spui-field",
+      "define": "defineField",
+      "module": "field",
+      "category": "forms",
+      "api": {
+        "reactSignature": "inputProps: TextFieldProps",
+        "callbackProps": [
+          "onValueChange"
+        ],
+        "slots": [],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Edit a single-line value with an accessible label and controlled change events."
+    }
+  ]
+}

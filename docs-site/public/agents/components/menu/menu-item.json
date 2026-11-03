@@ -1,0 +1,35 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "MenuItem",
+    "tag": "spui-menu-item",
+    "define": "defineMenuItem",
+    "module": "menu",
+    "category": "actions",
+    "api": {
+      "reactSignature": "{ children, content, checkmark, submenuIndicator, icon, secondaryContent, subText, switchIndicator, kind = \"default\", value, name, checked, disabled = false, disabledFocusable: _disabledFocusable, persistOnClick = false, hasSubmenu = false, onSelect, onCheckedChange, ...props }: Omit<ElementProps, \"onSelect\"> & { children?: React.ReactNode; content?: React.ReactNode; checkmark?: React.ReactNode; submenuIndicator?: React.ReactNode; icon?: React.ReactNode; secondaryContent?: React.ReactNode; subText?: React.ReactNode; switchIndicator?: React.ReactNode; kind?: \"default\" | \"checkbox\" | \"radio\" | \"switch\"; value?: string; name?: string; checked?: boolean; disabled?: boolean; disabledFocusable?: boolean; persistOnClick?: boolean; hasSubmenu?: boolean; onSelect?: (value: string, label: string, checked: boolean) => void; onCheckedChange?: (checked: boolean, event?: MenuCheckedValueChangeEvent) => void }",
+      "callbackProps": [
+        "onSelect",
+        "onCheckedChange"
+      ],
+      "slots": [
+        "default",
+        "content",
+        "checkmark",
+        "submenuIndicator",
+        "icon",
+        "subtext",
+        "secondary-content",
+        "switch-indicator"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Provide an enabled, disabled, checkbox, or radio command inside a Menu."
+  }
+}

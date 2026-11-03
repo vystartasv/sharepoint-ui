@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "table",
+    "category": "data-display",
+    "react": "TableSelectionCell",
+    "tag": "spui-table-selection-cell",
+    "define": "defineTableSelectionCell",
+    "api": {
+      "reactSignature": "{ type = \"checkbox\", checked = false, subtle = false, invisible = false, hidden = false, checkboxIndicator, radioIndicator, onSelectionChange, ...props }: ElementProps & { type?: \"checkbox\" | \"radio\"; checked?: boolean | \"mixed\"; subtle?: boolean; invisible?: boolean; hidden?: boolean; checkboxIndicator?: SelectionIndicatorSlot; radioIndicator?: SelectionIndicatorSlot; onSelectionChange?: (checked: boolean, type: \"checkbox\" | \"radio\") => void }",
+      "callbackProps": [
+        "onSelectionChange"
+      ],
+      "slots": [
+        "checkbox or radio",
+        "checkbox-indicator",
+        "radio-indicator"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Select a row using a labelled native checkbox or radio control."
+  }
+}

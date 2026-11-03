@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Tabs",
+    "tag": "spui-tabs",
+    "define": "defineTabs",
+    "module": "tabs",
+    "category": "tabs",
+    "api": {
+      "reactSignature": "{ children, selectedValue, defaultSelectedValue, disabled = false, onTabSelect, ...props }: ElementProps & { children?: React.ReactNode; selectedValue?: T; defaultSelectedValue?: T; disabled?: boolean; onTabSelect?: (value: T) => void }",
+      "callbackProps": [
+        "onTabSelect"
+      ],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "generic": "T = string",
+      "reactRefType": "HTMLElement",
+      "forwardRefParameterType": "React.ForwardedRef<HTMLElement>"
+    },
+    "summary": "Switch between related views with controlled selection and keyboard navigation."
+  }
+}

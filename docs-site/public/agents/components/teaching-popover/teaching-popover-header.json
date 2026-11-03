@@ -1,0 +1,28 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "teaching-popover",
+    "category": "feedback",
+    "react": "TeachingPopoverHeader",
+    "tag": "spui-teaching-popover-header",
+    "factory": "defineTeachingPopover",
+    "registered": true,
+    "summary": "Show a heading area and dismiss action for guided help.",
+    "api": {
+      "reactSignature": "{ children, icon, dismissButton, onDismiss, dismissLabel, style, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; dismissButton?: TeachingPopoverButtonSlot; onDismiss?: () => void; dismissLabel?: string }",
+      "callbackProps": [
+        "onDismiss"
+      ],
+      "slots": [
+        "default",
+        "icon",
+        "dismiss-button"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "theme-derived inline defaults",
+        "host className/style"
+      ]
+    }
+  }
+}

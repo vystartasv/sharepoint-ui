@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "MessageBarBody",
+    "tag": "spui-message-bar-body",
+    "define": "defineMessageBarBody",
+    "module": "message-bar",
+    "category": "feedback",
+    "api": {
+      "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Provide the descriptive content region within a message bar."
+  }
+}

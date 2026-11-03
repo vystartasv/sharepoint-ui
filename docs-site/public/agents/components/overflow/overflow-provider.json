@@ -1,0 +1,20 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "OverflowProvider",
+    "module": "overflow",
+    "reactOnly": true,
+    "category": "actions",
+    "api": {
+      "reactSignature": "{ value, children }: { value: OverflowContextValue; children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "children"
+      ],
+      "styling": [
+        "React context provider"
+      ]
+    },
+    "summary": "Provide overflow state and registration helpers to compound item, divider, and menu hooks."
+  }
+}

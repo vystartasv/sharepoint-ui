@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "carousel",
+    "category": "views",
+    "api": {
+      "callbackProps": [],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactSignature": "{ children, autoSize = false, ...props }: ElementProps & { children?: React.ReactNode; autoSize?: boolean }",
+      "slots": [
+        "content"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "react": "CarouselCard",
+    "tag": "spui-carousel-card",
+    "define": "defineCarouselCard",
+    "signature": "{ children, autoSize = false, ...props }: ElementProps & { children?: React.ReactNode; autoSize?: boolean }",
+    "slots": [
+      "content"
+    ],
+    "summary": "Represent one accessible carousel slide, with optional intrinsic sizing for content-driven galleries."
+  }
+}

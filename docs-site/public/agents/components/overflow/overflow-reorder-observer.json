@@ -1,0 +1,18 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "OverflowReorderObserver",
+    "module": "overflow",
+    "reactOnly": true,
+    "category": "actions",
+    "api": {
+      "reactSignature": "_props: Record<string, never> = {}",
+      "callbackProps": [],
+      "slots": [],
+      "styling": [
+        "Renderless helper"
+      ]
+    },
+    "summary": "Fluent-compatible renderless marker; the local overflow engine already observes child-list changes automatically."
+  }
+}

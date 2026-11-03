@@ -1,0 +1,27 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Tab",
+    "tag": "spui-tab",
+    "define": "defineTabs",
+    "module": "tabs",
+    "category": "tab",
+    "api": {
+      "reactSignature": "{ value, disabled = false, icon, content, children, ...props }: ElementProps & { value: TabValue; disabled?: boolean; icon?: React.ReactNode; content?: React.ReactNode; children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "icon",
+        "content",
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Represent one selectable view in a TabList with optional leading icon content."
+  }
+}

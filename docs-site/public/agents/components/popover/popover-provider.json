@@ -1,0 +1,20 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "PopoverProvider",
+    "module": "popover",
+    "reactOnly": true,
+    "category": "feedback",
+    "api": {
+      "reactSignature": "{ value, children }: { value: PopoverContextValue; children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "children"
+      ],
+      "styling": [
+        "React context provider"
+      ]
+    },
+    "summary": "Supply controlled open state, interaction settings, appearance, sizing, and an optional mountNode to a composed Popover."
+  }
+}

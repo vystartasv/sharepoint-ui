@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Avatar",
+    "tag": "spui-avatar",
+    "define": "defineAvatar",
+    "module": "avatar",
+    "category": "people",
+    "api": {
+      "reactSignature": "{ name, image, initials, size = 32, shape = \"circular\", color = \"neutral\", active, activeAppearance = \"ring\", idForColor, decorative = false, icon, badge, children, ...props }: AvatarProps",
+      "callbackProps": [],
+      "slots": [
+        "icon",
+        "badge"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Identify a person or entity with initials, an image, or composed icon and badge slots."
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "CarouselButton",
+    "tag": "spui-carousel-button",
+    "define": "defineCarouselButton",
+    "module": "carousel",
+    "category": "views",
+    "api": {
+      "callbackProps": [],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactSignature": "{ children, icon, navType = \"next\", label, ...props }: Omit<ElementProps, \"slot\"> & { children?: React.ReactNode; icon?: React.ReactNode; navType?: \"prev\" | \"next\"; label?: string; slot?: string | null }",
+      "slots": [
+        "icon",
+        "default"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Add a previous or next action to a composed Carousel control strip; the Carousel owns bounds, wrapping, and disabled state."
+  }
+}

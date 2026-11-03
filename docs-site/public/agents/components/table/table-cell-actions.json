@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "table",
+    "category": "data-display",
+    "react": "TableCellActions",
+    "tag": "spui-table-cell-actions",
+    "define": "defineTableCellActions",
+    "api": {
+      "reactSignature": "{ children, visible = false, ...props }: ElementProps & { children?: React.ReactNode; visible?: boolean }",
+      "callbackProps": [],
+      "slots": [
+        "actions"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Reveal contextual row actions on hover, focus, or explicit visibility."
+  }
+}

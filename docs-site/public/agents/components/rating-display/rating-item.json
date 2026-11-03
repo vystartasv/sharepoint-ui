@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "RatingItem",
+    "tag": "spui-rating-item",
+    "define": "defineRatingItem",
+    "module": "rating-display",
+    "category": "forms",
+    "api": {
+      "reactSignature": "{ value = 1, selectedIcon, unselectedIcon, ...props }: ElementProps & { value?: number; selectedIcon?: React.ReactNode; unselectedIcon?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "selectedIcon",
+        "unselectedIcon"
+      ],
+      "styling": [
+        "SharePointUIProvider theme/tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Compose a reusable filled or outlined rating item inside RatingDisplay."
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "breadcrumb",
+  "components": [
+    {
+      "react": "Breadcrumb",
+      "tag": "spui-breadcrumb",
+      "define": "defineBreadcrumb",
+      "module": "breadcrumb",
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ children, label, focusMode = \"tab\", size = \"medium\", separator, list, ...props }: ElementProps & { children?: React.ReactNode; label?: string; focusMode?: \"tab\" | \"arrow\"; size?: \"small\" | \"medium\" | \"large\"; separator?: string; list?: React.ReactElement }",
+        "callbackProps": [],
+        "slots": [
+          "default",
+          "list"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Show the current location in a labelled navigation trail with a replaceable list root and optional arrow-key focus."
+    },
+    {
+      "react": "BreadcrumbItem",
+      "tag": "spui-breadcrumb-item",
+      "define": "defineBreadcrumbItem",
+      "module": "breadcrumb",
+      "category": "navigation-item",
+      "api": {
+        "reactSignature": "{ children, current = false, size, ...props }: ElementProps & { children?: React.ReactNode; current?: boolean; size?: BreadcrumbSize }",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Represent a destination or current location inside a Breadcrumb."
+    },
+    {
+      "react": "BreadcrumbButton",
+      "tag": "spui-breadcrumb-button",
+      "define": "defineBreadcrumbButton",
+      "module": "breadcrumb",
+      "category": "navigation-item",
+      "api": {
+        "reactSignature": "{ children, icon, href, target, rel, type = \"button\", current = false, disabled = false, disabledFocusable = false, size, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; href?: string; target?: string; rel?: string; type?: \"button\" | \"submit\" | \"reset\"; current?: boolean; disabled?: boolean; disabledFocusable?: boolean; size?: BreadcrumbSize }",
+        "callbackProps": [],
+        "slots": [
+          "icon",
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Render a theme-aware breadcrumb action as a button or link with current and disabled states."
+    },
+    {
+      "react": "BreadcrumbDivider",
+      "tag": "spui-breadcrumb-divider",
+      "define": "defineBreadcrumbDivider",
+      "module": "breadcrumb",
+      "category": "navigation-item",
+      "api": {
+        "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Provide an accessible visual separator between breadcrumb items."
+    }
+  ]
+}

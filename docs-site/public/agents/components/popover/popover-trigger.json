@@ -1,0 +1,22 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "PopoverTrigger",
+    "tag": "spui-popover-trigger",
+    "define": "definePopoverTrigger",
+    "module": "popover",
+    "category": "feedback",
+    "api": {
+      "reactSignature": "{ children, disableButtonEnhancement = false, ...props }: ElementProps & { children?: React.ReactNode; disableButtonEnhancement?: boolean }",
+      "callbackProps": [],
+      "slots": [
+        "trigger"
+      ],
+      "styling": [
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Provide a composable trigger slot for Popover; the actual button or link retains its native interaction."
+  }
+}

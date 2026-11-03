@@ -1,0 +1,31 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ColorArea",
+    "tag": "spui-color-area",
+    "define": "defineColorArea",
+    "module": "color-picker",
+    "category": "forms",
+    "registered": true,
+    "summary": "Provide an accessible saturation and brightness surface inside ColorPicker or as a standalone HSV-controlled control.",
+    "api": {
+      "reactSignature": "{ children, color, defaultColor, inputX, inputY, thumb, shape, onChange, ...props }: ColorAreaProps",
+      "callbackProps": [
+        "onChange(event, { color })"
+      ],
+      "slots": [
+        "area",
+        "inputX",
+        "inputY",
+        "thumb"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    }
+  }
+}

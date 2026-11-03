@@ -1,0 +1,62 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "rich-text-editor",
+  "components": [
+    {
+      "react": "RichTextEditor",
+      "tag": "spui-rich-text-editor",
+      "define": "defineRichTextEditor",
+      "module": "rich-text-editor",
+      "category": "sharepoint-content",
+      "note": "SharePoint-specific extra; not a Fluent v9 parity component.",
+      "api": {
+        "reactSignature": "inputProps: RichTextEditorProps",
+        "relatedReactApis": [
+          {
+            "name": "RichTextEditorProps.editorLabel",
+            "description": "Accessible name used when no aria-label or visible label is supplied; defaults to SharePointUIProvider.strings.richTextEditorLabel."
+          },
+          {
+            "name": "RichTextEditorProps.onValueChange",
+            "description": "Receives sanitized HTML after edits. With a controlled value prop, update that prop from this callback; the editor preserves its live selection while React applies the committed value."
+          },
+          {
+            "name": "RichTextEditorProps.onImageUploadError",
+            "description": "Receives the failed image filename and error when the application-managed upload fails or returns an unsafe URL."
+          },
+          {
+            "name": "RichTextEditorProps.linkPicker",
+            "description": "Opens the host application's SharePoint picker with the current link, then fills the editor for review before the user applies it. Return null to cancel."
+          },
+          {
+            "name": "RichTextEditorProps.onLinkPickerError",
+            "description": "Receives an error when the host-provided SharePoint link picker fails."
+          },
+          {
+            "name": "SharePointUIProvider.strings.richTextLink*",
+            "description": "Customize the link editor's accessible name, field labels, action labels, picker states, and validation messages for the active language."
+          }
+        ],
+        "callbackProps": [
+          "onValueChange",
+          "onImageUpload",
+          "onImageUploadError",
+          "linkPicker",
+          "onLinkPickerError"
+        ],
+        "slots": [],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Edit sanitized rich HTML with controlled or uncontrolled form values, formatting history, table editing, a safe link editor with an optional host-provided SharePoint picker, and application-managed durable image upload.",
+      "highValueAdditions": [
+        "Preview SharePoint page titles and destination details before inserting internal links."
+      ]
+    }
+  ]
+}

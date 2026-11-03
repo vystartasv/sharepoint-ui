@@ -1,0 +1,57 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "TagPicker",
+    "tag": "spui-tag-picker",
+    "define": "defineTagPicker",
+    "module": "tag-picker",
+    "category": "form",
+    "api": {
+      "reactSignature": "{ children, label, selectedLabel, requiredMessage, selectedOptions, defaultSelectedOptions, selectedValues, defaultSelectedValues, inputValue, open, defaultOpen, positioning, disableAutoFocus = false, inline = false, noPopover = false, disabled, onOpenChange, onOptionSelect, onInputValueChange, onChange, ...props }: TagPickerProps",
+      "relatedReactApis": [
+        {
+          "name": "TagPickerProps.requiredMessage",
+          "description": "Sets the native form validation message; defaults to SharePointUIProvider.strings.required."
+        },
+        {
+          "name": "TagPickerProps.selectedLabel",
+          "description": "Names the selected-options group; defaults to SharePointUIProvider.strings.selectedOptionsLabel."
+        },
+        {
+          "name": "TagPickerProps.selectedOptions",
+          "description": "Controls the selected option values; use defaultSelectedOptions for an uncontrolled initial selection."
+        },
+        {
+          "name": "TagPickerProps.positioning",
+          "description": "Positions the options surface relative to the control; supports placement shorthands, alignment, fallbacks, and offsets."
+        },
+        {
+          "name": "TagPickerProps.disableAutoFocus",
+          "description": "Keeps the first matching option inactive until keyboard navigation selects one."
+        }
+      ],
+      "callbackProps": [
+        "onOpenChange",
+        "onOptionSelect",
+        "onInputValueChange",
+        "onChange"
+      ],
+      "slots": [
+        "button",
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Search, choose, and remove multiple values with keyboard and native form support.",
+    "highValueAdditions": [
+      "Add composed control, input, selected-tag group, and list primitives while preserving the single state engine.",
+      "Position the options surface against viewport and clipping ancestors, including SharePoint sections."
+    ]
+  }
+}

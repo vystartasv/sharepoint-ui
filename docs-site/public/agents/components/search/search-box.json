@@ -1,0 +1,31 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "SearchBox",
+    "tag": "spui-search-box",
+    "define": "defineSearchBox",
+    "module": "search",
+    "category": "forms",
+    "api": {
+      "reactSignature": "inputProps: SearchBoxProps",
+      "callbackProps": [
+        "onValueChange",
+        "onSearch",
+        "onChange"
+      ],
+      "slots": [
+        "content-before",
+        "content-after",
+        "dismiss"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Search or filter content with a clear action, native form value, and Enter-to-submit behavior."
+  }
+}

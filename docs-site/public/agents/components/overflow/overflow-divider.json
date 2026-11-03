@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "OverflowDivider",
+    "tag": "spui-overflow-divider",
+    "define": "defineOverflowDivider",
+    "module": "overflow",
+    "category": "actions",
+    "api": {
+      "reactSignature": "{ groupId, children, ...props }: ElementProps & { groupId: string; children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Visually separate action groups and hide the divider when its group moves into overflow."
+  }
+}

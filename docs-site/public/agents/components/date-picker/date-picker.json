@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "DatePicker",
+    "tag": "spui-date-picker",
+    "define": "defineDatePicker",
+    "module": "date-picker",
+    "category": "forms",
+    "api": {
+      "reactSignature": "inputProps: DatePickerProps",
+      "callbackProps": [
+        "onValueChange"
+      ],
+      "slots": [],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Select localized dates using a keyboard-accessible calendar with RTL navigation, min/max constraints, and native form participation.",
+    "note": "SharePoint addition; Fluent UI v9 DatePicker remains in a separate compatibility package."
+  }
+}

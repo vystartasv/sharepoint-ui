@@ -1,0 +1,18 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ColumnIdContextProvider",
+    "module": "data-grid",
+    "reactOnly": true,
+    "category": "data-display",
+    "api": {
+      "reactSignature": "{ value, children }: { value: TableColumnId | undefined; children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "children"
+      ],
+      "styling": []
+    },
+    "summary": "Pass the current table column id to DataGrid header and cell components."
+  }
+}

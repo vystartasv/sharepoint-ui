@@ -1,0 +1,23 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "TagPickerList",
+    "tag": "spui-tag-picker-list",
+    "define": "defineTagPicker",
+    "module": "tag-picker",
+    "category": "form-option",
+    "api": {
+      "reactSignature": "{ children }: ElementProps & { children?: React.ReactNode; disableAutoFocus?: boolean }",
+      "callbackProps": [],
+      "slots": [
+        "children"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "host className/style",
+        "named ::part hooks"
+      ]
+    },
+    "summary": "Compose a collection of TagPicker options in the picker popup."
+  }
+}

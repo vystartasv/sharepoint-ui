@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ToolbarGroup",
+    "tag": "spui-toolbar-group",
+    "define": "defineToolbarGroup",
+    "module": "toolbar",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Group related toolbar commands under an optional accessible name; controls remain part of the parent toolbar's single roving tab sequence."
+  }
+}

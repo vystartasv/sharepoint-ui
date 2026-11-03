@@ -1,0 +1,27 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "table",
+    "category": "data-display",
+    "react": "TableResizeHandle",
+    "tag": "spui-table-resize-handle",
+    "define": "defineTableResizeHandle",
+    "api": {
+      "reactSignature": "{ value, min, max, step = 8, label, onResize, ...props }: ElementProps & { value?: number; min?: number; max?: number; step?: number; label?: string; onResize?: (delta: number, value: number, event?: Event) => void }",
+      "callbackProps": [
+        "onResize"
+      ],
+      "slots": [
+        "resize handle"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Provide a keyboard-operable column resize handle that emits bounded resize requests."
+  }
+}

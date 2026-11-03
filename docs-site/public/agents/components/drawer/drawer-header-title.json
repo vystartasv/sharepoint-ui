@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "DrawerHeaderTitle",
+    "tag": "fragment",
+    "module": "drawer",
+    "category": "feedback",
+    "reactOnly": true,
+    "api": {
+      "reactSignature": "{ children, action, heading, ...props }: ElementProps & { children?: React.ReactNode; action?: React.ReactNode; heading?: DrawerHeaderTitleHeadingSlot }",
+      "callbackProps": [],
+      "slots": [
+        "title",
+        "header-action",
+        "heading"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ]
+    },
+    "summary": "Provide the title text and optional header action for a Drawer."
+  }
+}

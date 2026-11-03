@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "TagPickerOptionGroup",
+    "tag": "spui-tag-picker-option-group",
+    "define": "defineTagPicker",
+    "module": "tag-picker",
+    "category": "form-option",
+    "api": {
+      "reactSignature": "{ children, label, disabled = false }: ElementProps & { children?: React.ReactNode; label: string; disabled?: boolean }",
+      "callbackProps": [],
+      "slots": [
+        "children"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Group TagPicker options under an accessible label."
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "TabList",
+    "tag": "spui-tab-list",
+    "define": "defineTabs",
+    "module": "tabs",
+    "category": "tabs",
+    "api": {
+      "reactSignature": "{ children, selectedValue, defaultSelectedValue, selectTabOnFocus, reserveSelectedTabSpace, vertical, disabled, appearance, size, onTabSelect, ...props }: TabListProps",
+      "callbackProps": [
+        "onTabSelect"
+      ],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Group Tabs with keyboard selection, a selection callback, and an option to reserve label width across selected states."
+  }
+}

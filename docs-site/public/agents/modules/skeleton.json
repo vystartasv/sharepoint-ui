@@ -1,0 +1,56 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "skeleton",
+  "components": [
+    {
+      "react": "Skeleton",
+      "tag": "spui-skeleton",
+      "define": "defineSkeleton",
+      "module": "skeleton",
+      "category": "feedback",
+      "api": {
+        "reactSignature": "{ shape = \"text\", width, height, animated = true, animation, appearance = \"opaque\", size, children, ...props }: ElementProps & { shape?: SkeletonShape; width?: string | number; height?: string | number; animated?: boolean; animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; children?: React.ReactNode }",
+        "relatedReactApis": [
+          {
+            "name": "SkeletonContextProvider",
+            "description": "Supplies animation, appearance, size, and shape defaults to nested SkeletonItem components."
+          },
+          {
+            "name": "useSkeletonContext",
+            "description": "Reads the nearest SkeletonContextProvider value."
+          }
+        ],
+        "callbackProps": [],
+        "slots": [],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Show the shape of pending content while honoring reduced motion and forced colors."
+    },
+    {
+      "react": "SkeletonItem",
+      "tag": "spui-skeleton-item",
+      "define": "defineSkeletonItem",
+      "module": "skeleton",
+      "category": "feedback",
+      "api": {
+        "reactSignature": "{ animation, appearance, size, shape, ...props }: ElementProps & { animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; shape?: \"rectangle\" | \"square\" | \"circle\" }",
+        "callbackProps": [],
+        "slots": [],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Render a themed loading placeholder with Fluent size, shape, appearance, and motion options."
+    }
+  ]
+}

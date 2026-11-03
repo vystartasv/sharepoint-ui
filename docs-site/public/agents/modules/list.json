@@ -1,0 +1,59 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "list",
+  "components": [
+    {
+      "react": "List",
+      "tag": "spui-list",
+      "define": "defineList",
+      "module": "list",
+      "category": "collections",
+      "api": {
+        "reactSignature": "{ navigationMode, selectionMode, selectedItems, defaultSelectedItems, onSelectionChange, children, ...props }: ElementProps & { navigationMode?: ListNavigationMode; selectionMode?: ListSelectionMode; selectedItems?: ListItemValue[]; defaultSelectedItems?: ListItemValue[]; onSelectionChange?: (event: SharePointUIEvent, data: ListOnSelectionChangeData) => void; children?: React.ReactNode }",
+        "callbackProps": [
+          "onSelectionChange"
+        ],
+        "slots": [
+          "children"
+        ],
+        "styling": [
+          "SharePointUIProvider theme/tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Compose a keyboard-navigable list with single or multiple selection."
+    },
+    {
+      "react": "ListItem",
+      "tag": "spui-list-item",
+      "define": "defineListItem",
+      "module": "list",
+      "category": "collections",
+      "api": {
+        "reactSignature": "{ value, disabledSelection = false, checkmark, onAction, children, ...props }: ElementProps & { value?: ListItemValue; disabledSelection?: boolean; checkmark?: React.ReactNode; onAction?: (event: SharePointUIEvent, data: ListItemReactActionData) => void; children?: React.ReactNode }",
+        "reactHelpers": [
+          "ListItemReactActionData",
+          "ListItemReactActionEvent"
+        ],
+        "callbackProps": [
+          "onAction"
+        ],
+        "slots": [
+          "children",
+          "checkmark"
+        ],
+        "styling": [
+          "SharePointUIProvider theme/tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Provide a selectable, navigable, actionable row within List."
+    }
+  ]
+}

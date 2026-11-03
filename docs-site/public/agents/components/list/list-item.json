@@ -1,0 +1,32 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ListItem",
+    "tag": "spui-list-item",
+    "define": "defineListItem",
+    "module": "list",
+    "category": "collections",
+    "api": {
+      "reactSignature": "{ value, disabledSelection = false, checkmark, onAction, children, ...props }: ElementProps & { value?: ListItemValue; disabledSelection?: boolean; checkmark?: React.ReactNode; onAction?: (event: SharePointUIEvent, data: ListItemReactActionData) => void; children?: React.ReactNode }",
+      "reactHelpers": [
+        "ListItemReactActionData",
+        "ListItemReactActionEvent"
+      ],
+      "callbackProps": [
+        "onAction"
+      ],
+      "slots": [
+        "children",
+        "checkmark"
+      ],
+      "styling": [
+        "SharePointUIProvider theme/tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Provide a selectable, navigable, actionable row within List."
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "FlatTree",
+    "module": "tree",
+    "reactOnly": true,
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ children, ...props }: FlatTreeProps",
+      "callbackProps": [
+        "onSelectionChange",
+        "onCheckedChange",
+        "onExpandedChange",
+        "onOpenChange",
+        "onNavigation",
+        "renderItem"
+      ],
+      "slots": [
+        "FlatTreeItem",
+        "collapseMotion"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ]
+    },
+    "summary": "Build a hierarchical accessible Tree from flat items linked by parentValue."
+  }
+}

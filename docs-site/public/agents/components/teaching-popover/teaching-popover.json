@@ -1,0 +1,33 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "teaching-popover",
+    "category": "feedback",
+    "react": "TeachingPopover",
+    "tag": "spui-teaching-popover",
+    "factory": "defineTeachingPopover",
+    "registered": true,
+    "summary": "Guide users through a keyboard-contained help surface anchored to a trigger.",
+    "api": {
+      "reactSignature": "{ children, trigger, trapFocus = true, withArrow = true, ...props }: TeachingPopoverProps",
+      "relatedReactApis": [
+        {
+          "name": "TeachingPopoverProps.mountNode",
+          "description": "Inherits Popover mountNode support for mounting the teaching surface in an HTMLElement or generated body container while its trigger stays in place."
+        }
+      ],
+      "callbackProps": [
+        "onOpenChange"
+      ],
+      "slots": [
+        "trigger",
+        "content"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ]
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "capture": {
+    "source": "Published SharePoint page with the SPFx validation web part",
+    "capturedAt": "2026-11-03",
+    "note": "Effective SharePoint and Fluent theme values read from the rendered SPFx web part. No tenant identifiers or user data are included."
+  },
+  "presets": {
+    "sharepoint": {
+      "label": "SharePoint teal",
+      "accent": "#007780",
+      "tokens": {
+        "--spui-semantic-primary-button-background": "#007780",
+        "--spui-semantic-primary-button-background-hovered": "#006b73",
+        "--spui-semantic-primary-button-text": "#ffffff",
+        "--spui-semantic-body-text": "#323130",
+        "--spui-semantic-body-subtext": "#424242",
+        "--spui-semantic-body-background": "#ffffff",
+        "--spui-semantic-card-background": "#ffffff",
+        "--spui-semantic-body-divider": "#eaeaea",
+        "--spui-semantic-input-focus-border-alt": "#007780",
+        "--spui-semantic-input-background-checked": "#007780",
+        "--spui-semantic-input-foreground-checked": "#ffffff",
+        "--spui-semantic-link": "#006870",
+        "--spui-semantic-link-hovered": "#005861",
+        "--colorBrandBackground": "#007780",
+        "--colorBrandBackground2": "#d7ffff",
+        "--colorBrandBackground2Hover": "#9efaff",
+        "--colorBrandBackgroundPressed": "#003a40",
+        "--colorBrandBackgroundSelected": "#005861",
+        "--colorBrandForegroundLink": "#006870",
+        "--colorNeutralForeground1": "#242424",
+        "--colorNeutralForeground2": "#424242",
+        "--colorNeutralBackground1": "#ffffff",
+        "--colorNeutralBackground2": "#fafafa",
+        "--colorNeutralStroke2": "#eaeaea",
+        "--colorNeutralForegroundOnBrand": "#ffffff"
+      }
+    },
+    "blue": {
+      "label": "Blue",
+      "accent": "#0f6cbd",
+      "tokens": {
+        "--spui-semantic-primary-button-background": "#0f6cbd",
+        "--spui-semantic-primary-button-background-hovered": "#115ea3",
+        "--spui-semantic-primary-button-text": "#ffffff"
+      }
+    },
+    "green": {
+      "label": "Green",
+      "accent": "#107c10",
+      "tokens": {
+        "--spui-semantic-primary-button-background": "#107c10",
+        "--spui-semantic-primary-button-background-hovered": "#0b6a0b",
+        "--spui-semantic-primary-button-text": "#ffffff"
+      }
+    },
+    "pink": {
+      "label": "Pink",
+      "accent": "#c239b3",
+      "tokens": {
+        "--spui-semantic-primary-button-background": "#c239b3",
+        "--spui-semantic-primary-button-background-hovered": "#a42696",
+        "--spui-semantic-primary-button-text": "#ffffff"
+      }
+    }
+  }
+}

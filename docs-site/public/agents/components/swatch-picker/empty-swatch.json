@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "swatch-picker",
+    "category": "inputs",
+    "api": {
+      "callbackProps": [
+        "onAdd"
+      ],
+      "slots": [],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactSignature": "{ onAdd, disabled, size, shape, ...props }: ElementProps & { onAdd?: () => void; disabled?: boolean; size?: SwatchPickerProps[\"size\"]; shape?: SwatchPickerProps[\"shape\"] }",
+      "reactRefType": "HTMLElement"
+    },
+    "react": "EmptySwatch",
+    "tag": "spui-empty-swatch",
+    "define": "defineEmptySwatch",
+    "summary": "Offer an accessible add-color action within a swatch set."
+  }
+}

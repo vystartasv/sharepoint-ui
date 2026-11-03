@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "swatch-picker",
+    "category": "inputs",
+    "api": {
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+      "reactRefType": "HTMLElement"
+    },
+    "react": "SwatchPickerRow",
+    "tag": "spui-swatch-picker-row",
+    "define": "defineSwatchPickerRow",
+    "summary": "Group swatches into an explicit visual and semantic row within a picker."
+  }
+}

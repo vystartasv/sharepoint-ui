@@ -1,0 +1,27 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "TagGroup",
+    "tag": "spui-tag-group",
+    "define": "defineTagGroup",
+    "module": "tags",
+    "category": "data-display",
+    "api": {
+      "reactSignature": "{ children, orientation = \"horizontal\", label, appearance = \"filled\", size = \"medium\", disabled = false, dismissible = false, selectedValues, defaultSelectedValues, onTagSelect, onDismiss, ...props }: ElementProps & { children?: React.ReactNode; orientation?: \"horizontal\" | \"vertical\"; label?: string; appearance?: TagAppearance; size?: TagSize; disabled?: boolean; dismissible?: boolean; selectedValues?: string[]; defaultSelectedValues?: string[]; onTagSelect?: (event: SharePointUIEvent, data: TagGroupReactSelectData) => void; onDismiss?: (event: TagDismissEvent, data: { value: string }) => void }",
+      "callbackProps": [
+        "onTagSelect",
+        "onDismiss"
+      ],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Arrange related tags as a labelled horizontal or vertical collection."
+  }
+}

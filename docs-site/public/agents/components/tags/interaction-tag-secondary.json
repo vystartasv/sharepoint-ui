@@ -1,0 +1,22 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "InteractionTagSecondary",
+    "tag": "spui-interaction-tag-secondary",
+    "define": "defineInteractionTagSecondary",
+    "module": "tags",
+    "category": "data-display",
+    "api": {
+      "reactSignature": "{ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Provide the accessible secondary dismiss button for InteractionTag."
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "color-picker",
+  "components": [
+    {
+      "react": "ColorPicker",
+      "tag": "spui-color-picker",
+      "define": "defineColorPicker",
+      "module": "color-picker",
+      "category": "forms",
+      "api": {
+        "reactSignature": "inputProps: ColorPickerProps",
+        "callbackProps": [
+          "onColorChange",
+          "onValueChange",
+          "onFormatChange"
+        ],
+        "slots": [
+          "area",
+          "sliders",
+          "alpha"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Choose a color with controlled HSV or HEX values, interactive saturation/brightness and hue controls, opacity, HEX/RGB entry, and theme-derived swatches."
+    },
+    {
+      "react": "ColorArea",
+      "tag": "spui-color-area",
+      "define": "defineColorArea",
+      "module": "color-picker",
+      "category": "forms",
+      "registered": true,
+      "summary": "Provide an accessible saturation and brightness surface inside ColorPicker or as a standalone HSV-controlled control.",
+      "api": {
+        "reactSignature": "{ children, color, defaultColor, inputX, inputY, thumb, shape, onChange, ...props }: ColorAreaProps",
+        "callbackProps": [
+          "onChange(event, { color })"
+        ],
+        "slots": [
+          "area",
+          "inputX",
+          "inputY",
+          "thumb"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      }
+    },
+    {
+      "react": "ColorSlider",
+      "tag": "spui-color-slider",
+      "define": "defineColorSlider",
+      "module": "color-picker",
+      "category": "forms",
+      "registered": true,
+      "summary": "Adjust hue, saturation, or value inside ColorPicker or as a standalone HSV-controlled slider.",
+      "api": {
+        "reactSignature": "{ channel = \"hue\", vertical, color, defaultColor, input, rail, thumb, shape, onChange, ...props }: ColorSliderProps",
+        "callbackProps": [
+          "onChange(event, { color })"
+        ],
+        "slots": [
+          "sliders",
+          "input",
+          "rail",
+          "thumb"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      }
+    },
+    {
+      "react": "AlphaSlider",
+      "tag": "spui-alpha-slider",
+      "define": "defineAlphaSlider",
+      "module": "color-picker",
+      "category": "forms",
+      "registered": true,
+      "summary": "Adjust opacity or transparency inside ColorPicker or as a standalone HSV-controlled slider.",
+      "api": {
+        "reactSignature": "{ transparency, vertical, color, defaultColor, shape, onChange, ...props }: AlphaSliderProps",
+        "callbackProps": [
+          "onChange(event, { color })"
+        ],
+        "slots": [
+          "alpha"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      }
+    }
+  ]
+}

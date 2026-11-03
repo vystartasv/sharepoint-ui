@@ -1,0 +1,32 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Tag",
+    "tag": "spui-tag",
+    "define": "defineTag",
+    "module": "tags",
+    "category": "data-display",
+    "api": {
+      "reactSignature": "{ children, appearance, size, shape = \"rounded\", color, value, label, disabled = false, selected = false, dismissible = false, dismissLabel, onDismiss, media, icon, primaryText, secondaryText, dismissIcon, ...props }: TagProps",
+      "callbackProps": [
+        "onDismiss"
+      ],
+      "slots": [
+        "default",
+        "media",
+        "icon",
+        "primary-text",
+        "secondary-text",
+        "dismiss-icon"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Represent a selected value or status with theme-derived appearance and optional dismissal."
+  }
+}

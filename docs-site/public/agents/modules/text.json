@@ -1,0 +1,334 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "text",
+  "components": [
+    {
+      "react": "Text",
+      "tag": "spui-text",
+      "define": "defineText",
+      "module": "text",
+      "category": "typography",
+      "api": {
+        "reactSignature": "{ as = \"span\", size = 300, weight, font = \"base\", align = \"start\", italic = false, underline = false, strikethrough = false, truncate = false, wrap = true, block = false, children, ...props }: TextProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePoint and Fluent typography tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Set consistent, theme-aware type size, weight, font, alignment, emphasis, and semantic element."
+    },
+    {
+      "react": "Body1",
+      "module": "text",
+      "reactOnly": true,
+      "category": "typography",
+      "api": {
+        "reactSignature": "props: TextPresetProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "Fluent typography tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Fluent Body1 typography preset (base 300, regular). Use the custom element with size=300 for framework-neutral composition."
+    },
+    {
+      "react": "Body1Strong",
+      "module": "text",
+      "reactOnly": true,
+      "category": "typography",
+      "api": {
+        "reactSignature": "props: TextPresetProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "Fluent typography tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Fluent Body1Strong typography preset (base 300, semibold)."
+    },
+    {
+      "react": "Body1Stronger",
+      "module": "text",
+      "reactOnly": true,
+      "category": "typography",
+      "api": {
+        "reactSignature": "props: TextPresetProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "Fluent typography tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Fluent Body1Stronger typography preset (base 300, bold)."
+    },
+    {
+      "react": "Body2",
+      "module": "text",
+      "reactOnly": true,
+      "category": "typography",
+      "api": {
+        "reactSignature": "props: TextPresetProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "Fluent typography tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Fluent Body2 typography preset (base 400, regular)."
+    },
+    {
+      "react": "Caption1",
+      "module": "text",
+      "reactOnly": true,
+      "category": "typography",
+      "api": {
+        "reactSignature": "props: TextPresetProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "Fluent typography tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Fluent Caption1 typography preset (base 200, regular)."
+    },
+    {
+      "react": "Caption1Strong",
+      "module": "text",
+      "reactOnly": true,
+      "category": "typography",
+      "api": {
+        "reactSignature": "props: TextPresetProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "Fluent typography tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Fluent Caption1Strong typography preset (base 200, semibold)."
+    },
+    {
+      "react": "Caption1Stronger",
+      "module": "text",
+      "reactOnly": true,
+      "category": "typography",
+      "api": {
+        "reactSignature": "props: TextPresetProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "Fluent typography tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Fluent Caption1Stronger typography preset (base 200, bold)."
+    },
+    {
+      "react": "Caption2",
+      "module": "text",
+      "reactOnly": true,
+      "category": "typography",
+      "api": {
+        "reactSignature": "props: TextPresetProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "Fluent typography tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Fluent Caption2 typography preset (base 100, regular)."
+    },
+    {
+      "react": "Caption2Strong",
+      "module": "text",
+      "reactOnly": true,
+      "category": "typography",
+      "api": {
+        "reactSignature": "props: TextPresetProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "Fluent typography tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Fluent Caption2Strong typography preset (base 100, semibold)."
+    },
+    {
+      "react": "Display",
+      "module": "text",
+      "reactOnly": true,
+      "category": "typography",
+      "api": {
+        "reactSignature": "props: TextPresetProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "Fluent typography tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Fluent Display typography preset (hero 1000, semibold)."
+    },
+    {
+      "react": "LargeTitle",
+      "module": "text",
+      "reactOnly": true,
+      "category": "typography",
+      "api": {
+        "reactSignature": "props: TextPresetProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "Fluent typography tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Fluent LargeTitle typography preset (hero 900, semibold)."
+    },
+    {
+      "react": "Subtitle1",
+      "module": "text",
+      "reactOnly": true,
+      "category": "typography",
+      "api": {
+        "reactSignature": "props: TextPresetProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "Fluent typography tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Fluent Subtitle1 typography preset (base 500, semibold)."
+    },
+    {
+      "react": "Subtitle2",
+      "module": "text",
+      "reactOnly": true,
+      "category": "typography",
+      "api": {
+        "reactSignature": "props: TextPresetProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "Fluent typography tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Fluent Subtitle2 typography preset (base 400, semibold)."
+    },
+    {
+      "react": "Subtitle2Stronger",
+      "module": "text",
+      "reactOnly": true,
+      "category": "typography",
+      "api": {
+        "reactSignature": "props: TextPresetProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "Fluent typography tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Fluent Subtitle2Stronger typography preset (base 400, bold)."
+    },
+    {
+      "react": "Title1",
+      "module": "text",
+      "reactOnly": true,
+      "category": "typography",
+      "api": {
+        "reactSignature": "props: TextPresetProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "Fluent typography tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Fluent Title1 typography preset (hero 800, semibold)."
+    },
+    {
+      "react": "Title2",
+      "module": "text",
+      "reactOnly": true,
+      "category": "typography",
+      "api": {
+        "reactSignature": "props: TextPresetProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "Fluent typography tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Fluent Title2 typography preset (hero 700, semibold)."
+    },
+    {
+      "react": "Title3",
+      "module": "text",
+      "reactOnly": true,
+      "category": "typography",
+      "api": {
+        "reactSignature": "props: TextPresetProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "Fluent typography tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Fluent Title3 typography preset (base 600, semibold)."
+    }
+  ]
+}

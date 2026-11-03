@@ -1,0 +1,23 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "teaching-popover",
+    "category": "feedback",
+    "react": "TeachingPopoverTrigger",
+    "tag": "spui-teaching-popover-trigger",
+    "factory": "defineTeachingPopover",
+    "registered": true,
+    "summary": "Provide the trigger composition part for TeachingPopover.",
+    "api": {
+      "reactSignature": "{ children, disableButtonEnhancement = false, ...props }: ElementProps & { children?: React.ReactNode; disableButtonEnhancement?: boolean }",
+      "callbackProps": [],
+      "slots": [
+        "trigger"
+      ],
+      "styling": [
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    }
+  }
+}

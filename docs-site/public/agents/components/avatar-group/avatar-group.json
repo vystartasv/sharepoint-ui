@@ -1,0 +1,27 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "AvatarGroup",
+    "tag": "spui-avatar-group",
+    "define": "defineAvatarGroup",
+    "module": "avatar-group",
+    "category": "people",
+    "api": {
+      "reactSignature": "{ children, label, maxVisible = 5, layout, size, expanded, showMoreLabel, showLessLabel, onExpandedChange, ...props }: ElementProps & { children?: React.ReactNode; label?: string; maxVisible?: number; layout?: \"stack\" | \"spread\" | \"pie\"; size?: number; expanded?: boolean; showMoreLabel?: string; showLessLabel?: string; onExpandedChange?: (expanded: boolean) => void }",
+      "callbackProps": [
+        "onExpandedChange"
+      ],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Stack people avatars compactly and reveal the remaining members with a localized, keyboard-operable overflow control."
+  }
+}

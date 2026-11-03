@@ -1,0 +1,34 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "virtual-list",
+    "category": "data-display",
+    "react": "Virtualizer",
+    "tag": "spui-virtualizer",
+    "factory": "defineVirtualList",
+    "registered": false,
+    "api": {
+      "reactSignature": "{ children, numItems, itemSize, virtualizerLength = 24, bufferItems, bufferSize, containerSizeRef, getItemSize, gap = 0, reversed = false, updateScrollPosition, virtualizerContext, axis = \"vertical\", measureItems = false, enableScrollLoad = false, enablePagination = false, flaggedIndex, onRenderedFlaggedIndex, onRenderedRange: onRenderedRangeChange, imperativeVirtualizerRef, imperativeRef, scrollViewRef, label, scrollMode = \"element\", before, after, beforeContainer, afterContainer, ...props }: Omit<ElementProps, \"children\"> & { children: VirtualizerChildRenderFunction; numItems: number; itemSize: number; virtualizerLength?: number; bufferItems?: number; bufferSize?: number; containerSizeRef?: React.RefObject<number>; getItemSize?: (index: number) => number; gap?: number; reversed?: boolean; updateScrollPosition?: (position: number) => void; virtualizerContext?: VirtualizerContextProps; axis?: \"vertical\" | \"horizontal\"; scrollMode?: \"element\" | \"window\"; measureItems?: boolean; enableScrollLoad?: boolean; enablePagination?: boolean; flaggedIndex?: React.MutableRefObject<number | null>; onRenderedFlaggedIndex?: (index: number) => void; onRenderedRange?: (range: { start: number; end: number; total: number }) => void; imperativeVirtualizerRef?: React.RefObject<VirtualizerDataRef | null>; imperativeRef?: React.RefObject<VirtualizerScrollToHandle | null>; scrollViewRef?: React.MutableRefObject<HTMLElement | null>; label?: string } & VirtualizerBookendSlots",
+      "callbackProps": [
+        "children",
+        "onRenderedFlaggedIndex",
+        "onRenderedRange",
+        "getItemSize",
+        "updateScrollPosition"
+      ],
+      "slots": [
+        "default",
+        "before",
+        "after",
+        "beforeContainer",
+        "afterContainer"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ]
+    },
+    "summary": "Render large horizontal or vertical collections through a bounded accessible viewport, or use browser-window scrolling for vertical page-flow lists, with fixed or measured item sizes, index-based rendering, and imperative scrolling."
+  }
+}

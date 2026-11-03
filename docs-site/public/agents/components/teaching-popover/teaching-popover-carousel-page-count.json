@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "teaching-popover",
+    "category": "text",
+    "react": "TeachingPopoverCarouselPageCount",
+    "tag": "spui-teaching-popover-carousel-page-count",
+    "factory": "defineTeachingPopover",
+    "registered": true,
+    "summary": "Announce the current step and total count to assistive technology.",
+    "api": {
+      "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode | ((currentPage: number, totalPages: number) => React.ReactNode) }",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "theme-derived inline defaults",
+        "host className/style"
+      ]
+    }
+  }
+}

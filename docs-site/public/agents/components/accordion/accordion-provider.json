@@ -1,0 +1,20 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "AccordionProvider",
+    "module": "accordion",
+    "reactOnly": true,
+    "category": "disclosure",
+    "api": {
+      "reactSignature": "{ value, children }: { value: AccordionProviderValue; children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "children"
+      ],
+      "styling": [
+        "React context provider"
+      ]
+    },
+    "summary": "Provide controlled open items and accordion interaction defaults to composed Accordion descendants."
+  }
+}

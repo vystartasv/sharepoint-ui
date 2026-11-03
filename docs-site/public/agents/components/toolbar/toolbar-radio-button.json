@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ToolbarRadioButton",
+    "tag": "spui-toolbar-radio-button",
+    "define": "defineToolbarRadioButton",
+    "module": "toolbar",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ children, icon, name, value, appearance = \"subtle\", size, disabled, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; name: string; value: string; appearance?: \"primary\" | \"subtle\" | \"transparent\"; size?: \"small\" | \"medium\" | \"large\"; disabled?: boolean }",
+      "callbackProps": [],
+      "slots": [
+        "icon",
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Selectable toolbar radio command associated with a named checked-value set."
+  }
+}

@@ -1,0 +1,169 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "dialog",
+  "components": [
+    {
+      "react": "Dialog",
+      "tag": "spui-dialog",
+      "define": "defineDialog",
+      "module": "dialog",
+      "category": "overlays",
+      "api": {
+        "reactSignature": "{ open, defaultOpen = false, title, dialogLabel, modal = true, modalType, inertTrapFocus = false, dismissible = true, closeLabel, unmountOnClose = true, surfaceMotion, actions, onOpenChange, children, ...props }: ElementProps & { open?: boolean; defaultOpen?: boolean; title?: string; dialogLabel?: string; modal?: boolean; modalType?: \"modal\" | \"non-modal\" | \"alert\"; inertTrapFocus?: boolean; dismissible?: boolean; closeLabel?: string; unmountOnClose?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>; actions?: React.ReactNode; onOpenChange?: (event: DialogOpenChangeEvent, data: DialogOnOpenChangeData) => void; children?: React.ReactNode }",
+        "relatedReactApis": [
+          {
+            "name": "DialogProps.dialogLabel",
+            "description": "Names the fallback heading when no title is supplied; defaults to SharePointUIProvider.strings.dialogLabel."
+          }
+        ],
+        "callbackProps": [
+          "onOpenChange"
+        ],
+        "slots": [
+          "trigger",
+          "surface",
+          "default",
+          "actions",
+          "surface-motion"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Present a focused modal or non-modal task surface with title, actions, and dismissal controls."
+    },
+    {
+      "react": "DialogSurface",
+      "tag": "spui-dialog-surface",
+      "define": "defineDialogSurface",
+      "module": "dialog",
+      "category": "overlays",
+      "api": {
+        "reactSignature": "{ children, backdrop, backdropMotion, mountNode: _mountNode, style, tabIndex = -1, ...props }: DialogSurfaceProps",
+        "callbackProps": [],
+        "slots": [
+          "default",
+          "surface",
+          "backdrop",
+          "backdrop-motion"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "native div root className/style"
+        ],
+        "reactRefType": "HTMLDivElement"
+      },
+      "summary": "Compose the visible surface inside the native accessible dialog element."
+    },
+    {
+      "react": "DialogTitle",
+      "tag": "spui-dialog-title",
+      "define": "defineDialogTitle",
+      "module": "dialog",
+      "category": "overlays",
+      "api": {
+        "reactSignature": "{ children, action, style, ...props }: DialogTitleProps",
+        "callbackProps": [],
+        "slots": [
+          "default",
+          "action"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "native h2 root className/style"
+        ],
+        "reactRefType": "HTMLHeadingElement"
+      },
+      "summary": "Render the dialog heading and provide its accessible name, with an optional trailing action."
+    },
+    {
+      "react": "DialogContent",
+      "tag": "spui-dialog-content",
+      "define": "defineDialogContent",
+      "module": "dialog",
+      "category": "overlays",
+      "api": {
+        "reactSignature": "{ as: Root = \"div\", children, style, ...props }: DialogContentProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "native polymorphic root className/style"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Group the dialog's body and action content."
+    },
+    {
+      "react": "DialogBody",
+      "tag": "spui-dialog-body",
+      "define": "defineDialogBody",
+      "module": "dialog",
+      "category": "overlays",
+      "api": {
+        "reactSignature": "{ as: Root = \"div\", children, style, ...props }: DialogBodyProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "native polymorphic root className/style"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Render dialog content with standard spacing and readable line height."
+    },
+    {
+      "react": "DialogActions",
+      "tag": "spui-dialog-actions",
+      "define": "defineDialogActions",
+      "module": "dialog",
+      "category": "overlays",
+      "api": {
+        "reactSignature": "{ children, fluid = false, position = \"end\", style, ...props }: DialogActionsProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "native div root className/style"
+        ],
+        "reactRefType": "HTMLDivElement"
+      },
+      "summary": "Align dialog actions consistently at the end of a composed dialog."
+    },
+    {
+      "react": "DialogTrigger",
+      "tag": "spui-dialog-trigger",
+      "define": "defineDialogTrigger",
+      "module": "dialog",
+      "category": "overlays",
+      "api": {
+        "reactSignature": "{ children, action, disableButtonEnhancement = false, onClick: triggerOnClick, onKeyDown: triggerOnKeyDown, onKeyUp: triggerOnKeyUp, className: triggerClassName, style: triggerStyle, ...props }: DialogTriggerProps",
+        "callbackProps": [],
+        "slots": [
+          "default",
+          "trigger"
+        ],
+        "styling": [
+          "host className/style"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Open the parent dialog when its slotted interactive child is activated."
+    }
+  ]
+}

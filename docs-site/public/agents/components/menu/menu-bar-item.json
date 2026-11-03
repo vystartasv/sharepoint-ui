@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "MenuBarItem",
+    "tag": "spui-menu-bar-item",
+    "define": "defineMenuBarItem",
+    "module": "menu",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Render a top-level MenuBar command with accessible menu-trigger state and roving tab focus."
+  }
+}

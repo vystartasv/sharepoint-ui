@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "teaching-popover",
+    "category": "feedback",
+    "react": "TeachingPopoverCarousel",
+    "tag": "spui-teaching-popover-carousel",
+    "factory": "defineTeachingPopover",
+    "registered": true,
+    "summary": "Present a controlled or uncontrolled sequence of guided steps.",
+    "api": {
+      "reactSignature": "{ children, defaultValue, value, onValueChange, onAnnouncement, announcement, onFinish, ...props }: ElementProps & { children?: React.ReactNode; value?: string; defaultValue?: string; onValueChange?: (event: TeachingPopoverCarouselChangeEvent, data: TeachingPopoverCarouselValueChangeData) => void; onAnnouncement?: (message: string) => void; announcement?: (newValue: string) => string; onFinish?: (event: TeachingPopoverCarouselChangeEvent, data: TeachingPopoverCarouselFinishData) => void }",
+      "callbackProps": [
+        "onValueChange",
+        "onAnnouncement",
+        "announcement",
+        "onFinish"
+      ],
+      "slots": [
+        "cards"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "theme-derived inline defaults",
+        "host className/style"
+      ]
+    }
+  }
+}

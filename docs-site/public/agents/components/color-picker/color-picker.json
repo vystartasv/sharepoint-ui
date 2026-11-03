@@ -1,0 +1,31 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ColorPicker",
+    "tag": "spui-color-picker",
+    "define": "defineColorPicker",
+    "module": "color-picker",
+    "category": "forms",
+    "api": {
+      "reactSignature": "inputProps: ColorPickerProps",
+      "callbackProps": [
+        "onColorChange",
+        "onValueChange",
+        "onFormatChange"
+      ],
+      "slots": [
+        "area",
+        "sliders",
+        "alpha"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Choose a color with controlled HSV or HEX values, interactive saturation/brightness and hue controls, opacity, HEX/RGB entry, and theme-derived swatches."
+  }
+}

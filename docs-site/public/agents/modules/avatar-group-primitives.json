@@ -1,0 +1,63 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "avatar-group-primitives",
+  "components": [
+    {
+      "react": "AvatarGroupItem",
+      "tag": "spui-avatar-group-item",
+      "define": "defineAvatarGroupItem",
+      "module": "avatar-group-primitives",
+      "category": "people",
+      "api": {
+        "reactSignature": "{ name, avatar, overflowLabel, image, initials, size, shape = \"circular\", color = \"neutral\", active, activeAppearance = \"ring\", idForColor, icon, badge, ...props }: AvatarGroupItemProps",
+        "callbackProps": [],
+        "slots": [
+          "avatar",
+          "overflowLabel",
+          "icon",
+          "badge"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Represent one named person in an AvatarGroup, inheriting the group size and expanding to a labelled row inside its overflow popover."
+    },
+    {
+      "react": "AvatarGroupPopover",
+      "tag": "spui-avatar-group-popover",
+      "define": "defineAvatarGroupPopover",
+      "module": "avatar-group-primitives",
+      "category": "people",
+      "api": {
+        "reactSignature": "{ children, count, indicator, label, triggerLabel, open, placement = \"bottom\", onOpenChange, content, popoverSurface, tooltip, triggerButton, ...props }: AvatarGroupPopoverProps",
+        "callbackProps": [
+          "onOpenChange"
+        ],
+        "relatedReactApis": [
+          {
+            "name": "PopoverProps.mountNode",
+            "description": "Portal the popup surface to an HTMLElement or generated body container; className names generated containers and null selects the body fallback. The trigger stays in place."
+          }
+        ],
+        "slots": [
+          "content",
+          "popoverSurface",
+          "tooltip",
+          "triggerButton"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ]
+      },
+      "summary": "Show overflow members in a theme-aware, labelled popover with a count or icon trigger and keyboard dismissal."
+    }
+  ]
+}

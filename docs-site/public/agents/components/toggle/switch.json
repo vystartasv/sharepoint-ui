@@ -1,0 +1,31 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Switch",
+    "tag": "spui-switch",
+    "define": "defineSwitch",
+    "module": "toggle",
+    "category": "forms",
+    "api": {
+      "reactSignature": "{ checked, defaultChecked, disabledFocusable, onCheckedChange, onChange, label, children, input, indicator, size, labelPosition = \"after\", ...props }: SwitchProps",
+      "callbackProps": [
+        "onCheckedChange",
+        "onChange"
+      ],
+      "slots": [
+        "default",
+        "input",
+        "indicator",
+        "label"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Change a binary setting with an explicit label, small or medium sizing, logical label placement, native form participation, and optional keyboard-focusable disabled state."
+  }
+}

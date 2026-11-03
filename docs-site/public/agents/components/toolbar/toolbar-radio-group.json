@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ToolbarRadioGroup",
+    "tag": "spui-toolbar-radio-group",
+    "define": "defineToolbarRadioGroup",
+    "module": "toolbar",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Group mutually exclusive toolbar radio commands under an accessible radiogroup name."
+  }
+}

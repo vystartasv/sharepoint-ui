@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "TagPickerGroup",
+    "tag": "spui-tag-picker-group",
+    "define": "defineTagPicker",
+    "module": "tag-picker",
+    "category": "form-option",
+    "api": {
+      "reactSignature": "{ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }",
+      "callbackProps": [],
+      "slots": [
+        "children"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Render consumer-owned selected tags inside the TagPicker control."
+  }
+}

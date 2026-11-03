@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "DataGridRow",
+    "module": "data-grid",
+    "reactOnly": true,
+    "category": "data-display",
+    "api": {
+      "generic": "T",
+      "reactSignature": "{ item, rowId, rowIndex, appearance, selectionCell, children, onClick, ...props }: DataGridRowProps<T>",
+      "callbackProps": [
+        "children(render helpers)"
+      ],
+      "slots": [
+        "children",
+        "selectionCell"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "host className/style"
+      ]
+    },
+    "summary": "Compose a grid row and expose renderCell/renderHeaderCell helpers to its children; supports Fluent cell, row, and composite focus modes."
+  }
+}

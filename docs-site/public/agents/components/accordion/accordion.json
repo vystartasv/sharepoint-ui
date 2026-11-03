@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Accordion",
+    "tag": "spui-accordion",
+    "define": "defineAccordion",
+    "module": "accordion",
+    "category": "disclosure",
+    "api": {
+      "generic": "TValue extends AccordionItemValue = AccordionItemValue",
+      "reactSignature": "{ mode, multiple, collapsible, navigation, openItems, defaultOpenItems, onToggle, children, ...props }: ElementProps & { mode?: \"single\" | \"multiple\"; multiple?: boolean; collapsible?: boolean; navigation?: AccordionNavigation; openItems?: TValue | readonly TValue[]; defaultOpenItems?: TValue | readonly TValue[]; onToggle?: (event: AccordionToggleEvent, data: { value: TValue; openItems: TValue[] }) => void; children?: React.ReactNode }",
+      "callbackProps": [
+        "onToggle"
+      ],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement",
+      "forwardRefParameterType": "React.ForwardedRef<HTMLElement>"
+    },
+    "summary": "Group composed sections with controlled or default values, single/multiple and collapsible behavior, change details, and optional linear/circular keyboard navigation."
+  }
+}

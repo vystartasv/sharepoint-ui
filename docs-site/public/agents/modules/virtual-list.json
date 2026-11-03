@@ -1,0 +1,122 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "virtual-list",
+  "components": [
+    {
+      "react": "VirtualList",
+      "tag": "spui-virtual-list",
+      "define": "defineVirtualList",
+      "module": "virtual-list",
+      "category": "data-display",
+      "api": {
+        "generic": "T",
+        "reactSignature": "{ items, itemCount, dataSource, onDataLoadError, renderItem, itemKey, onRenderedRange, onScrollStateChange, viewportRef, scrollToIndexRef, virtualizerLength, label, rowHeight = 40, measureItems = false, overscan = 4, axis = \"vertical\", ...props }: ElementProps & { items?: T[]; itemCount?: number; dataSource?: VirtualListDataSource<T>; onDataLoadError?: (error: unknown, range: { start: number; end: number }) => void; renderItem: (item: T | undefined, index: number) => React.ReactNode; itemKey?: (item: T | undefined, index: number) => string | number; onRenderedRange?: (range: { start: number; end: number; total: number }) => void; onScrollStateChange?: (scrolling: boolean) => void; viewportRef?: React.Ref<HTMLDivElement>; scrollToIndexRef?: React.RefObject<VirtualListScrollToHandle | null>; virtualizerLength?: number; label?: string; rowHeight?: number; measureItems?: boolean; overscan?: number; axis?: \"vertical\" | \"horizontal\"; scrollMode?: \"element\" | \"window\" }",
+        "callbackProps": [
+          "renderItem",
+          "itemKey",
+          "onRenderedRange",
+          "onDataLoadError"
+        ],
+        "slots": [],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ]
+      },
+      "summary": "Render large local or asynchronously range-loaded collections with bounded horizontal or vertical viewport rendering, fixed or measured item sizes, and accessible list position metadata."
+    },
+    {
+      "module": "virtual-list",
+      "category": "data-display",
+      "react": "Virtualizer",
+      "tag": "spui-virtualizer",
+      "factory": "defineVirtualList",
+      "registered": false,
+      "api": {
+        "reactSignature": "{ children, numItems, itemSize, virtualizerLength = 24, bufferItems, bufferSize, containerSizeRef, getItemSize, gap = 0, reversed = false, updateScrollPosition, virtualizerContext, axis = \"vertical\", measureItems = false, enableScrollLoad = false, enablePagination = false, flaggedIndex, onRenderedFlaggedIndex, onRenderedRange: onRenderedRangeChange, imperativeVirtualizerRef, imperativeRef, scrollViewRef, label, scrollMode = \"element\", before, after, beforeContainer, afterContainer, ...props }: Omit<ElementProps, \"children\"> & { children: VirtualizerChildRenderFunction; numItems: number; itemSize: number; virtualizerLength?: number; bufferItems?: number; bufferSize?: number; containerSizeRef?: React.RefObject<number>; getItemSize?: (index: number) => number; gap?: number; reversed?: boolean; updateScrollPosition?: (position: number) => void; virtualizerContext?: VirtualizerContextProps; axis?: \"vertical\" | \"horizontal\"; scrollMode?: \"element\" | \"window\"; measureItems?: boolean; enableScrollLoad?: boolean; enablePagination?: boolean; flaggedIndex?: React.MutableRefObject<number | null>; onRenderedFlaggedIndex?: (index: number) => void; onRenderedRange?: (range: { start: number; end: number; total: number }) => void; imperativeVirtualizerRef?: React.RefObject<VirtualizerDataRef | null>; imperativeRef?: React.RefObject<VirtualizerScrollToHandle | null>; scrollViewRef?: React.MutableRefObject<HTMLElement | null>; label?: string } & VirtualizerBookendSlots",
+        "callbackProps": [
+          "children",
+          "onRenderedFlaggedIndex",
+          "onRenderedRange",
+          "getItemSize",
+          "updateScrollPosition"
+        ],
+        "slots": [
+          "default",
+          "before",
+          "after",
+          "beforeContainer",
+          "afterContainer"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ]
+      },
+      "summary": "Render large horizontal or vertical collections through a bounded accessible viewport, or use browser-window scrolling for vertical page-flow lists, with fixed or measured item sizes, index-based rendering, and imperative scrolling."
+    },
+    {
+      "module": "virtual-list",
+      "category": "data-display",
+      "react": "VirtualizerScrollView",
+      "tag": "div",
+      "reactOnly": true,
+      "api": {
+        "reactSignature": "{ children, itemSize, numItems, virtualizerLength, bufferItems, bufferSize, scrollViewRef: providedScrollViewRef, axis = \"vertical\", reversed, enableScrollLoad, onRenderedFlaggedIndex, flaggedIndex, imperativeVirtualizerRef, imperativeRef, containerSizeRef, updateScrollPosition, gap, enablePagination, container, label, ...props }: ScrollViewBaseProps",
+        "callbackProps": [
+          "children",
+          "getItemSize",
+          "updateScrollPosition",
+          "onRenderedFlaggedIndex"
+        ],
+        "slots": [
+          "default",
+          "container",
+          "before",
+          "after",
+          "beforeContainer",
+          "afterContainer"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ]
+      },
+      "summary": "Compatibility view for Fluent's legacy fixed-size virtualizer, with a responsive render window, accessible list positions, imperative scrolling, and optional scroll snapping."
+    },
+    {
+      "module": "virtual-list",
+      "category": "data-display",
+      "react": "VirtualizerScrollViewDynamic",
+      "tag": "div",
+      "reactOnly": true,
+      "api": {
+        "reactSignature": "{ children, itemSize, numItems, virtualizerLength, bufferItems, bufferSize, scrollViewRef: providedScrollViewRef, axis = \"vertical\", reversed, enableScrollLoad, getItemSize, virtualizerContext, onRenderedFlaggedIndex, flaggedIndex, imperativeVirtualizerRef, imperativeRef, containerSizeRef, updateScrollPosition, gap, enablePagination, container, label, ...props }: ScrollViewBaseProps",
+        "callbackProps": [
+          "children",
+          "getItemSize",
+          "updateScrollPosition",
+          "onRenderedFlaggedIndex"
+        ],
+        "slots": [
+          "default",
+          "container",
+          "before",
+          "after",
+          "beforeContainer",
+          "afterContainer"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ]
+      },
+      "summary": "Compatibility view for Fluent's legacy measured virtualizer, with variable item sizes, responsive rendering, accessible list positions, imperative scrolling, and optional scroll snapping."
+    }
+  ]
+}

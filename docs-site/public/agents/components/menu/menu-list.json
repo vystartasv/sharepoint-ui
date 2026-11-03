@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "MenuList",
+    "tag": "spui-menu-list",
+    "define": "defineMenuList",
+    "module": "menu",
+    "category": "actions",
+    "api": {
+      "reactSignature": "{ children, checkedValues, defaultCheckedValues, hasCheckmarks = false, hasIcons = false, onCheckedValueChange, ...props }: MenuListProps",
+      "callbackProps": [
+        "onCheckedValueChange"
+      ],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ]
+    },
+    "summary": "Compose menu items and optionally control their checked values and alignment hints."
+  }
+}

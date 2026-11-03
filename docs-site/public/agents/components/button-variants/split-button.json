@@ -1,0 +1,28 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "SplitButton",
+    "tag": "spui-split-button",
+    "define": "defineSplitButton",
+    "module": "button-variants",
+    "category": "actions",
+    "api": {
+      "reactSignature": "{ children, menuItems, menuLabel, appearance = \"primary\", size = \"medium\", shape = \"rounded\", disabled, disabledFocusable = false, icon, iconPosition = \"before\", menuIcon, onClick, primaryActionButton, menuButton, ...props }: ElementProps & { children: React.ReactNode; menuItems: React.ReactNode; menuLabel?: string; appearance?: ButtonAppearance; size?: ButtonSize; shape?: ButtonShape; disabled?: boolean; disabledFocusable?: boolean; icon?: React.ReactNode; iconPosition?: \"before\" | \"after\"; menuIcon?: React.ReactNode; onClick?: React.MouseEventHandler<HTMLElement>; primaryActionButton?: React.ReactElement | Partial<React.ComponentProps<typeof Button>>; menuButton?: React.ReactElement | Partial<React.ComponentProps<typeof MenuButton>> }",
+      "callbackProps": [
+        "onClick"
+      ],
+      "slots": [
+        "primary",
+        "menu"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Pair a primary action with a localized menu trigger; replace either button slot with a React element or partial prop object while retaining composed Menu behavior."
+  }
+}

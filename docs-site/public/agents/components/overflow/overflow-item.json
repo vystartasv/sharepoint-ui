@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "OverflowItem",
+    "tag": "spui-overflow-item",
+    "define": "defineOverflowItem",
+    "module": "overflow",
+    "category": "actions",
+    "api": {
+      "reactSignature": "{ id, priority = 0, pinned = false, groupId, overflowLabel, overflowContent, children, ...props }: OverflowItemProps",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Register one stable action with the responsive overflow engine; pin essential actions and provide its MenuItem representation for narrow layouts."
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Dropdown",
+    "tag": "spui-combobox",
+    "module": "combobox",
+    "category": "forms",
+    "reactOnly": true,
+    "api": {
+      "reactSignature": "{ label, button, listbox, mountNode, value, defaultValue, selectedOptions, defaultSelectedOptions, multiselect = false, disabled, placeholder, onOptionSelect, onOpenChange, onActiveOptionChange, defaultOpen, open, clearable, clearButton, expandIcon, disableAutoFocus, appearance, size, positioning, inlinePopup, children, ...props }: DropdownProps",
+      "relatedReactApis": [
+        {
+          "name": "DropdownProps.mountNode",
+          "description": "Mount the listbox popup in an HTMLElement, a generated body container with a className, or the default body portal; the trigger stays in place."
+        }
+      ],
+      "callbackProps": [
+        "onOptionSelect",
+        "onOpenChange",
+        "onActiveOptionChange"
+      ],
+      "slots": [
+        "default Option children",
+        "button",
+        "listbox",
+        "clearButton",
+        "expandIcon"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Choose from grouped options with a button trigger, replaceable button and listbox roots, controlled or default selection, keyboard interaction, accessible listbox semantics, and mountNode popup targeting."
+  }
+}

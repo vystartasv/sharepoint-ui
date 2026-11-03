@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "TagPickerControl",
+    "tag": "spui-tag-picker-control",
+    "define": "defineTagPicker",
+    "module": "tag-picker",
+    "category": "form-option",
+    "api": {
+      "reactSignature": "{ children, secondaryAction, expandIcon }: ElementProps & { children?: React.ReactNode; secondaryAction?: React.ReactNode; expandIcon?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "children",
+        "secondaryAction",
+        "expandIcon"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "host className/style",
+        "named ::part hooks"
+      ]
+    },
+    "summary": "Compose selected tags, the picker input, and secondary control actions."
+  }
+}

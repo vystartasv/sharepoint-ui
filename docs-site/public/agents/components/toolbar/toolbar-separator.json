@@ -1,0 +1,23 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ToolbarSeparator",
+    "tag": "spui-toolbar-separator",
+    "define": "defineToolbarSeparator",
+    "module": "toolbar",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "props: ElementProps = {}",
+      "callbackProps": [],
+      "slots": [],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "::part(line)"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Theme-derived non-interactive separator that reports the orientation matching its parent Toolbar layout."
+  }
+}

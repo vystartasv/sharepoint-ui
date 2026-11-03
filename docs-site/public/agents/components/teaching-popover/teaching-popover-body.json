@@ -1,0 +1,23 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "teaching-popover",
+    "category": "text",
+    "react": "TeachingPopoverBody",
+    "tag": "spui-teaching-popover-body",
+    "factory": "defineTeachingPopover",
+    "registered": true,
+    "summary": "Present instructional text and optional media.",
+    "api": {
+      "reactSignature": "{ children, media, mediaLength = \"medium\", ...props }: ElementProps & { children?: React.ReactNode; media?: React.ReactNode; mediaLength?: \"short\" | \"medium\" | \"tall\" }",
+      "callbackProps": [],
+      "slots": [
+        "media",
+        "default"
+      ],
+      "styling": [
+        "host className/style"
+      ]
+    }
+  }
+}

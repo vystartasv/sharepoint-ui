@@ -1,0 +1,208 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "tag-picker",
+  "components": [
+    {
+      "react": "TagPicker",
+      "tag": "spui-tag-picker",
+      "define": "defineTagPicker",
+      "module": "tag-picker",
+      "category": "form",
+      "api": {
+        "reactSignature": "{ children, label, selectedLabel, requiredMessage, selectedOptions, defaultSelectedOptions, selectedValues, defaultSelectedValues, inputValue, open, defaultOpen, positioning, disableAutoFocus = false, inline = false, noPopover = false, disabled, onOpenChange, onOptionSelect, onInputValueChange, onChange, ...props }: TagPickerProps",
+        "relatedReactApis": [
+          {
+            "name": "TagPickerProps.requiredMessage",
+            "description": "Sets the native form validation message; defaults to SharePointUIProvider.strings.required."
+          },
+          {
+            "name": "TagPickerProps.selectedLabel",
+            "description": "Names the selected-options group; defaults to SharePointUIProvider.strings.selectedOptionsLabel."
+          },
+          {
+            "name": "TagPickerProps.selectedOptions",
+            "description": "Controls the selected option values; use defaultSelectedOptions for an uncontrolled initial selection."
+          },
+          {
+            "name": "TagPickerProps.positioning",
+            "description": "Positions the options surface relative to the control; supports placement shorthands, alignment, fallbacks, and offsets."
+          },
+          {
+            "name": "TagPickerProps.disableAutoFocus",
+            "description": "Keeps the first matching option inactive until keyboard navigation selects one."
+          }
+        ],
+        "callbackProps": [
+          "onOpenChange",
+          "onOptionSelect",
+          "onInputValueChange",
+          "onChange"
+        ],
+        "slots": [
+          "button",
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Search, choose, and remove multiple values with keyboard and native form support.",
+      "highValueAdditions": [
+        "Add composed control, input, selected-tag group, and list primitives while preserving the single state engine.",
+        "Position the options surface against viewport and clipping ancestors, including SharePoint sections."
+      ]
+    },
+    {
+      "react": "TagPickerButton",
+      "tag": "button",
+      "module": "tag-picker",
+      "reactOnly": true,
+      "category": "form-trigger",
+      "api": {
+        "reactSignature": "{ children, appearance = \"outline\", size = \"medium\", disabled = false, ...props }: TagPickerButtonProps",
+        "reactRefType": "HTMLButtonElement",
+        "callbackProps": [],
+        "slots": [
+          "button"
+        ],
+        "styling": [
+          "Button theme tokens",
+          "SharePointUIProvider tokens",
+          "host className/style"
+        ]
+      },
+      "summary": "Provide a button-only TagPicker trigger. In framework-neutral markup, place a native button in the picker’s button slot."
+    },
+    {
+      "react": "TagPickerControl",
+      "tag": "spui-tag-picker-control",
+      "define": "defineTagPicker",
+      "module": "tag-picker",
+      "category": "form-option",
+      "api": {
+        "reactSignature": "{ children, secondaryAction, expandIcon }: ElementProps & { children?: React.ReactNode; secondaryAction?: React.ReactNode; expandIcon?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "children",
+          "secondaryAction",
+          "expandIcon"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "host className/style",
+          "named ::part hooks"
+        ]
+      },
+      "summary": "Compose selected tags, the picker input, and secondary control actions."
+    },
+    {
+      "react": "TagPickerGroup",
+      "tag": "spui-tag-picker-group",
+      "define": "defineTagPicker",
+      "module": "tag-picker",
+      "category": "form-option",
+      "api": {
+        "reactSignature": "{ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }",
+        "callbackProps": [],
+        "slots": [
+          "children"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Render consumer-owned selected tags inside the TagPicker control."
+    },
+    {
+      "react": "TagPickerInput",
+      "tag": "spui-tag-picker-input",
+      "define": "defineTagPicker",
+      "module": "tag-picker",
+      "category": "form-option",
+      "api": {
+        "reactSignature": "{ value, placeholder, disabled = false, clearable = false, appearance, onValueChange, ...props }: Omit<ElementProps, \"children\"> & { value?: string; placeholder?: string; disabled?: boolean; clearable?: boolean; appearance?: \"filled-darker\" | \"filled-lighter\" | \"outline\" | \"underline\"; onValueChange?: (value: string) => void }",
+        "callbackProps": [
+          "onValueChange"
+        ],
+        "slots": [
+          "input"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Configure and observe the TagPicker search input."
+    },
+    {
+      "react": "TagPickerList",
+      "tag": "spui-tag-picker-list",
+      "define": "defineTagPicker",
+      "module": "tag-picker",
+      "category": "form-option",
+      "api": {
+        "reactSignature": "{ children }: ElementProps & { children?: React.ReactNode; disableAutoFocus?: boolean }",
+        "callbackProps": [],
+        "slots": [
+          "children"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "host className/style",
+          "named ::part hooks"
+        ]
+      },
+      "summary": "Compose a collection of TagPicker options in the picker popup."
+    },
+    {
+      "react": "TagPickerOptionGroup",
+      "tag": "spui-tag-picker-option-group",
+      "define": "defineTagPicker",
+      "module": "tag-picker",
+      "category": "form-option",
+      "api": {
+        "reactSignature": "{ children, label, disabled = false }: ElementProps & { children?: React.ReactNode; label: string; disabled?: boolean }",
+        "callbackProps": [],
+        "slots": [
+          "children"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Group TagPicker options under an accessible label."
+    },
+    {
+      "react": "TagPickerOption",
+      "tag": "spui-tag-picker-option",
+      "define": "defineTagPicker",
+      "module": "tag-picker",
+      "category": "form-option",
+      "registered": false,
+      "api": {
+        "reactSignature": "{ value, text, label, group, media, secondaryContent, disabled = false, children, ...props }: ElementProps & { value: string; text?: string; label?: string; group?: string; media?: React.ReactNode; secondaryContent?: React.ReactNode; disabled?: boolean; children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "media",
+          "default",
+          "secondaryContent"
+        ],
+        "styling": [],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Define a selectable or disabled result inside a TagPicker."
+    }
+  ]
+}

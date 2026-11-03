@@ -1,0 +1,290 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "carousel",
+  "components": [
+    {
+      "react": "Carousel",
+      "tag": "spui-carousel",
+      "define": "defineCarousel",
+      "module": "carousel",
+      "category": "views",
+      "api": {
+        "reactSignature": "{ children, label, roleDescription, previousLabel, nextLabel, slideLabel, slideGroupLabel, navigationLabel, playLabel, pauseLabel, slideWidth, align = \"center\", appearance = \"flat\", motion = \"slide\", motionDuration = 240, autoplay = false, autoplayInterval = 4000, selectedIndex, activeIndex, defaultSelectedIndex, defaultActiveIndex, wrap = false, circular = false, groupSize = \"auto\", draggable = false, whitespace = false, announcement, onIndexChange, onActiveIndexChange, ...props }: ElementProps & {\n  children?: React.ReactNode; label?: string; roleDescription?: string; previousLabel?: string; nextLabel?: string; slideLabel?: string; slideGroupLabel?: string; navigationLabel?: string; playLabel?: string; pauseLabel?: string; slideWidth?: string;\n  align?: CarouselAlign; appearance?: CarouselAppearance; motion?: CarouselMotion; motionDuration?: number; autoplay?: boolean; autoplayInterval?: number; selectedIndex?: number; activeIndex?: number; defaultSelectedIndex?: number; defaultActiveIndex?: number; wrap?: boolean; circular?: boolean; groupSize?: number | \"auto\"; draggable?: boolean; whitespace?: boolean; announcement?: CarouselAnnouncerFunction; onIndexChange?: (index: number) => void; onActiveIndexChange?: (event: SharePointUIEvent, data: CarouselReactIndexChangeData) => void\n}",
+        "callbackProps": [
+          "onIndexChange",
+          "onActiveIndexChange"
+        ],
+        "slots": [
+          "slides (direct or CarouselViewport > CarouselSlider > CarouselCard)",
+          "navigation slot (CarouselNavContainer or CarouselNav)"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks",
+          "slideWidth or --spui-carousel-slide-width for fluid per-slide sizing",
+          "align, appearance, motion and motionDuration props; slideWidth or --spui-carousel-slide-width for fluid sizing",
+          "motion accepts slide attraction physics: { kind: \"slide\", duration?: number }; duration follows Embla’s 20–60 recommendation"
+        ],
+        "highValueAdditions": [
+          "Enable drag with keyboard-equivalent announcements and preserve end padding when slides are centered."
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Compose direct or grouped CarouselCard slides with localized navigation, optional autoplay, numeric or responsive page groups, drag interaction, and theme-aware motion."
+    },
+    {
+      "module": "carousel",
+      "category": "views",
+      "api": {
+        "callbackProps": [],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactSignature": "{ children, autoSize = false, ...props }: ElementProps & { children?: React.ReactNode; autoSize?: boolean }",
+        "slots": [
+          "content"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "react": "CarouselCard",
+      "tag": "spui-carousel-card",
+      "define": "defineCarouselCard",
+      "signature": "{ children, autoSize = false, ...props }: ElementProps & { children?: React.ReactNode; autoSize?: boolean }",
+      "slots": [
+        "content"
+      ],
+      "summary": "Represent one accessible carousel slide, with optional intrinsic sizing for content-driven galleries."
+    },
+    {
+      "module": "carousel",
+      "category": "views",
+      "api": {
+        "callbackProps": [],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactSignature": "{ children, label, appearance, slot = \"navigation\", ...props }: ElementProps & { children?: React.ReactNode; label?: string; appearance?: \"brand\"; slot?: string }",
+        "slots": [
+          "navigation buttons"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "react": "CarouselNav",
+      "tag": "spui-carousel-nav",
+      "define": "defineCarouselNav",
+      "signature": "{ children, label, appearance, ...props }: ElementProps & { children?: React.ReactNode; label?: string; appearance?: \"brand\" }",
+      "slots": [
+        "navigation buttons"
+      ],
+      "summary": "Group carousel position buttons with RTL-aware roving keyboard focus."
+    },
+    {
+      "module": "carousel",
+      "category": "views",
+      "api": {
+        "callbackProps": [],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactSignature": "{ children, index, label, selected = false, disabled = false, ...props }: ElementProps & { children?: React.ReactNode; index: number; label?: string; selected?: boolean; disabled?: boolean }",
+        "slots": [
+          "default"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "react": "CarouselNavButton",
+      "tag": "spui-carousel-nav-button",
+      "define": "defineCarouselNavButton",
+      "signature": "{ children, index, label, selected = false, disabled = false, ...props }: ElementProps & { children?: React.ReactNode; index: number; label?: string; selected?: boolean; disabled?: boolean }",
+      "slots": [
+        "label"
+      ],
+      "summary": "Jump to a carousel slide with selected state and roving focus."
+    },
+    {
+      "module": "carousel",
+      "category": "views",
+      "api": {
+        "callbackProps": [],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactSignature": "{ index, src, alt, label, image, selected = false, disabled = false, ...props }: ElementProps & { index: number; src: string; alt: string; label?: string; image?: React.ReactElement; selected?: boolean; disabled?: boolean }",
+        "slots": [
+          "image"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "react": "CarouselNavImageButton",
+      "tag": "spui-carousel-nav-image-button",
+      "define": "defineCarouselNavImageButton",
+      "signature": "{ index, src, alt, label, image, selected = false, disabled = false, ...props }: ElementProps & { index: number; src: string; alt: string; label?: string; image?: React.ReactElement; selected?: boolean; disabled?: boolean }",
+      "slots": [
+        "image"
+      ],
+      "summary": "Navigate carousel slides with an accessible image preview."
+    },
+    {
+      "react": "CarouselButton",
+      "tag": "spui-carousel-button",
+      "define": "defineCarouselButton",
+      "module": "carousel",
+      "category": "views",
+      "api": {
+        "callbackProps": [],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ],
+        "reactSignature": "{ children, icon, navType = \"next\", label, ...props }: Omit<ElementProps, \"slot\"> & { children?: React.ReactNode; icon?: React.ReactNode; navType?: \"prev\" | \"next\"; label?: string; slot?: string | null }",
+        "slots": [
+          "icon",
+          "default"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Add a previous or next action to a composed Carousel control strip; the Carousel owns bounds, wrapping, and disabled state."
+    },
+    {
+      "react": "CarouselAutoplayButton",
+      "tag": "spui-carousel-autoplay-button",
+      "define": "defineCarouselAutoplayButton",
+      "module": "carousel",
+      "category": "views",
+      "api": {
+        "relatedReactApis": [
+          {
+            "name": "CarouselAutoplayButtonProps.checked",
+            "description": "Controls whether autoplay is running; onCheckedChange reports the requested next value."
+          },
+          {
+            "name": "CarouselAutoplayButtonProps.defaultChecked",
+            "description": "Sets the initial uncontrolled autoplay state."
+          },
+          {
+            "name": "CarouselAutoplayButtonProps.appearance",
+            "description": "Uses the same appearance options as a ToggleButton."
+          }
+        ],
+        "callbackProps": [
+          "onCheckedChange"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ],
+        "reactSignature": "{ icon, appearance = \"secondary\", checked, defaultChecked, disabled = false, disabledFocusable = false, iconPosition = \"before\", isAccessible = false, shape = \"rounded\", size = \"medium\", playLabel, pauseLabel, onCheckedChange, ...props }: CarouselAutoplayButtonProps",
+        "slots": [
+          "icon"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Expose a localized, accessible play/pause control synchronized with its parent Carousel autoplay state."
+    },
+    {
+      "react": "CarouselNavContainer",
+      "tag": "spui-carousel-nav-container",
+      "define": "defineCarouselNavContainer",
+      "module": "carousel",
+      "category": "views",
+      "api": {
+        "callbackProps": [],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ],
+        "reactSignature": "{ children, prev, next, autoplay, prevTooltip, nextTooltip, autoplayTooltip, layout = \"inline\", ...props }: ElementProps & { children?: React.ReactNode; prev?: CarouselNavButtonSlotProps | null; next?: CarouselNavButtonSlotProps | null; autoplay?: CarouselAutoplaySlotProps | null; prevTooltip?: CarouselTooltipSlotProps | null; nextTooltip?: CarouselTooltipSlotProps | null; autoplayTooltip?: CarouselTooltipSlotProps | null; layout?: \"inline\" | \"inline-wide\" | \"overlay\" | \"overlay-wide\" | \"overlay-expanded\" }",
+        "slots": [
+          "previous",
+          "prev",
+          "navigation",
+          "autoplay",
+          "next",
+          "prevTooltip",
+          "nextTooltip",
+          "autoplayTooltip"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Arrange Carousel navigation, previous/next, and autoplay controls in inline or overlay layouts."
+    },
+    {
+      "react": "CarouselSlider",
+      "tag": "spui-carousel-slider",
+      "define": "defineCarouselSlider",
+      "module": "carousel",
+      "category": "views",
+      "summary": "Provide the scroll track and optional arrow-key focus group for CarouselCard slides.",
+      "api": {
+        "reactSignature": "{ children, cardFocus = false, ...props }: ElementProps & { children?: React.ReactNode; cardFocus?: boolean }",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ],
+        "reactRefType": "HTMLElement"
+      }
+    },
+    {
+      "react": "CarouselViewport",
+      "tag": "spui-carousel-viewport",
+      "define": "defineCarouselViewport",
+      "module": "carousel",
+      "category": "views",
+      "summary": "Mark the visible slide region in a composed Carousel; the parent Carousel manages scrolling and pauses autoplay during focus or pointer interaction.",
+      "api": {
+        "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ],
+        "reactRefType": "HTMLElement"
+      }
+    },
+    {
+      "react": "CarouselProvider",
+      "module": "carousel",
+      "category": "views",
+      "reactOnly": true,
+      "summary": "Provide Carousel state and navigation methods to React descendants through the Carousel context.",
+      "api": {
+        "reactSignature": "{ value, children }: { value: CarouselContextValue | undefined; children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "children"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ]
+      }
+    }
+  ]
+}

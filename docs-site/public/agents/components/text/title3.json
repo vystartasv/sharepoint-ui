@@ -1,0 +1,21 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Title3",
+    "module": "text",
+    "reactOnly": true,
+    "category": "typography",
+    "api": {
+      "reactSignature": "props: TextPresetProps",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "Fluent typography tokens",
+        "host className/style"
+      ]
+    },
+    "summary": "Fluent Title3 typography preset (base 600, semibold)."
+  }
+}

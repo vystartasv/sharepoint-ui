@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "AccordionPanel",
+    "tag": "spui-accordion-panel",
+    "define": "defineAccordionPanel",
+    "module": "accordion",
+    "category": "disclosure",
+    "api": {
+      "reactSignature": "{ children, collapseMotion, ...props }: ElementProps & { children?: React.ReactNode; collapseMotion?: React.ComponentType<PresenceMotionSlotProps> }",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "collapse-motion"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Compose a region-labelled content panel controlled by its parent AccordionItem."
+  }
+}

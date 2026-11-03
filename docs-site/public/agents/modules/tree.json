@@ -1,0 +1,153 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "tree",
+  "components": [
+    {
+      "react": "Tree",
+      "tag": "spui-tree",
+      "define": "defineTree",
+      "module": "tree",
+      "category": "navigation",
+      "api": {
+        "generic": "T",
+        "reactSignature": "{ items, children, label, selectionMode = \"none\", selectedKeys, defaultSelectedKeys = [], checkedItems, defaultCheckedItems, openItems, defaultOpenItems, expandedKeys, defaultExpandedKeys = [], onSelectionChange, onCheckedChange, onExpandedChange, onOpenChange, onNavigation, navigationMode = \"tree\", appearance = \"subtle\", size = \"medium\", renderItem, collapseMotion, toggleLabel, emptyMessage, ...props }: TreeProps<T>",
+        "callbackProps": [
+          "onSelectionChange",
+          "onCheckedChange",
+          "onExpandedChange",
+          "onOpenChange",
+          "onNavigation",
+          "renderItem"
+        ],
+        "slots": [
+          "collapseMotion"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ]
+      },
+      "summary": "Browse nested folders or navigation nodes with hierarchy semantics and RTL-aware keys."
+    },
+    {
+      "react": "TreeItemLayout",
+      "module": "tree",
+      "reactOnly": true,
+      "category": "tree-layout",
+      "api": {
+        "reactSignature": "{ children, main, iconBefore, iconAfter, expandIcon, aside, actions, selector, className, ...props }: TreeItemLayoutProps",
+        "callbackProps": [],
+        "slots": [
+          "main",
+          "iconBefore",
+          "iconAfter",
+          "expandIcon",
+          "aside",
+          "actions",
+          "selector"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ]
+      },
+      "summary": "Compose the content, icons, aside, and actions for a TreeItem while keeping expansion and selection controls in the tree engine."
+    },
+    {
+      "react": "TreeItemPersonaLayout",
+      "module": "tree",
+      "reactOnly": true,
+      "category": "tree-layout",
+      "api": {
+        "reactSignature": "{ children, media, main, description, actions, aside, expandIcon, selector, className, ...props }: TreeItemPersonaLayoutProps",
+        "callbackProps": [],
+        "slots": [
+          "media",
+          "main",
+          "description",
+          "actions",
+          "aside",
+          "expandIcon",
+          "selector"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ]
+      },
+      "summary": "Compose a person-style TreeItem with media, primary and secondary text, aside, and actions."
+    },
+    {
+      "react": "TreeItem",
+      "module": "tree",
+      "reactOnly": true,
+      "category": "tree-item",
+      "api": {
+        "reactSignature": "_props: TreeItemProps",
+        "callbackProps": [
+          "onOpenChange"
+        ],
+        "slots": [
+          "TreeItemLayout",
+          "TreeItemPersonaLayout",
+          "nested Tree"
+        ],
+        "styling": [
+          "Composed Tree state"
+        ]
+      },
+      "summary": "Declare a leaf or branch in a composable Tree; the Tree owns rendering, hierarchy, focus, selection, and expansion."
+    },
+    {
+      "react": "FlatTreeItem",
+      "module": "tree",
+      "reactOnly": true,
+      "category": "tree-item",
+      "api": {
+        "reactSignature": "_props: FlatTreeItemProps",
+        "callbackProps": [
+          "onOpenChange"
+        ],
+        "slots": [
+          "TreeItemLayout",
+          "TreeItemPersonaLayout"
+        ],
+        "styling": [
+          "Composed Tree state"
+        ]
+      },
+      "summary": "Declare one flat Tree record with a parent value and explicit hierarchy metadata."
+    },
+    {
+      "react": "FlatTree",
+      "module": "tree",
+      "reactOnly": true,
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ children, ...props }: FlatTreeProps",
+        "callbackProps": [
+          "onSelectionChange",
+          "onCheckedChange",
+          "onExpandedChange",
+          "onOpenChange",
+          "onNavigation",
+          "renderItem"
+        ],
+        "slots": [
+          "FlatTreeItem",
+          "collapseMotion"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ]
+      },
+      "summary": "Build a hierarchical accessible Tree from flat items linked by parentValue."
+    }
+  ]
+}

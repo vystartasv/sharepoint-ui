@@ -19,23 +19,31 @@
       <spui-badge appearance="tint" color="success">Ready for review</spui-badge>
       <span>Updated just now</span>
     </div>
-    <output id="preview-message" class="preview-message" aria-live="polite">iOS appearance · stone accent</output>
+      <output id="preview-message" class="preview-message" aria-live="polite">iOS · SharePoint theme · #007780</output>
   </div>
 </section>
 
 <script>
   import { defineBadge, defineButton, defineInput, defineTag } from "@spfx-fast/sharepoint-ui/elements";
   import { getSharePointUIStyleTokens } from "@spfx-fast/sharepoint-ui/appearance";
+  import themeCapture from "../data/sharepoint-theme.json";
+  import { createPreviewThemeOverrides } from "../utils/preview-theme.js";
 
   defineBadge();
   defineButton();
   defineInput();
   defineTag();
 
-  const preview = document.querySelector<HTMLElement>("#preview-surface");
-  const accents = ["#78716c", "#0078d4", "#138a58", "#c23b8d"];
+  const preview = document.querySelector<HTMLElement>(".preview-bench");
+  const accents = ["#007780", "#0f6cbd", "#107c10", "#c239b3"];
   let accentIndex = 0;
-  if (preview) Object.entries(getSharePointUIStyleTokens("ios", { "--spui-ui-accent": accents[accentIndex] })).forEach(([name, value]) => preview.style.setProperty(name, value));
+  const applyPreviewTheme = (accent: string) => {
+    if (!preview) return;
+    const overrides = createPreviewThemeOverrides(themeCapture.presets.sharepoint.tokens, accent, accent !== themeCapture.presets.sharepoint.accent);
+    Object.entries(getSharePointUIStyleTokens("ios", overrides)).forEach(([name, value]) => preview.style.setProperty(name, value));
+    Object.entries(overrides).forEach(([name, value]) => preview.style.setProperty(name, value));
+  };
+  applyPreviewTheme(accents[accentIndex]);
 
   const previewMessage = document.querySelector<HTMLOutputElement>("#preview-message");
   document.querySelector("#preview-save")?.addEventListener("click", () => {
@@ -44,9 +52,8 @@
   document.querySelector("#preview-theme")?.addEventListener("click", () => {
     if (preview) {
       accentIndex = (accentIndex + 1) % accents.length;
-      const tokens = getSharePointUIStyleTokens("ios", { "--spui-ui-accent": accents[accentIndex] });
-      Object.entries(tokens).forEach(([name, value]) => preview.style.setProperty(name, value));
-      if (previewMessage) previewMessage.textContent = `iOS appearance · accent ${accents[accentIndex]}`;
+      applyPreviewTheme(accents[accentIndex]);
+      if (previewMessage) previewMessage.textContent = `iOS · ${accentIndex === 0 ? "SharePoint theme" : "accent"} · ${accents[accentIndex]}`;
     }
   });
 </script>

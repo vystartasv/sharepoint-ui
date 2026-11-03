@@ -1,0 +1,28 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "AlphaSlider",
+    "tag": "spui-alpha-slider",
+    "define": "defineAlphaSlider",
+    "module": "color-picker",
+    "category": "forms",
+    "registered": true,
+    "summary": "Adjust opacity or transparency inside ColorPicker or as a standalone HSV-controlled slider.",
+    "api": {
+      "reactSignature": "{ transparency, vertical, color, defaultColor, shape, onChange, ...props }: AlphaSliderProps",
+      "callbackProps": [
+        "onChange(event, { color })"
+      ],
+      "slots": [
+        "alpha"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    }
+  }
+}

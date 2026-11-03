@@ -1,0 +1,19 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "useOverflowSnapshot",
+    "module": "overflow",
+    "reactOnly": true,
+    "category": "actions",
+    "api": {
+      "generic": "TSelected",
+      "reactSignature": "selector: (snapshot: OverflowSnapshot) => TSelected",
+      "callbackProps": [],
+      "slots": [],
+      "styling": [
+        "React hook"
+      ]
+    },
+    "summary": "Subscribe to a selected value from the latest overflow snapshot."
+  }
+}

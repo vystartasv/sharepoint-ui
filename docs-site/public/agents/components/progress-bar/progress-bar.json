@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ProgressBar",
+    "tag": "spui-progress-bar",
+    "define": "defineProgressBar",
+    "module": "progress-bar",
+    "category": "feedback",
+    "api": {
+      "reactSignature": "{ value, max = 1, label, color, shape = \"rounded\", thickness = \"medium\", bar, indeterminateMotion, ...props }: ElementProps & { value?: number; max?: number; label?: string; color?: ProgressBarColor; shape?: ProgressBarShape; thickness?: ProgressBarThickness; bar?: React.ReactNode; indeterminateMotion?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "bar",
+        "indeterminateMotion"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Report determinate or indeterminate task progress with theme-aware Fluent colors, shapes, thicknesses, reduced-motion support, and accessible progressbar semantics."
+  }
+}

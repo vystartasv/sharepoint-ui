@@ -1,0 +1,414 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "nav",
+  "components": [
+    {
+      "react": "Nav",
+      "tag": "spui-nav",
+      "define": "defineNav",
+      "module": "nav",
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ children, label = \"Navigation\", selectedValue, defaultSelectedValue, selectedCategoryValue, defaultSelectedCategoryValue, openCategories, defaultOpenCategories = [], open, defaultOpen, collapsed, defaultCollapsed, collapsible = false, multiple = true, density = \"medium\", openLabel, closeLabel, onItemSelect, onCategoryToggle, onNavItemSelect, onNavCategoryItemToggle, onOpenChange, onCollapsedChange, onClick, onClickCapture, onKeyDown, onKeyDownCapture, onKeyUp, onKeyUpCapture, onKeyPress, onKeyPressCapture, onFocus, onFocusCapture, onBlur, onBlurCapture, onAuxClick, onAuxClickCapture, onContextMenu, onContextMenuCapture, onDoubleClick, onDoubleClickCapture, onMouseDown, onMouseDownCapture, onMouseMove, onMouseMoveCapture, onMouseOut, onMouseOutCapture, onMouseOver, onMouseOverCapture, onMouseUp, onMouseUpCapture, onGotPointerCapture, onGotPointerCaptureCapture, onLostPointerCapture, onLostPointerCaptureCapture, onPointerCancel, onPointerCancelCapture, onPointerDown, onPointerDownCapture, onPointerMove, onPointerMoveCapture, onPointerOut, onPointerOutCapture, onPointerOver, onPointerOverCapture, onPointerUp, onPointerUpCapture, onMouseEnter, onMouseLeave, onPointerEnter, onPointerLeave, ...props }: Omit<ElementProps, \"onSelect\" | \"onClick\" | \"onClickCapture\"> & { onClick?: React.MouseEventHandler<HTMLElement>; onClickCapture?: React.MouseEventHandler<HTMLElement>; children?: React.ReactNode; label?: string; selectedValue?: string | null; defaultSelectedValue?: string | null; selectedCategoryValue?: string | null; defaultSelectedCategoryValue?: string | null; openCategories?: readonly string[]; defaultOpenCategories?: readonly string[]; open?: boolean; defaultOpen?: boolean; collapsed?: boolean; defaultCollapsed?: boolean; collapsible?: boolean; multiple?: boolean; density?: \"small\" | \"medium\" | \"large\"; tabbable?: boolean | \"true\" | \"false\"; openLabel?: string; closeLabel?: string; onItemSelect?: (value: string, href: string | null, label: string) => void; onCategoryToggle?: (value: string, open: boolean, openCategories: string[]) => void; onNavItemSelect?: (event: SharePointUIEvent, data: NavReactItemSelectData) => void; onNavCategoryItemToggle?: (event: SharePointUIEvent, data: NavReactCategoryToggleData) => void; onOpenChange?: (open: boolean) => void; onCollapsedChange?: (collapsed: boolean) => void }",
+        "callbackProps": [
+          "onItemSelect",
+          "onCategoryToggle",
+          "onNavItemSelect",
+          "onNavCategoryItemToggle",
+          "onOpenChange",
+          "onCollapsedChange"
+        ],
+        "slots": [
+          "items",
+          "category items",
+          "NavItem avatar/icon",
+          "NavCategoryItem avatar/icon",
+          "NavDrawerHeader",
+          "NavDrawerBody",
+          "NavDrawerFooter"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Navigate app destinations with grouped disclosures, a responsive localized mobile drawer, and an optional compact desktop rail that retains screen-reader labels."
+    },
+    {
+      "react": "NavItem",
+      "tag": "spui-nav-item",
+      "define": "defineNavItem",
+      "module": "nav",
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ children, value, href, disabled = false, icon, avatar, onClick, onClickCapture, onKeyDown, onKeyDownCapture, onKeyUp, onKeyUpCapture, onKeyPress, onKeyPressCapture, onFocus, onFocusCapture, onBlur, onBlurCapture, onAuxClick, onAuxClickCapture, onContextMenu, onContextMenuCapture, onDoubleClick, onDoubleClickCapture, onMouseDown, onMouseDownCapture, onMouseMove, onMouseMoveCapture, onMouseOut, onMouseOutCapture, onMouseOver, onMouseOverCapture, onMouseUp, onMouseUpCapture, onGotPointerCapture, onGotPointerCaptureCapture, onLostPointerCapture, onLostPointerCaptureCapture, onPointerCancel, onPointerCancelCapture, onPointerDown, onPointerDownCapture, onPointerMove, onPointerMoveCapture, onPointerOut, onPointerOutCapture, onPointerOver, onPointerOverCapture, onPointerUp, onPointerUpCapture, onMouseEnter, onMouseLeave, onPointerEnter, onPointerLeave, ...props }: NativeClickHostProps<HTMLButtonElement | HTMLAnchorElement> & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }",
+        "callbackProps": [],
+        "slots": [
+          "default",
+          "icon",
+          "avatar"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Render a selectable navigation destination as a native link or button."
+    },
+    {
+      "react": "NavCategory",
+      "tag": "spui-nav-category",
+      "define": "defineNavCategory",
+      "module": "nav",
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ children, value, disabled = false, ...props }: ElementProps & { children?: React.ReactNode; value: string; disabled?: boolean }",
+        "callbackProps": [],
+        "slots": [
+          "NavCategoryItem",
+          "NavSubItemGroup"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Group expandable navigation destinations."
+    },
+    {
+      "react": "NavCategoryItem",
+      "tag": "spui-nav-category-item",
+      "define": "defineNavCategoryItem",
+      "module": "nav",
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ children, icon, avatar, expandIcon, expandIconMotion, onClick, onClickCapture, onKeyDown, onKeyDownCapture, onKeyUp, onKeyUpCapture, onKeyPress, onKeyPressCapture, onFocus, onFocusCapture, onBlur, onBlurCapture, onAuxClick, onAuxClickCapture, onContextMenu, onContextMenuCapture, onDoubleClick, onDoubleClickCapture, onMouseDown, onMouseDownCapture, onMouseMove, onMouseMoveCapture, onMouseOut, onMouseOutCapture, onMouseOver, onMouseOverCapture, onMouseUp, onMouseUpCapture, onGotPointerCapture, onGotPointerCaptureCapture, onLostPointerCapture, onLostPointerCaptureCapture, onPointerCancel, onPointerCancelCapture, onPointerDown, onPointerDownCapture, onPointerMove, onPointerMoveCapture, onPointerOut, onPointerOutCapture, onPointerOver, onPointerOverCapture, onPointerUp, onPointerUpCapture, onMouseEnter, onMouseLeave, onPointerEnter, onPointerLeave, ...props }: NativeButtonHostProps & { children?: React.ReactNode; icon?: React.ReactNode; avatar?: React.ReactElement; expandIcon?: React.ReactNode; expandIconMotion?: React.ComponentType<PresenceMotionSlotProps> }",
+        "callbackProps": [],
+        "slots": [
+          "default",
+          "icon",
+          "avatar",
+          "expandIcon",
+          "expandIconMotion"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Provide the accessible disclosure button for a NavCategory."
+    },
+    {
+      "react": "NavSubItemGroup",
+      "tag": "spui-nav-sub-item-group",
+      "define": "defineNavSubItemGroup",
+      "module": "nav",
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ children, collapseMotion, ...props }: ElementProps & { children?: React.ReactNode; collapseMotion?: React.ComponentType<PresenceMotionSlotProps> }",
+        "callbackProps": [],
+        "slots": [
+          "NavSubItem",
+          "collapse-motion"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Contain the destinations revealed by a NavCategory."
+    },
+    {
+      "react": "NavSubItem",
+      "tag": "spui-nav-sub-item",
+      "define": "defineNavSubItem",
+      "module": "nav",
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ children, value, href, disabled = false, icon, avatar, onClick, onClickCapture, onKeyDown, onKeyDownCapture, onKeyUp, onKeyUpCapture, onKeyPress, onKeyPressCapture, onFocus, onFocusCapture, onBlur, onBlurCapture, onAuxClick, onAuxClickCapture, onContextMenu, onContextMenuCapture, onDoubleClick, onDoubleClickCapture, onMouseDown, onMouseDownCapture, onMouseMove, onMouseMoveCapture, onMouseOut, onMouseOutCapture, onMouseOver, onMouseOverCapture, onMouseUp, onMouseUpCapture, onGotPointerCapture, onGotPointerCaptureCapture, onLostPointerCapture, onLostPointerCaptureCapture, onPointerCancel, onPointerCancelCapture, onPointerDown, onPointerDownCapture, onPointerMove, onPointerMoveCapture, onPointerOut, onPointerOutCapture, onPointerOver, onPointerOverCapture, onPointerUp, onPointerUpCapture, onMouseEnter, onMouseLeave, onPointerEnter, onPointerLeave, ...props }: NativeClickHostProps<HTMLButtonElement | HTMLAnchorElement> & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }",
+        "callbackProps": [],
+        "slots": [
+          "default",
+          "icon",
+          "avatar"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Render a nested destination as a native link or button."
+    },
+    {
+      "react": "NavDivider",
+      "tag": "spui-nav-divider",
+      "define": "defineNavDivider",
+      "module": "nav",
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ wrapper, alignContent = \"center\", appearance = \"default\", inset = false, vertical = false, ...props }: NavDividerProps",
+        "relatedReactApis": [
+          {
+            "name": "NavDividerProps.alignContent",
+            "description": "Aligns wrapper content at the start, center, or end of the divider."
+          },
+          {
+            "name": "NavDividerProps.appearance",
+            "description": "Selects the default, brand, strong, or subtle theme-derived divider line."
+          },
+          {
+            "name": "NavDividerProps.inset",
+            "description": "Adds logical inline spacing around the divider."
+          },
+          {
+            "name": "NavDividerProps.vertical",
+            "description": "Renders a vertical divider and sets aria-orientation accordingly."
+          }
+        ],
+        "callbackProps": [],
+        "slots": [
+          "wrapper"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Separate navigation groups."
+    },
+    {
+      "react": "NavSectionHeader",
+      "tag": "spui-nav-section-header",
+      "define": "defineNavSectionHeader",
+      "module": "nav",
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Label a group of related navigation items."
+    },
+    {
+      "react": "AppItem",
+      "tag": "spui-app-item",
+      "define": "defineAppItem",
+      "module": "nav",
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ children, value, href, disabled = false, icon, avatar, onClick, onClickCapture, onKeyDown, onKeyDownCapture, onKeyUp, onKeyUpCapture, onKeyPress, onKeyPressCapture, onFocus, onFocusCapture, onBlur, onBlurCapture, onAuxClick, onAuxClickCapture, onContextMenu, onContextMenuCapture, onDoubleClick, onDoubleClickCapture, onMouseDown, onMouseDownCapture, onMouseMove, onMouseMoveCapture, onMouseOut, onMouseOutCapture, onMouseOver, onMouseOverCapture, onMouseUp, onMouseUpCapture, onGotPointerCapture, onGotPointerCaptureCapture, onLostPointerCapture, onLostPointerCaptureCapture, onPointerCancel, onPointerCancelCapture, onPointerDown, onPointerDownCapture, onPointerMove, onPointerMoveCapture, onPointerOut, onPointerOutCapture, onPointerOver, onPointerOverCapture, onPointerUp, onPointerUpCapture, onMouseEnter, onMouseLeave, onPointerEnter, onPointerLeave, ...props }: NativeClickHostProps<HTMLButtonElement | HTMLAnchorElement> & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }",
+        "callbackProps": [],
+        "slots": [
+          "default",
+          "icon",
+          "avatar"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "AppItem is a selectable application destination with icon/avatar and native link semantics."
+    },
+    {
+      "react": "AppItemStatic",
+      "tag": "spui-app-item-static",
+      "define": "defineAppItemStatic",
+      "module": "nav",
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ children, icon, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "default",
+          "icon"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Display the current application identity without navigation behavior."
+    },
+    {
+      "react": "Hamburger",
+      "tag": "spui-hamburger",
+      "define": "defineHamburger",
+      "module": "nav",
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ children, icon, open = false, label, disabled = false, disabledFocusable = false, appearance = \"subtle\", iconPosition = \"before\", shape = \"rounded\", size = \"medium\", onClick, onClickCapture, onKeyDown, onKeyDownCapture, onKeyUp, onKeyUpCapture, onKeyPress, onKeyPressCapture, onFocus, onFocusCapture, onBlur, onBlurCapture, onAuxClick, onAuxClickCapture, onContextMenu, onContextMenuCapture, onDoubleClick, onDoubleClickCapture, onMouseDown, onMouseDownCapture, onMouseMove, onMouseMoveCapture, onMouseOut, onMouseOutCapture, onMouseOver, onMouseOverCapture, onMouseUp, onMouseUpCapture, onGotPointerCapture, onGotPointerCaptureCapture, onLostPointerCapture, onLostPointerCaptureCapture, onPointerCancel, onPointerCancelCapture, onPointerDown, onPointerDownCapture, onPointerMove, onPointerMoveCapture, onPointerOut, onPointerOutCapture, onPointerOver, onPointerOverCapture, onPointerUp, onPointerUpCapture, onMouseEnter, onMouseLeave, onPointerEnter, onPointerLeave, ...props }: HamburgerProps",
+        "callbackProps": [],
+        "slots": [
+          "icon",
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Accessible keyboard-operable navigation toggle control."
+    },
+    {
+      "react": "NavDrawer",
+      "tag": "spui-nav-drawer",
+      "define": "defineNavDrawer",
+      "module": "nav",
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ children, type = \"overlay\", open, defaultOpen, modal = true, dismissible = true, position = \"start\", size = \"medium\", expandable = false, expanded, unmountOnClose = true, separator = false, closeLabel, onOpenChange, onDismiss, onExpandedChange, tabbable = false, ...props }: NavDrawerProps",
+        "callbackProps": [],
+        "slots": [
+          "Nav",
+          "NavDrawerHeader",
+          "NavDrawerBody",
+          "NavDrawerFooter"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Compose Nav with optional drawer header, body, and footer regions."
+    },
+    {
+      "react": "NavDrawerBody",
+      "tag": "spui-nav-drawer-body",
+      "define": "defineNavDrawerBody",
+      "module": "nav",
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Group the main navigation drawer content."
+    },
+    {
+      "react": "NavDrawerFooter",
+      "tag": "spui-nav-drawer-footer",
+      "define": "defineNavDrawerFooter",
+      "module": "nav",
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Place secondary actions at the end of the navigation drawer."
+    },
+    {
+      "react": "NavDrawerHeader",
+      "tag": "spui-nav-drawer-header",
+      "define": "defineNavDrawerHeader",
+      "module": "nav",
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Place title and controls at the start of the navigation drawer."
+    },
+    {
+      "react": "SplitNavItem",
+      "tag": "spui-split-nav-item",
+      "define": "defineSplitNavItem",
+      "module": "nav",
+      "category": "navigation",
+      "api": {
+        "reactSignature": "{ children, value, href, disabled = false, icon, action, actionLabel, onAction, navItem, actionButton, actionButtonTooltip, menuButton, menuButtonTooltip, toggleButton, toggleButtonTooltip, ...props }: ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; action?: React.ReactNode; actionLabel?: string; onAction?: React.MouseEventHandler<HTMLButtonElement>; navItem?: React.ReactElement; actionButton?: React.ReactElement; actionButtonTooltip?: React.ReactElement; menuButton?: React.ReactElement; menuButtonTooltip?: React.ReactElement; toggleButton?: React.ReactElement; toggleButtonTooltip?: React.ReactElement }",
+        "callbackProps": [],
+        "slots": [
+          "NavItem",
+          "action",
+          "navItem",
+          "actionButton",
+          "actionButtonTooltip",
+          "menuButton",
+          "menuButtonTooltip",
+          "toggleButton",
+          "toggleButtonTooltip"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Combine a destination with a separate secondary action."
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ToastTrigger",
+    "reactOnly": true,
+    "module": "toast",
+    "category": "feedback",
+    "api": {
+      "reactSignature": "{ children, disableButtonEnhancement = false }: { children: React.ReactElement; disableButtonEnhancement?: boolean }",
+      "callbackProps": [],
+      "slots": [
+        "child"
+      ],
+      "styling": [
+        "Clones and enhances one child element"
+      ]
+    },
+    "summary": "Make a toast child dismiss its toast when activated, with optional button semantics for non-button elements."
+  }
+}

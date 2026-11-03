@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Breadcrumb",
+    "tag": "spui-breadcrumb",
+    "define": "defineBreadcrumb",
+    "module": "breadcrumb",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ children, label, focusMode = \"tab\", size = \"medium\", separator, list, ...props }: ElementProps & { children?: React.ReactNode; label?: string; focusMode?: \"tab\" | \"arrow\"; size?: \"small\" | \"medium\" | \"large\"; separator?: string; list?: React.ReactElement }",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "list"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Show the current location in a labelled navigation trail with a replaceable list root and optional arrow-key focus."
+  }
+}

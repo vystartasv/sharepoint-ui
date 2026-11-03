@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "CardFooter",
+    "tag": "spui-card-footer",
+    "define": "defineCardFooter",
+    "module": "card-primitives",
+    "category": "layout",
+    "api": {
+      "reactSignature": "{ action, children, ...props }: ElementProps & { action?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "action"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Arrange related card actions in a wrapping footer, with an optional action aligned to the logical end."
+  }
+}

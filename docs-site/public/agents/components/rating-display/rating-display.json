@@ -1,0 +1,27 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "RatingDisplay",
+    "tag": "spui-rating-display",
+    "define": "defineRatingDisplay",
+    "module": "rating-display",
+    "category": "forms",
+    "api": {
+      "reactSignature": "{ value, max = 5, count, compact = false, color = \"neutral\", size = \"medium\", icon, label, valueText, countText, children, ...props }: ElementProps & { value?: number; max?: number; count?: number; compact?: boolean; color?: \"brand\" | \"marigold\" | \"neutral\"; size?: \"small\" | \"medium\" | \"large\" | \"extra-large\"; icon?: React.ElementType; label?: string; valueText?: React.ReactNode; countText?: React.ReactNode; children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "items",
+        "valueText",
+        "countText"
+      ],
+      "styling": [
+        "SharePointUIProvider theme/tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Display an accessible, theme-aware whole or fractional rating with compact and count modes."
+  }
+}

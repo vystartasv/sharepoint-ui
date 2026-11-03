@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "file-upload",
+  "components": [
+    {
+      "react": "FileUpload",
+      "tag": "spui-file-upload",
+      "define": "defineFileUpload",
+      "module": "file-upload",
+      "category": "forms",
+      "api": {
+        "reactSignature": "inputProps: FileUploadProps",
+        "callbackProps": [
+          "onFilesChange",
+          "onFilesError"
+        ],
+        "slots": [],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Select files by browsing or drag and drop, enforce type/count/size constraints, expose accessible removal and events, and contribute selected files to native forms. The consumer owns upload transport and SharePoint persistence."
+    }
+  ]
+}

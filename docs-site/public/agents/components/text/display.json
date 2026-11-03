@@ -1,0 +1,21 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Display",
+    "module": "text",
+    "reactOnly": true,
+    "category": "typography",
+    "api": {
+      "reactSignature": "props: TextPresetProps",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "Fluent typography tokens",
+        "host className/style"
+      ]
+    },
+    "summary": "Fluent Display typography preset (hero 1000, semibold)."
+  }
+}

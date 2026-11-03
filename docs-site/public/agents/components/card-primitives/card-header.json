@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "CardHeader",
+    "tag": "spui-card-header",
+    "define": "defineCardHeader",
+    "module": "card-primitives",
+    "category": "layout",
+    "api": {
+      "reactSignature": "{ image, header, description, action, children, ...props }: ElementProps & { image?: React.ReactNode; header?: React.ReactNode; description?: React.ReactNode; action?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "image",
+        "header",
+        "description",
+        "action",
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Compose a card identity, title, supporting description, and optional action in a responsive logical-direction header."
+  }
+}

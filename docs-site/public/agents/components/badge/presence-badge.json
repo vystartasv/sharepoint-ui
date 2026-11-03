@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "PresenceBadge",
+    "tag": "spui-presence-badge",
+    "define": "definePresenceBadge",
+    "module": "badge",
+    "category": "status",
+    "api": {
+      "reactSignature": "{ status = \"available\", outOfOffice = false, size = \"medium\", icon, ...props }: ElementProps & { status?: PresenceBadgeStatus; outOfOffice?: boolean; size?: BadgeSize; icon?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "icon"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Show a compact, accessible presence status with an optional out-of-office marker."
+  }
+}

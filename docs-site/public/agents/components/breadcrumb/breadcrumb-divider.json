@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "BreadcrumbDivider",
+    "tag": "spui-breadcrumb-divider",
+    "define": "defineBreadcrumbDivider",
+    "module": "breadcrumb",
+    "category": "navigation-item",
+    "api": {
+      "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Provide an accessible visual separator between breadcrumb items."
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "AvatarGroupItem",
+    "tag": "spui-avatar-group-item",
+    "define": "defineAvatarGroupItem",
+    "module": "avatar-group-primitives",
+    "category": "people",
+    "api": {
+      "reactSignature": "{ name, avatar, overflowLabel, image, initials, size, shape = \"circular\", color = \"neutral\", active, activeAppearance = \"ring\", idForColor, icon, badge, ...props }: AvatarGroupItemProps",
+      "callbackProps": [],
+      "slots": [
+        "avatar",
+        "overflowLabel",
+        "icon",
+        "badge"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Represent one named person in an AvatarGroup, inheriting the group size and expanding to a labelled row inside its overflow popover."
+  }
+}

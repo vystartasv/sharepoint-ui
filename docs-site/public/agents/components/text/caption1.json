@@ -1,0 +1,21 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Caption1",
+    "module": "text",
+    "reactOnly": true,
+    "category": "typography",
+    "api": {
+      "reactSignature": "props: TextPresetProps",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "Fluent typography tokens",
+        "host className/style"
+      ]
+    },
+    "summary": "Fluent Caption1 typography preset (base 200, regular)."
+  }
+}

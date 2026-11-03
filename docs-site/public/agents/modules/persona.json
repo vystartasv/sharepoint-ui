@@ -1,0 +1,33 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "persona",
+  "components": [
+    {
+      "react": "Persona",
+      "tag": "spui-persona",
+      "define": "definePersona",
+      "module": "persona",
+      "category": "people",
+      "api": {
+        "reactSignature": "{ name, image, initials, primaryText, secondaryText, tertiaryText, quaternaryText, presence, presenceLabel, size = \"medium\", color = \"neutral\", textPosition = \"after\", textAlignment = \"start\", presenceOnly = false, avatar, children, ...props }: ElementProps & { name: string; image?: string; initials?: string; primaryText?: React.ReactNode; secondaryText?: React.ReactNode; tertiaryText?: React.ReactNode; quaternaryText?: React.ReactNode; presence?: PersonaPresence; presenceLabel?: string; size?: PersonaSize; color?: AvatarColor; textPosition?: \"after\" | \"before\" | \"below\"; textAlignment?: \"start\" | \"center\"; presenceOnly?: boolean; avatar?: React.ReactNode; children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "avatar",
+          "details",
+          "primaryText",
+          "secondaryText",
+          "tertiaryText",
+          "quaternaryText"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Present a person with an Avatar, four composable identity text lines, and localized presence context."
+    }
+  ]
+}

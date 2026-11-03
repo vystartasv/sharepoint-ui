@@ -1,0 +1,30 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Toast",
+    "tag": "spui-toast",
+    "define": "defineToast",
+    "module": "toast",
+    "category": "feedback",
+    "api": {
+      "reactSignature": "{ id, title, action, onAction, onDismiss, priority = 0, intent = \"info\", appearance, politeness, timeout = 3000, dismissLabel, pauseOnHover = false, pauseOnWindowBlur = false, children, ...props }: ToastProps",
+      "callbackProps": [
+        "onAction",
+        "onDismiss"
+      ],
+      "slots": [
+        "title",
+        "default",
+        "action"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Announce brief, dismissible feedback with intent-based live politeness, priority scheduling, and a three-second timeout that continues while hovered or the window is unfocused."
+  }
+}

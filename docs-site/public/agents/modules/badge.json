@@ -1,0 +1,72 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "badge",
+  "components": [
+    {
+      "react": "Badge",
+      "tag": "spui-badge",
+      "define": "defineBadge",
+      "module": "badge",
+      "category": "status",
+      "api": {
+        "reactSignature": "{ children, icon, appearance = \"filled\", color = \"brand\", iconPosition = \"before\", shape = \"circular\", size = \"medium\", ...props }: BadgeProps",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Show a compact status or category label alongside its related content."
+    },
+    {
+      "react": "CounterBadge",
+      "tag": "spui-counter-badge",
+      "define": "defineCounterBadge",
+      "module": "badge",
+      "category": "status",
+      "api": {
+        "reactSignature": "{ count = 0, dot = false, overflowCount = 99, showZero = false, appearance = \"filled\", color = \"brand\", shape = \"circular\", size = \"medium\", icon, iconPosition = \"before\", ...props }: ElementProps & { count?: number; dot?: boolean; overflowCount?: number; showZero?: boolean; appearance?: \"filled\" | \"ghost\"; color?: Extract<BadgeColor, \"brand\" | \"danger\" | \"important\" | \"informative\">; shape?: \"circular\" | \"rounded\"; size?: BadgeSize; icon?: React.ReactNode; iconPosition?: \"before\" | \"after\" }",
+        "callbackProps": [],
+        "slots": [
+          "icon"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Display an accessible count or dot badge with an optional overflow limit."
+    },
+    {
+      "react": "PresenceBadge",
+      "tag": "spui-presence-badge",
+      "define": "definePresenceBadge",
+      "module": "badge",
+      "category": "status",
+      "api": {
+        "reactSignature": "{ status = \"available\", outOfOffice = false, size = \"medium\", icon, ...props }: ElementProps & { status?: PresenceBadgeStatus; outOfOffice?: boolean; size?: BadgeSize; icon?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "icon"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Show a compact, accessible presence status with an optional out-of-office marker."
+    }
+  ]
+}

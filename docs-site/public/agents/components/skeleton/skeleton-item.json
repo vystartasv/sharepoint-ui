@@ -1,0 +1,23 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "SkeletonItem",
+    "tag": "spui-skeleton-item",
+    "define": "defineSkeletonItem",
+    "module": "skeleton",
+    "category": "feedback",
+    "api": {
+      "reactSignature": "{ animation, appearance, size, shape, ...props }: ElementProps & { animation?: SkeletonAnimation; appearance?: SkeletonAppearance; size?: SkeletonItemSize; shape?: \"rectangle\" | \"square\" | \"circle\" }",
+      "callbackProps": [],
+      "slots": [],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Render a themed loading placeholder with Fluent size, shape, appearance, and motion options."
+  }
+}

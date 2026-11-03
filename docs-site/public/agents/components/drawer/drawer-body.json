@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "DrawerBody",
+    "tag": "div",
+    "module": "drawer",
+    "category": "feedback",
+    "reactOnly": true,
+    "api": {
+      "reactSignature": "{ children, ...props }: DrawerBodyProps",
+      "reactRefType": "HTMLDivElement",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ]
+    },
+    "summary": "Wrap the main drawer content while preserving the drawer’s scroll and layout behavior."
+  }
+}

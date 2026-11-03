@@ -1,0 +1,21 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "DataGridHeader",
+    "module": "data-grid",
+    "reactOnly": true,
+    "category": "data-display",
+    "api": {
+      "reactSignature": "{ children, ...props }: DataGridHeaderProps",
+      "callbackProps": [],
+      "slots": [
+        "children"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "host className/style"
+      ]
+    },
+    "summary": "Group composable DataGrid header rows with grid semantics."
+  }
+}

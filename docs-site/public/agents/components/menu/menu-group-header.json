@@ -1,0 +1,23 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "MenuGroupHeader",
+    "tag": "spui-menu-group-header",
+    "define": "defineMenuGroupHeader",
+    "module": "menu",
+    "category": "actions",
+    "api": {
+      "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Display a non-interactive visual heading within a Menu."
+  }
+}

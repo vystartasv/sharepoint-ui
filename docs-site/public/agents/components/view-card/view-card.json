@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ViewCard",
+    "tag": "spui-view-card",
+    "define": "defineViewCard",
+    "module": "view-card",
+    "category": "sharepoint-data",
+    "api": {
+      "reactSignature": "{ kind, title, subtitle, description, children, ...props }: ElementProps & { kind: \"document\" | \"person\" | \"task\" | \"approval\" | \"list-item\"; title: string; subtitle?: string; description?: string }",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "leading",
+        "eyebrow",
+        "status",
+        "footer"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Present a document, person, task, approval, or list item with replaceable fields and actions."
+  }
+}

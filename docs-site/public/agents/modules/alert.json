@@ -1,0 +1,33 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "alert",
+  "components": [
+    {
+      "react": "Alert",
+      "tag": "spui-alert",
+      "define": "defineAlert",
+      "module": "alert",
+      "category": "feedback",
+      "api": {
+        "reactSignature": "{ intent = \"info\", appearance = \"primary\", assertive, dismissible = false, dismissLabel, onDismiss, icon, avatar, action, actions, children, ...props }: ElementProps & { intent?: \"info\" | \"success\" | \"warning\" | \"error\"; appearance?: \"primary\" | \"inverted\"; assertive?: boolean; dismissible?: boolean; dismissLabel?: string; onDismiss?: () => void; icon?: React.ReactNode; avatar?: React.ReactNode; action?: React.ReactNode; actions?: React.ReactNode }",
+        "callbackProps": [
+          "onDismiss"
+        ],
+        "slots": [
+          "default",
+          "icon",
+          "action",
+          "avatar"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Announce by intent with polite or assertive live-region behavior, and compose icon, avatar, action, or dismissal slots."
+    }
+  ]
+}

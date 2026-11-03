@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "DataGridHeaderCell",
+    "module": "data-grid",
+    "reactOnly": true,
+    "category": "data-display",
+    "api": {
+      "reactSignature": "{ children, columnId, rowIndex = 0, columnIndex = 0, sortable = true, sortDirection: explicitSortDirection, focusMode = \"cell\", aside, sortIcon, button, ...props }: DataGridHeaderCellProps",
+      "callbackProps": [],
+      "slots": [
+        "children",
+        "aside",
+        "button",
+        "sortIcon"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "host className/style"
+      ]
+    },
+    "summary": "Render a sortable, keyboard-navigable DataGrid column header."
+  }
+}

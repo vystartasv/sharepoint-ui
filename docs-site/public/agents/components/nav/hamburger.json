@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Hamburger",
+    "tag": "spui-hamburger",
+    "define": "defineHamburger",
+    "module": "nav",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ children, icon, open = false, label, disabled = false, disabledFocusable = false, appearance = \"subtle\", iconPosition = \"before\", shape = \"rounded\", size = \"medium\", onClick, onClickCapture, onKeyDown, onKeyDownCapture, onKeyUp, onKeyUpCapture, onKeyPress, onKeyPressCapture, onFocus, onFocusCapture, onBlur, onBlurCapture, onAuxClick, onAuxClickCapture, onContextMenu, onContextMenuCapture, onDoubleClick, onDoubleClickCapture, onMouseDown, onMouseDownCapture, onMouseMove, onMouseMoveCapture, onMouseOut, onMouseOutCapture, onMouseOver, onMouseOverCapture, onMouseUp, onMouseUpCapture, onGotPointerCapture, onGotPointerCaptureCapture, onLostPointerCapture, onLostPointerCaptureCapture, onPointerCancel, onPointerCancelCapture, onPointerDown, onPointerDownCapture, onPointerMove, onPointerMoveCapture, onPointerOut, onPointerOutCapture, onPointerOver, onPointerOverCapture, onPointerUp, onPointerUpCapture, onMouseEnter, onMouseLeave, onPointerEnter, onPointerLeave, ...props }: HamburgerProps",
+      "callbackProps": [],
+      "slots": [
+        "icon",
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Accessible keyboard-operable navigation toggle control."
+  }
+}

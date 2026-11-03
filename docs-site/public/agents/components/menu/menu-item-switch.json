@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "MenuItemSwitch",
+    "tag": "spui-menu-item",
+    "define": "defineMenuItem",
+    "module": "menu",
+    "category": "actions",
+    "api": {
+      "reactSignature": "props: MenuItemSwitchProps",
+      "callbackProps": [
+        "onCheckedChange"
+      ],
+      "slots": [
+        "default",
+        "icon",
+        "subtext",
+        "secondary-content",
+        "switch-indicator"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ]
+    },
+    "summary": "Render a menu checkbox with a switch indicator for an immediate setting."
+  }
+}

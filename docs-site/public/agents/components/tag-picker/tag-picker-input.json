@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "TagPickerInput",
+    "tag": "spui-tag-picker-input",
+    "define": "defineTagPicker",
+    "module": "tag-picker",
+    "category": "form-option",
+    "api": {
+      "reactSignature": "{ value, placeholder, disabled = false, clearable = false, appearance, onValueChange, ...props }: Omit<ElementProps, \"children\"> & { value?: string; placeholder?: string; disabled?: boolean; clearable?: boolean; appearance?: \"filled-darker\" | \"filled-lighter\" | \"outline\" | \"underline\"; onValueChange?: (value: string) => void }",
+      "callbackProps": [
+        "onValueChange"
+      ],
+      "slots": [
+        "input"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Configure and observe the TagPicker search input."
+  }
+}

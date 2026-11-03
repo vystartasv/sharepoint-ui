@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "BreadcrumbItem",
+    "tag": "spui-breadcrumb-item",
+    "define": "defineBreadcrumbItem",
+    "module": "breadcrumb",
+    "category": "navigation-item",
+    "api": {
+      "reactSignature": "{ children, current = false, size, ...props }: ElementProps & { children?: React.ReactNode; current?: boolean; size?: BreadcrumbSize }",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Represent a destination or current location inside a Breadcrumb."
+  }
+}

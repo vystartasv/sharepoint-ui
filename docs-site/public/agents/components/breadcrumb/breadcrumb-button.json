@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "BreadcrumbButton",
+    "tag": "spui-breadcrumb-button",
+    "define": "defineBreadcrumbButton",
+    "module": "breadcrumb",
+    "category": "navigation-item",
+    "api": {
+      "reactSignature": "{ children, icon, href, target, rel, type = \"button\", current = false, disabled = false, disabledFocusable = false, size, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode; href?: string; target?: string; rel?: string; type?: \"button\" | \"submit\" | \"reset\"; current?: boolean; disabled?: boolean; disabledFocusable?: boolean; size?: BreadcrumbSize }",
+      "callbackProps": [],
+      "slots": [
+        "icon",
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Render a theme-aware breadcrumb action as a button or link with current and disabled states."
+  }
+}

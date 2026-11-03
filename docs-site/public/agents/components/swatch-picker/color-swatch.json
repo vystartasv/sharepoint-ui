@@ -1,0 +1,27 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "swatch-picker",
+    "category": "inputs",
+    "api": {
+      "callbackProps": [
+        "onCheckedChange"
+      ],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactSignature": "{ color, value, disabled, borderColor, size, shape, icon, disabledIcon, children, ...props }: ElementProps & { color: string; value: string; disabled?: boolean; borderColor?: string; size?: SwatchPickerProps[\"size\"]; shape?: SwatchPickerProps[\"shape\"]; icon?: React.ReactNode; disabledIcon?: React.ReactNode; children?: React.ReactNode }",
+      "reactRefType": "HTMLElement"
+    },
+    "react": "ColorSwatch",
+    "tag": "spui-color-swatch",
+    "define": "defineColorSwatch",
+    "summary": "Represent one selectable color with an accessible name and selected state."
+  }
+}

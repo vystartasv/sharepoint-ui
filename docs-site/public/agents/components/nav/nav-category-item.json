@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "NavCategoryItem",
+    "tag": "spui-nav-category-item",
+    "define": "defineNavCategoryItem",
+    "module": "nav",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ children, icon, avatar, expandIcon, expandIconMotion, onClick, onClickCapture, onKeyDown, onKeyDownCapture, onKeyUp, onKeyUpCapture, onKeyPress, onKeyPressCapture, onFocus, onFocusCapture, onBlur, onBlurCapture, onAuxClick, onAuxClickCapture, onContextMenu, onContextMenuCapture, onDoubleClick, onDoubleClickCapture, onMouseDown, onMouseDownCapture, onMouseMove, onMouseMoveCapture, onMouseOut, onMouseOutCapture, onMouseOver, onMouseOverCapture, onMouseUp, onMouseUpCapture, onGotPointerCapture, onGotPointerCaptureCapture, onLostPointerCapture, onLostPointerCaptureCapture, onPointerCancel, onPointerCancelCapture, onPointerDown, onPointerDownCapture, onPointerMove, onPointerMoveCapture, onPointerOut, onPointerOutCapture, onPointerOver, onPointerOverCapture, onPointerUp, onPointerUpCapture, onMouseEnter, onMouseLeave, onPointerEnter, onPointerLeave, ...props }: NativeButtonHostProps & { children?: React.ReactNode; icon?: React.ReactNode; avatar?: React.ReactElement; expandIcon?: React.ReactNode; expandIconMotion?: React.ComponentType<PresenceMotionSlotProps> }",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "icon",
+        "avatar",
+        "expandIcon",
+        "expandIconMotion"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Provide the accessible disclosure button for a NavCategory."
+  }
+}

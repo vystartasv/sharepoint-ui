@@ -1,0 +1,54 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "info",
+  "components": [
+    {
+      "react": "InfoLabel",
+      "tag": "native-label+spui-info-button",
+      "factory": "createInfoLabel",
+      "module": "info",
+      "category": "forms",
+      "registered": false,
+      "note": "Combines a native associated label with a separately focusable information button.",
+      "api": {
+        "reactRefType": "HTMLSpanElement",
+        "reactSignature": "{ children, info, htmlFor, size = \"medium\", weight = \"regular\", required = false, disabled = false, infoButtonLabel, placement = \"top\", label, infoButton, style, ...props }: InfoLabelProps",
+        "callbackProps": [],
+        "slots": [
+          "label",
+          "infoButton"
+        ],
+        "styling": [
+          "SharePoint and Fluent typography tokens",
+          "CSS custom properties",
+          "host className/style"
+        ]
+      },
+      "summary": "Pair a form label with accessible supplementary guidance without putting the help button inside the clickable label."
+    },
+    {
+      "react": "InfoButton",
+      "tag": "spui-info-button",
+      "define": "defineInfoButton",
+      "module": "info",
+      "category": "feedback",
+      "api": {
+        "reactSignature": "{ info, children, label, placement = \"top\", size = \"medium\", inline = true, popover, open, onOpenChange, ...props }: ElementProps & { info?: React.ReactNode; children?: React.ReactNode; label?: string; placement?: InfoPlacement; size?: \"small\" | \"medium\" | \"large\"; inline?: boolean; popover?: InfoButtonPopoverProps; open?: boolean; onOpenChange?: (open: boolean) => void }",
+        "callbackProps": [
+          "onOpenChange"
+        ],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Open a keyboard-operable, theme-aware information popover with support for links and other focusable guidance."
+    }
+  ]
+}

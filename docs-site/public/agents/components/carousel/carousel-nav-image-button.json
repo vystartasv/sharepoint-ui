@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "carousel",
+    "category": "views",
+    "api": {
+      "callbackProps": [],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactSignature": "{ index, src, alt, label, image, selected = false, disabled = false, ...props }: ElementProps & { index: number; src: string; alt: string; label?: string; image?: React.ReactElement; selected?: boolean; disabled?: boolean }",
+      "slots": [
+        "image"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "react": "CarouselNavImageButton",
+    "tag": "spui-carousel-nav-image-button",
+    "define": "defineCarouselNavImageButton",
+    "signature": "{ index, src, alt, label, image, selected = false, disabled = false, ...props }: ElementProps & { index: number; src: string; alt: string; label?: string; image?: React.ReactElement; selected?: boolean; disabled?: boolean }",
+    "slots": [
+      "image"
+    ],
+    "summary": "Navigate carousel slides with an accessible image preview."
+  }
+}

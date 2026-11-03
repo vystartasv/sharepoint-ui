@@ -1,0 +1,31 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "MenuItemCheckbox",
+    "tag": "spui-menu-item",
+    "define": "defineMenuItem",
+    "module": "menu",
+    "category": "actions",
+    "api": {
+      "reactSignature": "props: MenuItemSelectableProps",
+      "callbackProps": [
+        "onCheckedChange"
+      ],
+      "slots": [
+        "default",
+        "content",
+        "checkmark",
+        "submenuIndicator",
+        "icon",
+        "subtext",
+        "secondary-content"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ]
+    },
+    "summary": "Render a selectable menu checkbox with controlled group values and persistent checked state."
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "CarouselNavContainer",
+    "tag": "spui-carousel-nav-container",
+    "define": "defineCarouselNavContainer",
+    "module": "carousel",
+    "category": "views",
+    "api": {
+      "callbackProps": [],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactSignature": "{ children, prev, next, autoplay, prevTooltip, nextTooltip, autoplayTooltip, layout = \"inline\", ...props }: ElementProps & { children?: React.ReactNode; prev?: CarouselNavButtonSlotProps | null; next?: CarouselNavButtonSlotProps | null; autoplay?: CarouselAutoplaySlotProps | null; prevTooltip?: CarouselTooltipSlotProps | null; nextTooltip?: CarouselTooltipSlotProps | null; autoplayTooltip?: CarouselTooltipSlotProps | null; layout?: \"inline\" | \"inline-wide\" | \"overlay\" | \"overlay-wide\" | \"overlay-expanded\" }",
+      "slots": [
+        "previous",
+        "prev",
+        "navigation",
+        "autoplay",
+        "next",
+        "prevTooltip",
+        "nextTooltip",
+        "autoplayTooltip"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Arrange Carousel navigation, previous/next, and autoplay controls in inline or overlay layouts."
+  }
+}

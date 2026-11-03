@@ -1,0 +1,31 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Overflow",
+    "tag": "spui-overflow",
+    "define": "defineOverflow",
+    "module": "overflow",
+    "category": "actions",
+    "api": {
+      "reactSignature": "{ children, label, minimumVisible = 0, overflowDirection = \"end\", overflowAxis = \"horizontal\", hasHiddenItems = false, overflowContent, padding = 10, onOverflowChange, onOverflowItemSelect, ...props }: ElementProps & { children?: React.ReactNode; label?: string; minimumVisible?: number; overflowDirection?: \"start\" | \"end\"; overflowAxis?: OverflowAxis; hasHiddenItems?: boolean; overflowContent?: React.ReactNode; padding?: number; onOverflowChange?: (event: null, data: OverflowState) => void; onOverflowItemSelect?: (id: string) => void }",
+      "callbackProps": [
+        "onOverflowChange",
+        "onOverflowItemSelect"
+      ],
+      "slots": [
+        "items",
+        "overflow-trigger"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ]
+    },
+    "summary": "Keep priority actions visible as space changes and render the overflowed actions through the existing Menu primitives without cloning or moving controls.",
+    "highValueAdditions": [
+      "Add a priority-aware responsive command shelf with group labels and persisted compact mode."
+    ]
+  }
+}

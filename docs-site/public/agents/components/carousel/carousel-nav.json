@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "carousel",
+    "category": "views",
+    "api": {
+      "callbackProps": [],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactSignature": "{ children, label, appearance, slot = \"navigation\", ...props }: ElementProps & { children?: React.ReactNode; label?: string; appearance?: \"brand\"; slot?: string }",
+      "slots": [
+        "navigation buttons"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "react": "CarouselNav",
+    "tag": "spui-carousel-nav",
+    "define": "defineCarouselNav",
+    "signature": "{ children, label, appearance, ...props }: ElementProps & { children?: React.ReactNode; label?: string; appearance?: \"brand\" }",
+    "slots": [
+      "navigation buttons"
+    ],
+    "summary": "Group carousel position buttons with RTL-aware roving keyboard focus."
+  }
+}

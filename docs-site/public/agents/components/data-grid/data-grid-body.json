@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "DataGridBody",
+    "module": "data-grid",
+    "reactOnly": true,
+    "category": "data-display",
+    "api": {
+      "generic": "T",
+      "reactSignature": "{ children, renderGroupRow, ...props }: DataGridBodyProps<T>",
+      "callbackProps": [
+        "children(itemRow)",
+        "renderGroupRow(groupRow)"
+      ],
+      "slots": [
+        "children"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "host className/style"
+      ]
+    },
+    "summary": "Render windowed item rows, accessible provider group rows, and loading placeholders in the composed DataGrid context."
+  }
+}

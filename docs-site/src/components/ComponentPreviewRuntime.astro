@@ -1,38 +1,83 @@
 <script>
   import { getSharePointUIStyleTokens } from "@spfx-fast/sharepoint-ui/appearance";
+  import themeCapture from "../data/sharepoint-theme.json";
+  import { createPreviewThemeOverrides } from "../utils/preview-theme.js";
   import { registerPreviewElements } from "./preview-elements.generated.js";
+
+  const themePresets = themeCapture.presets;
+  const componentValueSelector = ["input[type=range]", "input[type=checkbox]", "input[type=radio]", "select", "textarea", "spui-slider", "spui-input", "spui-textarea", "spui-select", "spui-radio-group", "spui-combobox", "spui-tag-picker", "spui-color-picker", "spui-spin-button"].join(",");
 
   document.querySelectorAll("[data-component-demo]").forEach(async (demo) => {
     const appearance = demo.querySelector("[data-preview-appearance]");
+    const theme = demo.querySelector("[data-preview-theme]");
     const accent = demo.querySelector("[data-preview-accent]");
     const stage = demo.querySelector(".component-demo__stage");
     const status = demo.querySelector(".component-demo__status");
+    const tokenReadout = demo.querySelector("[data-preview-tokens]");
 
     const applyTokens = () => {
       const selectedAppearance = appearance?.value ?? "ios";
+      const presetKey = theme?.value ?? "sharepoint";
+      const preset = themePresets[presetKey] ?? themePresets.sharepoint;
+      const capturedTokens = { ...themePresets.sharepoint.tokens, ...preset.tokens };
+      const accentValue = accent?.value ?? preset.accent;
       const baseAppearance = selectedAppearance === "glass" ? "ios" : "fluent";
       demo.dataset.spuiAppearance = selectedAppearance;
       demo.dataset.spuiBaseAppearance = baseAppearance;
       if (stage) stage.dataset.spuiAppearance = selectedAppearance;
-      const tokens = getSharePointUIStyleTokens(selectedAppearance, { "--spui-ui-accent": accent?.value ?? "#78716c" }, baseAppearance);
+      const overrides = createPreviewThemeOverrides(capturedTokens, accentValue, presetKey !== "sharepoint" || accentValue !== preset.accent);
+      const tokens = getSharePointUIStyleTokens(selectedAppearance, overrides, baseAppearance);
       for (const [name, value] of Object.entries(tokens)) demo.style.setProperty(name, value);
+      for (const [name, value] of Object.entries(overrides)) demo.style.setProperty(name, value);
+      if (accent && accent.value !== accentValue) accent.value = accentValue;
+      if (tokenReadout) {
+        tokenReadout.replaceChildren();
+        for (const [label, value] of [["Accent", accentValue], ["Surface", capturedTokens["--spui-semantic-body-background"] ?? "#ffffff"], ["Text", capturedTokens["--spui-semantic-body-text"] ?? "#242424"]]) {
+          const token = document.createElement("span");
+          const swatch = document.createElement("i");
+          swatch.style.backgroundColor = value;
+          token.append(swatch, document.createTextNode(`${label} ${value}`));
+          tokenReadout.append(token);
+        }
+      }
+      updateStatus();
+    };
+
+    const updateStatus = (eventTarget) => {
+      if (!status) return;
+      const preset = themePresets[theme?.value ?? "sharepoint"] ?? themePresets.sharepoint;
+      const control = eventTarget ?? stage?.querySelector(componentValueSelector);
+      const value = control?.checked !== undefined && ["checkbox", "radio"].includes(control?.type)
+        ? (control.checked ? "selected" : "not selected")
+        : control?.value;
+      const selectedValue = value !== undefined && value !== "" ? ` · Value: ${Array.isArray(value) ? value.join(", ") : value}` : "";
+      const selection = theme?.selectedOptions?.[0]?.textContent ?? preset.label ?? "SharePoint teal";
+      status.textContent = `${selection} theme · accent ${accent?.value ?? preset.accent}${selectedValue}`;
     };
 
     appearance?.addEventListener("change", applyTokens);
-    accent?.addEventListener("input", applyTokens);
-    applyTokens();
+    theme?.addEventListener("change", () => {
+      const preset = themePresets[theme.value];
+      if (accent && preset) accent.value = preset.accent;
+      applyTokens();
+    });
+    accent?.addEventListener("input", () => {
+      if (theme) theme.value = "custom";
+      applyTokens();
+    });
     applyTokens();
 
     for (const type of ["click", "input", "change"]) {
       stage?.addEventListener(type, (event) => {
         const target = event.target;
-        const label = demo.dataset.label ?? "Component";
-        const value = target?.value ?? target?.checked;
-        if (status) status.textContent = value === undefined ? `${label} ${type === "click" ? "activated" : "updated"}.` : `${label} value: ${value}`;
+        if (type === "click" && target?.value === undefined && target?.checked === undefined) {
+          if (status) status.textContent = `${demo.dataset.label ?? "Component"} activated · ${themePresets[theme?.value ?? "sharepoint"]?.label ?? "SharePoint"} theme`;
+        } else updateStatus(target);
       });
     }
     try {
       await registerPreviewElements(demo);
+      updateStatus();
       const virtualList = stage?.querySelector("spui-virtual-list");
       if (virtualList && "items" in virtualList) {
         virtualList.items = [
@@ -44,6 +89,7 @@
           { title: "Policy acknowledgement", owner: "Sofia Rossi" },
         ];
         virtualList.renderItem = (item) => `${item.title} · ${item.owner}`;
+        updateStatus();
       }
     } catch (error) {
       if (status) status.textContent = `${demo.dataset.label ?? "Component"} preview could not be loaded.`;

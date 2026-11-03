@@ -1,0 +1,28 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "TreeItemLayout",
+    "module": "tree",
+    "reactOnly": true,
+    "category": "tree-layout",
+    "api": {
+      "reactSignature": "{ children, main, iconBefore, iconAfter, expandIcon, aside, actions, selector, className, ...props }: TreeItemLayoutProps",
+      "callbackProps": [],
+      "slots": [
+        "main",
+        "iconBefore",
+        "iconAfter",
+        "expandIcon",
+        "aside",
+        "actions",
+        "selector"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ]
+    },
+    "summary": "Compose the content, icons, aside, and actions for a TreeItem while keeping expansion and selection controls in the tree engine."
+  }
+}

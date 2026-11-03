@@ -1,0 +1,35 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "AvatarGroupPopover",
+    "tag": "spui-avatar-group-popover",
+    "define": "defineAvatarGroupPopover",
+    "module": "avatar-group-primitives",
+    "category": "people",
+    "api": {
+      "reactSignature": "{ children, count, indicator, label, triggerLabel, open, placement = \"bottom\", onOpenChange, content, popoverSurface, tooltip, triggerButton, ...props }: AvatarGroupPopoverProps",
+      "callbackProps": [
+        "onOpenChange"
+      ],
+      "relatedReactApis": [
+        {
+          "name": "PopoverProps.mountNode",
+          "description": "Portal the popup surface to an HTMLElement or generated body container; className names generated containers and null selects the body fallback. The trigger stays in place."
+        }
+      ],
+      "slots": [
+        "content",
+        "popoverSurface",
+        "tooltip",
+        "triggerButton"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ]
+    },
+    "summary": "Show overflow members in a theme-aware, labelled popover with a count or icon trigger and keyboard dismissal."
+  }
+}

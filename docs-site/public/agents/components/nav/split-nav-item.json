@@ -1,0 +1,33 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "SplitNavItem",
+    "tag": "spui-split-nav-item",
+    "define": "defineSplitNavItem",
+    "module": "nav",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ children, value, href, disabled = false, icon, action, actionLabel, onAction, navItem, actionButton, actionButtonTooltip, menuButton, menuButtonTooltip, toggleButton, toggleButtonTooltip, ...props }: ElementProps & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; action?: React.ReactNode; actionLabel?: string; onAction?: React.MouseEventHandler<HTMLButtonElement>; navItem?: React.ReactElement; actionButton?: React.ReactElement; actionButtonTooltip?: React.ReactElement; menuButton?: React.ReactElement; menuButtonTooltip?: React.ReactElement; toggleButton?: React.ReactElement; toggleButtonTooltip?: React.ReactElement }",
+      "callbackProps": [],
+      "slots": [
+        "NavItem",
+        "action",
+        "navItem",
+        "actionButton",
+        "actionButtonTooltip",
+        "menuButton",
+        "menuButtonTooltip",
+        "toggleButton",
+        "toggleButtonTooltip"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Combine a destination with a separate secondary action."
+  }
+}

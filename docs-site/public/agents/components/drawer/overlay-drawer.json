@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "OverlayDrawer",
+    "tag": "spui-drawer",
+    "module": "drawer",
+    "category": "feedback",
+    "reactOnly": true,
+    "api": {
+      "reactSignature": "{ open, defaultOpen, modalType = \"modal\", inertTrapFocus = false, position = \"start\", size = \"small\", onOpenChange, ...props }: OverlayDrawerProps",
+      "callbackProps": [
+        "onOpenChange",
+        "onDismiss",
+        "onExpandedChange"
+      ],
+      "slots": [
+        "default",
+        "title",
+        "actions"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ]
+    },
+    "summary": "Use the modal or non-modal overlay drawer with Fluent overlay defaults."
+  }
+}

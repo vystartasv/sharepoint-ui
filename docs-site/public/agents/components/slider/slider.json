@@ -1,0 +1,30 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Slider",
+    "tag": "spui-slider",
+    "define": "defineSlider",
+    "module": "slider",
+    "category": "forms",
+    "api": {
+      "reactSignature": "inputProps: SliderProps",
+      "callbackProps": [
+        "onValueChange",
+        "onChange"
+      ],
+      "slots": [
+        "input",
+        "rail",
+        "thumb"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Choose a numeric value within a range using pointer or keyboard input."
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "DialogTitle",
+    "tag": "spui-dialog-title",
+    "define": "defineDialogTitle",
+    "module": "dialog",
+    "category": "overlays",
+    "api": {
+      "reactSignature": "{ children, action, style, ...props }: DialogTitleProps",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "action"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "native h2 root className/style"
+      ],
+      "reactRefType": "HTMLHeadingElement"
+    },
+    "summary": "Render the dialog heading and provide its accessible name, with an optional trailing action."
+  }
+}

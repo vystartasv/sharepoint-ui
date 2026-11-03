@@ -1,0 +1,49 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ComboBox",
+    "tag": "spui-combobox",
+    "define": "defineCombobox",
+    "module": "combobox",
+    "category": "forms",
+    "api": {
+      "reactSignature": "inputProps: ComboBoxProps",
+      "relatedReactApis": [
+        {
+          "name": "ComboBoxProps.requiredMessage",
+          "description": "Sets the native form validation message; defaults to SharePointUIProvider.strings.required."
+        },
+        {
+          "name": "ComboBoxProps.selectedLabel",
+          "description": "In multiselect mode, names the selected-options group; defaults to SharePointUIProvider.strings.selectedOptionsLabel."
+        },
+        {
+          "name": "ComboBoxProps.mountNode",
+          "description": "Mount the listbox popup in an HTMLElement, a generated body container with a className, or the default body portal; the input stays in place."
+        }
+      ],
+      "callbackProps": [
+        "onValueChange",
+        "onOptionSelect",
+        "onSelectedOptionsChange",
+        "onOpenChange",
+        "onActiveOptionChange"
+      ],
+      "slots": [
+        "default ComboOption children",
+        "input",
+        "clearIcon",
+        "expandIcon",
+        "listbox"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Filter and select one or multiple options with accessible checks, visible removable tags, and form-associated values; mount the listbox popup elsewhere without moving the input."
+  }
+}

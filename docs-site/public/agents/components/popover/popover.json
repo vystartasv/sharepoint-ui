@@ -1,0 +1,30 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Popover",
+    "tag": "spui-popover",
+    "define": "definePopover",
+    "module": "popover",
+    "category": "feedback",
+    "api": {
+      "reactSignature": "{ children, trigger, label, placement = \"bottom\", positioning, open, defaultOpen = false, openOnContext, openOnHover, mouseLeaveDelay, closeOnIframeFocus = true, onOpenChange, inline, trapFocus, inertTrapFocus, legacyTrapFocus, unstable_disableAutoFocus = false, arrow, withArrow, appearance, size, closeOnScroll = false, surfaceMotion, mountNode, ...props }: ElementProps & { children?: React.ReactNode; trigger?: React.ReactElement; label?: string; placement?: \"top\" | \"bottom\" | \"start\" | \"end\"; positioning?: PopoverPositioning; open?: boolean; defaultOpen?: boolean; openOnContext?: boolean; openOnHover?: boolean; mouseLeaveDelay?: number; closeOnIframeFocus?: boolean; onOpenChange?: (event: PopoverOpenChangeEvent, data: PopoverOpenChangeData) => void; inline?: boolean; trapFocus?: boolean; inertTrapFocus?: boolean; legacyTrapFocus?: boolean; unstable_disableAutoFocus?: boolean; arrow?: boolean; withArrow?: boolean; appearance?: \"brand\" | \"inverted\"; size?: \"small\" | \"medium\" | \"large\"; closeOnScroll?: boolean; surfaceMotion?: React.ComponentType<PresenceMotionSlotProps>; mountNode?: PortalMountNode }",
+      "callbackProps": [
+        "onOpenChange"
+      ],
+      "slots": [
+        "trigger",
+        "title",
+        "content",
+        "surface-motion"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Show a non-modal top-layer surface anchored to a trigger, with optional mountNode portal targeting, dismissal, focus return, and Fluent positioning fallbacks, boundaries, offsets, sizing, virtual targets, and update refs."
+  }
+}

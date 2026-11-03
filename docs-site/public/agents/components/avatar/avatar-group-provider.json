@@ -1,0 +1,20 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "AvatarGroupProvider",
+    "module": "avatar",
+    "reactOnly": true,
+    "category": "people",
+    "api": {
+      "reactSignature": "{ value, children }: { value: AvatarGroupContextValue; children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "children"
+      ],
+      "styling": [
+        "React context provider"
+      ]
+    },
+    "summary": "Provide shared avatar size, layout, and overflow context to avatar group descendants."
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "accordion",
+  "components": [
+    {
+      "react": "AccordionItem",
+      "tag": "spui-accordion-item",
+      "define": "defineAccordion",
+      "module": "accordion",
+      "category": "disclosure",
+      "api": {
+        "reactSignature": "{ value, heading, open, defaultOpen, disabled, onOpenChange, children, ...props }: ElementProps & { value: AccordionItemValue; heading?: string; open?: boolean; defaultOpen?: boolean; disabled?: boolean; onOpenChange?: (open: boolean) => void; children?: React.ReactNode }",
+        "callbackProps": [
+          "onOpenChange"
+        ],
+        "slots": [
+          "heading",
+          "panel",
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Identify one panel by value; compose an accessible AccordionHeader and AccordionPanel, or use the heading/default-content compatibility form."
+    },
+    {
+      "react": "AccordionHeader",
+      "tag": "spui-accordion-header",
+      "define": "defineAccordionHeader",
+      "module": "accordion",
+      "category": "disclosure",
+      "api": {
+        "reactSignature": "{ expandIconPosition = \"end\", inline = false, size = \"medium\", icon, expandIcon, button, children, ...props }: NativeClickHostProps<HTMLDivElement> & { expandIconPosition?: \"start\" | \"end\"; inline?: boolean; size?: \"small\" | \"medium\" | \"large\" | \"extra-large\"; icon?: React.ReactNode; expandIcon?: React.ReactNode; button?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "default",
+          "icon",
+          "expandIcon",
+          "button"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Compose the labelled, keyboard-operable heading for an AccordionItem with optional leading and expandable icon slots."
+    },
+    {
+      "react": "AccordionPanel",
+      "tag": "spui-accordion-panel",
+      "define": "defineAccordionPanel",
+      "module": "accordion",
+      "category": "disclosure",
+      "api": {
+        "reactSignature": "{ children, collapseMotion, ...props }: ElementProps & { children?: React.ReactNode; collapseMotion?: React.ComponentType<PresenceMotionSlotProps> }",
+        "callbackProps": [],
+        "slots": [
+          "default",
+          "collapse-motion"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Compose a region-labelled content panel controlled by its parent AccordionItem."
+    },
+    {
+      "react": "Accordion",
+      "tag": "spui-accordion",
+      "define": "defineAccordion",
+      "module": "accordion",
+      "category": "disclosure",
+      "api": {
+        "generic": "TValue extends AccordionItemValue = AccordionItemValue",
+        "reactSignature": "{ mode, multiple, collapsible, navigation, openItems, defaultOpenItems, onToggle, children, ...props }: ElementProps & { mode?: \"single\" | \"multiple\"; multiple?: boolean; collapsible?: boolean; navigation?: AccordionNavigation; openItems?: TValue | readonly TValue[]; defaultOpenItems?: TValue | readonly TValue[]; onToggle?: (event: AccordionToggleEvent, data: { value: TValue; openItems: TValue[] }) => void; children?: React.ReactNode }",
+        "callbackProps": [
+          "onToggle"
+        ],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement",
+        "forwardRefParameterType": "React.ForwardedRef<HTMLElement>"
+      },
+      "summary": "Group composed sections with controlled or default values, single/multiple and collapsible behavior, change details, and optional linear/circular keyboard navigation."
+    },
+    {
+      "react": "AccordionProvider",
+      "module": "accordion",
+      "reactOnly": true,
+      "category": "disclosure",
+      "api": {
+        "reactSignature": "{ value, children }: { value: AccordionProviderValue; children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "children"
+        ],
+        "styling": [
+          "React context provider"
+        ]
+      },
+      "summary": "Provide controlled open items and accordion interaction defaults to composed Accordion descendants."
+    }
+  ]
+}

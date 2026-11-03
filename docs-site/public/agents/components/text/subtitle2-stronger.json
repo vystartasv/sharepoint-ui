@@ -1,0 +1,21 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Subtitle2Stronger",
+    "module": "text",
+    "reactOnly": true,
+    "category": "typography",
+    "api": {
+      "reactSignature": "props: TextPresetProps",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "Fluent typography tokens",
+        "host className/style"
+      ]
+    },
+    "summary": "Fluent Subtitle2Stronger typography preset (base 400, bold)."
+  }
+}

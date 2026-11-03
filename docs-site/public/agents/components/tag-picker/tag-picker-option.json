@@ -1,0 +1,23 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "TagPickerOption",
+    "tag": "spui-tag-picker-option",
+    "define": "defineTagPicker",
+    "module": "tag-picker",
+    "category": "form-option",
+    "registered": false,
+    "api": {
+      "reactSignature": "{ value, text, label, group, media, secondaryContent, disabled = false, children, ...props }: ElementProps & { value: string; text?: string; label?: string; group?: string; media?: React.ReactNode; secondaryContent?: React.ReactNode; disabled?: boolean; children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "media",
+        "default",
+        "secondaryContent"
+      ],
+      "styling": [],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Define a selectable or disabled result inside a TagPicker."
+  }
+}

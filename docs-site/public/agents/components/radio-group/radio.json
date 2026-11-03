@@ -1,0 +1,31 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Radio",
+    "tag": "spui-radio-option",
+    "define": "defineRadioGroup",
+    "module": "radio-group",
+    "category": "forms",
+    "registered": false,
+    "note": "Option child tag; it is consumed by its parent group and is not separately registered.",
+    "api": {
+      "reactSignature": "{ value, label, labelPosition, disabled, input, indicator, onChange, children, ...props }: RadioProps",
+      "callbackProps": [
+        "onChange"
+      ],
+      "slots": [
+        "default",
+        "input",
+        "indicator"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Define one labelled RadioGroup option with its own label position, disabled state, and selection callback."
+  }
+}

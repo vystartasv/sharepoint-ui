@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "label",
+  "components": [
+    {
+      "react": "Label",
+      "tag": "label",
+      "factory": "createLabel",
+      "module": "label",
+      "category": "forms",
+      "registered": false,
+      "note": "Uses a native HTML label to preserve browser label association and click-to-focus behavior; createLabel returns an HTMLLabelElement for non-React consumers.",
+      "api": {
+        "reactSignature": "{ htmlFor, size = \"medium\", weight = \"regular\", required = false, disabled = false, children, style, ...props }: React.LabelHTMLAttributes<HTMLLabelElement> & { size?: LabelSize; weight?: LabelWeight; required?: LabelRequired; disabled?: boolean }",
+        "reactRefType": "HTMLLabelElement",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePoint and Fluent typography tokens",
+          "CSS custom properties",
+          "host style"
+        ]
+      },
+      "summary": "Label a form control with native association, optional required marker, and theme-aware sizing."
+    }
+  ]
+}

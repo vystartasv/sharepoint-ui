@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "swatch-picker",
+    "category": "inputs",
+    "api": {
+      "callbackProps": [
+        "onSelectionChange"
+      ],
+      "slots": [
+        "swatches"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactSignature": "{ children, selectedValue, defaultSelectedValue, selectedValues, defaultSelectedValues, selectionMode = \"single\", layout = \"grid\", size = \"medium\", shape = \"square\", spacing = \"medium\", focusMode = \"arrow\", columns = 6, onSelectionChange, ...props }: SwatchPickerProps",
+      "reactRefType": "HTMLElement"
+    },
+    "react": "SwatchPicker",
+    "tag": "spui-swatch-picker",
+    "define": "defineSwatchPicker",
+    "summary": "Render accessible color and image swatches as a keyboard-operable single- or multi-selection grid or row.",
+    "highValueAdditions": [
+      "Offer reusable named theme-color presets alongside caller-defined palettes."
+    ]
+  }
+}

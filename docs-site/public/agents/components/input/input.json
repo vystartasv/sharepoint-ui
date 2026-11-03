@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Input",
+    "tag": "spui-input",
+    "define": "defineInput",
+    "module": "input",
+    "category": "forms",
+    "api": {
+      "reactSignature": "inputProps: InputProps",
+      "reactRefType": "HTMLElement",
+      "callbackProps": [
+        "onValueChange",
+        "onChange"
+      ],
+      "slots": [
+        "before",
+        "after"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ]
+    },
+    "summary": "A bare native input with controlled/default values, Fluent size and appearance variants, before/after content slots, input/change events, and native form validation. Supply aria-label or aria-labelledby; use TextField when a shadow-safe visible label is needed."
+  }
+}

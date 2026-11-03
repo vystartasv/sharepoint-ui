@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "MenuBar",
+    "tag": "spui-menu-bar",
+    "define": "defineMenuBar",
+    "module": "menu",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ children, label, ...props }: ElementProps & { children?: React.ReactNode; label?: string }",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Group top-level command menus with a labelled menubar, roving focus, and direction-aware keyboard navigation."
+  }
+}

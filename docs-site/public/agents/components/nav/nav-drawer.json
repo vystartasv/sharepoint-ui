@@ -1,0 +1,28 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "NavDrawer",
+    "tag": "spui-nav-drawer",
+    "define": "defineNavDrawer",
+    "module": "nav",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ children, type = \"overlay\", open, defaultOpen, modal = true, dismissible = true, position = \"start\", size = \"medium\", expandable = false, expanded, unmountOnClose = true, separator = false, closeLabel, onOpenChange, onDismiss, onExpandedChange, tabbable = false, ...props }: NavDrawerProps",
+      "callbackProps": [],
+      "slots": [
+        "Nav",
+        "NavDrawerHeader",
+        "NavDrawerBody",
+        "NavDrawerFooter"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Compose Nav with optional drawer header, body, and footer regions."
+  }
+}

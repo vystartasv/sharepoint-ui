@@ -36,7 +36,8 @@ export default defineConfig({
     social: [{ icon: "github", label: "GitHub", href: "https://github.com/vystartasv/sharepoint-ui" }],
     customCss: ["./src/styles/custom.css"],
     sidebar: [
-      { label: "Start here", items: ["index", "getting-started", "catalog", { label: "Rich text editor", link: "/components/rich-text-editor/rich-text-editor/" }] },
+      { label: "For people", items: ["index", "getting-started", "catalog", { label: "Rich text editor", link: "/components/rich-text-editor/rich-text-editor/" }] },
+      { label: "For agents", items: [{ label: "Agent documentation", link: "/agents/" }] },
       { label: "Guides", items: ["guides/spfx", "guides/theming-and-direction", "guides/custom-elements", { label: "Save rich text in SharePoint", link: "/guides/rich-text-editor/" }, "guides/agent-workflow"] },
       { label: "Component catalog", collapsed: true, items: componentSidebar },
     ],

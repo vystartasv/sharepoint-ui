@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "carousel",
+    "category": "views",
+    "api": {
+      "callbackProps": [],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactSignature": "{ children, index, label, selected = false, disabled = false, ...props }: ElementProps & { children?: React.ReactNode; index: number; label?: string; selected?: boolean; disabled?: boolean }",
+      "slots": [
+        "default"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "react": "CarouselNavButton",
+    "tag": "spui-carousel-nav-button",
+    "define": "defineCarouselNavButton",
+    "signature": "{ children, index, label, selected = false, disabled = false, ...props }: ElementProps & { children?: React.ReactNode; index: number; label?: string; selected?: boolean; disabled?: boolean }",
+    "slots": [
+      "label"
+    ],
+    "summary": "Jump to a carousel slide with selected state and roving focus."
+  }
+}

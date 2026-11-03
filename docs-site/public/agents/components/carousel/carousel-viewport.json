@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "CarouselViewport",
+    "tag": "spui-carousel-viewport",
+    "define": "defineCarouselViewport",
+    "module": "carousel",
+    "category": "views",
+    "summary": "Mark the visible slide region in a composed Carousel; the parent Carousel manages scrolling and pauses autoplay during focus or pointer interaction.",
+    "api": {
+      "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    }
+  }
+}

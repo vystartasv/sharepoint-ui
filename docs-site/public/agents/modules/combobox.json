@@ -1,0 +1,196 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "combobox",
+  "components": [
+    {
+      "react": "ComboBox",
+      "tag": "spui-combobox",
+      "define": "defineCombobox",
+      "module": "combobox",
+      "category": "forms",
+      "api": {
+        "reactSignature": "inputProps: ComboBoxProps",
+        "relatedReactApis": [
+          {
+            "name": "ComboBoxProps.requiredMessage",
+            "description": "Sets the native form validation message; defaults to SharePointUIProvider.strings.required."
+          },
+          {
+            "name": "ComboBoxProps.selectedLabel",
+            "description": "In multiselect mode, names the selected-options group; defaults to SharePointUIProvider.strings.selectedOptionsLabel."
+          },
+          {
+            "name": "ComboBoxProps.mountNode",
+            "description": "Mount the listbox popup in an HTMLElement, a generated body container with a className, or the default body portal; the input stays in place."
+          }
+        ],
+        "callbackProps": [
+          "onValueChange",
+          "onOptionSelect",
+          "onSelectedOptionsChange",
+          "onOpenChange",
+          "onActiveOptionChange"
+        ],
+        "slots": [
+          "default ComboOption children",
+          "input",
+          "clearIcon",
+          "expandIcon",
+          "listbox"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Filter and select one or multiple options with accessible checks, visible removable tags, and form-associated values; mount the listbox popup elsewhere without moving the input."
+    },
+    {
+      "react": "ComboOption",
+      "tag": "spui-combobox-option",
+      "define": "defineCombobox",
+      "module": "combobox",
+      "category": "forms",
+      "registered": false,
+      "note": "Option child tag; it is consumed by its parent group and is not separately registered.",
+      "api": {
+        "reactSignature": "{ value, label, disabled, children }: { value: string; label?: string; disabled?: boolean; children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Define one selectable or disabled suggestion inside a ComboBox."
+    },
+    {
+      "react": "ComboboxProvider",
+      "tag": "spui-combobox",
+      "module": "combobox",
+      "category": "forms",
+      "reactOnly": true,
+      "api": {
+        "reactSignature": "{ value, children }: { value: ComboboxProviderValue; children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "children"
+        ],
+        "styling": [
+          "React context provider"
+        ]
+      },
+      "summary": "Share Fluent-compatible option registration, selection, active-option, appearance, and open state with composed combobox descendants; custom value and callback fields remain supported."
+    },
+    {
+      "react": "Dropdown",
+      "tag": "spui-combobox",
+      "module": "combobox",
+      "category": "forms",
+      "reactOnly": true,
+      "api": {
+        "reactSignature": "{ label, button, listbox, mountNode, value, defaultValue, selectedOptions, defaultSelectedOptions, multiselect = false, disabled, placeholder, onOptionSelect, onOpenChange, onActiveOptionChange, defaultOpen, open, clearable, clearButton, expandIcon, disableAutoFocus, appearance, size, positioning, inlinePopup, children, ...props }: DropdownProps",
+        "relatedReactApis": [
+          {
+            "name": "DropdownProps.mountNode",
+            "description": "Mount the listbox popup in an HTMLElement, a generated body container with a className, or the default body portal; the trigger stays in place."
+          }
+        ],
+        "callbackProps": [
+          "onOptionSelect",
+          "onOpenChange",
+          "onActiveOptionChange"
+        ],
+        "slots": [
+          "default Option children",
+          "button",
+          "listbox",
+          "clearButton",
+          "expandIcon"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Choose from grouped options with a button trigger, replaceable button and listbox roots, controlled or default selection, keyboard interaction, accessible listbox semantics, and mountNode popup targeting."
+    },
+    {
+      "react": "Listbox",
+      "tag": "div",
+      "module": "combobox",
+      "category": "forms",
+      "reactOnly": true,
+      "api": {
+        "reactSignature": "{ children, selectedOptions, defaultSelectedOptions = [], multiselect = false, disableAutoFocus = false, onOptionSelect, ...props }: ListboxProps",
+        "callbackProps": [
+          "onOptionSelect"
+        ],
+        "slots": [
+          "default Option and OptionGroup children"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ],
+        "reactRefType": "HTMLDivElement"
+      },
+      "summary": "Render a standalone single or multiselect listbox with Fluent menu semantics for multiselect, keyboard active-descendant navigation, root refs, and Option composition."
+    },
+    {
+      "react": "Option",
+      "tag": "spui-combobox-option",
+      "module": "combobox",
+      "category": "forms",
+      "reactOnly": true,
+      "api": {
+        "reactSignature": "{ value, text, disabled = false, checkIcon, children, id, ...props }: OptionProps",
+        "callbackProps": [],
+        "slots": [
+          "default",
+          "check icon"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Declare a selectable option for Dropdown, ComboBox, or standalone Listbox."
+    },
+    {
+      "react": "OptionGroup",
+      "tag": "spui-combobox-option-group",
+      "module": "combobox",
+      "category": "forms",
+      "reactOnly": true,
+      "api": {
+        "reactSignature": "{ label, children, ...props }: OptionGroupProps",
+        "callbackProps": [],
+        "slots": [
+          "label",
+          "default options"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Group related options and expose the group label to assistive technology."
+    }
+  ]
+}

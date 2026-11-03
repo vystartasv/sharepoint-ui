@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "teaching-popover",
+    "category": "navigation",
+    "react": "TeachingPopoverCarouselNavButton",
+    "tag": "spui-teaching-popover-carousel-nav-button",
+    "factory": "defineTeachingPopover",
+    "registered": true,
+    "summary": "Jump directly to a keyed tutorial step.",
+    "api": {
+      "reactSignature": "{ value, children, onClick, ...props }: ElementProps & { value: string; children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "theme-derived inline defaults",
+        "host className/style"
+      ]
+    }
+  }
+}

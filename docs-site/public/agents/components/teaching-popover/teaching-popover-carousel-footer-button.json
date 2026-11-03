@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "teaching-popover",
+    "category": "actions",
+    "react": "TeachingPopoverCarouselFooterButton",
+    "tag": "spui-teaching-popover-carousel-footer-button",
+    "factory": "defineTeachingPopover",
+    "registered": true,
+    "summary": "Move between tutorial steps or finish and dismiss the tour.",
+    "api": {
+      "reactSignature": "{ navType, altText, children, onClick, appearance, size = \"medium\", shape, icon, iconPosition = \"before\", ...props }: TeachingPopoverCarouselFooterButtonProps",
+      "callbackProps": [
+        "onClick"
+      ],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "theme-derived inline defaults",
+        "host className/style"
+      ]
+    }
+  }
+}

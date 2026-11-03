@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "DataGridCell",
+    "module": "data-grid",
+    "reactOnly": true,
+    "category": "data-display",
+    "api": {
+      "reactSignature": "{ children, columnId, rowIndex = 1, columnIndex = 0, focusMode: requestedFocusMode, editable = false, value, editType = \"text\", editLabel, ...props }: DataGridCellProps",
+      "callbackProps": [
+        "DataGrid onCellEdit",
+        "DataGrid validateCellEdit"
+      ],
+      "slots": [
+        "children"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "host className/style"
+      ]
+    },
+    "summary": "Render a grid cell with roving focus, nested-control group focus, or optional validated editing."
+  }
+}

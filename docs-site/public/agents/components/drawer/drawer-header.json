@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "DrawerHeader",
+    "tag": "fragment",
+    "module": "drawer",
+    "category": "feedback",
+    "reactOnly": true,
+    "api": {
+      "reactSignature": "{ children }: { children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "header-navigation",
+        "title",
+        "header-action"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ]
+    },
+    "summary": "Group drawer header navigation, title, and title actions without adding a wrapper that would break named slots."
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "MenuSplitGroup",
+    "tag": "spui-menu-split-group",
+    "define": "defineMenuSplitGroup",
+    "module": "menu",
+    "category": "actions",
+    "api": {
+      "reactSignature": "{ children, orientation = \"horizontal\", ...props }: ElementProps & { children?: React.ReactNode; orientation?: \"horizontal\" | \"vertical\" }",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Group two menu actions as a horizontal or vertical split action."
+  }
+}

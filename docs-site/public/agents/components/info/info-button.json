@@ -1,0 +1,27 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "InfoButton",
+    "tag": "spui-info-button",
+    "define": "defineInfoButton",
+    "module": "info",
+    "category": "feedback",
+    "api": {
+      "reactSignature": "{ info, children, label, placement = \"top\", size = \"medium\", inline = true, popover, open, onOpenChange, ...props }: ElementProps & { info?: React.ReactNode; children?: React.ReactNode; label?: string; placement?: InfoPlacement; size?: \"small\" | \"medium\" | \"large\"; inline?: boolean; popover?: InfoButtonPopoverProps; open?: boolean; onOpenChange?: (open: boolean) => void }",
+      "callbackProps": [
+        "onOpenChange"
+      ],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Open a keyboard-operable, theme-aware information popover with support for links and other focusable guidance."
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Button",
+    "tag": "spui-button",
+    "define": "defineButton",
+    "module": "button",
+    "category": "actions",
+    "api": {
+      "reactSignature": "{ as = \"button\", icon, iconPosition = \"before\", disabledFocusable = false, vertical = false, download, hrefLang, referrerPolicy, formAction, formEncType, formMethod, formNoValidate, formTarget, value, onClick, onClickCapture, onKeyDown, onKeyDownCapture, onKeyUp, onKeyUpCapture, onKeyPress, onKeyPressCapture, onFocus, onFocusCapture, onBlur, onBlurCapture, onAuxClick, onAuxClickCapture, onContextMenu, onContextMenuCapture, onDoubleClick, onDoubleClickCapture, onMouseDown, onMouseDownCapture, onMouseMove, onMouseMoveCapture, onMouseOut, onMouseOutCapture, onMouseOver, onMouseOverCapture, onMouseUp, onMouseUpCapture, onGotPointerCapture, onGotPointerCaptureCapture, onLostPointerCapture, onLostPointerCaptureCapture, onPointerCancel, onPointerCancelCapture, onPointerDown, onPointerDownCapture, onPointerMove, onPointerMoveCapture, onPointerOut, onPointerOutCapture, onPointerOver, onPointerOverCapture, onPointerUp, onPointerUpCapture, onMouseEnter, onMouseLeave, onPointerEnter, onPointerLeave, ...props }: ButtonProps",
+      "reactRefType": "HTMLElement",
+      "callbackProps": [],
+      "slots": [],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ]
+    },
+    "summary": "Render a native button or accessible link/action anchor with context-inherited sizing, automatic icon-only layout, and the active SharePoint accent."
+  }
+}

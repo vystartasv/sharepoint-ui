@@ -1,0 +1,27 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "table",
+    "category": "data-display",
+    "react": "TableCellLayout",
+    "tag": "spui-table-cell-layout",
+    "define": "defineTableCellLayout",
+    "api": {
+      "reactSignature": "{ children, main, media, description, appearance, truncate = false, ...props }: TableCellLayoutProps",
+      "callbackProps": [],
+      "slots": [
+        "media",
+        "main",
+        "description"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Arrange primary or truncated content inside a table cell."
+  }
+}

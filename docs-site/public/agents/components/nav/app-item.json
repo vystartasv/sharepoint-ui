@@ -1,0 +1,27 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "AppItem",
+    "tag": "spui-app-item",
+    "define": "defineAppItem",
+    "module": "nav",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ children, value, href, disabled = false, icon, avatar, onClick, onClickCapture, onKeyDown, onKeyDownCapture, onKeyUp, onKeyUpCapture, onKeyPress, onKeyPressCapture, onFocus, onFocusCapture, onBlur, onBlurCapture, onAuxClick, onAuxClickCapture, onContextMenu, onContextMenuCapture, onDoubleClick, onDoubleClickCapture, onMouseDown, onMouseDownCapture, onMouseMove, onMouseMoveCapture, onMouseOut, onMouseOutCapture, onMouseOver, onMouseOverCapture, onMouseUp, onMouseUpCapture, onGotPointerCapture, onGotPointerCaptureCapture, onLostPointerCapture, onLostPointerCaptureCapture, onPointerCancel, onPointerCancelCapture, onPointerDown, onPointerDownCapture, onPointerMove, onPointerMoveCapture, onPointerOut, onPointerOutCapture, onPointerOver, onPointerOverCapture, onPointerUp, onPointerUpCapture, onMouseEnter, onMouseLeave, onPointerEnter, onPointerLeave, ...props }: NativeClickHostProps<HTMLButtonElement | HTMLAnchorElement> & { children?: React.ReactNode; value: string; href?: string; disabled?: boolean; icon?: React.ReactNode; avatar?: React.ReactElement }",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "icon",
+        "avatar"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "AppItem is a selectable application destination with icon/avatar and native link semantics."
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "image",
+  "components": [
+    {
+      "react": "Image",
+      "tag": "img",
+      "factory": "createImage",
+      "module": "image",
+      "category": "content",
+      "registered": false,
+      "api": {
+        "reactSignature": "{ alt, fit = \"default\", shape = \"square\", block, bordered, shadow, loading, decoding, style, ...props }: ImageProps",
+        "callbackProps": [
+          "onLoad",
+          "onError"
+        ],
+        "slots": [],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style"
+        ],
+        "reactRefType": "HTMLImageElement"
+      },
+      "summary": "Render a native image with HTMLImageElement ref forwarding, responsive loading, Fluent fit defaults, shape, border, and shadow options."
+    }
+  ]
+}

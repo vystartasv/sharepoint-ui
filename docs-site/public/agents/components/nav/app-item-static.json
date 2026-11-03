@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "AppItemStatic",
+    "tag": "spui-app-item-static",
+    "define": "defineAppItemStatic",
+    "module": "nav",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ children, icon, ...props }: ElementProps & { children?: React.ReactNode; icon?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "icon"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Display the current application identity without navigation behavior."
+  }
+}

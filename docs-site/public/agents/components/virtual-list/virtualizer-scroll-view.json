@@ -1,0 +1,33 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "virtual-list",
+    "category": "data-display",
+    "react": "VirtualizerScrollView",
+    "tag": "div",
+    "reactOnly": true,
+    "api": {
+      "reactSignature": "{ children, itemSize, numItems, virtualizerLength, bufferItems, bufferSize, scrollViewRef: providedScrollViewRef, axis = \"vertical\", reversed, enableScrollLoad, onRenderedFlaggedIndex, flaggedIndex, imperativeVirtualizerRef, imperativeRef, containerSizeRef, updateScrollPosition, gap, enablePagination, container, label, ...props }: ScrollViewBaseProps",
+      "callbackProps": [
+        "children",
+        "getItemSize",
+        "updateScrollPosition",
+        "onRenderedFlaggedIndex"
+      ],
+      "slots": [
+        "default",
+        "container",
+        "before",
+        "after",
+        "beforeContainer",
+        "afterContainer"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ]
+    },
+    "summary": "Compatibility view for Fluent's legacy fixed-size virtualizer, with a responsive render window, accessible list positions, imperative scrolling, and optional scroll snapping."
+  }
+}

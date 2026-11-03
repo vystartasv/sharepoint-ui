@@ -1,0 +1,35 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Drawer",
+    "tag": "spui-drawer",
+    "define": "defineDrawer",
+    "module": "drawer",
+    "category": "overlays",
+    "api": {
+      "reactSignature": "{ type = \"overlay\", open, defaultOpen = false, unmountOnClose = true, separator = false, title, modal = true, modalType, inertTrapFocus = false, dismissible = true, position = \"end\", size = \"medium\", expandable = false, expanded, surfaceMotion, backdropMotion, closeLabel, expandLabel, restoreLabel, actions, onOpenChange, onExpandedChange, onDismiss, children, ...props }: DrawerProps",
+      "callbackProps": [
+        "onOpenChange",
+        "onExpandedChange",
+        "onDismiss"
+      ],
+      "slots": [
+        "default",
+        "title",
+        "actions",
+        "surface-motion",
+        "backdrop-motion",
+        "backdrop"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks",
+        "::part(expand-button)"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Present a modal or non-modal task surface with optional full-screen expansion."
+  }
+}

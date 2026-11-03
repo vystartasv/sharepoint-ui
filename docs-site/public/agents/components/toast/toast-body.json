@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ToastBody",
+    "tag": "spui-toast-body",
+    "define": "defineToastBody",
+    "module": "toast",
+    "category": "feedback",
+    "api": {
+      "reactSignature": "{ subtitle, children, ...props }: ElementProps & { subtitle?: React.ReactNode; children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "subtitle"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Compose toast message content with an optional secondary subtitle."
+  }
+}

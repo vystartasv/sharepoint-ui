@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "teaching-popover",
+    "category": "feedback",
+    "react": "TeachingPopoverCarouselFooter",
+    "tag": "spui-teaching-popover-carousel-footer",
+    "factory": "defineTeachingPopover",
+    "registered": true,
+    "summary": "Place navigation actions and progress in a teaching carousel.",
+    "api": {
+      "reactSignature": "{ children, previous, next, layout = \"centered\", initialStepText, finalStepText, ...props }: ElementProps & { children?: React.ReactNode; previous?: React.ReactNode; next?: React.ReactNode; layout?: \"centered\" | \"offset\"; initialStepText?: string; finalStepText?: string }",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "previous",
+        "next"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "theme-derived inline defaults",
+        "host className/style"
+      ]
+    }
+  }
+}

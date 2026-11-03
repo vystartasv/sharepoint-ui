@@ -1,0 +1,19 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "DataGridContextProvider",
+    "module": "data-grid",
+    "reactOnly": true,
+    "category": "data-display",
+    "api": {
+      "generic": "T",
+      "reactSignature": "{ value, children }: { value: DataGridContextValue<T> | undefined; children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "children"
+      ],
+      "styling": []
+    },
+    "summary": "Provide items, columns, selection, sorting, and roving focus state to composed DataGrid parts."
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "MenuGroup",
+    "tag": "spui-menu-group",
+    "define": "defineMenuGroup",
+    "module": "menu",
+    "category": "actions",
+    "api": {
+      "reactSignature": "{ children, label, ...props }: ElementProps & { children?: React.ReactNode; label: string }",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Label and group related Menu items for assistive technology."
+  }
+}

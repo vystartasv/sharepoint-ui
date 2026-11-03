@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ToolbarDivider",
+    "tag": "spui-toolbar-separator",
+    "define": "defineToolbarSeparator",
+    "module": "toolbar",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ vertical, wrapper, ...props }: ElementProps & { vertical?: boolean; wrapper?: DividerWrapper } = {}",
+      "callbackProps": [],
+      "slots": [
+        "wrapper"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "::part(line)"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Theme-derived non-interactive divider within a toolbar."
+  }
+}

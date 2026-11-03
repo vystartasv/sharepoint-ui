@@ -1,0 +1,33 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "spin-button",
+  "components": [
+    {
+      "react": "SpinButton",
+      "tag": "spui-spin-button",
+      "define": "defineSpinButton",
+      "module": "spin-button",
+      "category": "forms",
+      "api": {
+        "reactSignature": "inputProps: SpinButtonProps",
+        "callbackProps": [
+          "onValueChange",
+          "onChange"
+        ],
+        "slots": [
+          "input",
+          "incrementButton",
+          "decrementButton"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Edit a bounded numeric value with increment and decrement controls."
+    }
+  ]
+}

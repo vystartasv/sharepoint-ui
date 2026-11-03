@@ -1,0 +1,28 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "InteractionTag",
+    "tag": "spui-interaction-tag",
+    "define": "defineInteractionTag",
+    "module": "tags",
+    "category": "data-display",
+    "api": {
+      "reactSignature": "{ children, appearance, size, shape = \"rounded\", value, label, disabled = false, selected = false, onTagSelect, onDismiss, ...props }: ElementProps & { children?: React.ReactNode; appearance?: \"filled\" | \"outline\" | \"brand\"; size?: \"extra-small\" | \"small\" | \"medium\"; shape?: \"rounded\" | \"circular\"; value?: string; label?: string; disabled?: boolean; selected?: boolean; onTagSelect?: (event: Event, data: InteractionTagSelectData) => void; onDismiss?: (event: TagDismissEvent, data: { value: string }) => void }",
+      "callbackProps": [
+        "onTagSelect",
+        "onDismiss"
+      ],
+      "slots": [
+        "InteractionTagPrimary",
+        "InteractionTagSecondary"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Compose a selectable primary action and optional dismiss action in a theme-derived tag."
+  }
+}

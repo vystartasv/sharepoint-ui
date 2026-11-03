@@ -1,0 +1,23 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "FlatTreeItem",
+    "module": "tree",
+    "reactOnly": true,
+    "category": "tree-item",
+    "api": {
+      "reactSignature": "_props: FlatTreeItemProps",
+      "callbackProps": [
+        "onOpenChange"
+      ],
+      "slots": [
+        "TreeItemLayout",
+        "TreeItemPersonaLayout"
+      ],
+      "styling": [
+        "Composed Tree state"
+      ]
+    },
+    "summary": "Declare one flat Tree record with a parent value and explicit hierarchy metadata."
+  }
+}

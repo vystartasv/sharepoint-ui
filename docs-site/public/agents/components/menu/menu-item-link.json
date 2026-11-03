@@ -1,0 +1,28 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "MenuItemLink",
+    "tag": "spui-menu-item-link",
+    "define": "defineMenuItemLink",
+    "module": "menu",
+    "category": "actions",
+    "api": {
+      "reactSignature": "{ href, target, rel, download, disabled = false, icon, checkmark, content, secondaryContent, children, ...props }: MenuItemLinkProps",
+      "callbackProps": [],
+      "slots": [
+        "icon",
+        "checkmark",
+        "content",
+        "secondary-content",
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Navigate from a menu item using a native anchor with disabled link semantics."
+  }
+}

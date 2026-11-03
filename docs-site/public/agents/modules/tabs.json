@@ -1,0 +1,119 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "tabs",
+  "components": [
+    {
+      "react": "Tabs",
+      "tag": "spui-tabs",
+      "define": "defineTabs",
+      "module": "tabs",
+      "category": "tabs",
+      "api": {
+        "reactSignature": "{ children, selectedValue, defaultSelectedValue, disabled = false, onTabSelect, ...props }: ElementProps & { children?: React.ReactNode; selectedValue?: T; defaultSelectedValue?: T; disabled?: boolean; onTabSelect?: (value: T) => void }",
+        "callbackProps": [
+          "onTabSelect"
+        ],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "generic": "T = string",
+        "reactRefType": "HTMLElement",
+        "forwardRefParameterType": "React.ForwardedRef<HTMLElement>"
+      },
+      "summary": "Switch between related views with controlled selection and keyboard navigation."
+    },
+    {
+      "react": "TabList",
+      "tag": "spui-tab-list",
+      "define": "defineTabs",
+      "module": "tabs",
+      "category": "tabs",
+      "api": {
+        "reactSignature": "{ children, selectedValue, defaultSelectedValue, selectTabOnFocus, reserveSelectedTabSpace, vertical, disabled, appearance, size, onTabSelect, ...props }: TabListProps",
+        "callbackProps": [
+          "onTabSelect"
+        ],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Group Tabs with keyboard selection, a selection callback, and an option to reserve label width across selected states."
+    },
+    {
+      "react": "TabListProvider",
+      "module": "tabs",
+      "reactOnly": true,
+      "category": "tabs",
+      "api": {
+        "reactSignature": "{ value, children }: { value: TabListProviderValue; children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "children"
+        ],
+        "styling": [
+          "React context provider"
+        ]
+      },
+      "summary": "Supply selection, keyboard, appearance, and tab-registration behavior to composed TabList and Tab descendants."
+    },
+    {
+      "react": "Tab",
+      "tag": "spui-tab",
+      "define": "defineTabs",
+      "module": "tabs",
+      "category": "tab",
+      "api": {
+        "reactSignature": "{ value, disabled = false, icon, content, children, ...props }: ElementProps & { value: TabValue; disabled?: boolean; icon?: React.ReactNode; content?: React.ReactNode; children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "icon",
+          "content",
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Represent one selectable view in a TabList with optional leading icon content."
+    },
+    {
+      "react": "TabPanel",
+      "tag": "spui-tab-panel",
+      "define": "defineTabs",
+      "module": "tabs",
+      "category": "tab-panel",
+      "api": {
+        "reactSignature": "{ value, children, ...props }: ElementProps & { value: TabValue; children?: React.ReactNode }",
+        "callbackProps": [],
+        "slots": [
+          "default"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Contain the content associated with one Tab."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Option",
+    "tag": "spui-combobox-option",
+    "module": "combobox",
+    "category": "forms",
+    "reactOnly": true,
+    "api": {
+      "reactSignature": "{ value, text, disabled = false, checkIcon, children, id, ...props }: OptionProps",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "check icon"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Declare a selectable option for Dropdown, ComboBox, or standalone Listbox."
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "NavCategory",
+    "tag": "spui-nav-category",
+    "define": "defineNavCategory",
+    "module": "nav",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ children, value, disabled = false, ...props }: ElementProps & { children?: React.ReactNode; value: string; disabled?: boolean }",
+      "callbackProps": [],
+      "slots": [
+        "NavCategoryItem",
+        "NavSubItemGroup"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Group expandable navigation destinations."
+  }
+}

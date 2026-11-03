@@ -1,0 +1,35 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "Carousel",
+    "tag": "spui-carousel",
+    "define": "defineCarousel",
+    "module": "carousel",
+    "category": "views",
+    "api": {
+      "reactSignature": "{ children, label, roleDescription, previousLabel, nextLabel, slideLabel, slideGroupLabel, navigationLabel, playLabel, pauseLabel, slideWidth, align = \"center\", appearance = \"flat\", motion = \"slide\", motionDuration = 240, autoplay = false, autoplayInterval = 4000, selectedIndex, activeIndex, defaultSelectedIndex, defaultActiveIndex, wrap = false, circular = false, groupSize = \"auto\", draggable = false, whitespace = false, announcement, onIndexChange, onActiveIndexChange, ...props }: ElementProps & {\n  children?: React.ReactNode; label?: string; roleDescription?: string; previousLabel?: string; nextLabel?: string; slideLabel?: string; slideGroupLabel?: string; navigationLabel?: string; playLabel?: string; pauseLabel?: string; slideWidth?: string;\n  align?: CarouselAlign; appearance?: CarouselAppearance; motion?: CarouselMotion; motionDuration?: number; autoplay?: boolean; autoplayInterval?: number; selectedIndex?: number; activeIndex?: number; defaultSelectedIndex?: number; defaultActiveIndex?: number; wrap?: boolean; circular?: boolean; groupSize?: number | \"auto\"; draggable?: boolean; whitespace?: boolean; announcement?: CarouselAnnouncerFunction; onIndexChange?: (index: number) => void; onActiveIndexChange?: (event: SharePointUIEvent, data: CarouselReactIndexChangeData) => void\n}",
+      "callbackProps": [
+        "onIndexChange",
+        "onActiveIndexChange"
+      ],
+      "slots": [
+        "slides (direct or CarouselViewport > CarouselSlider > CarouselCard)",
+        "navigation slot (CarouselNavContainer or CarouselNav)"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks",
+        "slideWidth or --spui-carousel-slide-width for fluid per-slide sizing",
+        "align, appearance, motion and motionDuration props; slideWidth or --spui-carousel-slide-width for fluid sizing",
+        "motion accepts slide attraction physics: { kind: \"slide\", duration?: number }; duration follows Embla’s 20–60 recommendation"
+      ],
+      "highValueAdditions": [
+        "Enable drag with keyboard-equivalent announcements and preserve end padding when slides are centered."
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Compose direct or grouped CarouselCard slides with localized navigation, optional autoplay, numeric or responsive page groups, drag interaction, and theme-aware motion."
+  }
+}

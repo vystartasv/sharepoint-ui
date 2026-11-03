@@ -1,0 +1,40 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "CarouselAutoplayButton",
+    "tag": "spui-carousel-autoplay-button",
+    "define": "defineCarouselAutoplayButton",
+    "module": "carousel",
+    "category": "views",
+    "api": {
+      "relatedReactApis": [
+        {
+          "name": "CarouselAutoplayButtonProps.checked",
+          "description": "Controls whether autoplay is running; onCheckedChange reports the requested next value."
+        },
+        {
+          "name": "CarouselAutoplayButtonProps.defaultChecked",
+          "description": "Sets the initial uncontrolled autoplay state."
+        },
+        {
+          "name": "CarouselAutoplayButtonProps.appearance",
+          "description": "Uses the same appearance options as a ToggleButton."
+        }
+      ],
+      "callbackProps": [
+        "onCheckedChange"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactSignature": "{ icon, appearance = \"secondary\", checked, defaultChecked, disabled = false, disabledFocusable = false, iconPosition = \"before\", isAccessible = false, shape = \"rounded\", size = \"medium\", playLabel, pauseLabel, onCheckedChange, ...props }: CarouselAutoplayButtonProps",
+      "slots": [
+        "icon"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Expose a localized, accessible play/pause control synchronized with its parent Carousel autoplay state."
+  }
+}

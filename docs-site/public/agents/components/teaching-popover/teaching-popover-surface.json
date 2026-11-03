@@ -1,0 +1,23 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "teaching-popover",
+    "category": "feedback",
+    "react": "TeachingPopoverSurface",
+    "tag": "spui-teaching-popover-surface",
+    "factory": "defineTeachingPopover",
+    "registered": true,
+    "summary": "Group the content shown inside a TeachingPopover.",
+    "api": {
+      "reactSignature": "{ children, ...props }: ElementProps & { children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "action"
+      ],
+      "styling": [
+        "host className/style"
+      ]
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "DialogContent",
+    "tag": "spui-dialog-content",
+    "define": "defineDialogContent",
+    "module": "dialog",
+    "category": "overlays",
+    "api": {
+      "reactSignature": "{ as: Root = \"div\", children, style, ...props }: DialogContentProps",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "native polymorphic root className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Group the dialog's body and action content."
+  }
+}

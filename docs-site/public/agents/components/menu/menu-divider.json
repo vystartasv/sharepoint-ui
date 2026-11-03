@@ -1,0 +1,21 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "MenuDivider",
+    "tag": "spui-menu-divider",
+    "define": "defineMenuDivider",
+    "module": "menu",
+    "category": "actions",
+    "api": {
+      "reactSignature": "props: ElementProps",
+      "callbackProps": [],
+      "slots": [],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Separate related command groups within a Menu."
+  }
+}

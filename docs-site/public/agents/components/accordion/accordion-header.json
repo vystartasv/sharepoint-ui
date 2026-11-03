@@ -1,0 +1,27 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "AccordionHeader",
+    "tag": "spui-accordion-header",
+    "define": "defineAccordionHeader",
+    "module": "accordion",
+    "category": "disclosure",
+    "api": {
+      "reactSignature": "{ expandIconPosition = \"end\", inline = false, size = \"medium\", icon, expandIcon, button, children, ...props }: NativeClickHostProps<HTMLDivElement> & { expandIconPosition?: \"start\" | \"end\"; inline?: boolean; size?: \"small\" | \"medium\" | \"large\" | \"extra-large\"; icon?: React.ReactNode; expandIcon?: React.ReactNode; button?: React.ReactElement<React.ButtonHTMLAttributes<HTMLButtonElement>> | React.ButtonHTMLAttributes<HTMLButtonElement>; children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "default",
+        "icon",
+        "expandIcon",
+        "button"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Compose the labelled, keyboard-operable heading for an AccordionItem with optional leading and expandable icon slots."
+  }
+}

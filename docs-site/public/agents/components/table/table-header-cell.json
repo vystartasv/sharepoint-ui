@@ -1,0 +1,30 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "table",
+    "category": "data-display",
+    "react": "TableHeaderCell",
+    "tag": "spui-table-header-cell",
+    "define": "defineTableHeaderCell",
+    "api": {
+      "reactSignature": "{ children, aside, sortIcon, button, sortable = false, sortDirection, columnId, onSort, ...props }: ElementProps & { children?: React.ReactNode; aside?: React.ReactNode; sortIcon?: React.ReactNode; button?: TableHeaderCellButtonSlot; sortable?: boolean; sortDirection?: TableSortDirection; columnId?: string | number; onSort?: (direction: TableSortDirection, columnId?: string) => void }",
+      "callbackProps": [
+        "onSort"
+      ],
+      "slots": [
+        "content",
+        "button",
+        "sortIcon",
+        "aside"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Render a column header with accessible sort state and a sort request event."
+  }
+}

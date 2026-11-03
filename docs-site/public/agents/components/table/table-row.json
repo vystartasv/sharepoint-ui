@@ -1,0 +1,25 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "module": "table",
+    "category": "data-display",
+    "react": "TableRow",
+    "tag": "spui-table-row",
+    "define": "defineTableRow",
+    "api": {
+      "reactSignature": "{ children, selected = false, appearance, ...props }: ElementProps & { children?: React.ReactNode; selected?: boolean; appearance?: \"brand\" | \"neutral\" | \"none\" }",
+      "callbackProps": [],
+      "slots": [
+        "cells"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Render a themed table row with an optional selected appearance."
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "module": "select",
+  "components": [
+    {
+      "react": "Select",
+      "tag": "spui-select",
+      "define": "defineSelect",
+      "module": "select",
+      "category": "forms",
+      "api": {
+        "reactSignature": "inputProps: SelectProps",
+        "callbackProps": [
+          "onValueChange",
+          "onChange"
+        ],
+        "slots": [
+          "default option children"
+        ],
+        "styling": [
+          "SharePointUIProvider tokens",
+          "CSS custom properties",
+          "host className/style",
+          "named ::part hooks"
+        ],
+        "reactRefType": "HTMLElement"
+      },
+      "summary": "Choose a value from a fixed native option list with browser keyboard behavior, configurable native focus, and tab order."
+    }
+  ]
+}

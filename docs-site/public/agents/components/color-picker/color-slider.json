@@ -1,0 +1,31 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ColorSlider",
+    "tag": "spui-color-slider",
+    "define": "defineColorSlider",
+    "module": "color-picker",
+    "category": "forms",
+    "registered": true,
+    "summary": "Adjust hue, saturation, or value inside ColorPicker or as a standalone HSV-controlled slider.",
+    "api": {
+      "reactSignature": "{ channel = \"hue\", vertical, color, defaultColor, input, rail, thumb, shape, onChange, ...props }: ColorSliderProps",
+      "callbackProps": [
+        "onChange(event, { color })"
+      ],
+      "slots": [
+        "sliders",
+        "input",
+        "rail",
+        "thumb"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    }
+  }
+}

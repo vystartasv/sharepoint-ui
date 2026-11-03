@@ -1,0 +1,43 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "NavDivider",
+    "tag": "spui-nav-divider",
+    "define": "defineNavDivider",
+    "module": "nav",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ wrapper, alignContent = \"center\", appearance = \"default\", inset = false, vertical = false, ...props }: NavDividerProps",
+      "relatedReactApis": [
+        {
+          "name": "NavDividerProps.alignContent",
+          "description": "Aligns wrapper content at the start, center, or end of the divider."
+        },
+        {
+          "name": "NavDividerProps.appearance",
+          "description": "Selects the default, brand, strong, or subtle theme-derived divider line."
+        },
+        {
+          "name": "NavDividerProps.inset",
+          "description": "Adds logical inline spacing around the divider."
+        },
+        {
+          "name": "NavDividerProps.vertical",
+          "description": "Renders a vertical divider and sets aria-orientation accordingly."
+        }
+      ],
+      "callbackProps": [],
+      "slots": [
+        "wrapper"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Separate navigation groups."
+  }
+}

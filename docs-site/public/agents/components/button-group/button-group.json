@@ -1,0 +1,24 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ButtonGroup",
+    "tag": "spui-button-group",
+    "define": "defineButtonGroup",
+    "module": "button-group",
+    "category": "actions",
+    "api": {
+      "reactSignature": "{ children, orientation = \"horizontal\", label, ...props }: ElementProps & { children?: React.ReactNode; orientation?: \"horizontal\" | \"vertical\"; label?: string }",
+      "callbackProps": [],
+      "slots": [
+        "default"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Group related buttons under one accessible label, with horizontal or vertical layout and native button tab behavior."
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ContextMenu",
+    "tag": "spui-menu",
+    "define": "defineMenu",
+    "registered": false,
+    "module": "menu",
+    "category": "actions",
+    "api": {
+      "reactSignature": "props: MenuProps",
+      "callbackProps": [
+        "onOpenChange",
+        "onSelect"
+      ],
+      "slots": [
+        "trigger",
+        "menu"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ]
+    },
+    "summary": "Open a Menu at a pointer or trigger edge with right-click, the Context Menu key, or Shift+F10."
+  }
+}

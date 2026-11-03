@@ -1,0 +1,26 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "NavSubItemGroup",
+    "tag": "spui-nav-sub-item-group",
+    "define": "defineNavSubItemGroup",
+    "module": "nav",
+    "category": "navigation",
+    "api": {
+      "reactSignature": "{ children, collapseMotion, ...props }: ElementProps & { children?: React.ReactNode; collapseMotion?: React.ComponentType<PresenceMotionSlotProps> }",
+      "callbackProps": [],
+      "slots": [
+        "NavSubItem",
+        "collapse-motion"
+      ],
+      "styling": [
+        "SharePointUIProvider tokens",
+        "CSS custom properties",
+        "host className/style",
+        "named ::part hooks"
+      ],
+      "reactRefType": "HTMLElement"
+    },
+    "summary": "Contain the destinations revealed by a NavCategory."
+  }
+}

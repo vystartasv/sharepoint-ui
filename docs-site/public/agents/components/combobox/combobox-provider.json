@@ -1,0 +1,21 @@
+{
+  "package": "@spfx-fast/sharepoint-ui",
+  "component": {
+    "react": "ComboboxProvider",
+    "tag": "spui-combobox",
+    "module": "combobox",
+    "category": "forms",
+    "reactOnly": true,
+    "api": {
+      "reactSignature": "{ value, children }: { value: ComboboxProviderValue; children?: React.ReactNode }",
+      "callbackProps": [],
+      "slots": [
+        "children"
+      ],
+      "styling": [
+        "React context provider"
+      ]
+    },
+    "summary": "Share Fluent-compatible option registration, selection, active-option, appearance, and open state with composed combobox descendants; custom value and callback fields remain supported."
+  }
+}
