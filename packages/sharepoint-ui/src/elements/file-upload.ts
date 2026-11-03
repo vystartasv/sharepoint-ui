@@ -19,7 +19,7 @@ export function defineFileUpload(): void {
 
     constructor() { super(); try { this.internals = this.attachInternals(); } catch { /* Native picker continues to work where form-associated elements are unavailable. */ } }
     connectedCallback(): void { if (!this.shadowRoot) this.render(); this.sync(); }
-    attributeChangedCallback(): void { if (this.isConnected) this.sync(); }
+    attributeChangedCallback(): void { if (this.isConnected && this.input) this.sync(); }
     formDisabledCallback(disabled: boolean): void { this.formDisabled = disabled; if (this.input) this.sync(); }
     formResetCallback(): void { if (this.status) this.status.textContent = ""; this.setFiles([], false); }
     formStateRestoreCallback(state: string | File | FormData | null): void { if (state instanceof File) this.setFiles([state], false); else if (state instanceof FormData) this.setFiles(state.getAll(this.getAttribute("name") || "").filter((value): value is File => value instanceof File), false); }
