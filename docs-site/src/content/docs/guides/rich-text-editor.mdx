@@ -46,3 +46,36 @@ function NotesEditor() {
 ## Save the value
 
 Use the editor's sanitized `onValueChange` value with your normal SPFx persistence path. Provide loading, saved, and error feedback in the web part. Read back important writes where the workflow requires confirmation. To render saved content, pass it back through `RichTextEditor` or another sanitizer-aware renderer; do not inject it with raw `innerHTML`.
+
+## Load the editor only when needed
+
+For pages where editing is optional, keep the editor out of the initial web-part bundle. `React.lazy` lets the SPFx webpack build place the React adapter and editor in an async chunk, requested when the user starts editing.
+
+```tsx
+import * as React from "react";
+
+const LazyRichTextEditor = React.lazy(() =>
+  import("@spfx-fast/sharepoint-ui/react").then(({ RichTextEditor }) => ({
+    default: RichTextEditor,
+  })),
+);
+
+function DeferredNotesEditor({ value, onChange }: {
+  value: string;
+  onChange: (html: string) => void;
+}) {
+  const [editing, setEditing] = React.useState(false);
+
+  if (!editing) {
+    return <button type="button" onClick={() => setEditing(true)}>Edit notes</button>;
+  }
+
+  return (
+    <React.Suspense fallback={<div role="status">Loading editor…</div>}>
+      <LazyRichTextEditor label="Notes" value={value} onValueChange={onChange} />
+    </React.Suspense>
+  );
+}
+```
+
+Keep the editor imported only through this lazy boundary if you want it excluded from the initial bundle. If the page always opens in edit mode, render it directly instead of adding a loading step.
