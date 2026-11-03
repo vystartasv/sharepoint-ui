@@ -3,7 +3,7 @@ title: SharePoint UI
 description: Framework-independent components for SharePoint Framework 1.24, with React adapters, theme inheritance, and a searchable API catalog.
 template: splash
 hero:
-  tagline: Build SharePoint experiences with a focused component library. Keep the tenant theme, choose your framework, and ship only the pieces you use.
+  tagline: SPFx-native work surfaces for SharePoint pages and Microsoft 365 Copilot. Keep the tenant theme, choose React or custom elements, and ship only the pieces you use.
   actions:
     - text: Browse components
       link: /sharepoint-ui/catalog/
@@ -19,7 +19,7 @@ import PreviewBench from "../../components/PreviewBench.astro";
 
 ## A component system shaped for SharePoint
 
-SharePoint UI gives SPFx developers and coding agents a searchable set of controls, compound components, and reusable SharePoint views. Components inherit SharePoint and Fluent theme values. Use the React adapter in SPFx, or register custom elements directly from plain JavaScript and other frameworks.
+SharePoint UI focuses on one job: build a tenant-aware SharePoint task view once, then make it useful in a page or an SPFx 1.24 Copilot UX component. Controls inherit SharePoint and Fluent theme values; React is optional, and agents can browse the same predictable APIs and working examples.
 
 ```sh
 npm install @spfx-fast/sharepoint-ui
@@ -51,19 +51,20 @@ The catalog covers 243 named exports across 62 modules, including the named comp
 <div class="catalog-actions">
   <a class="catalog-link" href="/sharepoint-ui/catalog/">Explore the component catalog <span aria-hidden="true">→</span></a>
   <a class="catalog-link" href="/sharepoint-ui/components/rich-text-editor/rich-text-editor/">See the rich text editor in action <span aria-hidden="true">→</span></a>
+  <a class="catalog-link" href="/sharepoint-ui/guides/copilot-ux/">See an SPFx 1.24 Copilot experience <span aria-hidden="true">→</span></a>
 </div>
 
 ## Why use this for SharePoint?
 
-Fluent UI is a strong general-purpose system. Choose SharePoint UI when the experience needs SharePoint-specific composition and deployment fit. The same elements work through React or direct custom-element imports, so a web part can use the API shape that fits its host and ship only what it renders.
+Fluent UI is a strong general-purpose system. Choose SharePoint UI for SPFx-native, agent-ready SharePoint work surfaces: tenant theme inheritance, reusable SharePoint views, React or direct custom-element imports, selected-component packaging, and a Copilot UX integration guide. We focus on making SharePoint tasks quick to compose; we do not claim broad ecosystem parity or proven performance leadership.
 
 <div class="sharepoint-advantages">
   <section><h3>Fits the tenant</h3><p>Inherit the site palette and font, map locale to RTL, and keep each view inside its SharePoint section.</p></section>
-  <section><h3>Starts with real work</h3><p>Compose document, person, task, approval, and list-item views from reusable cards, plus a rich text editor that can match field limits.</p></section>
+  <section><h3>Starts with real work</h3><p>Compose document, person, task, approval, and list-item views, then return them as interactive Copilot experiences in SPFx 1.24.</p></section>
   <section><h3>Predictable for agents</h3><p>Use one component pattern, copyable examples, and machine-readable API slices instead of guessing slots and event names.</p></section>
 </div>
 
-This is the product wedge, not a claim that every control is smaller or faster than Fluent UI. Choose Fluent UI directly when you need its broader ecosystem without these SharePoint-specific needs.
+This is the product wedge: make the SharePoint page and its Copilot experience feel like one product. Choose Fluent UI directly when you need its broader general-purpose ecosystem without these SharePoint-specific needs.
 
 ## Keep composition lightweight
 

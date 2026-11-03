@@ -51,7 +51,7 @@ export default defineConfig({
     sidebar: [
       { label: "For people", items: ["index", "getting-started", "catalog", { label: "Rich text editor", link: "/components/rich-text-editor/rich-text-editor/" }] },
       { label: "For agents", items: [{ label: "Agent documentation", link: "/agents/" }] },
-      { label: "Guides", items: ["guides/spfx", "guides/theming-and-direction", "guides/saved-palettes", "guides/component-patterns", "guides/custom-elements", { label: "Save rich text in SharePoint", link: "/guides/rich-text-editor/" }, "guides/agent-workflow"] },
+      { label: "Guides", items: ["guides/spfx", { label: "Copilot UX in SPFx 1.24", link: "/guides/copilot-ux/" }, "guides/theming-and-direction", "guides/saved-palettes", "guides/component-patterns", "guides/custom-elements", { label: "Save rich text in SharePoint", link: "/guides/rich-text-editor/" }, "guides/agent-workflow"] },
       { label: "Component catalog", collapsed: true, items: componentSidebar },
     ],
   })],
