@@ -110,8 +110,10 @@ export type SharePointChoiceValue = string | readonly string[] | null;
 export type SharePointChoiceUpdate = Record<string, string | null | { results: string[] }>;
 export type SharePointUrlValue = { url: string; description?: string };
 export type SharePointTaxonomyTermValue = { label: string; termGuid: string; wssId?: number };
-export type SharePointTaxonomyValue = SharePointTaxonomyTermValue | readonly SharePointTaxonomyTermValue[] | null;
-export type SharePointFieldValue = string | number | boolean | Date | SharePointUrlValue | SharePointTaxonomyTermValue | readonly string[] | readonly SharePointLookupId[] | readonly SharePointTaxonomyTermValue[] | null;
+export type SharePointTaxonomyRestTermValue = { Label: string; TermGuid: string; WssId?: number };
+export type SharePointTaxonomyRestValueCollection = { results: readonly (SharePointTaxonomyTermValue | SharePointTaxonomyRestTermValue)[] } | { Results: readonly (SharePointTaxonomyTermValue | SharePointTaxonomyRestTermValue)[] };
+export type SharePointTaxonomyValue = SharePointTaxonomyTermValue | SharePointTaxonomyRestTermValue | SharePointTaxonomyRestValueCollection | readonly (SharePointTaxonomyTermValue | SharePointTaxonomyRestTermValue)[] | string | null;
+export type SharePointFieldValue = string | number | boolean | Date | SharePointUrlValue | SharePointTaxonomyTermValue | SharePointTaxonomyRestTermValue | SharePointTaxonomyRestValueCollection | readonly string[] | readonly SharePointLookupId[] | readonly (SharePointTaxonomyTermValue | SharePointTaxonomyRestTermValue)[] | null;
 export type SharePointFieldValues = Readonly<Record<string, SharePointFieldValue | undefined>>;
 export type SharePointTaxonomyFieldFormValue = { FieldName: string; FieldValue: string };
 export type SharePointFieldUpdateValue = string | number | boolean | null | { results: Array<string | number> } | { __metadata: { type: "SP.FieldUrlValue" }; Url: string; Description: string };
@@ -195,6 +197,52 @@ export function getSharePointFieldAdapter(field: SharePointFieldMetadata): Share
   if (["counter", "computed", "calculated"].includes(normalized)) return { ...finish("read-only"), readOnly: true };
 
   return { ...adapter, unsupportedReason: "This SharePoint field type needs a specialized data source or renderer." };
+}
+
+/** Convert REST TaxonomyFieldValue objects or serialized values into the field's canonical term shape. */
+export function normalizeSharePointTaxonomyValue(field: SharePointFieldMetadata, value: unknown): SharePointTaxonomyValue {
+  const adapter = getSharePointFieldAdapter(field);
+  if (adapter.control !== "taxonomy") throw new TypeError(`${adapter.label} is not a SharePoint managed-metadata field.`);
+  if (value == null || (typeof value === "string" && value.trim() === "")) return null;
+
+  const parseTerm = (input: unknown): SharePointTaxonomyTermValue => {
+    if (!input || typeof input !== "object" || Array.isArray(input)) throw new TypeError(`${adapter.label} contains an invalid taxonomy term.`);
+    const record = input as Record<string, unknown>;
+    const label = record.label ?? record.Label;
+    const rawGuid = record.termGuid ?? record.TermGuid;
+    const rawWssId = record.wssId ?? record.WssId;
+    if (typeof label !== "string" || !label.trim() || typeof rawGuid !== "string") throw new TypeError(`${adapter.label} terms require a label and term GUID.`);
+    const termGuid = normalizeSharePointListId(rawGuid, `${adapter.label} terms require a valid term GUID.`);
+    const wssId = rawWssId == null || rawWssId === "" ? undefined : typeof rawWssId === "number" ? rawWssId : typeof rawWssId === "string" && /^-?\d+$/.test(rawWssId) ? Number(rawWssId) : NaN;
+    if (wssId !== undefined && (!Number.isSafeInteger(wssId) || wssId < -1)) throw new RangeError(`${adapter.label} term WssId must be -1 or a non-negative safe integer.`);
+    return { label: label.trim(), termGuid, ...(wssId === undefined ? {} : { wssId }) };
+  };
+  const parseSerialized = (serialized: string): SharePointTaxonomyTermValue[] => {
+    if (!serialized.trim()) return [];
+    const parts = serialized.split(";#");
+    if (parts.length % 2 !== 0) throw new TypeError(`${adapter.label} has an invalid serialized taxonomy value.`);
+    return Array.from({ length: parts.length / 2 }, (_, index) => {
+      const rawWssId = parts[index * 2];
+      const pair = parts[index * 2 + 1];
+      const separator = pair.lastIndexOf("|");
+      const label = pair.slice(0, separator);
+      const termGuid = pair.slice(separator + 1);
+      return parseTerm({ label, termGuid, wssId: rawWssId });
+    });
+  };
+
+  let terms: SharePointTaxonomyTermValue[];
+  if (typeof value === "string") terms = parseSerialized(value);
+  else if (Array.isArray(value)) terms = value.map(parseTerm);
+  else if (typeof value === "object" && ("results" in value || "Results" in value)) {
+    const results = (value as { results?: unknown; Results?: unknown }).results ?? (value as { Results?: unknown }).Results;
+    if (!Array.isArray(results)) throw new TypeError(`${adapter.label} taxonomy results must be an array.`);
+    terms = results.flatMap(item => typeof item === "string" ? parseSerialized(item) : [parseTerm(item)]);
+  } else if (typeof value === "object") terms = [parseTerm(value)];
+  else throw new TypeError(`${adapter.label} has an unsupported taxonomy value.`);
+
+  if (!adapter.multiple && terms.length > 1) throw new TypeError(`${adapter.label} accepts only one selected term.`);
+  return adapter.multiple ? terms : terms[0] ?? null;
 }
 
 /** Build a bounded REST request for a list's field definitions and their type-specific metadata. */
@@ -386,11 +434,9 @@ export function serializeSharePointTaxonomyFieldFormValue(field: SharePointField
     throw new TypeError(`${adapter.label} is not a SharePoint managed-metadata field.`);
   }
   if (!adapter.name) throw new TypeError("The SharePoint field must include InternalName.");
-  assertSharePointFieldValueWritable(adapter, value);
-
-  const terms = adapter.multiple
-    ? value == null ? [] : Array.isArray(value) ? value : (() => { throw new TypeError(`${adapter.label} requires an array of selected terms.`); })()
-    : value == null ? [] : Array.isArray(value) ? (() => { throw new TypeError(`${adapter.label} accepts one selected term or null.`); })() : [value as SharePointTaxonomyTermValue];
+  const normalized = normalizeSharePointTaxonomyValue(field, value);
+  assertSharePointFieldValueWritable(adapter, normalized);
+  const terms: readonly SharePointTaxonomyTermValue[] = normalized == null ? [] : Array.isArray(normalized) ? normalized : [normalized];
   const serialized = terms.map(term => {
     if (!term || typeof term.label !== "string" || !term.label.trim()) throw new TypeError(`${adapter.label} terms require a non-empty label.`);
     const termGuid = normalizeSharePointListId(term.termGuid, `${adapter.label} terms require a valid term GUID.`);

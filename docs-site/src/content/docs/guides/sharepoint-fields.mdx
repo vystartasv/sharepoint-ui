@@ -111,7 +111,15 @@ Pass numeric IDs or digit strings; malformed and non-positive IDs throw instead 
 
 Managed-metadata fields need terms from the field's term set. The library maps them to a single-value `ComboBox` or multi-value `TagPicker`; the host loads terms with its approved SharePoint/Graph authentication and passes options as `{ value: termGuid, label, wssId? }`. Use the label for the user's current locale and keep the stable term GUID as the value. Microsoft Graph returns a set's first-level terms from `/sites/{site-id}/termStore/sets/{set-id}/children`; request child terms recursively if the taxonomy is hierarchical. Delegated access requires `TermStore.Read.All`. The adapter returns `termSetId` when SharePoint includes `TermSetId` in the field metadata. See Microsoft's [list children API](https://learn.microsoft.com/en-us/graph/api/termstore-term-list-children?view=graph-rest-1.0).
 
-The field value is `{ label, termGuid, wssId? }` for one term or an array for a multi-term field. `wssId` can be omitted when the host does not know it; serialization uses `-1` so SharePoint can resolve the term. Use the dedicated serializer with `ValidateUpdateListItem`, because taxonomy values use SharePoint's form-value format rather than the ordinary list-item PATCH shape:
+SharePoint REST item reads expose a taxonomy term as `{ Label, TermGuid, WssId }`; depending on the endpoint, multi-values can arrive as a collection or as the `WssId;#Label|TermGuid` form string. Normalize the read value before giving it to the component:
+
+```ts
+import { normalizeSharePointTaxonomyValue } from "@spfx-fast/sharepoint-ui/sharepoint-fields";
+
+const initialTerms = normalizeSharePointTaxonomyValue(field, item[field.InternalName]);
+```
+
+The normalized value is `{ label, termGuid, wssId? }` for one term or an array for a multi-term field. `wssId` can be omitted when the host does not know it; serialization uses `-1` so SharePoint can resolve the term. Use the dedicated serializer with `ValidateUpdateListItem`, because taxonomy values use SharePoint's form-value format rather than the ordinary list-item PATCH shape:
 
 ```tsx
 import { useState } from "react";
@@ -145,7 +153,7 @@ const failure = results.find(result => result.HasException || result.ErrorMessag
 if (failure) throw new Error(failure.ErrorMessage || `SharePoint rejected ${failure.FieldName}.`);
 ```
 
-For multi-term fields, pass an array of term values. Pass `null` or `[]` to clear an optional field; required fields reject empty values. SharePoint's managed-metadata form format is based on `WssId;#Label|TermGuid`; Microsoft's protocol documents the [taxonomy value format](https://learn.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-emmcsom/489ac564-28b1-41bb-9701-c01611e5156e) and the [`ValidateUpdateListItem` operation](https://learn.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-csomspt/652ab52f-8f47-4eec-95fd-743af5ee38cc). The library does not silently use a label-only write or retrieve terms without the host's authorization.
+For multi-term fields, pass an array of term values. Pass `null` or `[]` to clear an optional field; required fields reject empty values. Microsoft's [`TaxonomyFieldValue` shape](https://learn.microsoft.com/en-us/dotnet/api/microsoft.sharepoint.client.taxonomy.taxonomyfieldvalue?view=sharepoint-csom) exposes label, term GUID, and WssId. The form serialization follows the [taxonomy value format](https://learn.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-emmcsom/489ac564-28b1-41bb-9701-c01611e5156e) and the [`ValidateUpdateListItem` operation](https://learn.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-csomspt/652ab52f-8f47-4eec-95fd-743af5ee38cc). The library does not silently use a label-only write or retrieve terms without the host's authorization.
 
 ## Save choice values
 

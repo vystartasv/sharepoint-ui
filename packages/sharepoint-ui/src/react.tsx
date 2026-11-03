@@ -36,7 +36,7 @@ import { defineDatePicker } from "./elements/date-picker.js";
 import { defineCombobox } from "./elements/combobox.js";
 import { defineRichTextEditor, getRichTextEditorFieldOptions, type RichTextEditorImageUploader, type RichTextEditorLinkPicker, type SharePointMultiLineField } from "./elements/rich-text-editor.js";
 export { getRichTextEditorFieldOptions, type SharePointMultiLineField, type RichTextEditorImageUploadResult, type RichTextEditorImageUploader, type RichTextEditorLink, type RichTextEditorLinkPicker } from "./elements/rich-text-editor.js";
-import { getSharePointFieldAdapter, type SharePointFieldMetadata, type SharePointTaxonomyTermValue, type SharePointFieldValue } from "./sharepoint-fields.js";
+import { getSharePointFieldAdapter, normalizeSharePointTaxonomyValue, type SharePointFieldMetadata, type SharePointTaxonomyTermValue, type SharePointFieldValue } from "./sharepoint-fields.js";
 import { defineAlert } from "./elements/alert.js";
 import { defineSkeleton, defineSkeletonItem, type SkeletonAnimation, type SkeletonAppearance, type SkeletonItemSize, type SkeletonShape } from "./elements/skeleton.js";
 import { defineLink } from "./elements/link.js";
@@ -7226,7 +7226,8 @@ export function SharePointField({ field, value, defaultValue, options: providedO
   const [fillInValue, setFillInValue] = React.useState("");
   if (adapter.hidden) return null;
 
-  const currentValue = value === undefined ? internalValue : value;
+  const rawValue = value === undefined ? internalValue : value;
+  const currentValue = adapter.control === "taxonomy" ? normalizeSharePointTaxonomyValue(field, rawValue) : rawValue;
   const updateValue = (next: SharePointFieldValue): void => {
     if (value === undefined) setInternalValue(next);
     onValueChange?.(next);

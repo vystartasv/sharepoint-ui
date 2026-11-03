@@ -1,5 +1,6 @@
 import {
   getSharePointFieldAdapter,
+  normalizeSharePointTaxonomyValue,
   type SharePointFieldMetadata,
   type SharePointTaxonomyTermValue,
   type SharePointFieldValue,
@@ -166,7 +167,7 @@ export function defineSharePointField(): void {
         this.removeAttribute("aria-busy");
         const options = this.hasProvidedOptions ? this.currentOptions : (adapter.choices ?? []).map(value => ({ value, label: value }));
         const label = adapter.label || adapter.name || adapter.fieldType;
-        const value = this.currentValue;
+        const value = adapter.control === "taxonomy" ? normalizeSharePointTaxonomyValue(field, this.currentValue) : this.currentValue;
         const terms = taxonomyTerms(value);
         const fieldOptions = [...options];
         if (adapter.control === "taxonomy") for (const term of terms) if (!fieldOptions.some(option => String(option.value).toLowerCase() === term.termGuid.toLowerCase())) fieldOptions.push({ value: term.termGuid, label: term.label, wssId: term.wssId });
@@ -382,8 +383,16 @@ export function defineSharePointField(): void {
         control.querySelectorAll<FieldControl>("spui-checkbox").forEach(checkbox => { checkbox.checked = selected.has(checkbox.getAttribute("value") ?? ""); });
       } else if (control.localName === "spui-checkbox") control.checked = this.currentValue === true || this.currentValue === "true";
       else if (control.localName === "spui-combobox" && control.hasAttribute("multiselect")) control.selectedOptions = Array.isArray(this.currentValue) ? this.currentValue.map(String) : [];
-      else if (control.localName === "spui-tag-picker") control.selectedOptions = taxonomyTerms(this.currentValue).map(term => term.termGuid);
-      else if ("value" in control) control.value = textValue(this.currentValue);
+      else if (control.localName === "spui-combobox" && this.fieldValue && getSharePointFieldAdapter(this.fieldValue).control === "taxonomy") {
+        const term = taxonomyTerms(normalizeSharePointTaxonomyValue(this.fieldValue, this.currentValue))[0];
+        control.selectedValue = term?.termGuid ?? "";
+        control.value = term?.label ?? "";
+      }
+      else if (control.localName === "spui-tag-picker") {
+        const field = this.fieldValue;
+        const value = field && getSharePointFieldAdapter(field).control === "taxonomy" ? normalizeSharePointTaxonomyValue(field, this.currentValue) : this.currentValue;
+        control.selectedOptions = taxonomyTerms(value).map(term => term.termGuid);
+      } else if ("value" in control) control.value = textValue(this.currentValue);
     }
 
     private acceptValue(value: SharePointFieldValue): void {
@@ -424,12 +433,14 @@ export function defineSharePointField(): void {
           const selected = detail.selectedOptions ?? detail.values!;
           const field = this.fieldValue;
           const adapter = field ? getSharePointFieldAdapter(field) : undefined;
-          this.acceptValue(adapter?.control === "taxonomy" ? taxonomyValuesFromIds(selected, this.currentValue, this.currentOptions, adapter.multiple === true) : selected);
+          const current = field && adapter?.control === "taxonomy" ? normalizeSharePointTaxonomyValue(field, this.currentValue) : this.currentValue;
+          this.acceptValue(adapter?.control === "taxonomy" ? taxonomyValuesFromIds(selected, current, this.currentOptions, adapter.multiple === true) : selected);
         } else if (detail.selectedValue !== undefined) {
           const field = this.fieldValue;
           const adapter = field ? getSharePointFieldAdapter(field) : undefined;
+          const current = field && adapter?.control === "taxonomy" ? normalizeSharePointTaxonomyValue(field, this.currentValue) : this.currentValue;
           this.acceptValue(adapter?.control === "taxonomy"
-            ? taxonomyValuesFromIds(detail.selectedValue ? [detail.selectedValue] : [], this.currentValue, this.currentOptions, false)
+            ? taxonomyValuesFromIds(detail.selectedValue ? [detail.selectedValue] : [], current, this.currentOptions, false)
             : detail.selectedValue || null);
         }
         else if (detail.value !== undefined) this.acceptValue(detail.value || null);
