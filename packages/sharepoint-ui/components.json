@@ -1977,6 +1977,10 @@
         "reactSignature": "inputProps: ComboBoxProps",
         "relatedReactApis": [
           {
+            "name": "ComboBoxProps.requiredMessage",
+            "description": "Sets the native form validation message; defaults to SharePointUIProvider.strings.required."
+          },
+          {
             "name": "ComboBoxProps.selectedLabel",
             "description": "In multiselect mode, names the selected-options group; defaults to SharePointUIProvider.strings.selectedOptionsLabel."
           },
@@ -3707,7 +3711,13 @@
       "module": "rating",
       "category": "forms",
       "api": {
-        "reactSignature": "{ value, defaultValue = 0, max = 5, step = 1, size = \"extra-large\", color = \"neutral\", label, itemLabel, iconFilled, iconOutline, fullValueInput, halfValueInput, name, disabled = false, readOnly = false, required = false, onChange, ...props }: RatingProps",
+        "reactSignature": "{ value, defaultValue = 0, max = 5, step = 1, size = \"extra-large\", color = \"neutral\", label, requiredMessage, itemLabel, iconFilled, iconOutline, fullValueInput, halfValueInput, name, disabled = false, readOnly = false, required = false, onChange, ...props }: RatingProps",
+        "relatedReactApis": [
+          {
+            "name": "RatingProps.requiredMessage",
+            "description": "Sets the native form validation message; defaults to SharePointUIProvider.strings.required."
+          }
+        ],
         "callbackProps": [
           "itemLabel",
           "onChange"

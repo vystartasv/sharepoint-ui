@@ -4,7 +4,7 @@ export function defineCombobox(): void {
   if (customElements.get("spui-combobox")) return;
   class SpuiCombobox extends HTMLElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "value", "selected-value", "selected-options", "default-selected-options", "multiselect", "disabled", "required", "name", "placeholder", "allow-freeform", "read-only", "button-trigger", "open", "default-open", "clearable", "clear-label", "disable-auto-focus", "appearance", "size", "positioning", "inline-popup", "no-results", "remove-selected-label", "selected-label", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid"];
+    static observedAttributes = ["label", "value", "selected-value", "selected-options", "default-selected-options", "multiselect", "disabled", "required", "required-message", "name", "placeholder", "allow-freeform", "read-only", "button-trigger", "open", "default-open", "clearable", "clear-label", "disable-auto-focus", "appearance", "size", "positioning", "inline-popup", "no-results", "remove-selected-label", "selected-label", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid"];
     private internals: ElementInternals | undefined;
     private observer: MutationObserver | undefined;
     private positionEvents?: AbortController;
@@ -234,7 +234,7 @@ export function defineCombobox(): void {
         : this.dirty ? (this.hasAttribute("allow-freeform") ? this.currentValue : "") : (this.selectedValue || (this.hasAttribute("allow-freeform") ? this.currentValue : ""));
       this.internals?.setFormValue(formValue || null, this.hasAttribute("multiselect") ? JSON.stringify(this.selectedOptionsState) : typeof formValue === "string" ? formValue : null);
       const missing = this.hasAttribute("required") && (this.hasAttribute("multiselect") ? this.selectedOptionsState.length === 0 : !formValue);
-      try { this.internals?.setValidity(missing ? { valueMissing: true } : {}, missing ? "Choose an option." : "", this.hasAttribute("button-trigger") ? undefined : this.getInput() ?? undefined); } catch { /* Keep native input semantics if an engine rejects the validity anchor. */ }
+      try { this.internals?.setValidity(missing ? { valueMissing: true } : {}, missing ? this.getAttribute("required-message") || "Choose an option." : "", this.hasAttribute("button-trigger") ? undefined : this.getInput() ?? undefined); } catch { /* Keep native input semantics if an engine rejects the validity anchor. */ }
     }
 
     private selectedOptionsFormData(): FormData {

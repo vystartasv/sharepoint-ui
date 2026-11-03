@@ -5,7 +5,7 @@ export function defineRating(): void {
   if (customElements.get("spui-rating")) return;
   class SpuiRating extends HTMLElement {
     static formAssociated = true;
-    static observedAttributes = ["value", "default-value", "max", "step", "size", "color", "label", "item-label", "name", "disabled", "readonly", "required", "aria-label", "aria-labelledby", "aria-description", "aria-describedby"];
+    static observedAttributes = ["value", "default-value", "max", "step", "size", "color", "label", "item-label", "name", "disabled", "readonly", "required", "required-message", "aria-label", "aria-labelledby", "aria-description", "aria-describedby"];
     private internals?: ElementInternals;
     private readonly instanceName = `spui-rating-${crypto.randomUUID()}`;
     private rating = 0;
@@ -88,7 +88,7 @@ export function defineRating(): void {
     private syncForm(): void {
       this.internals?.setFormValue(this.rating > 0 ? String(this.rating) : null, String(this.rating));
       const missing = this.hasAttribute("required") && this.rating === 0;
-      try { this.internals?.setValidity(missing ? { valueMissing: true } : {}, missing ? "Choose a rating." : "", this.queryInputs()[0]); } catch { /* Keep the radio group functional if a browser rejects the validity anchor. */ }
+      try { this.internals?.setValidity(missing ? { valueMissing: true } : {}, missing ? this.getAttribute("required-message") || "Choose a rating." : "", this.queryInputs()[0]); } catch { /* Keep the radio group functional if a browser rejects the validity anchor. */ }
     }
     private labelFor(value: number): string {
       if (this.itemLabelFormatter) return this.itemLabelFormatter(value);
