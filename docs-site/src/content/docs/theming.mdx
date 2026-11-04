@@ -9,14 +9,19 @@ Import the stylesheet once and wrap the app in `SharePointThemeProvider`. It rea
 
 ## Control sizing
 
-Buttons, single-line inputs, selects, and component action buttons share a 40px minimum height and the same horizontal padding. Text areas use the same padding but stay taller for multi-line text. Checkbox, radio, and switch controls keep their native shapes.
+Buttons, inputs, selects, and action controls share a 44px minimum height and the same horizontal padding. Labels, disclosure rows, and navigation targets use that height too. Text areas stay taller for multi-line text. Checkbox and radio marks and the switch track keep their natural shapes while their labels remain easy to tap.
 
-The defaults come from two CSS variables on `.spui-theme`:
+The defaults come from CSS variables on `.spui-theme`:
 
 | Variable | Default | Applies to |
 | --- | --- | --- |
-| `--spui-control-height` | `2.5rem` (40px) | Buttons, single-line inputs, selects |
+| `--spui-control-height` | `2.75rem` (44px) | Controls, labels, disclosure rows, and navigation targets |
 | `--spui-control-padding-inline` | `.75rem` | Buttons and text-entry controls |
+| `--spui-space-1` | `.25rem` (4px) | Tight gaps |
+| `--spui-space-2` | `.5rem` (8px) | Control padding and compact gaps |
+| `--spui-space-3` | `.75rem` (12px) | Field and group gaps |
+| `--spui-space-4` | `1rem` (16px) | Section and card padding |
+| `--spui-space-6` | `1.5rem` (24px) | Large section spacing |
 
 Override the variables where the provider is mounted:
 
@@ -24,6 +29,7 @@ Override the variables where the provider is mounted:
 .spui-theme {
   --spui-control-height: 2.75rem;
   --spui-control-padding-inline: 1rem;
+  --spui-space-3: 1rem;
 }
 ```
 

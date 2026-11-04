@@ -16,13 +16,21 @@
   --spui-surface: #fff;
   --spui-text: #182230;
   --spui-muted: #526070;
+  --spui-control-height: 2.75rem;
+  --spui-control-padding-inline: .75rem;
+  --spui-space-1: .25rem;
+  --spui-space-2: .5rem;
+  --spui-space-3: .75rem;
+  --spui-space-4: 1rem;
+  --spui-space-6: 1.5rem;
 }
 
 .hero { padding-block: 3rem; }
+.sl-menu-button { box-sizing: border-box; width: var(--spui-control-height); height: var(--spui-control-height); }
 
-.component-catalog { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1.5rem; padding: 0; list-style: none; }
+.component-catalog { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 var(--spui-space-6); padding: 0; list-style: none; }
 .component-catalog li { border-bottom: 1px solid var(--sl-color-hairline); }
-.component-catalog a { display: grid; gap: .2rem; padding: .7rem 0; text-decoration: none; }
+.component-catalog a { display: grid; gap: var(--spui-space-1); min-height: var(--spui-control-height); padding-block: var(--spui-space-2); text-decoration: none; }
 .component-catalog a span { color: var(--sl-color-gray-2); font-size: .9rem; }
 .component-catalog a:hover strong { text-decoration: underline; text-underline-offset: .15em; }
 @media (max-width: 40rem) { .component-catalog { grid-template-columns: 1fr; } }

@@ -14,7 +14,7 @@ await page.getByRole("button", { name: "Save work item" }).click();
 await expect(page.getByRole("status")).toContainText("Saved");
 ```
 
-Buttons, single-line inputs, and selects share a 40px minimum height. Text areas stay taller; see [control sizing](/sharepoint-ui/theming/#control-sizing) for customization.
+Controls, action buttons, labels, and disclosure rows share a 44px minimum target height. Text areas stay taller; see [control sizing](/sharepoint-ui/theming/#control-sizing) for customization.
 
 Check the [component guide](/sharepoint-ui/components/) before choosing a control. Each catalog item opens its own interactive page. The package's `components.json` is the machine-readable inventory. The package does not read or save SharePoint data; use the host workflow and verify its visible result.
 
