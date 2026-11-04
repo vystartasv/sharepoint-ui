@@ -7,12 +7,12 @@ SharePoint UI's strongest measured advantage is its framework-free custom-elemen
 
 ## Measured result
 
-On 2026-11-03, the repository benchmark bundled `Button`, `Input`, `Card`, and `Tag` from SharePoint UI `0.4.3` and Fluent UI React `9.75.0` as minified, tree-shaken browser ESM targeting ES2022 with esbuild 0.28.2. React and React DOM were external in both React builds.
+On 2026-11-04, the repository benchmark bundled `Button`, `Input`, `Card`, and `Tag` from SharePoint UI `0.4.3` and Fluent UI React `9.75.0` as minified, tree-shaken browser ESM targeting ES2022 with esbuild 0.28.2. React and React DOM were external in both React builds. The source revision was [`ff3f905`](https://github.com/vystartasv/sharepoint-ui/commit/ff3f905f1b615cd70f04ddfe4d4fa50db484ed3b).
 
 | Import path | Raw JavaScript | Gzip | Brotli | Gzip change vs Fluent |
 | --- | ---: | ---: | ---: | ---: |
 | SharePoint UI custom elements, no React | 47,862 bytes | 11,562 bytes | 10,254 bytes | 74.0% less |
-| SharePoint UI React adapters | 95,927 bytes | 23,729 bytes | 20,840 bytes | 46.6% less |
+| SharePoint UI React adapters | 95,991 bytes | 23,753 bytes | 20,901 bytes | 46.5% less |
 | Fluent UI React 9.75.0 | 181,420 bytes | 44,411 bytes | 38,069 bytes | Baseline |
 
 This is a concrete advantage for compact SharePoint and Copilot task surfaces: the four-component custom-element slice is 74% smaller after gzip than the matching Fluent imports.
@@ -25,35 +25,35 @@ A separate per-component measurement on 2026-11-04 shows how payload follows the
 | --- | ---: | ---: | ---: | ---: |
 | Button custom-element leaf | 18,478 bytes | 5,533 bytes | 4,957 bytes | 3 |
 | Button React adapter | 61,212 bytes | 16,157 bytes | 14,218 bytes | 5 |
-| RichTextEditor custom-element leaf | 227,676 bytes | 65,383 bytes | 56,276 bytes | 202 |
-| RichTextEditor React adapter | 273,888 bytes | 77,394 bytes | 66,289 bytes | 206 |
+| RichTextEditor custom-element leaf | 242,564 bytes | 69,007 bytes | 59,033 bytes | 202 |
+| RichTextEditor React adapter | 288,826 bytes | 81,005 bytes | 69,104 bytes | 206 |
 
 The small import stays small: the measured React Button slice retains the adapter, its shared helper, and Button code; it does not retain RichTextEditor or Quill. Import the editor only where it is used, and use the [lazy-loading pattern](/sharepoint-ui/guides/rich-text-editor/#load-the-editor-only-when-needed) if editing should not load with the initial view. These are independent component slices, not additive totals.
 
 The measurements use the same minify/tree-shake process as the package analyzer. They exclude CSS, React's host-provided runtime, SharePoint startup and rendering work, and do not predict full-page download or interaction time. RichTextEditor is not compared with Fluent's core component set because Fluent UI React does not include a first-party rich-text editor.
 
-These per-component readings describe repository source at [commit `4f7cd60`](https://github.com/vystartasv/sharepoint-ui/commit/4f7cd60d7862c39b6f0e7e80310d83ada62805bd), not a measurement of the current npm tarball.
+These per-component readings describe repository source at [`ff3f905`](https://github.com/vystartasv/sharepoint-ui/commit/ff3f905f1b615cd70f04ddfe4d4fa50db484ed3b), not a measurement of the current npm tarball. RichTextEditor is 3,624 gzip bytes larger than the previous recorded slice; the benchmark does not identify which source changes account for that increase.
 
 ## SharePoint metadata fields
 
-The same benchmark measures the metadata-driven `SharePointField` renderer. Eagerly importing every supported control is 51,725 gzip bytes for the custom element and 67,112 bytes for the React adapter: the no-React import is 22.9% smaller. This includes the field types and control code the renderer can select; it is not the size of one rendered text field.
+The same benchmark measures the metadata-driven `SharePointField` renderer. Eagerly importing every supported control is 116,738 gzip bytes for the custom element and 129,343 bytes for the React adapter: the no-React import is 9.7% smaller. This includes the field types and control code the renderer can select; it is not the size of one rendered text field.
 
 | Import path | Raw JavaScript | Gzip | Brotli | Modules included |
 | --- | ---: | ---: | ---: | ---: |
-| `SharePointField` custom element, no React | 230,860 bytes | 51,725 bytes | 42,367 bytes | 16 |
-| `SharePointField` React adapter | 289,585 bytes | 67,112 bytes | 55,446 bytes | 17 |
+| `SharePointField` custom element, no React | 451,577 bytes | 116,738 bytes | 94,945 bytes | 218 |
+| `SharePointField` React adapter | 504,718 bytes | 129,343 bytes | 105,711 bytes | 218 |
 
-The custom-element renderer can split rich text, lookup/person, and date controls into on-demand chunks when the consuming bundler supports dynamic imports. Its entry is 18,906 gzip bytes before a control chunk is requested. The measured entry-plus-required-chunks payload depends on the fields used:
+The custom-element renderer can split rich text, lookup/person, and date controls into on-demand chunks when the consuming bundler supports dynamic imports. Its entry is 19,949 gzip bytes before a control chunk is requested. The measured entry-plus-required-chunks payload depends on the fields used:
 
 | Fields used | Gzip payload |
 | --- | ---: |
-| Common text, choice, Boolean, and multi-choice fields | 23,347 bytes |
-| Rich-text Note | 39,231 bytes |
-| Lookup or User | 32,433 bytes |
-| Date or date-time | 29,689 bytes |
-| A form using all four groups | 54,659 bytes |
+| Common text, choice, Boolean, and multi-choice fields | 25,724 bytes |
+| Rich-text Note | 91,382 bytes |
+| Lookup or User | 34,812 bytes |
+| Date or date-time | 32,067 bytes |
+| A form using all four groups | 106,813 bytes |
 
-Splitting reduces what a typical form needs up front, but adds chunk overhead: loading every field group this way is about 5.7% larger than the eager custom-element bundle in this measurement.
+The lazy entry-plus-chunks estimate for a form using all four groups is 8.5% smaller than the eager bundle. A common-fields form is 25,724 gzip bytes. These are build-time estimates; they do not include requests, cache state, or runtime field rendering.
 
 ## Reproduce it
 
