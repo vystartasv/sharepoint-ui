@@ -681,7 +681,8 @@ export function defineRichTextEditor(): void {
           const width = Math.min(360, window.innerWidth - 24);
           const left = Math.max(12, Math.min(window.innerWidth - width - 12, trigger.right - width));
           const height = Math.min(480, window.innerHeight * 0.7);
-          const top = window.innerHeight - trigger.bottom - 12 >= height ? trigger.bottom + 6 : Math.max(12, trigger.top - height - 6);
+          const desiredTop = window.innerHeight - trigger.bottom - 12 >= height ? trigger.bottom + 6 : trigger.top - height - 6;
+          const top = Math.max(12, Math.min(window.innerHeight - height - 12, desiredTop));
           overflowPanel.style.position = "fixed";
           overflowPanel.style.insetInlineEnd = "auto";
           overflowPanel.style.left = `${left}px`;
