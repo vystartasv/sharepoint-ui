@@ -1,4 +1,4 @@
-import { createElement, Fragment, useId, type ReactElement } from "react";
+import { createElement, useId, type HTMLAttributes, type ReactElement } from "react";
 import { Checkbox } from "./checkbox.js";
 import { Field } from "./field.js";
 import { Input } from "./input.js";
@@ -8,7 +8,7 @@ import { Select } from "./select.js";
 import { TextArea } from "./textarea.js";
 
 export type SharePointFieldType = "text" | "multiline" | "number" | "date" | "boolean" | "choice" | "person" | "lookup";
-export type SharePointFieldProps = {
+export type SharePointFieldProps = Omit<HTMLAttributes<HTMLDivElement>, "children"> & {
   name: string;
   label: string;
   type: SharePointFieldType;
@@ -24,6 +24,7 @@ export type SharePointFieldProps = {
 
 export function SharePointField({
   name, label, type, value, defaultValue, required, hint, choices = [], people = [], lookups = [], onValueChange,
+  className = "", ...props
 }: SharePointFieldProps): ReactElement {
   const id = useId();
   const onStringChange = (event: { currentTarget: { value: string } }) => onValueChange?.(event.currentTarget.value);
@@ -69,7 +70,10 @@ export function SharePointField({
                 value: value === undefined ? undefined : typeof value === "string" ? value : "",
                 defaultValue: value === undefined ? typeof defaultValue === "string" ? defaultValue : "" : undefined,
               });
-  return type === "person" || type === "lookup"
-    ? createElement(Fragment, null, control, hint && createElement("span", { id: `${id}-hint`, className: "spui-hint" }, hint))
-    : createElement(Field, { id, label, hint, required, children: control as ReactElement<{ id?: string; required?: boolean }> });
+  return createElement("div", { ...props, className: `spui-sharepoint-field ${className}`.trim() },
+    type === "person" || type === "lookup"
+      ? control
+      : createElement(Field, { id, label, hint, required, children: control as ReactElement<{ id?: string; required?: boolean }> }),
+    (type === "person" || type === "lookup") && hint && createElement("span", { id: `${id}-hint`, className: "spui-hint" }, hint),
+  );
 }

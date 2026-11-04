@@ -36,4 +36,18 @@ Read `/components/` or the published `@spfx-fast/sharepoint-ui/components.json` 
 
 The package does not read, write, or upload SharePoint data. Use the host web part's existing SPFx service and verify the visible saved value afterward.
 
-The package adds no automation API. Components accept native `aria-*`, `data-*`, and event props, so agents can use the same selectors and actions as users.
+Choose `ListView` with a labelled `FilterBar` for searchable, paged results; add `ViewSwitcher` only when users can change the results layout. Choose `FileDropzone` and `AttachmentList` for file selection and upload status; the host performs the SharePoint upload.
+
+Composite locator names stay explicit. A `FilterBar` named `Open requests filters` can contain a native searchbox named `Search requests`; its clear action is a button named `Clear filters`. `FileDropzone` exposes its native file input by its visible label. `ListView` names its results table `Open requests results` and its paging navigation `Open requests pages`. A `ViewSwitcher` is a group named `Open requests view` with buttons named after each view and an `aria-pressed` state.
+
+```ts
+await page.getByRole("search", { name: "Open requests filters" }).getByRole("searchbox", { name: "Search requests" }).fill("access");
+await page.getByRole("button", { name: "Clear filters" }).click();
+await expect(page.getByRole("status")).toContainText("3 requests shown");
+await page.getByLabel("Supporting documents").setInputFiles("access-review.pdf");
+await expect(page.getByRole("group", { name: "Supporting documents" }).getByRole("status")).toContainText("1 file selected");
+await page.getByRole("button", { name: "Cards" }).click();
+await expect(page.getByRole("button", { name: "Cards" })).toHaveAttribute("aria-pressed", "true");
+```
+
+The package adds no automation API. Rendered controls accept native `aria-*`, `data-*`, and event props, so agents can use the same selectors and actions as users.

@@ -1,6 +1,6 @@
 import { createElement, type HTMLAttributes, type ReactElement, type ReactNode } from "react";
 
-export type ViewCardProps = Omit<HTMLAttributes<HTMLElement>, "children"> & {
+export type ViewCardProps = Omit<HTMLAttributes<HTMLElement>, "children" | "title"> & {
   title: ReactNode;
   subtitle?: ReactNode;
   description?: ReactNode;

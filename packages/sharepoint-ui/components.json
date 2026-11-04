@@ -23,12 +23,6 @@
       "available": true
     },
     {
-      "name": "Menu",
-      "group": "Actions",
-      "summary": "Reveal a short list of actions on demand.",
-      "available": true
-    },
-    {
       "name": "CopyButton",
       "group": "Actions",
       "summary": "Copy supplied text and announce completion.",
@@ -41,81 +35,21 @@
       "available": true
     },
     {
-      "name": "Field",
-      "group": "Forms",
-      "summary": "Associate a visible label, hint, and validation message with one control.",
+      "name": "Menu",
+      "group": "Actions",
+      "summary": "Reveal a short list of actions on demand.",
       "available": true
     },
     {
-      "name": "Input",
-      "group": "Forms",
-      "summary": "Use native text, search, date, number, or other input types.",
+      "name": "Accordion",
+      "group": "Content",
+      "summary": "Reveal and hide supplementary sections.",
       "available": true
     },
     {
-      "name": "TextArea",
-      "group": "Forms",
-      "summary": "Enter multiline text with native form behavior.",
-      "available": true
-    },
-    {
-      "name": "Checkbox",
-      "group": "Forms",
-      "summary": "Set or clear an independent boolean value.",
-      "available": true
-    },
-    {
-      "name": "Switch",
-      "group": "Forms",
-      "summary": "Set an immediate on/off preference.",
-      "available": true
-    },
-    {
-      "name": "RadioGroup",
-      "group": "Forms",
-      "summary": "Choose one option from a labelled set.",
-      "available": true
-    },
-    {
-      "name": "Radio",
-      "group": "Forms",
-      "summary": "Choose one option within a RadioGroup.",
-      "available": true
-    },
-    {
-      "name": "Select",
-      "group": "Forms",
-      "summary": "Choose from a short fixed list of options.",
-      "available": true
-    },
-    {
-      "name": "ComboBox",
-      "group": "Forms",
-      "summary": "Type or choose from a supplied list of options.",
-      "available": true
-    },
-    {
-      "name": "DateRangePicker",
-      "group": "Forms",
-      "summary": "Choose a start and end date.",
-      "available": true
-    },
-    {
-      "name": "PersonPicker",
-      "group": "SharePoint",
-      "summary": "Find a person in caller-supplied SharePoint people results.",
-      "available": true
-    },
-    {
-      "name": "LookupPicker",
-      "group": "SharePoint",
-      "summary": "Choose a related list item from caller-supplied results.",
-      "available": true
-    },
-    {
-      "name": "SharePointField",
-      "group": "SharePoint",
-      "summary": "Render supported SharePoint field metadata as native form controls.",
+      "name": "Badge",
+      "group": "Content",
+      "summary": "Show a short status or category.",
       "available": true
     },
     {
@@ -125,9 +59,15 @@
       "available": true
     },
     {
-      "name": "ViewCard",
-      "group": "SharePoint",
-      "summary": "Summarize a SharePoint record with its key fields and action.",
+      "name": "Carousel",
+      "group": "Content",
+      "summary": "Browse a short sequence of related panels.",
+      "available": true
+    },
+    {
+      "name": "Divider",
+      "group": "Content",
+      "summary": "Separate adjacent sections with a native horizontal rule.",
       "available": true
     },
     {
@@ -137,9 +77,21 @@
       "available": true
     },
     {
-      "name": "Badge",
+      "name": "Image",
       "group": "Content",
-      "summary": "Show a short status or category.",
+      "summary": "Display an image with meaningful alternative text.",
+      "available": true
+    },
+    {
+      "name": "List",
+      "group": "Content",
+      "summary": "Render a semantic list of related items.",
+      "available": true
+    },
+    {
+      "name": "Rating",
+      "group": "Content",
+      "summary": "Read or set a labelled numeric rating.",
       "available": true
     },
     {
@@ -155,81 +107,9 @@
       "available": true
     },
     {
-      "name": "Avatar",
-      "group": "People",
-      "summary": "Identify a person with an image or initials.",
-      "available": true
-    },
-    {
-      "name": "AvatarGroup",
-      "group": "People",
-      "summary": "Show a set of people with an overflow count.",
-      "available": true
-    },
-    {
-      "name": "Persona",
-      "group": "People",
-      "summary": "Show a person's name, role, and optional avatar.",
-      "available": true
-    },
-    {
-      "name": "Image",
-      "group": "Content",
-      "summary": "Display an image with meaningful alternative text.",
-      "available": true
-    },
-    {
       "name": "Text",
       "group": "Content",
       "summary": "Render a semantic text block with a chosen HTML element.",
-      "available": true
-    },
-    {
-      "name": "Label",
-      "group": "Forms",
-      "summary": "Provide a visible native label for a form control.",
-      "available": true
-    },
-    {
-      "name": "Divider",
-      "group": "Content",
-      "summary": "Separate adjacent sections with a native horizontal rule.",
-      "available": true
-    },
-    {
-      "name": "Accordion",
-      "group": "Content",
-      "summary": "Reveal and hide supplementary sections.",
-      "available": true
-    },
-    {
-      "name": "Tabs",
-      "group": "Navigation",
-      "summary": "Switch between a small set of related panels.",
-      "available": true
-    },
-    {
-      "name": "Breadcrumb",
-      "group": "Navigation",
-      "summary": "Show the current page's location in a hierarchy.",
-      "available": true
-    },
-    {
-      "name": "Pagination",
-      "group": "Navigation",
-      "summary": "Move through a controlled, paged result set.",
-      "available": true
-    },
-    {
-      "name": "List",
-      "group": "Content",
-      "summary": "Render a semantic list of related items.",
-      "available": true
-    },
-    {
-      "name": "Table",
-      "group": "Data",
-      "summary": "Present static or lightly interactive tabular data.",
       "available": true
     },
     {
@@ -239,9 +119,147 @@
       "available": true
     },
     {
+      "name": "ListView",
+      "group": "Data",
+      "summary": "Compose list tools, results, loading or empty state, and pagination.",
+      "available": true
+    },
+    {
+      "name": "Table",
+      "group": "Data",
+      "summary": "Present static or lightly interactive tabular data.",
+      "available": true
+    },
+    {
       "name": "VirtualList",
       "group": "Data",
       "summary": "Render a window of a large, fixed-height list.",
+      "available": true
+    },
+    {
+      "name": "Alert",
+      "group": "Feedback",
+      "summary": "Announce important status or validation information.",
+      "available": true
+    },
+    {
+      "name": "Toast",
+      "group": "Feedback",
+      "summary": "Announce a temporary result without interrupting work.",
+      "available": true
+    },
+    {
+      "name": "Checkbox",
+      "group": "Forms",
+      "summary": "Set or clear an independent boolean value.",
+      "available": true
+    },
+    {
+      "name": "ComboBox",
+      "group": "Forms",
+      "summary": "Type or choose from a supplied list of options.",
+      "available": true
+    },
+    {
+      "name": "DateRangePicker",
+      "group": "Forms",
+      "summary": "Choose a start and end date.",
+      "available": true
+    },
+    {
+      "name": "Field",
+      "group": "Forms",
+      "summary": "Associate a visible label, hint, and validation message with one control.",
+      "available": true
+    },
+    {
+      "name": "FileDropzone",
+      "group": "Forms",
+      "summary": "Select or drop files and report them to the host for upload.",
+      "available": true
+    },
+    {
+      "name": "FilterBar",
+      "group": "Forms",
+      "summary": "Group search and list filters with a labelled clear action.",
+      "available": true
+    },
+    {
+      "name": "Input",
+      "group": "Forms",
+      "summary": "Use native text, search, date, number, or other input types.",
+      "available": true
+    },
+    {
+      "name": "Label",
+      "group": "Forms",
+      "summary": "Provide a visible native label for a form control.",
+      "available": true
+    },
+    {
+      "name": "Radio",
+      "group": "Forms",
+      "summary": "Choose one option within a RadioGroup.",
+      "available": true
+    },
+    {
+      "name": "RadioGroup",
+      "group": "Forms",
+      "summary": "Choose one option from a labelled set.",
+      "available": true
+    },
+    {
+      "name": "Select",
+      "group": "Forms",
+      "summary": "Choose from a short fixed list of options.",
+      "available": true
+    },
+    {
+      "name": "SwatchPicker",
+      "group": "Forms",
+      "summary": "Choose a color or image from a labelled set.",
+      "available": true
+    },
+    {
+      "name": "Switch",
+      "group": "Forms",
+      "summary": "Set an immediate on/off preference.",
+      "available": true
+    },
+    {
+      "name": "TagPicker",
+      "group": "Forms",
+      "summary": "Search, select, and remove multiple values.",
+      "available": true
+    },
+    {
+      "name": "TextArea",
+      "group": "Forms",
+      "summary": "Enter multiline text with native form behavior.",
+      "available": true
+    },
+    {
+      "name": "Breadcrumb",
+      "group": "Navigation",
+      "summary": "Show the current page's location in a hierarchy.",
+      "available": true
+    },
+    {
+      "name": "Nav",
+      "group": "Navigation",
+      "summary": "Navigate between primary application sections.",
+      "available": true
+    },
+    {
+      "name": "Pagination",
+      "group": "Navigation",
+      "summary": "Move through a controlled, paged result set.",
+      "available": true
+    },
+    {
+      "name": "Tabs",
+      "group": "Navigation",
+      "summary": "Switch between a small set of related panels.",
       "available": true
     },
     {
@@ -251,33 +269,9 @@
       "available": true
     },
     {
-      "name": "Rating",
-      "group": "Content",
-      "summary": "Read or set a labelled numeric rating.",
-      "available": true
-    },
-    {
-      "name": "ProgressBar",
-      "group": "Status",
-      "summary": "Show determinate task progress.",
-      "available": true
-    },
-    {
-      "name": "Spinner",
-      "group": "Status",
-      "summary": "Announce an ongoing task with no known completion time.",
-      "available": true
-    },
-    {
-      "name": "Skeleton",
-      "group": "Status",
-      "summary": "Reserve space for content while it loads.",
-      "available": true
-    },
-    {
-      "name": "Alert",
-      "group": "Feedback",
-      "summary": "Announce important status or validation information.",
+      "name": "ViewSwitcher",
+      "group": "Navigation",
+      "summary": "Switch between named list or content views.",
       "available": true
     },
     {
@@ -299,33 +293,69 @@
       "available": true
     },
     {
-      "name": "Toast",
-      "group": "Feedback",
-      "summary": "Announce a temporary result without interrupting work.",
+      "name": "Avatar",
+      "group": "People",
+      "summary": "Identify a person with an image or initials.",
       "available": true
     },
     {
-      "name": "Carousel",
-      "group": "Content",
-      "summary": "Browse a short sequence of related panels.",
+      "name": "AvatarGroup",
+      "group": "People",
+      "summary": "Show a set of people with an overflow count.",
       "available": true
     },
     {
-      "name": "Nav",
-      "group": "Navigation",
-      "summary": "Navigate between primary application sections.",
+      "name": "Persona",
+      "group": "People",
+      "summary": "Show a person's name, role, and optional avatar.",
       "available": true
     },
     {
-      "name": "TagPicker",
-      "group": "Forms",
-      "summary": "Search, select, and remove multiple values.",
+      "name": "AttachmentList",
+      "group": "SharePoint",
+      "summary": "Show file names, upload status, progress, and labelled removal actions.",
       "available": true
     },
     {
-      "name": "SwatchPicker",
-      "group": "Forms",
-      "summary": "Choose a color or image from a labelled set.",
+      "name": "LookupPicker",
+      "group": "SharePoint",
+      "summary": "Choose a related list item from caller-supplied results.",
+      "available": true
+    },
+    {
+      "name": "PersonPicker",
+      "group": "SharePoint",
+      "summary": "Find a person in caller-supplied SharePoint people results.",
+      "available": true
+    },
+    {
+      "name": "SharePointField",
+      "group": "SharePoint",
+      "summary": "Render supported SharePoint field metadata as native form controls.",
+      "available": true
+    },
+    {
+      "name": "ViewCard",
+      "group": "SharePoint",
+      "summary": "Summarize a SharePoint record with its key fields and action.",
+      "available": true
+    },
+    {
+      "name": "ProgressBar",
+      "group": "Status",
+      "summary": "Show determinate task progress.",
+      "available": true
+    },
+    {
+      "name": "Skeleton",
+      "group": "Status",
+      "summary": "Reserve space for content while it loads.",
+      "available": true
+    },
+    {
+      "name": "Spinner",
+      "group": "Status",
+      "summary": "Announce an ongoing task with no known completion time.",
       "available": true
     }
   ]

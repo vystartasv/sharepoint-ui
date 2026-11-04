@@ -1,6 +1,6 @@
 import { createElement, type HTMLAttributes, type ReactElement, type ReactNode } from "react";
 
-export type ButtonGroupProps = Omit<HTMLAttributes<HTMLDivElement>, "children"> & {
+export type ButtonGroupProps = Omit<HTMLAttributes<HTMLDivElement>, "children" | "aria-label"> & {
   label: string;
   children?: ReactNode;
 };

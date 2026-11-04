@@ -1,0 +1,82 @@
+<section class="list-workflow spui-theme" aria-labelledby="workflow-title">
+  <h2 id="workflow-title">Try a filtered list</h2>
+  <p>Search the example, change its status filter, or switch the result layout. The labels and roles match the component interaction guide.</p>
+
+  <div class="workflow-filters" role="search" aria-label="Open requests filters" data-agent-id="open-request-filters">
+    <label for="request-search">Search requests</label>
+    <input class="spui-input" id="request-search" type="search" placeholder="Search requests" />
+    <label for="request-status">Status</label>
+    <select class="spui-select" id="request-status">
+      <option value="">All statuses</option>
+      <option>In progress</option>
+      <option>Needs review</option>
+    </select>
+    <button class="workflow-button" type="button" data-clear-filters>Clear filters</button>
+  </div>
+
+  <div class="workflow-views" role="group" aria-label="Open requests view" data-agent-id="open-request-view">
+    <button class="workflow-button" type="button" aria-pressed="true" data-view="list">List</button>
+    <button class="workflow-button" type="button" aria-pressed="false" data-view="cards">Cards</button>
+  </div>
+  <p class="workflow-status" role="status" aria-live="polite" data-agent-id="open-request-count">3 requests shown</p>
+
+  <ul class="workflow-results" aria-label="Open requests results" data-view="list">
+    <li data-status="In progress" data-text="update team site in progress">
+      <strong>Update the team site</strong><span>In progress</span>
+    </li>
+    <li data-status="Needs review" data-text="review access requests needs review">
+      <strong>Review access requests</strong><span>Needs review</span>
+    </li>
+    <li data-status="In progress" data-text="publish new guidance in progress">
+      <strong>Publish new guidance</strong><span>In progress</span>
+    </li>
+  </ul>
+</section>
+
+<script>
+  document.querySelectorAll(".list-workflow").forEach(sample => {
+    const search = sample.querySelector("#request-search");
+    const status = sample.querySelector("#request-status");
+    const results = sample.querySelector(".workflow-results");
+    const items = [...results.querySelectorAll("li")];
+    const count = sample.querySelector("[data-agent-id='open-request-count']");
+    const views = [...sample.querySelectorAll("[data-view]")];
+    const update = () => {
+      const query = search.value.trim().toLowerCase();
+      let shown = 0;
+      items.forEach(item => {
+        item.hidden = !item.dataset.text.includes(query) || (status.value && item.dataset.status !== status.value);
+        if (!item.hidden) shown++;
+      });
+      count.textContent = `${shown} request${shown === 1 ? "" : "s"} shown`;
+    };
+    search.addEventListener("input", update);
+    status.addEventListener("change", update);
+    sample.querySelector("[data-clear-filters]").addEventListener("click", () => {
+      search.value = "";
+      status.value = "";
+      update();
+    });
+    views.forEach(button => button.addEventListener("click", () => {
+      views.forEach(view => view.setAttribute("aria-pressed", String(view === button)));
+      results.dataset.view = button.dataset.view;
+    }));
+  });
+</script>
+
+<style>
+  .list-workflow { margin-block: 2rem; }
+  .list-workflow > p { max-width: 68ch; }
+  .workflow-filters { display: flex; flex-wrap: wrap; align-items: end; gap: .65rem; margin-block: 1rem; }
+  .workflow-filters label { display: grid; gap: .25rem; font-weight: 600; }
+  .workflow-filters input { min-width: 15rem; }
+  .workflow-button { min-height: 2.25rem; border: 1px solid var(--spui-border); border-radius: var(--spui-radius); background: var(--spui-surface); color: var(--spui-text); font: inherit; padding: .4rem .65rem; cursor: pointer; }
+  .workflow-views { display: inline-flex; gap: .3rem; border: 1px solid var(--spui-border); border-radius: var(--spui-radius); padding: .2rem; }
+  .workflow-views [aria-pressed="true"] { background: var(--spui-accent); color: var(--spui-accentText); }
+  .workflow-status { min-height: 1.5em; }
+  .workflow-results { display: grid; gap: .5rem; padding: 0; list-style: none; }
+  .workflow-results li { display: flex; justify-content: space-between; gap: 1rem; border: 1px solid var(--spui-border); border-radius: var(--spui-radius); background: var(--spui-surface); padding: .8rem; }
+  .workflow-results[data-view="cards"] { grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); }
+  .workflow-results li[hidden] { display: none; }
+  @media (max-width: 35rem) { .workflow-filters { align-items: stretch; } .workflow-filters input { min-width: 0; } }
+</style>

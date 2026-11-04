@@ -1,6 +1,6 @@
 import { createElement, useId, type HTMLAttributes, type ReactElement, type ReactNode } from "react";
 
-export type EmptyStateProps = Omit<HTMLAttributes<HTMLElement>, "children"> & {
+export type EmptyStateProps = Omit<HTMLAttributes<HTMLElement>, "children" | "title"> & {
   title: ReactNode;
   description?: ReactNode;
   children?: ReactNode;

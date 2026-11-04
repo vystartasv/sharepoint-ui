@@ -1,9 +1,0 @@
-{
-  "$schema": "https://developer.microsoft.com/json-schemas/copilot/plugin/v2.4/schema.json",
-  "schema_version": "v2.4",
-  "namespace": "accessReview",
-  "name_for_human": "Access review Agent",
-  "description_for_human": "Review SharePoint access with the Copilot agent",
-  "description_for_model": "Review SharePoint access with the Copilot agent",
-  "contact_email": "publisher@contoso.com"
-}

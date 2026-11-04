@@ -24,3 +24,11 @@ import "@spfx-fast/sharepoint-ui/styles.css";
 ```
 
 The provider reads the SharePoint theme CSS variables from its host page. Override tokens with `theme` or ordinary CSS custom properties to customize the result.
+
+## SharePoint list workflows
+
+Use `FilterBar` with `ListView` for labelled search and filters, empty/loading states, and paging. Add `ViewSwitcher` when users can choose between list and card layouts. These components keep query and paging state in the host app.
+
+Use `FileDropzone` to collect selected or dropped files and `AttachmentList` to show upload status and remove actions. Upload files through the host's SPFx service; validate files on the host before saving.
+
+Each control exposes native roles and visible labels. For browser agents, locate controls by role and accessible name first, then use `data-agent-id` only when names are duplicated. See the [agent interaction guide](https://vystartasv.github.io/sharepoint-ui/agents/) for locator and verification examples.

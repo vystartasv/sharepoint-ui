@@ -1,8 +1,0 @@
-{
-  "name": "spfx-fast-copilot-access-review",
-  "description": "Framework-free SPFx 1.24 Copilot UX component using SharePoint UI and live SharePoint list data.",
-  "category": "webpart",
-  "version": "0.1.0",
-  "spfxVersion": "1.24.1",
-  "minimumEngineVersion": "0.1.0-pre.3"
-}

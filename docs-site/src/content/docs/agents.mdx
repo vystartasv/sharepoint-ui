@@ -35,7 +35,7 @@ Read `checked`, `selected`, `expanded`, `disabled`, and `value` from the accessi
 
 ## Stable selectors
 
-All React components forward standard `data-*` props. For duplicate labels, add a stable `data-agent-id` such as `save-work-item`; otherwise prefer role and label locators. Do not target generated classes, child positions, or visual coordinates when an accessible name exists.
+Rendered UI controls forward standard `data-*` props. For duplicate labels, add a stable `data-agent-id` such as `save-work-item`; otherwise prefer role and label locators. Do not target generated classes, child positions, or visual coordinates when an accessible name exists.
 
 See the plain Markdown copy at `/agents/AGENTS.md` for retrieval by coding agents.
 
@@ -50,5 +50,19 @@ Examples:
 - An immediate preference: `Switch`; a separately submitted choice: `Checkbox`.
 - A record list: `DataGrid`; static columns: `Table`; a large fixed-height feed: `VirtualList`.
 - A SharePoint person or lookup: `PersonPicker` or `LookupPicker`, with options loaded by the host.
+- A searchable, paged result set: `ListView` with a labelled `FilterBar` and optional `ViewSwitcher`.
+- File selection and upload status: `FileDropzone` and `AttachmentList`; the host performs the SharePoint upload.
+
+Composite locator names stay explicit. A `FilterBar` named `Open requests filters` can contain a native searchbox named `Search requests`; its clear action is a button named `Clear filters`. `FileDropzone` exposes its native file input by its visible label. `ListView` names its results table `Open requests results` and its paging navigation `Open requests pages`. A `ViewSwitcher` is a group named `Open requests view` with buttons named after each view and an `aria-pressed` state.
+
+```ts
+await page.getByRole("search", { name: "Open requests filters" }).getByRole("searchbox", { name: "Search requests" }).fill("access");
+await page.getByRole("button", { name: "Clear filters" }).click();
+await expect(page.getByRole("status")).toContainText("3 requests shown");
+await page.getByLabel("Supporting documents").setInputFiles("access-review.pdf");
+await expect(page.getByRole("group", { name: "Supporting documents" }).getByRole("status")).toContainText("1 file selected");
+await page.getByRole("button", { name: "Cards" }).click();
+await expect(page.getByRole("button", { name: "Cards" })).toHaveAttribute("aria-pressed", "true");
+```
 
 The library does not fetch, save, or upload SharePoint data. Agents should use the host page's supported workflow for those operations, then verify the saved value in the page.

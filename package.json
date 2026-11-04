@@ -9,9 +9,9 @@
     "build:library": "npm run build --workspace @spfx-fast/sharepoint-ui",
     "build:spfx": "npm run build:library && npm run build --prefix examples/spfx124-webpart",
     "build:docs": "npm run build:library && npm run build --workspace @vilius/sharepoint-ui-docs",
+    "measure:components": "node scripts/measure-components.mjs",
     "dev:docs": "npm run dev --workspace @vilius/sharepoint-ui-docs",
     "setup:spfx": "npm install --prefix examples/spfx124-webpart",
-    "sync:spfx-cli-template": "node scripts/sync-spfx-cli-template.mjs",
     "version:spfx:patch": "node scripts/bump-spfx-version.mjs patch",
     "version:spfx:dry-run": "node scripts/bump-spfx-version.mjs patch --dry-run"
   }
