@@ -1,18 +1,18 @@
-# SPFx template
+# SPFx web part starter
 
-This repository contains a small React SPFx 1.24 web part template built with native controls from `@spfx-fast/sharepoint-ui`. It demonstrates one labelled, required field and a visible save status. It contains no SharePoint data or business logic.
+Create a React web part from this template with the SPFx CLI:
 
 ```sh
-npx --yes @microsoft/spfx-cli@0.1.0-pre.3 create \
+npx --yes @microsoft/spfx-cli@0.1.0-pre.4 create \
   --template sharepoint-ui-webpart \
-  --template-url https://github.com/vystartasv/sharepoint-ui/tree/main \
+  --template-url https://github.com/vystartasv/sharepoint-ui \
   --library-name contoso-workspace \
-  --component-name "Workspace" \
-  --component-description "A simple SharePoint workspace form" \
+  --component-name Workspace \
+  --component-description "Workspace form" \
   --solution-name contoso-workspace \
   --package-manager npm
 ```
 
-The CLI and template API are still prerelease. The template pins SPFx package dependencies to 1.24.1.
+The starter uses SPFx 1.24.1, React 18.3.1, and `@spfx-fast/sharepoint-ui`. Replace its local demo state with the SharePoint services your app needs.
 
-The template creates a basic React web part with no data-service assumptions. Extend it with the SharePoint services and workflows your app requires.
+The SPFx CLI is prerelease software; check its current Node.js requirements before running it.

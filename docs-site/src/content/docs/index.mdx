@@ -1,28 +1,18 @@
 ---
 title: SharePoint UI
-description: Small, native React components built for SharePoint Framework.
+description: Native React controls for SharePoint Framework.
 ---
 
 import InteractiveSample from "../../components/InteractiveSample.astro";
 
-# Build SharePoint forms agents can operate
+# SharePoint UI
 
-SharePoint UI is a compact set of native HTML controls with a theme engine that reads SharePoint's active palette. React 18.3.1 stays external and is supplied by the SPFx host.
-
-Start with the smallest component that does the task. Keep labels visible, let the browser handle standard interactions, and use semantic roles and names so people and browser agents can find the same control.
+Small React 18.3.1 components styled from the active SharePoint theme. The package uses native HTML and leaves SharePoint data access to the host.
 
 <InteractiveSample />
 
-## Start here
-
-- [Browse the component inventory](/sharepoint-ui/components/)
-- [Read the agent interaction guide](/sharepoint-ui/agents/)
-- [Install and use the package](https://github.com/vystartasv/sharepoint-ui/tree/main/packages/sharepoint-ui#readme)
-
-## Design rules
-
-- One `Button` for actions. Use `Checkbox` for independent choices, `RadioGroup` for one-of-many, and `Switch` only for immediate on/off settings.
-- Prefer native controls: `Input`, `Select`, `TextArea`, `DatePicker`, and `FileUpload` retain browser keyboard and form behavior.
-- Use `Field` for a visible label, hint, and validation message.
-- Use `data-agent-id` only when a page has duplicate accessible names. Agents should prefer role and label locators.
-- The host owns SharePoint reads, writes, permissions, and upload transport.
+- [Browse components and samples](/sharepoint-ui/components/)
+- [Customize the theme](/sharepoint-ui/theming/)
+- [Agent interaction guide](/sharepoint-ui/agents/)
+- [Build and deployment](/sharepoint-ui/deployment/)
+- [Install the package](https://github.com/vystartasv/sharepoint-ui/tree/main/packages/sharepoint-ui#readme)
