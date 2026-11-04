@@ -60,14 +60,60 @@ function NotesEditor() {
 The React `onImageUpload` callback and custom-element `uploadImage` property can keep returning a URL string, or return `{ src, alt }`. Use the object form when the host can collect or generate a meaningful description; `alt` is required, and `alt: ""` is only for decorative images. A string URL keeps the legacy filename-based alternative text.
 
 ```tsx
+import { SPHttpClient } from "@microsoft/sp-http";
+import type { WebPartContext } from "@microsoft/sp-webpart-base";
+import type { RichTextEditorImageUploader } from "@spfx-fast/sharepoint-ui/react";
+
+function createListAttachmentUploader(
+  context: WebPartContext,
+  listId: string,
+  itemId: number,
+  getAltText: (file: File) => Promise<string>,
+): RichTextEditorImageUploader {
+  return async file => {
+    if (!file.type.startsWith("image/")) throw new Error("Choose an image file.");
+    if (file.size > 10 * 1024 * 1024) throw new Error("Images must be 10 MB or smaller.");
+    if (!/^[\da-f-]{36}$/i.test(listId) || !Number.isSafeInteger(itemId) || itemId < 1) {
+      throw new Error("A SharePoint list GUID and existing item ID are required.");
+    }
+
+    // Ask before upload so canceling the description prompt cannot leave an orphaned attachment.
+    const alt = await getAltText(file);
+    if (typeof alt !== "string") throw new Error("Image alternative text is required; use an empty string only for a decorative image.");
+
+    const extension = file.name.split(".").pop()?.replace(/[^a-z\d]/gi, "").slice(0, 8) || "img";
+    const fileName = `rte-${crypto.randomUUID()}.${extension}`;
+    const webUrl = context.pageContext.web.absoluteUrl;
+    const endpoint = `${webUrl}/_api/web/lists(guid'${listId}')/items(${itemId})/AttachmentFiles/add(FileName='${fileName}')`;
+    const response = await context.spHttpClient.post(endpoint, SPHttpClient.configurations.v1, {
+      headers: {
+        accept: "application/json;odata=nometadata",
+        "content-type": "application/octet-stream",
+      },
+      body: file,
+    });
+    if (!response.ok) throw new Error(`SharePoint image upload failed (${response.status}).`);
+
+    const attachment = await response.json() as { ServerRelativeUrl?: string };
+    if (!attachment.ServerRelativeUrl) throw new Error("SharePoint did not return the uploaded image URL.");
+    return { src: new URL(attachment.ServerRelativeUrl, webUrl).href, alt };
+  };
+}
+
+const uploadNoteImage = createListAttachmentUploader(
+  webPartContext, // The current web part's WebPartContext.
+  noteListId,
+  noteItemId, // The list item must exist, and attachments must be enabled for the list.
+  file => openAltTextDialog(file.name), // Return a description or "" if decorative; reject if canceled.
+);
+
 <RichTextEditor
   label="Project notes"
-  onImageUpload={async file => {
-    const src = await uploadToSharePoint(file);
-    return { src, alt: await describeImageForEditor(file) };
-  }}
+  onImageUpload={uploadNoteImage}
 />
 ```
+
+This example stores images as attachments on the existing list item. For a new item, create the item first; for a document library or Site Assets, replace the attachment endpoint with the upload endpoint used by your app. SharePoint REST documents the `AttachmentFiles/add(FileName=...)` route, and SPFx `SPHttpClient` supplies the request digest for writes. [Attachment upload API](https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-folders-and-files-with-rest#working-with-files-attached-to-list-items-by-using-rest) · [SPHttpClient](https://learn.microsoft.com/en-us/javascript/api/sp-http-base/sphttpclient).
 
 ## Save the value
 
