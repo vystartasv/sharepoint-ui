@@ -3,4 +3,6 @@
 .spui-button:hover{filter:brightness(.94)}
 .spui-button:focus-visible,.spui-input:focus-visible{outline:2px solid var(--spui-accent);outline-offset:2px}
 .spui-input{box-sizing:border-box;min-height:2.25rem;border:1px solid var(--spui-border);border-radius:var(--spui-radius);background:var(--spui-surface);color:var(--spui-text);font:inherit;padding:.45rem .65rem}
+.spui-checkbox{accent-color:var(--spui-accent)}
+.spui-checkbox:focus-visible{outline:2px solid var(--spui-accent);outline-offset:2px}
 .spui-card{border:1px solid var(--spui-border);border-radius:var(--spui-radius);background:var(--spui-surface);padding:1rem}
