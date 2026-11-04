@@ -24,4 +24,4 @@ function RequestForm() {
 
 The package provides presentation and interaction only. The host owns SharePoint requests, permissions, validation, and persistence. See the [component guide](https://vystartasv.github.io/sharepoint-ui/components/), [theme guide](https://vystartasv.github.io/sharepoint-ui/theming/), and [agent guide](https://vystartasv.github.io/sharepoint-ui/agents/).
 
-Buttons, inputs, selects, and action controls share a 44px minimum height. Labels, disclosure rows, and component actions use the same target height. Text areas remain taller for multi-line content; checkbox, radio, and switch marks keep their natural shape. Customize `--spui-control-height`, `--spui-control-padding-inline`, and the `--spui-space-*` scale on `.spui-theme`.
+Buttons, inputs, selects, and action controls share a 44px minimum height. Labels, disclosure rows, and component actions use the same target height. Text areas remain taller for multi-line content; checkbox, radio, and switch marks keep their natural shape. Customize `--spui-control-height`, `--spui-control-line-height`, `--spui-control-padding-inline`, and the `--spui-space-*` scale on `.spui-theme`.

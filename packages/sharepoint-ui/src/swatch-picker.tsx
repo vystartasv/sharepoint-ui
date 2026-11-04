@@ -16,7 +16,7 @@ export function SwatchPicker({ name, label, options, value, defaultValue, onChan
     createElement("legend", null, label),
     options.map((option, index) => createElement("label", { key: option.value, htmlFor: `${id}-${index}`, className: "spui-swatch-option" },
       createElement("input", {
-        id: `${id}-${index}`, type: "radio", name, value: option.value, disabled: option.disabled,
+        id: `${id}-${index}`, type: "radio", name, value: option.value, disabled: option.disabled, className: "spui-radio",
         checked: value === undefined ? undefined : value === option.value,
         defaultChecked: value === undefined && defaultValue === option.value,
         onChange,
