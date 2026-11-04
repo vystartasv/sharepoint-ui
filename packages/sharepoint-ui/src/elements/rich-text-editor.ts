@@ -451,6 +451,10 @@ export function defineRichTextEditor(): void {
         this.savedRange = range;
       }
       const link = this.linkAtRange(this.savedRange);
+      if (link && this.quill && !this.savedQuillSelection?.length) {
+        const blot = Quill.find(link);
+        if (blot && !(blot instanceof Quill)) this.savedQuillSelection = { index: this.quill.getIndex(blot), length: link.textContent?.length ?? 0 };
+      }
       this.linkUrlInput!.value = link?.getAttribute("href") ?? "";
       this.linkTextInput!.value = link?.textContent ?? this.savedRange.toString();
       this.linkTitleInput!.value = link?.getAttribute("title") ?? "";
@@ -570,6 +574,7 @@ export function defineRichTextEditor(): void {
         if (!this.quill || !range) return;
         this.suppressEditorCommit = true;
         try {
+          if (range.length) this.quill.deleteText(range.index, range.length, "user");
           this.quill.insertEmbed(range.index, "image", new URL(src, document.baseURI).href, "user");
           const [image] = this.quill.getLeaf(range.index);
           if (image?.domNode instanceof HTMLImageElement) image.domNode.alt = (typeof uploaded === "string" ? file.name.replace(/\.[^.]*$/, "") : uploaded.alt).slice(0, 200);
@@ -675,7 +680,9 @@ export function defineRichTextEditor(): void {
           const trigger = overflowTrigger.getBoundingClientRect();
           const width = Math.min(360, window.innerWidth - 24);
           const left = Math.max(12, Math.min(window.innerWidth - width - 12, trigger.right - width));
-          const top = Math.min(trigger.bottom + 6, Math.max(12, window.innerHeight - Math.min(480, window.innerHeight * 0.7) - 12));
+          const height = Math.min(480, window.innerHeight * 0.7);
+          const top = window.innerHeight - trigger.bottom - 12 >= height ? trigger.bottom + 6 : Math.max(12, trigger.top - height - 6);
+          overflowPanel.style.position = "fixed";
           overflowPanel.style.insetInlineEnd = "auto";
           overflowPanel.style.left = `${left}px`;
           overflowPanel.style.top = `${top}px`;
@@ -742,7 +749,23 @@ export function defineRichTextEditor(): void {
       this.editor.addEventListener("keydown", event => { const key = (event as KeyboardEvent).key.toLowerCase(); const shortcut = (event as KeyboardEvent).metaKey || (event as KeyboardEvent).ctrlKey; if (this.contentMode === "plain" && shortcut && ["b", "i", "u", "k"].includes(key)) event.preventDefault(); });
       this.quill.on("text-change", (_delta, _old, source) => { if (source === "user" && !this.suppressEditorCommit) this.commitEditorValue(); });
       this.editor.addEventListener("mouseup", this.onSelectionChange); this.editor.addEventListener("keyup", this.onSelectionChange); this.editor.addEventListener("click", this.onEditorClick);
-      this.editor.addEventListener("paste", event => { event.preventDefault(); const clipboard = (event as ClipboardEvent).clipboardData; const imageFile = [...(clipboard?.files ?? [])].find(file => file.type.startsWith("image/")); if (imageFile) { void this.insertUploadedImage(imageFile); return; } const selection = this.quill?.getSelection(true); if (!selection || !this.quill) return; const html = cleanHtml(clipboard?.getData("text/html") ?? clipboard?.getData("text/plain") ?? "", this.contentMode, this.allowHyperlinks); this.quill.clipboard.dangerouslyPasteHTML(selection.index, html, "user"); });
+      this.editor.addEventListener("paste", event => {
+        event.preventDefault();
+        const clipboard = (event as ClipboardEvent).clipboardData;
+        const selection = this.quill?.getSelection(true);
+        if (!selection || !this.quill) return;
+        if (this.contentMode === "plain" || this.contentMode === "restricted") {
+          const text = clipboard?.getData("text/plain") || plainText(clipboard?.getData("text/html") ?? "");
+          if (selection.length) this.quill.deleteText(selection.index, selection.length, "user");
+          if (text) this.quill.insertText(selection.index, text, "user");
+          return;
+        }
+        const imageFile = [...(clipboard?.files ?? [])].find(file => file.type.startsWith("image/"));
+        if (imageFile) { this.savedQuillSelection = { index: selection.index, length: selection.length }; void this.insertUploadedImage(imageFile); return; }
+        const html = cleanHtml(clipboard?.getData("text/html") ?? clipboard?.getData("text/plain") ?? "", this.contentMode, this.allowHyperlinks);
+        if (selection.length) this.quill.deleteText(selection.index, selection.length, "user");
+        this.quill.clipboard.dangerouslyPasteHTML(selection.index, html, "user");
+      }, true);
       this.editor.addEventListener("blur", () => this.commitEditorValue("spui-change"));
       syncHostAccessibleName(this, this.editor);
       this.syncDisabled();
