@@ -1,0 +1,53 @@
+<form class="spui-theme live-sample" id="sample-work-item" aria-label="Create a work item">
+  <div class="sample-heading">
+    <div>
+      <h2>Try a short form</h2>
+      <p>Enter a title, choose a status, and save. These are the same native elements the React wrappers render.</p>
+    </div>
+    <span class="sample-native">Native form</span>
+  </div>
+  <div class="sample-controls">
+    <label class="sample-field">
+      <span>Work item title</span>
+      <input class="spui-input" name="title" required maxlength="80" placeholder="Update the team site" data-agent-id="work-title" />
+    </label>
+    <label class="sample-field">
+      <span>Status</span>
+      <select class="spui-input" name="status" data-agent-id="work-status">
+        <option>Not started</option>
+        <option>In progress</option>
+        <option>Done</option>
+      </select>
+    </label>
+    <label class="sample-check">
+      <input class="spui-checkbox" type="checkbox" name="notify" />
+      Notify the owner
+    </label>
+    <button class="spui-button" type="submit" data-agent-id="save-work-item">Save work item</button>
+  </div>
+  <p class="sample-result" role="status" aria-live="polite" data-agent-id="save-result"></p>
+</form>
+
+<script>
+  const form = document.querySelector("#sample-work-item");
+  form?.addEventListener("submit", event => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    const data = new FormData(form);
+    const result = form.querySelector("[data-agent-id='save-result']");
+    if (result) result.textContent = `Saved “${data.get("title")}” as ${data.get("status")}.`;
+  });
+</script>
+
+<style>
+  .live-sample { margin-block: 2rem 3rem; border: 1px solid #c8d0d9; border-radius: 8px; background: #fff; color: #182230; padding: 1.25rem; }
+  .sample-heading { display: flex; align-items: start; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
+  .sample-heading h2 { margin: 0; font-size: 1.2rem; }
+  .sample-heading p { max-width: 60ch; margin: .4rem 0 0; color: #526070; }
+  .sample-native { flex: none; border: 1px solid #c8d0d9; border-radius: 999px; padding: .2rem .55rem; font-size: .75rem; }
+  .sample-controls { display: flex; flex-wrap: wrap; align-items: end; gap: .9rem; }
+  .sample-field { display: grid; gap: .35rem; min-width: min(100%, 14rem); font-weight: 600; }
+  .sample-check { display: inline-flex; align-items: center; gap: .45rem; min-height: 2.25rem; }
+  .sample-result { min-height: 1.4em; margin: 1rem 0 0; color: #146c43; }
+  @media (max-width: 42rem) { .sample-heading { flex-direction: column; } .sample-controls { align-items: stretch; } }
+</style>

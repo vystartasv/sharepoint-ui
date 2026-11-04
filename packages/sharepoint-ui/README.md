@@ -1,41 +1,34 @@
 # @spfx-fast/sharepoint-ui
 
-Theme-aware UI components for SharePoint Framework 1.24. React 18.3.1+ is optional; custom elements work without React.
-
-## Install
+Small themeable React components for SharePoint Framework. Uses native HTML and a compact semantic theme token set.
 
 ```sh
 npm install @spfx-fast/sharepoint-ui
 ```
 
-## React
+React 18.3.1 is a peer dependency supplied by the SharePoint Framework host.
+
+## Usage
 
 ```tsx
-import { SharePointUIProvider, Button, TextField } from "@spfx-fast/sharepoint-ui/react";
+import { Button, Card, Checkbox, Input, SharePointThemeProvider } from "@spfx-fast/sharepoint-ui/react";
+import "@spfx-fast/sharepoint-ui/styles.css";
 
-export function Example() {
-  return <SharePointUIProvider lang="en-GB">
-    <TextField label="Work item" />
-    <Button appearance="primary">Save</Button>
-  </SharePointUIProvider>;
-}
+<SharePointThemeProvider>
+  <Card>
+    <Input aria-label="Search" placeholder="Search" />
+    <label><Checkbox name="includeArchived" /> Include archived</label>
+    <Button>Search</Button>
+  </Card>
+</SharePointThemeProvider>
 ```
 
-## Custom elements
+The provider reads the SharePoint theme CSS variables from its host page. Override tokens with `theme` or ordinary CSS custom properties to customize the result.
 
-```js
-import { defineButton } from "@spfx-fast/sharepoint-ui/elements/button";
-defineButton();
-```
+## SharePoint list workflows
 
-```html
-<spui-button appearance="primary">Save</spui-button>
-```
+Use `FilterBar` with `ListView` for labelled search and filters, empty/loading states, and paging. Add `ViewSwitcher` when users can choose between list and card layouts. These components keep query and paging state in the host app.
 
-**Docs:** [component catalog](https://vystartasv.github.io/sharepoint-ui/) · **Agent quickstart:** [build from a component page](https://vystartasv.github.io/sharepoint-ui/agents/QUICKSTART.md) · **Agent references:** [instructions and API slices](https://vystartasv.github.io/sharepoint-ui/agents/)
+Use `FileDropzone` to collect selected or dropped files and `AttachmentList` to show upload status and remove actions. Upload files through the host's SPFx service; validate files on the host before saving.
 
-The docs cover theming, RTL, accessibility, forms, rich-text persistence, and every component. See [AGENTS.md](./AGENTS.md) for agent guidance and [components.json](./components.json) for the API catalog.
-
-For framework-independent theme helpers, import from `@spfx-fast/sharepoint-ui/theme`. Set `brandColor` in `SharePointUIDesignTheme` to derive coordinated accent, focus, selection, surface, hover, and border colors.
-
-[MIT License](./LICENSE)
+Each control exposes native roles and visible labels. For browser agents, locate controls by role and accessible name first, then use `data-agent-id` only when names are duplicated. See the [agent interaction guide](https://vystartasv.github.io/sharepoint-ui/agents/) for locator and verification examples.

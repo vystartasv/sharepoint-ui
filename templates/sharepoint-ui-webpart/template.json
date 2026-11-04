@@ -1,1 +1,1 @@
-{"name":"sharepoint-ui-webpart","category":"webpart","description":"React SPFx web part using SharePoint UI elements and host theme tokens","version":"0.1.0","spfxVersion":"1.24.1"}
+{"name":"sharepoint-ui-webpart","category":"webpart","description":"Minimal React SPFx web part using native SharePoint UI controls and host theme tokens","version":"0.2.0","spfxVersion":"1.24.1"}

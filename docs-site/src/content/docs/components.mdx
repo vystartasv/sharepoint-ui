@@ -1,0 +1,132 @@
+---
+title: Component inventory
+description: A small set of distinct native controls and SharePoint workflows.
+---
+
+import inventory from "../../../../packages/sharepoint-ui/components.json";
+import measurements from "../../../../packages/sharepoint-ui/measurements.json";
+import InteractionSamples from "../../components/InteractionSamples.astro";
+import ListWorkflowSample from "../../components/ListWorkflowSample.astro";
+
+# Component inventory
+
+The library keeps one control per distinct task. Several old variants are consolidated: one `Button` covers actions; native `Input` types cover search, dates, files, colors, ranges, and numbers; semantic HTML covers common structure. The inventory has {inventory.components.length} components; {inventory.components.filter(component => component.available).length} are implemented in this branch.
+
+<InteractionSamples />
+
+<ListWorkflowSample />
+
+## Current set
+
+{Object.entries(inventory.components.reduce((groups, component) => {
+  (groups[component.group] ??= []).push(component);
+  return groups;
+}, {})).map(([group, components]) => <section>
+  <h2>{group}</h2>
+  <dl>
+    {components.map(component => <><dt><code>{component.name}</code> <small>{component.available ? "Available" : "Planned"}</small></dt><dd>{component.summary}</dd></>)}
+  </dl>
+</section>)}
+
+## Use the components
+
+```tsx
+import { Button, Checkbox, Field, Input, SharePointThemeProvider } from "@spfx-fast/sharepoint-ui/react";
+import "@spfx-fast/sharepoint-ui/styles.css";
+
+<SharePointThemeProvider>
+  <Field id="request-title" label="Request title" required hint="Use a short subject.">
+    <Input name="title" required />
+  </Field>
+  <label><Checkbox name="notifyOwner" /> Notify the owner</label>
+  <Button type="submit">Save request</Button>
+</SharePointThemeProvider>
+```
+
+For list data, give the grid stable record keys and a readable row name:
+
+```tsx
+<DataGrid
+  label="Open requests"
+  caption="Open requests awaiting review"
+  rows={requests}
+  getRowId={row => row.id}
+  rowLabel={row => row.title}
+  selectable
+  columns={[
+    { key: "title", label: "Title" },
+    { key: "owner", label: "Owner" },
+    { key: "due", label: "Due" },
+  ]}
+/>
+```
+
+`PersonPicker` and `LookupPicker` accept results supplied by the host. They do not make SharePoint requests; load options with the web part's existing SPFx services, then persist changes in the host app.
+
+For a searchable list, compose the existing controls into one view. The host owns the query, selected view, page data, and SharePoint requests:
+
+```tsx
+import { AttachmentList, Button, CommandBar, Field, FileDropzone, FilterBar, Input, ListView, Select, ViewSwitcher } from "@spfx-fast/sharepoint-ui/react";
+import "@spfx-fast/sharepoint-ui/styles.css";
+
+<ListView
+  label="Open requests"
+  rows={visibleRequests}
+  columns={columns}
+  getRowId={request => request.id}
+  toolbar={<CommandBar label="Request actions"><Button>Add request</Button></CommandBar>}
+  filters={<FilterBar label="Open requests filters" onClear={clearFilters} activeFilterCount={activeFilterCount}>
+    <Field id="request-search" label="Search requests"><Input type="search" value={query} onChange={event => setQuery(event.currentTarget.value)} /></Field>
+    <Field id="request-status" label="Status"><Select value={status} onChange={event => setStatus(event.currentTarget.value)}>{statusOptions}</Select></Field>
+  </FilterBar>}
+  page={{ currentPage, totalPages, onPageChange: setCurrentPage }}
+/>
+```
+
+Use `ViewSwitcher` when the same results have distinct list and card layouts. For files, `FileDropzone` reports selected or dropped `File` objects to the host; `AttachmentList` displays the host's upload status and removal actions. The host validates and uploads the files through its existing SharePoint service.
+
+```tsx
+<ViewSwitcher label="Open requests view" value={view} views={[
+  { value: "list", label: "List" }, { value: "cards", label: "Cards" },
+]} onChange={setView} />
+
+<FileDropzone id="supporting-files" label="Supporting documents" accept=".pdf,.docx"
+  files={files} onFiles={setFiles} />
+<AttachmentList label="Selected documents" items={attachments} onRemove={removeAttachment} />
+```
+
+For large fixed-height collections, use `VirtualList` with a stable key and a known row height. It only mounts the visible range plus overscan.
+
+```tsx
+<VirtualList
+  label="Recent documents"
+  items={documents}
+  itemHeight={48}
+  height={360}
+  getItemKey={document => document.id}
+  renderItem={document => <a href={document.url}>{document.name}</a>}
+/>
+```
+
+## Additions for SharePoint work
+
+`PersonPicker` and `LookupPicker` accept results supplied by the host. They do not call SharePoint. `DateRangePicker`, `Pagination`, `EmptyState`, `CopyButton`, and `CommandBar` fill common workbench tasks missing from the earlier set.
+
+The React surface accepts standard native element props, including `aria-label`, `aria-labelledby`, `name`, `value`, `disabled`, `data-*`, `onChange`, and `onClick`. Each control remains a native HTML element or a small semantic composition.
+
+To keep the inventory compact, `Input` also covers search, dates, files, colors, ranges, and numeric values through its native `type` prop. Use `FileDropzone` when users also need drag-and-drop; use `AttachmentList` to show the host-managed upload queue.
+
+Menus use a native disclosure, and onboarding can be composed from `Dialog`, `Popover`, and `Tabs`. Rich-text editing remains the host app's responsibility because safe HTML storage requires a tenant-approved sanitizer; use `TextArea` for plain-text fields. Tooltips use the browser's native `title` attribute.
+
+## Package measurements
+
+These measurements cover the emitted JavaScript module and declaration for each component. Cold import time is an isolated Node ESM import and includes startup of the external React peer; it is not component render time. Import timings vary with the machine and Node version.
+
+<details>
+  <summary>{measurements.componentCount} component modules · {measurements.componentJsBytes.toLocaleString()} JavaScript bytes total</summary>
+  <table>
+    <thead><tr><th>Component</th><th>JS bytes</th><th>Type bytes</th><th>Cold import (ms)</th></tr></thead>
+    <tbody>{measurements.components.map(component => <tr><th scope="row"><code>{component.name}</code></th><td>{component.moduleBytes}</td><td>{component.declarationBytes}</td><td>{component.coldImportMs.toFixed(3)}</td></tr>)}</tbody>
+  </table>
+  <p>Measured with Node {measurements.measuredWith.node} and React {measurements.measuredWith.react}.</p>
+</details>

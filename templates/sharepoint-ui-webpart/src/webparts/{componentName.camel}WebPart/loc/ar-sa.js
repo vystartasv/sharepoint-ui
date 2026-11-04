@@ -1,1 +1,1 @@
-define([], function() { return { "PropertyPaneDescription": "تطبيق SharePoint", "CardEyebrow": "المستندات المشتركة", "CardTitle": "خطة ربع السنة.docx", "CardSubtitle": "تم التحديث في ٢٨ أكتوبر · فيليوس بيتراوسكاس", "CardDescription": "خارطة الطريق والمراحل والقرارات لدورة التخطيط القادمة.", "CardStatus": "مستند Word", "CardDetails": "تم تسجيل الوصول · ٤٫٢ ميغابايت", "MarkReviewed": "وضع علامة تمت المراجعة", "Reviewed": "تمت المراجعة" }; });
+define([], function() { return { "PropertyPaneDescription": "تطبيق SharePoint" }; });

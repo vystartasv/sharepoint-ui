@@ -1,2 +1,1 @@
-declare interface I<%= componentName.pascal %>WebPartStrings { PropertyPaneDescription: string; CardEyebrow: string; CardTitle: string; CardSubtitle: string; CardDescription: string; CardStatus: string; CardDetails: string; MarkReviewed: string; Reviewed: string; }
-declare module '<%= componentName.pascal %>WebPartStrings' { const strings: I<%= componentName.pascal %>WebPartStrings; export = strings; }
+declare interface I<%= componentName.pascal %>WebPartStrings { PropertyPaneDescription: string; }

@@ -1,20 +1,20 @@
 # Contributing
 
-The repository is private today. The project owner must make it public or grant repository access before outside contributors can open issues or pull requests.
-
 ## Report a problem
 
-Include the component, package version, SPFx version, browser, locale and direction, appearance, SharePoint theme, and a short reproduction. Remove tenant data, tokens, and personal information.
+Include the component, package version, SPFx version, browser, locale and direction, SharePoint theme, and a short reproduction. Remove tenant data, tokens, and personal information.
 
 ## Propose a change
 
-Open an issue before a large API or architecture change. For a pull request, keep the change focused, update the component catalog and docs when public behavior changes, and describe the behavior you verified. Do not claim Fluent parity from an API-name match alone.
+Keep changes focused and native-first. Avoid compatibility aliases for removed APIs and avoid copying another library's interface design. Update the component catalog, agent examples, and human docs when public behavior changes. Describe the behavior and package measurements you verified.
 
 Useful local checks:
 
 ```sh
 npm run build:library
+npm run build:spfx
 npm run build:docs
+npm run measure:components
 ```
 
-For a UI change, include screenshots or a concise description of the appearance, theme, and direction used to review it.
+For UI changes, use visible labels and native roles, forward `data-*` props, and document agent locators that verify a resulting value or status.
