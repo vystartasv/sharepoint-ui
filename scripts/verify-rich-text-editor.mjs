@@ -234,6 +234,8 @@ try {
     await openMore(editor);
     await editor.locator('.toolbar-overflow__panel button[data-command="redo"]').click();
     assert.match(await editor.evaluate(node => node.value), /History&nbsp;basechanged/);
+    assert.equal(await editor.locator(".toolbar-overflow__trigger").getAttribute("tabindex"), "0", "closing More restores the toolbar tab stop to its visible trigger");
+    assert.equal(await editor.locator('.toolbar-overflow__panel button[data-command="redo"]').getAttribute("tabindex"), "-1", "closed More controls are removed from sequential keyboard navigation");
   }
   await page.locator("#native-form").evaluate(form => form.reset());
   await page.locator("#react-form").evaluate(form => form.reset());
@@ -250,7 +252,6 @@ try {
   await page.waitForFunction(() => document.querySelector("#native").value.includes("pasted.png"));
   assert.match(await native.evaluate(node => node.value), /SiteAssets\/pasted\.png/);
   const toolbar = reactEditor.getByRole("toolbar", { name: "Rich text formatting" });
-  const bold = toolbar.getByRole("button", { name: "Bold" });
   const italic = toolbar.getByRole("button", { name: "Italic" });
   assert.equal(await reactEditor.getByRole("textbox", { name: "محرر أصلي" }).count(), 1, "RTL editor has a programmatic name");
   assert.equal(await reactEditor.evaluate(node => getComputedStyle(node).direction), "rtl", "RTL host direction reaches the editor controls");
@@ -258,7 +259,7 @@ try {
   assert.equal(await nativeLabel, "Native editor");
   assert.equal(await reactLabel, "محرر أصلي");
   assert.deepEqual(errors, [], JSON.stringify(errors));
-  console.log(JSON.stringify({ assertions: "passed", nativeReactEventBridge: true, nativeTableEditing: true, reactTableEditing: true, richPasteStructureAndSanitization: true, plainTextPastePreservesLineBreaks: true, plainTextMarkupRemainsInert: true, nativeAndReactUndoRedo: true, nativeAndReactDefaultValueReset: true, controlledReactValue: true, formParticipationAndValidity: true, disabledFieldsetDisablesAndReenables: true, pastedImageUpload: true, rtlLabels: true, rtlToolbarRovingFocus: true, tabNavigationBetweenToolbarAndEditor: true, mergedCellGuard: true, sanitizedContent: true, nativeAndReactDurableImageUpload: true, pageErrors: errors }));
+  console.log(JSON.stringify({ assertions: "passed", nativeReactEventBridge: true, nativeTableEditing: true, reactTableEditing: true, richPasteStructureAndSanitization: true, plainTextPastePreservesLineBreaks: true, plainTextMarkupRemainsInert: true, nativeAndReactUndoRedo: true, nativeAndReactDefaultValueReset: true, controlledReactValue: true, formParticipationAndValidity: true, disabledFieldsetDisablesAndReenables: true, pastedImageUpload: true, rtlLabels: true, toolbarTabStopRecovery: true, mergedCellGuard: true, sanitizedContent: true, nativeAndReactDurableImageUpload: true, pageErrors: errors }));
 } finally {
   await browser?.close();
   await new Promise(done => server.close(done));

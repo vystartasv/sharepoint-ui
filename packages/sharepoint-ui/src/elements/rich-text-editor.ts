@@ -328,6 +328,9 @@ export function defineRichTextEditor(): void {
       overflow.dataset.open = String(open);
       trigger.setAttribute("aria-expanded", String(open));
       if (!open) {
+        if (panel.querySelector('[tabindex="0"]')) {
+          this.shadowRoot?.querySelectorAll<HTMLElement>("[role=toolbar] button[data-command],[role=toolbar] select[data-command],[role=toolbar] input[data-toolbar-control],[role=toolbar] button.toolbar-overflow__trigger").forEach(control => { control.tabIndex = control === trigger ? 0 : -1; });
+        }
         panel.style.removeProperty("left"); panel.style.removeProperty("top"); panel.style.removeProperty("position"); panel.style.removeProperty("inset-inline-end");
         return;
       }
