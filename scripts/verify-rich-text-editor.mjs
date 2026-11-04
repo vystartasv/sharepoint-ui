@@ -87,6 +87,12 @@ try {
   assert.ok(overflowLayout.left >= 0 && overflowLayout.top >= 0 && overflowLayout.right <= overflowLayout.width && overflowLayout.bottom <= overflowLayout.height && overflowLayout.zIndex >= 1000, "the mobile More panel stays inside the viewport above sticky page chrome");
   await native.locator('.toolbar-color-swatch[data-color-format="background"]').first().click();
   assert.deepEqual(await native.evaluate(node => [...node.querySelectorAll('[role="textbox"] [style*="background-color"]')].map(span => span.textContent)), ["Highlight"], "highlight color applies only to the native selected text through the overflow toolbar");
+  await nativeEditable.click();
+  await nativeEditable.press("End");
+  await nativeEditable.press("Shift+ArrowLeft");
+  await page.waitForFunction(host => host.quill.getSelection()?.length === 1, await native.elementHandle());
+  await native.evaluate(host => { host.value = "<p>Fresh content with enough room</p>"; });
+  assert.equal(await native.evaluate(host => host.quill.getSelection()?.length), 1, "controlled value updates retain the focused editor selection");
   await page.setViewportSize({ width: 1000, height: 800 });
   await native.evaluate((node, value) => { node.value = value; }, nativeTableValue);
   const openMore = async editor => {

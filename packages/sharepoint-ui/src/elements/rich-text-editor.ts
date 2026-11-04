@@ -280,18 +280,19 @@ export function defineRichTextEditor(): void {
     }
     private syncEditorLabel(): void { this.editor.setAttribute("aria-label", this.getAttribute("aria-label") ?? this.getAttribute("label") ?? this.getAttribute("editor-label") ?? "Rich text"); }
     private syncEditorDirection(): void { this.editor.dir = this.getAttribute("dir") ?? (getComputedStyle(this).direction === "rtl" ? "rtl" : "ltr"); }
+    private hasEditorFocus(): boolean { return this.editor.matches(":focus") || this.quill?.hasFocus() === true; }
     get value(): string { const html = this.quill?.getSemanticHTML() ?? this.editor?.innerHTML; return html !== undefined ? (this.contentMode === "plain" ? plainText(html) : cleanHtml(html, this.contentMode, this.allowHyperlinks)) : this.pendingValue ?? this.getAttribute("value") ?? ""; }
     set value(value: string) {
       this.pendingValue = value;
       if (!this.editor) return;
       const normalized = this.contentMode === "plain" ? plainText(value) : cleanHtml(value, this.contentMode, this.allowHyperlinks);
       if (this.value !== normalized) {
-        if (!this.quill?.hasFocus()) { this.savedQuillSelection = undefined; this.savedRange = undefined; this.savedCell = undefined; }
+        if (!this.hasEditorFocus()) { this.savedQuillSelection = undefined; this.savedRange = undefined; this.savedCell = undefined; }
         this.setEditorHtml(normalized);
       }
       this.syncForm(normalized);
     }
-    private setEditorHtml(value: string, restoreFocus = this.shadowRoot?.activeElement === this.editor): void {
+    private setEditorHtml(value: string, restoreFocus = this.hasEditorFocus()): void {
       if (!this.quill) { this.editor.innerHTML = value; return; }
       const selection = this.quill.getSelection() ?? this.savedQuillSelection;
       this.quill.clipboard.dangerouslyPasteHTML(value, "silent");
