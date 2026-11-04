@@ -69,16 +69,28 @@ try {
   const nativeTableValue = await native.evaluate(node => node.value);
   await native.evaluate(node => { node.value = "<p>Highlight this text</p>"; });
   const nativeEditable = native.locator('[role="textbox"]');
-  await nativeEditable.evaluate(node => {
-    const text = node.querySelector("p")?.firstChild;
-    if (!text) throw new Error("Expected text to select in the editor");
-    const range = node.ownerDocument.createRange();
-    range.setStart(text, 0);
-    range.setEnd(text, 9);
-    const selection = node.ownerDocument.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-  });
+  if (browserType === webkit) {
+    const drag = await nativeEditable.evaluate(node => {
+      const text = node.querySelector("p")?.firstChild;
+      if (!text) throw new Error("Expected text to select in the editor");
+      const range = node.ownerDocument.createRange(); range.setStart(text, 0); range.setEnd(text, 9);
+      const rect = range.getBoundingClientRect();
+      return { startX: rect.left + 1, endX: rect.right - 1, y: rect.top + rect.height / 2 };
+    });
+    await page.mouse.move(drag.startX, drag.y); await page.mouse.down(); await page.mouse.move(drag.endX, drag.y, { steps: 8 }); await page.mouse.up();
+    await page.waitForFunction(host => host.ownerDocument.getSelection()?.toString() === "Highlight", await native.elementHandle());
+  } else {
+    await nativeEditable.evaluate(node => {
+      const text = node.querySelector("p")?.firstChild;
+      if (!text) throw new Error("Expected text to select in the editor");
+      const range = node.ownerDocument.createRange();
+      range.setStart(text, 0);
+      range.setEnd(text, 9);
+      const selection = node.ownerDocument.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    });
+  }
   await page.setViewportSize({ width: 393, height: 852 });
   await native.locator(".toolbar-overflow__trigger").click();
   assert.deepEqual(await nativeEditable.evaluate(node => ({ userSelect: getComputedStyle(node).webkitUserSelect, touchAction: getComputedStyle(node).touchAction })), { userSelect: "text", touchAction: "auto" }, "mobile browsers allow native long-press text selection inside the editor");
@@ -98,7 +110,7 @@ try {
   await native.locator('.toolbar-color-swatch[data-color-format="background"]').first().click();
   assert.deepEqual(await native.evaluate(node => [...node.querySelectorAll('[role="textbox"] [style*="background-color"]')].map(span => span.textContent)), ["Highlight"], "highlight color applies only to the native selected text through the overflow toolbar");
   if (process.env.RTE_SCOPE === "selection") {
-    console.log(JSON.stringify({ assertions: "passed", browser: browserType.name(), scope: "mobile-selection-and-highlight", nativeSelectionStyles: true, selectedTextHighlight: true }));
+    console.log(JSON.stringify({ assertions: "passed", browser: browserType.name(), scope: "mobile-selection-and-highlight", nativeSelectionStyles: true, browserTextDragSelection: browserType === webkit, selectedTextHighlight: true }));
   } else {
   await nativeEditable.click();
   await nativeEditable.press("End");
