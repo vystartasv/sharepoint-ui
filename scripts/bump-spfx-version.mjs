@@ -1,5 +1,5 @@
 import { readFile, rename, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const bump = process.argv[2] ?? "patch";
