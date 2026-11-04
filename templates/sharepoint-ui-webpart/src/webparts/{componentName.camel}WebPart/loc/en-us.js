@@ -1,1 +1,1 @@
-define([], function() { return { "PropertyPaneDescription": "<%= componentDescription %>", "CardEyebrow": "SHARED DOCUMENTS", "CardTitle": "Quarterly planning.docx", "CardSubtitle": "Modified 28 October · Vilius Petrauskas", "CardDescription": "Roadmap, milestones, and decisions for the next planning cycle.", "CardStatus": "Word document", "CardDetails": "Checked in · 4.2 MB", "MarkReviewed": "Mark reviewed", "Reviewed": "Reviewed" }; });
+define([], function() { return { "PropertyPaneDescription": "<%= componentDescription %>" }; });

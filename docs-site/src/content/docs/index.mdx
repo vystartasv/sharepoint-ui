@@ -1,113 +1,16 @@
 ---
 title: SharePoint UI
-description: Framework-independent components for SharePoint Framework 1.24, with React adapters, theme inheritance, and a searchable API catalog.
-template: splash
-hero:
-  tagline: The low-payload component kit for SharePoint pages and SPFx Copilot UX. Inherit the tenant theme, use React or no framework, and ship only the pieces you need.
-  actions:
-    - text: Browse components
-      link: /sharepoint-ui/catalog/
-      variant: primary
-    - text: Start with SPFx
-      link: /sharepoint-ui/getting-started/
-      variant: minimal
+description: Small themeable React components for SharePoint Framework.
 ---
 
-import PreviewBench from "../../components/PreviewBench.astro";
+SharePoint UI is a compact React component library designed for SharePoint pages. It uses native HTML controls, inherits SharePoint theme colors, and keeps React as a host supplied peer dependency.
 
-<PreviewBench />
-
-## A component system shaped for SharePoint
-
-SharePoint UI's focus is a tenant-aware task view that works in both a SharePoint page and an SPFx 1.24 Copilot UX component. The Copilot example reads and updates a real SharePoint list, inherits SharePoint theme tokens, and returns its visible state to the agent. React is optional; the sample uses custom elements directly.
+## Install
 
 ```sh
 npm install @spfx-fast/sharepoint-ui
 ```
 
-The package targets SPFx 1.24 and React 18. React is an optional peer dependency; custom-element consumers can import only the definitions they need.
+## Components
 
-## Choose your documentation
-
-<div class="documentation-modes">
-  <section>
-    <p class="mode-eyebrow">For people</p>
-    <h3>See it, try it, then build it</h3>
-    <p>Browse live components, change their theme, inspect current values, and read plain-language properties and slot tables.</p>
-    <a href="/sharepoint-ui/catalog/">Open the component catalog <span aria-hidden="true">→</span></a>
-  </section>
-  <section>
-    <p class="mode-eyebrow">For coding agents</p>
-    <h3>Give the agent only the context it needs</h3>
-    <p>Use concise Markdown instructions, the full machine-readable catalog, or a single module/component JSON slice.</p>
-    <a href="/sharepoint-ui/agents/">Open agent documentation <span aria-hidden="true">→</span></a>
-  </section>
-</div>
-
-## Find a useful starting point
-
-The catalog covers 243 named exports across 62 modules, including the named component families in the pinned Fluent UI React v9 baseline and SharePoint additions such as `ViewCard` and `RichTextEditor`. This is catalog coverage, not a claim of complete behavioral parity. Every visual component has its own live preview with appearance and SharePoint palette controls, a visible token readout, and live values. Search names, slots, callback props, and API summaries from the site search.
-
-<div class="catalog-actions">
-  <a class="catalog-link" href="/sharepoint-ui/catalog/">Explore the component catalog <span aria-hidden="true">→</span></a>
-  <a class="catalog-link" href="/sharepoint-ui/components/rich-text-editor/rich-text-editor/">See the rich text editor in action <span aria-hidden="true">→</span></a>
-  <a class="catalog-link" href="/sharepoint-ui/guides/copilot-ux/">See an SPFx 1.24 Copilot experience <span aria-hidden="true">→</span></a>
-  <a class="catalog-link" href="/sharepoint-ui/guides/sharepoint-fields/">Map SharePoint fields to controls <span aria-hidden="true">→</span></a>
-  <a class="catalog-link" href="https://github.com/vystartasv/sharepoint-ui/tree/main/examples/spfx124-copilot-ux">Build the tenant-connected Copilot example <span aria-hidden="true">→</span></a>
-</div>
-
-## Why use this for SharePoint?
-
-Fluent UI is a strong general-purpose system. Choose SharePoint UI when you need low-payload, tenant-themed task surfaces that work without React in SPFx Copilot UX and SharePoint pages. The four-control custom-element slice measured 11,562 gzip bytes, 74% less than equivalent Fluent UI React 9.75 imports at 44,411 bytes. The metadata-driven field renderer measured 116,738 gzip bytes without React versus 129,343 with the React adapter; a common-fields form using lazy chunks measured 25,724 gzip bytes. The repository includes a real-list Copilot example and interactive preview. These are source-import payload measurements, not complete-app or render-speed claims. [See the benchmark and its limits](/sharepoint-ui/guides/payload/).
-
-<div class="sharepoint-advantages">
-  <section><h3>Fits the tenant</h3><p>Inherit the site palette and font, map locale to RTL, and keep each view inside its SharePoint section.</p></section>
-  <section><h3>Starts with real work</h3><p>Compose document, person, task, approval, and list-item views, then return them as interactive Copilot experiences in SPFx 1.24.</p></section>
-  <section><h3>Predictable for agents</h3><p>Use one component pattern, copyable examples, and machine-readable API slices instead of guessing slots and event names.</p></section>
-</div>
-
-This is the product wedge: make the SharePoint page and its Copilot experience feel like one product. Choose Fluent UI directly when you need its broader general-purpose ecosystem without these SharePoint-specific needs.
-
-## Keep composition lightweight
-
-The React adapter is convenient for SPFx projects. For other frameworks, import a leaf element definition and register it once. Both approaches use the same theme-aware custom-element implementation.
-
-<div class="entry-points">
-  <section>
-    <h3>React in SPFx</h3>
-    <p>Use familiar React props and compose components inside your web part.</p>
-    <a href="/sharepoint-ui/getting-started/">React quick start <span aria-hidden="true">→</span></a>
-  </section>
-  <section>
-    <h3>Custom elements</h3>
-    <p>Register a leaf component and use it in plain HTML or another framework.</p>
-    <a href="/sharepoint-ui/components/button/">See the Button API <span aria-hidden="true">→</span></a>
-  </section>
-</div>
-
-## Compose an SPFx view
-
-```tsx
-import { Button, SharePointUIProvider, ViewCard } from "@spfx-fast/sharepoint-ui/react";
-
-export function RequestList({ items, locale, openItem }) {
-  return (
-    <SharePointUIProvider lang={locale}>
-      {items.map(item => (
-        <ViewCard key={item.Id} kind="list-item" title={item.Title} subtitle={item.Modified} description={item.Status}>
-          <Button slot="action" appearance="primary" onClick={() => openItem(item.Id)}>Open item</Button>
-        </ViewCard>
-      ))}
-    </SharePointUIProvider>
-  );
-}
-
-// From the SPFx web part's render method, pass:
-// locale={this.context.pageContext.cultureInfo.currentUICultureName}
-```
-
-The `lang` value controls localization and direction. Components inherit the site theme and stay within the SharePoint section that owns them. Keep SharePoint data access and persistence in the web part; the UI components expose the interaction and value changes.
-
-## Go from component to working web part
-
-Use the focused guides for [SPFx setup](/sharepoint-ui/guides/spfx/), [theme and direction](/sharepoint-ui/guides/theming-and-direction/), [custom elements](/sharepoint-ui/guides/custom-elements/), and [agent workflow](/sharepoint-ui/guides/agent-workflow/). Component pages show rendered examples alongside their React export, custom-element tag, slots, callbacks, styling hooks, and API signature.
+The initial component set is Button, Input, and Card. See the package README for usage and theming details.
