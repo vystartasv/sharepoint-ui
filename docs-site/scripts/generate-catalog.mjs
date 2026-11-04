@@ -167,7 +167,7 @@ function customElementAttributesTableFor(component) {
     "collapse-label": "Text announced for the collapse action.",
     "container-width-offset": "Adjusts available grid width before column sizing.",
     "clear-color-label": "Localized action name for removing the selected text or highlight color.",
-    "custom-color-label": "Label for the exact six-digit #RRGGBB color field.",
+    "custom-color-label": "Label for the custom three- or six-digit hex color field.",
     disabled: "Prevents user interaction.",
     dir: "Text direction: left-to-right, right-to-left, or automatic.",
     "edit-error-label": "Fallback message announced when a cell cannot be saved.",

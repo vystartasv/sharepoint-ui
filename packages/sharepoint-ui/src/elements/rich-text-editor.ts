@@ -115,8 +115,15 @@ function mixRgb(foreground: string, background: string, amount: number): string 
   return `rgb(${front.map((channel, index) => Math.round(channel * amount + back[index] * (1 - amount))).join(" ")})`;
 }
 function colorInputValue(value: string, fallback = "#0078d4"): string {
+  const hex = normalizeHexColor(value);
+  if (hex) return hex;
   const channels = value.match(/[\d.]+/g)?.slice(0, 3).map(Number);
   return channels?.length === 3 ? `#${channels.map(channel => Math.max(0, Math.min(255, Math.round(channel))).toString(16).padStart(2, "0")).join("")}` : fallback;
+}
+function normalizeHexColor(value: string): string | undefined {
+  const hex = value.trim().replace(/^#/, "");
+  if (/^[\da-f]{3}$/i.test(hex)) return `#${[...hex].map(channel => channel + channel).join("")}`;
+  return /^[\da-f]{6}$/i.test(hex) ? `#${hex}` : undefined;
 }
 function safeLanguageTag(value: string): boolean {
   const tag = value.trim();
@@ -372,11 +379,12 @@ export function defineRichTextEditor(): void {
       const trigger = overflow?.querySelector<HTMLButtonElement>(".toolbar-overflow__trigger");
       const panel = overflow?.querySelector<HTMLElement>(".toolbar-overflow__panel");
       if (!overflow || !trigger || !panel) return;
+      if (open) this.syncThemeColorSwatches();
       overflow.dataset.open = String(open);
       trigger.setAttribute("aria-expanded", String(open));
       if (!open) {
         if (panel.querySelector('[tabindex="0"]')) {
-          this.shadowRoot?.querySelectorAll<HTMLElement>("[role=toolbar] button[data-command],[role=toolbar] select[data-command],[role=toolbar] input[data-toolbar-control],[role=toolbar] button.toolbar-overflow__trigger").forEach(control => { control.tabIndex = control === trigger ? 0 : -1; });
+          this.shadowRoot?.querySelectorAll<HTMLElement>("[role=toolbar] button[data-command],[role=toolbar] button[data-toolbar-control],[role=toolbar] select[data-command],[role=toolbar] input[data-toolbar-control],[role=toolbar] button.toolbar-overflow__trigger").forEach(control => { control.tabIndex = control === trigger ? 0 : -1; });
         }
         panel.style.removeProperty("left"); panel.style.removeProperty("top"); panel.style.removeProperty("position"); panel.style.removeProperty("inset-inline-end");
         return;
@@ -392,6 +400,20 @@ export function defineRichTextEditor(): void {
       const desiredTop = below >= height + 6 ? anchor.bottom + 6 : anchor.top - height - 6;
       const top = Math.max(bounds.top + 8, Math.min(bounds.bottom - height - 8, desiredTop));
       panel.style.position = "fixed"; panel.style.insetInlineEnd = "auto"; panel.style.left = `${left}px`; panel.style.top = `${top}px`;
+    }
+    private syncThemeColorSwatches(): void {
+      const accent = colorInputValue(resolveHostColor(this, "--spui-ui-accent", "#0078d4"));
+      const surface = resolveHostColor(this, "--spui-ui-surface", "#ffffff");
+      for (const swatch of this.shadowRoot?.querySelectorAll<HTMLButtonElement>(".toolbar-color-swatch") ?? []) {
+        const themeColor = swatch.dataset.themeColor;
+        const value = themeColor === "highlight" ? colorInputValue(mixRgb(accent, surface, 0.2), "#d7ffff") : themeColor === "accent" ? accent : swatch.dataset.colorValue ?? "";
+        const name = themeColor === "accent" ? this.getAttribute("theme-accent-label") ?? "SharePoint theme accent" : swatch.dataset.colorName ?? "Color";
+        swatch.dataset.colorValue = value;
+        swatch.style.backgroundColor = value;
+        const label = (this.getAttribute("color-swatch-label") ?? "Select {color}").replace("{color}", `${name} ${value}`);
+        swatch.setAttribute("aria-label", label);
+        swatch.title = label;
+      }
     }
     private syncContentMode(): void {
       const toolbar = this.shadowRoot?.querySelector<HTMLElement>('[role="toolbar"]');
@@ -542,6 +564,10 @@ export function defineRichTextEditor(): void {
       const size = toolbar.querySelector<HTMLSelectElement>('select[data-command="fontSize"]');
       if (family) family.value = typeof formats.font === "string" ? formats.font : "";
       if (size) size.value = typeof formats.size === "string" ? formats.size : "";
+      toolbar.querySelectorAll<HTMLButtonElement>(".toolbar-color-swatch").forEach(swatch => {
+        const property = swatch.closest<HTMLElement>(".toolbar-color")?.dataset.labelAttribute === "highlight-color-label" ? formats.background : formats.color;
+        swatch.setAttribute("aria-pressed", String(colorInputValue(String(property ?? ""), "").toLowerCase() === (swatch.dataset.colorValue ?? "").toLowerCase()));
+      });
     }
     private onEditorClick = (event: MouseEvent): void => {
       const cell = event.composedPath().find((node): node is HTMLTableCellElement => node instanceof HTMLTableCellElement && this.editor.contains(node));
@@ -838,25 +864,27 @@ export function defineRichTextEditor(): void {
       const colorGroup = document.createElement("div"); colorGroup.className = "toolbar-group toolbar-group--color";
       const accent = resolveHostColor(this, "--spui-ui-accent", "#0078d4");
       const surface = resolveHostColor(this, "--spui-ui-surface", "#ffffff");
-      const colorSets: Array<{ attribute: string; name: string; format: "color" | "background"; initial: string }> = [
-        { attribute: "text-color-label", name: "Text color", format: "color", initial: colorInputValue(accent) },
-        { attribute: "highlight-color-label", name: "Highlight color", format: "background", initial: colorInputValue(mixRgb(accent, surface, 0.2), "#d7ffff") }
+      const colorSets: Array<{ attribute: string; name: string; format: "color" | "background"; colors: Array<{ name: string; value?: string; theme?: "accent" | "highlight" }> }> = [
+        { attribute: "text-color-label", name: "Text color", format: "color", colors: [{ name: "Theme accent", theme: "accent" }, { name: "Black", value: "#242424" }, { name: "White", value: "#ffffff" }, { name: "Red", value: "#c50f1f" }, { name: "Blue", value: "#0078d4" }, { name: "Green", value: "#107c10" }, { name: "Orange", value: "#ca5010" }] },
+        { attribute: "highlight-color-label", name: "Highlight color", format: "background", colors: [{ name: "Theme tint", theme: "highlight" }, { name: "Yellow", value: "#fff2cc" }, { name: "Blue", value: "#d9eaf7" }, { name: "Green", value: "#dff6dd" }, { name: "Pink", value: "#fce4ec" }, { name: "Orange", value: "#fde2cf" }, { name: "Purple", value: "#e8dcf5" }] }
       ];
       for (const set of colorSets) {
-        const control = document.createElement("label"); control.className = "toolbar-color"; control.dataset.labelAttribute = set.attribute;
-        control.append(createToolbarIcon(set.format === "color" ? "textColor" : "highlightColor"));
-        const picker = document.createElement("input"); picker.type = "color"; picker.className = "toolbar-color-picker"; picker.value = set.initial; picker.dataset.toolbarControl = "";
-        picker.setAttribute("aria-label", this.getAttribute(set.attribute) ?? set.name);
-        const syncThemeColor = (): void => {
-          if (picker.dataset.userSelected) return;
-          const currentAccent = resolveHostColor(this, "--spui-ui-accent", "#0078d4");
-          const currentSurface = resolveHostColor(this, "--spui-ui-surface", "#ffffff");
-          picker.value = set.format === "color" ? colorInputValue(currentAccent) : colorInputValue(mixRgb(currentAccent, currentSurface, 0.2), "#d7ffff");
-        };
-        picker.addEventListener("focus", syncThemeColor);
-        picker.addEventListener("pointerdown", syncThemeColor);
-        picker.addEventListener("change", () => { picker.dataset.userSelected = "true"; this.applyInlineStyle(set.format === "color" ? "color" : "background-color", picker.value); this.setOverflowOpen(false); });
-        control.append(picker);
+        const control = document.createElement("section"); control.className = "toolbar-color"; control.dataset.labelAttribute = set.attribute;
+        const heading = document.createElement("strong"); heading.className = "toolbar-color__heading"; heading.textContent = this.getAttribute(set.attribute) ?? set.name; heading.append(createToolbarIcon(set.format === "color" ? "textColor" : "highlightColor")); control.append(heading);
+        const swatches = document.createElement("div"); swatches.className = "toolbar-color__swatches"; swatches.setAttribute("role", "group"); swatches.setAttribute("aria-label", this.getAttribute(set.attribute) ?? set.name);
+        for (const color of set.colors) {
+          const swatch = document.createElement("button"); swatch.type = "button"; swatch.className = "toolbar-color-swatch"; swatch.dataset.toolbarControl = ""; swatch.dataset.colorName = color.name;
+          const value = color.theme === "accent" ? accent : color.theme === "highlight" ? colorInputValue(mixRgb(accent, surface, 0.2), "#d7ffff") : color.value!;
+          swatch.dataset.colorValue = value; if (color.theme) swatch.dataset.themeColor = color.theme; swatch.setAttribute("aria-pressed", "false");
+          swatch.style.backgroundColor = value; swatch.setAttribute("aria-label", `${color.name} ${value}`); swatch.title = `${color.name} ${value}`;
+          swatch.addEventListener("click", () => { this.applyInlineStyle(set.format === "color" ? "color" : "background-color", swatch.dataset.colorValue ?? value); this.setOverflowOpen(false); });
+          swatches.append(swatch);
+        }
+        control.append(swatches);
+        const custom = document.createElement("input"); custom.type = "text"; custom.inputMode = "text"; custom.maxLength = 7; custom.pattern = "#?[0-9a-fA-F]{3}([0-9a-fA-F]{3})?"; custom.className = "toolbar-color-custom"; custom.dataset.toolbarControl = ""; custom.value = set.format === "color" ? colorInputValue(accent) : colorInputValue(mixRgb(accent, surface, 0.2), "#d7ffff"); custom.placeholder = "#hex"; custom.setAttribute("aria-label", `${this.getAttribute("custom-color-label") ?? "Custom hex color"} (${this.getAttribute(set.attribute) ?? set.name})`); custom.title = "Enter a 3 or 6 digit hex color";
+        custom.addEventListener("change", () => { const value = normalizeHexColor(custom.value); if (!value) { custom.setAttribute("aria-invalid", "true"); return; } custom.removeAttribute("aria-invalid"); custom.value = value; this.applyInlineStyle(set.format === "color" ? "color" : "background-color", value); this.setOverflowOpen(false); });
+        custom.addEventListener("keydown", event => { if (event.key === "Enter") { event.preventDefault(); custom.blur(); } });
+        control.append(custom);
         const clear = document.createElement("button"); clear.type = "button"; clear.className = "toolbar-color-clear"; clear.dataset.command = "clearColor"; clear.dataset.clearLabelAttribute = "clear-color-label"; clear.dataset.colorLabelAttribute = set.attribute; clear.dataset.fallback = `${this.getAttribute("clear-color-label") ?? "Remove color"} (${(this.getAttribute(set.attribute) ?? set.name).toLowerCase()})`; clear.setAttribute("aria-label", clear.dataset.fallback); clear.title = clear.dataset.fallback; clear.append(createToolbarIcon("removeFormat"));
         clear.addEventListener("click", () => { this.applyInlineStyle(set.format === "color" ? "color" : "background-color", false); this.setOverflowOpen(false); });
         control.append(clear); colorGroup.append(control);
@@ -912,7 +940,7 @@ export function defineRichTextEditor(): void {
       linkForm.append(linkActions);
       linkForm.addEventListener("submit", event => { event.preventDefault(); this.applyLink(); });
       linkForm.addEventListener("keydown", event => { if ((event as KeyboardEvent).key === "Escape") { event.preventDefault(); event.stopPropagation(); this.closeLinkEditor(false); } });
-      const toolbarFocusable = "button[data-command],select[data-command],input[data-toolbar-control],button.toolbar-overflow__trigger";
+      const toolbarFocusable = "button[data-command],button[data-toolbar-control],select[data-command],input[data-toolbar-control],button.toolbar-overflow__trigger";
       const toolbarControls = [...toolbar.querySelectorAll<HTMLElement>(toolbarFocusable)];
       const firstToolbarButton = toolbar.querySelector<HTMLElement>("button[data-command]:not([hidden])");
       toolbarControls.forEach(control => { control.tabIndex = control === firstToolbarButton ? 0 : -1; });
@@ -938,11 +966,12 @@ export function defineRichTextEditor(): void {
       style.textContent += `.toolbar-group--fonts{gap:4px}.toolbar-font-select{width:100%;min-width:0}@container (max-width:64rem){.toolbar-font-select{min-height:40px}}`;
       style.textContent += `.link-new-tab{display:inline-flex;flex:1 0 100%;align-items:center;gap:8px;color:var(--spui-ui-text,inherit);font-size:13px}.link-new-tab input{width:16px;height:16px;min-height:16px;margin:0;accent-color:var(--spui-ui-accent,#0078d4)}`;
       style.textContent += `.toolbar-overflow:not([data-open="true"])>.toolbar-overflow__panel,.toolbar-overflow__panel[hidden]{display:none!important}.toolbar-overflow[data-open="true"]>.toolbar-overflow__panel:not([hidden]){display:grid;gap:8px}.toolbar-overflow__panel{width:min(320px,calc(100vw - 24px))}.link-picker-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}`;
-      style.textContent += `.toolbar-overflow__panel .toolbar-group--color{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));flex:1 0 100%;gap:8px;padding:0;border:0}.toolbar-color{box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;min-height:44px;padding:4px 8px;border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,6px);color:var(--spui-ui-text,inherit)}.toolbar-color svg{width:18px;height:18px;flex:none}.toolbar-color-picker{box-sizing:border-box;appearance:none;width:40px;min-width:40px;height:32px;min-height:32px;padding:2px;border:1px solid var(--spui-ui-stroke,#8a8886);border-radius:var(--spui-control-radius,4px);background:var(--spui-ui-surface,#fff);cursor:pointer}.toolbar-color-picker::-webkit-color-swatch-wrapper{padding:2px}.toolbar-color-picker::-webkit-color-swatch{border:0;border-radius:2px}.toolbar-color-picker:focus-visible,.toolbar-color-clear:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}.toolbar-color-clear{width:32px;min-width:32px;min-height:32px;border:1px solid var(--spui-ui-stroke,#8a8886)}@media(pointer:coarse){.toolbar-color{min-height:48px}.toolbar-color-picker{width:44px;min-width:44px;height:40px;min-height:40px}.toolbar-color-clear{width:40px;min-width:40px;min-height:40px}}@media(forced-colors:active){.toolbar-color{border-color:ButtonText}.toolbar-color-picker,.toolbar-color-clear{border-color:ButtonText;background:Canvas;color:CanvasText}}`;
-      style.textContent += `[role=toolbar]{position:relative;flex-wrap:nowrap;min-width:0;overflow:visible}.toolbar-group{flex:0 0 auto;flex-wrap:nowrap}.toolbar-overflow{position:relative;flex:none}.toolbar-overflow__trigger{box-sizing:border-box;display:grid;place-items:center;width:36px;min-width:36px;min-height:36px;border:1px solid transparent;border-radius:var(--spui-control-radius,5px);color:var(--spui-ui-text,inherit);cursor:pointer;list-style:none}.toolbar-overflow__trigger::-webkit-details-marker{display:none}.toolbar-overflow__trigger svg{width:18px;height:18px}.toolbar-overflow__trigger:hover{background:var(--spui-ui-surface-hover,#eee)}.toolbar-overflow__trigger:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}.toolbar-overflow[data-open="true"]>.toolbar-overflow__trigger{background:color-mix(in srgb,var(--spui-ui-accent,#0078d4) 12%,var(--spui-ui-surface,#fff))}.toolbar-overflow__panel{position:absolute;z-index:var(--spui-layer-popover,10000);inset-block-start:calc(100% + 6px);inset-inline-end:0;display:none;box-sizing:border-box;width:min(320px,calc(100vw - 24px));max-height:min(70dvh,480px);overflow:auto;padding:10px;border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,8px);background:var(--spui-ui-surface,#fff);color:var(--spui-ui-text,inherit);box-shadow:0 8px 24px #0003}.toolbar-overflow[data-open="true"]>.toolbar-overflow__panel{display:grid;gap:8px}.toolbar-overflow__panel>.toolbar-format{width:100%;max-width:none;min-width:0;min-height:40px}.toolbar-overflow__panel>.toolbar-group{display:flex;flex-wrap:wrap;min-width:0;padding:6px 0;border:0;border-block-start:1px solid var(--spui-ui-stroke,#ddd)}.toolbar-overflow__panel .toolbar-group--fonts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.toolbar-overflow__panel .toolbar-font-select{width:100%;min-width:0;max-width:none;min-height:40px}.toolbar-overflow__panel .toolbar-group--more-commands{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));justify-items:center}.toolbar-overflow__panel .toolbar-group--table{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));justify-items:center}.toolbar-overflow__panel .toolbar-group--color{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:6px 0}.toolbar-overflow__panel>.toolbar-group--color{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}@media(pointer:coarse){.toolbar-overflow__trigger{width:44px;min-width:44px;min-height:44px}}@media(forced-colors:active){.toolbar-overflow__trigger,.toolbar-overflow__panel{border-color:ButtonText;background:Canvas;color:CanvasText;box-shadow:none}}`;
+      style.textContent += `.toolbar-overflow__panel .toolbar-group--color{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));flex:1 0 100%;gap:8px;padding:0;border:0}.toolbar-color{box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;min-height:44px;padding:4px 8px;border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,6px);color:var(--spui-ui-text,inherit)}.toolbar-color svg{width:18px;height:18px;flex:none}.toolbar-color-clear:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}.toolbar-color-clear{width:32px;min-width:32px;min-height:32px;border:1px solid var(--spui-ui-stroke,#8a8886)}@media(pointer:coarse){.toolbar-color-clear{width:40px;min-width:40px;min-height:40px}} @media(forced-colors:active){.toolbar-color{border-color:ButtonText}.toolbar-color-clear{border-color:ButtonText;background:Canvas;color:CanvasText}}`;
+      style.textContent += `[role=toolbar]{position:relative;flex-wrap:nowrap;min-width:0;overflow:visible}.toolbar-group{flex:0 0 auto;flex-wrap:nowrap}.toolbar-overflow{position:relative;flex:none}.toolbar-overflow__trigger{box-sizing:border-box;display:grid;place-items:center;width:36px;min-width:36px;min-height:36px;border:1px solid transparent;border-radius:var(--spui-control-radius,5px);color:var(--spui-ui-text,inherit);cursor:pointer;list-style:none}.toolbar-overflow__trigger::-webkit-details-marker{display:none}.toolbar-overflow__trigger svg{width:18px;height:18px}.toolbar-overflow__trigger:hover{background:var(--spui-ui-surface-hover,#eee)}.toolbar-overflow__trigger:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}.toolbar-overflow[data-open="true"]>.toolbar-overflow__trigger{background:color-mix(in srgb,var(--spui-ui-accent,#0078d4) 12%,var(--spui-ui-surface,#fff))}.toolbar-overflow__panel{position:absolute;z-index:var(--spui-layer-popover,10000);inset-block-start:calc(100% + 6px);inset-inline-end:0;display:none;box-sizing:border-box;width:min(320px,calc(100vw - 24px));max-height:min(78dvh,640px);overflow:auto;padding:10px;border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,8px);background:var(--spui-ui-surface,#fff);color:var(--spui-ui-text,inherit);box-shadow:0 8px 24px #0003}.toolbar-overflow[data-open="true"]>.toolbar-overflow__panel{display:grid;gap:8px}.toolbar-overflow__panel>.toolbar-format{width:100%;max-width:none;min-width:0;min-height:40px}.toolbar-overflow__panel>.toolbar-group{display:flex;flex-wrap:wrap;min-width:0;padding:6px 0;border:0;border-block-start:1px solid var(--spui-ui-stroke,#ddd)}.toolbar-overflow__panel .toolbar-group--fonts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.toolbar-overflow__panel .toolbar-font-select{width:100%;min-width:0;max-width:none;min-height:40px}.toolbar-overflow__panel .toolbar-group--more-commands{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));justify-items:center}.toolbar-overflow__panel .toolbar-group--table{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));justify-items:center}.toolbar-overflow__panel .toolbar-group--color{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:6px 0}.toolbar-overflow__panel>.toolbar-group--color{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}@media(pointer:coarse){.toolbar-overflow__trigger{width:44px;min-width:44px;min-height:44px}}@media(forced-colors:active){.toolbar-overflow__trigger,.toolbar-overflow__panel{border-color:ButtonText;background:Canvas;color:CanvasText;box-shadow:none}}`;
       style.textContent += `.editor-mount{min-width:0;max-width:100%;border:0;background:transparent;color:var(--spui-ui-text,inherit)}.ql-container{min-width:0;max-width:100%;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit}.ql-container:focus-within{border-color:var(--spui-focus-ring,var(--spui-ui-accent,#005a9e))}.ql-editor[role=textbox]{box-sizing:border-box;min-height:150px;padding:10px 12px;border:0;border-radius:inherit;background:transparent;color:inherit;font:inherit;line-height:1.5;overflow:auto;caret-color:var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline:none}.ql-editor.ql-blank::before{inset-inline:12px;color:var(--spui-ui-muted,#666);font-style:normal;pointer-events:none}.ql-editor p{margin:0 0 .5em}.ql-editor table{display:table;overflow:auto}.ql-editor td,.ql-editor th{min-width:56px;padding:6px 9px;border:1px solid var(--spui-ui-stroke,#c8c8c8)}.ql-editor a{color:var(--spui-semantic-link,#0f6cbd)}@container (max-width:64rem){.ql-editor[role=textbox]{min-height:12rem;overflow-wrap:anywhere}.ql-editor table{display:block;overflow-x:auto}}`;
       style.textContent += `@media(forced-colors:active){.ql-container{border-color:FieldText}.ql-container:focus-within{border-color:Highlight}}`;
       style.textContent += `.toolbar-overflow__panel>.toolbar-group--color{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));flex:1 0 100%;gap:8px;padding:0;border:0}.toolbar-overflow__panel>.toolbar-group[hidden],[role=toolbar] .toolbar-group[hidden]{display:none!important}`;
+      style.textContent += `.toolbar-color{box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) 32px;align-items:center;gap:8px;min-width:0;min-height:0;padding:8px;border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,6px);color:var(--spui-ui-text,inherit)}.toolbar-color__heading{display:flex;grid-column:1/-1;align-items:center;gap:6px;min-width:0;font-size:12px}.toolbar-color__heading svg{width:16px;height:16px;flex:none}.toolbar-color__swatches{display:grid;grid-column:1/-1;grid-template-columns:repeat(4,26px);gap:4px}.toolbar-color-swatch{box-sizing:border-box;width:26px;min-width:26px;height:26px;min-height:26px;padding:0;border:1px solid color-mix(in srgb,var(--spui-ui-text,#242424) 28%,transparent);border-radius:50%;cursor:pointer}.toolbar-color-swatch[aria-pressed=true]{outline:2px solid var(--spui-ui-accent,#0078d4);outline-offset:1px}.toolbar-color-swatch:hover{outline:2px solid var(--spui-ui-accent,#0078d4);outline-offset:1px}.toolbar-color-swatch:focus-visible,.toolbar-color-custom:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}.toolbar-color-custom{box-sizing:border-box;width:100%;min-width:0;min-height:32px;padding:4px 6px;border:1px solid var(--spui-ui-stroke,#8a8886);border-radius:var(--spui-control-radius,4px);background:var(--spui-ui-surface,#fff);color:var(--spui-ui-text,inherit);font:12px/1.2 ui-monospace,monospace}.toolbar-color-custom[aria-invalid=true]{border-color:var(--spui-ui-danger,#c50f1f)}.toolbar-color-clear{grid-column:2;grid-row:3;width:32px;min-width:32px;min-height:32px;border:1px solid var(--spui-ui-stroke,#8a8886)}@media(pointer:coarse){.toolbar-color-swatch{width:30px;min-width:30px;height:30px;min-height:30px}.toolbar-color-custom{min-height:40px}.toolbar-color-clear{width:40px;min-width:40px;min-height:40px}}@media(forced-colors:active){.toolbar-color{border-color:ButtonText}.toolbar-color-swatch{border-color:ButtonText}.toolbar-color-custom,.toolbar-color-clear{border-color:ButtonText;background:Field;color:FieldText}}`;
       this.editorMount = document.createElement("div"); this.editorMount.className = "editor-mount"; this.editorMount.part.add("editor");
       const editorSlot = document.createElement("slot");
       shadow.replaceChildren(style,label,toolbar,editorSlot,linkForm);
@@ -1004,9 +1033,14 @@ export function defineRichTextEditor(): void {
         format.querySelectorAll<HTMLOptionElement>("option").forEach(option => { const [attribute, fallback] = labels[option.value]; option.textContent = this.getAttribute(attribute) ?? fallback; });
       }
       toolbar.querySelectorAll<HTMLSelectElement>(".toolbar-font-select").forEach(select => select.setAttribute("aria-label", this.getAttribute(select.dataset.labelAttribute ?? "") ?? (select.dataset.command === "fontFamily" ? "Font family" : "Font size")));
-      toolbar.querySelectorAll<HTMLInputElement>(".toolbar-color[data-label-attribute] .toolbar-color-picker").forEach(input => {
-        input.setAttribute("aria-label", this.getAttribute(input.parentElement?.getAttribute("data-label-attribute") ?? "") ?? (input.parentElement?.getAttribute("data-label-attribute") === "text-color-label" ? "Text color" : "Highlight color"));
+      toolbar.querySelectorAll<HTMLElement>(".toolbar-color[data-label-attribute]").forEach(group => {
+        const label = this.getAttribute(group.dataset.labelAttribute ?? "") ?? (group.dataset.labelAttribute === "text-color-label" ? "Text color" : "Highlight color");
+        const heading = group.querySelector<HTMLElement>(".toolbar-color__heading");
+        if (heading?.firstChild) heading.firstChild.textContent = label;
+        group.querySelector<HTMLElement>(".toolbar-color__swatches")?.setAttribute("aria-label", label);
+        group.querySelector<HTMLInputElement>(".toolbar-color-custom")?.setAttribute("aria-label", `${this.getAttribute("custom-color-label") ?? "Custom hex color"} (${label})`);
       });
+      this.syncThemeColorSwatches();
       toolbar.querySelectorAll<HTMLButtonElement>(".toolbar-color-clear").forEach(button => {
         const action = this.getAttribute(button.dataset.clearLabelAttribute ?? "") ?? "Remove color";
         const group = this.getAttribute(button.dataset.colorLabelAttribute ?? "") ?? "color";
