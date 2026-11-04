@@ -205,6 +205,12 @@ export function defineRichTextEditor(): void {
       this.events = new AbortController();
       this.render();
       document.addEventListener("selectionchange", this.onSelectionChange, { signal: this.events.signal });
+      const overflow = this.shadowRoot?.querySelector<HTMLDetailsElement>(".toolbar-overflow");
+      if (overflow) {
+        window.addEventListener("scroll", () => { if (overflow.open) overflow.open = false; }, { capture: true, signal: this.events.signal });
+        window.addEventListener("resize", () => { if (overflow.open) overflow.open = false; }, { signal: this.events.signal });
+        document.addEventListener("pointerdown", event => { if (overflow.open && !event.composedPath().includes(overflow)) overflow.open = false; }, { signal: this.events.signal });
+      }
       if (this.pendingValue !== undefined) this.value = this.pendingValue;
       else if (this.hasAttribute("value")) this.value = this.getAttribute("value") ?? "";
       this.syncForm();
@@ -689,9 +695,6 @@ export function defineRichTextEditor(): void {
           overflowPanel.style.top = `${top}px`;
         }
       });
-      window.addEventListener("scroll", () => { if (overflow.open) overflow.open = false; }, { capture: true, signal: this.events?.signal });
-      window.addEventListener("resize", () => { if (overflow.open) overflow.open = false; }, { signal: this.events?.signal });
-      document.addEventListener("pointerdown", event => { if (overflow.open && !event.composedPath().includes(overflow)) overflow.open = false; }, { signal: this.events?.signal });
       toolbar.append(overflow);
       this.imageInput = document.createElement("input"); this.imageInput.type = "file"; this.imageInput.accept = "image/*"; this.imageInput.hidden = true; this.imageInput.setAttribute("aria-label", this.getAttribute("image-input-label") ?? "Choose image"); this.imageInput.addEventListener("change", () => { const file = this.imageInput?.files?.[0]; if (file) void this.insertUploadedImage(file); this.imageInput!.value = ""; }); toolbar.append(this.imageInput);
       const linkForm = document.createElement("form"); this.linkForm = linkForm; linkForm.className = "link-editor"; linkForm.part.add("link-editor"); linkForm.hidden = true; linkForm.setAttribute("aria-label", this.getAttribute("link-dialog-label") ?? "Edit link");
