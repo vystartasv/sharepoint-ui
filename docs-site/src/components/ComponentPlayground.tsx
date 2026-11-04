@@ -91,7 +91,7 @@ function Demo({ name, notify }: { name: string; notify: (message: string) => voi
     case "Field": return <Field id="demo-field" label="Workspace name" hint="Use a short name." required><Input placeholder="Operations" required /></Field>;
     case "FileDropzone": return <><FileDropzone id="demo-files" label="Supporting files" hint="Choose or drop PDF files." accept=".pdf" multiple files={files} onFiles={setFiles} /><p role="status">{files.length ? `${files.length} file${files.length === 1 ? "" : "s"} selected.` : "No files selected."}</p></>;
     case "FilterBar": return <FilterBar label="Request filters" activeFilterCount={filter ? 1 : 0} onClear={() => setFilter("")}><label className="playground-control">Search requests<Input type="search" value={filter} onChange={event => setFilter(event.currentTarget.value)} placeholder="Search" /></label></FilterBar>;
-    case "Image": return <Image src="/sharepoint-ui/favicon.svg" alt="SharePoint UI mark" width={48} height={48} />;
+    case "Image": return <figure className="playground-image-example"><Image src="/sharepoint-ui/favicon.svg" alt="Document icon for a SharePoint workspace guide" width={128} height={128} /><figcaption>Workspace guide · Shared with the project team</figcaption></figure>;
     case "Input": return <label className="playground-control">Search requests<Input type="search" placeholder="Search requests" /></label>;
     case "Label": return <><Label htmlFor="demo-labelled-input">Workspace name</Label><Input id="demo-labelled-input" placeholder="Operations" /></>;
     case "Link": return <Link href="/sharepoint-ui/components/">Open the component catalog</Link>;
@@ -108,14 +108,14 @@ function Demo({ name, notify }: { name: string; notify: (message: string) => voi
     case "PersonPicker": return <PersonPicker id="demo-person" label="Request owner" options={people} placeholder="Choose a person" />;
     case "Persona": return <Persona name="Avery Chen" description="Site owner" />;
     case "Popover": return <Popover label="More about this request"><p>Requests are reviewed by the assigned site owner.</p></Popover>;
-    case "ProgressBar": return <ProgressBar label="Upload progress" value={68} max={100} />;
+    case "ProgressBar": return <div className="playground-progress-example"><ProgressBar label="Quarterly access review" value={68} max={100} /><output>68% complete</output></div>;
     case "Radio": return <label className="playground-inline"><Radio name="demo-radio" value="email" defaultChecked /> Email updates</label>;
     case "RadioGroup": return <RadioGroup label="Notification frequency"><label className="playground-inline"><Radio name="frequency" value="daily" defaultChecked /> Daily</label><label className="playground-inline"><Radio name="frequency" value="weekly" /> Weekly</label></RadioGroup>;
     case "Rating": return <Rating label="Rate this request" min={1} max={5} value={rating} onChange={event => setRating(event.currentTarget.value)} />;
     case "Select": return <label className="playground-control">Request status<Select defaultValue="open"><option value="open">Open</option><option value="progress">In progress</option><option value="done">Done</option></Select></label>;
     case "SharePointField": return <SharePointField name="priority" label="Priority" type="choice" choices={["Low", "Normal", "High"]} value={choice} onValueChange={value => typeof value === "string" && setChoice(value)} />;
-    case "Skeleton": return <div className="playground-stack" aria-label="Loading request preview"><Skeleton width="55%" height="1rem" /><Skeleton width="90%" height=".75rem" /><Skeleton width="75%" height=".75rem" /></div>;
-    case "Spinner": return <Spinner label="Saving request" />;
+    case "Skeleton": return <div className="playground-loading-example" role="status" aria-label="Loading recent activity"><div className="playground-stack" aria-hidden="true"><Skeleton width="55%" height="1rem" /><Skeleton width="90%" height=".75rem" /><Skeleton width="75%" height=".75rem" /></div><p>Loading recent activity…</p></div>;
+    case "Spinner": return <div className="playground-spinner-example"><Spinner label="Saving request" /><div><strong>Saving request</strong><p>Applying updates to the access review.</p></div></div>;
     case "SwatchPicker": return <SwatchPicker name="theme-color" label="Accent color" value={choice} onChange={event => setChoice(event.currentTarget.value)} options={[{ value: "Blue", label: "Blue", color: "#0f6cbd" }, { value: "Green", label: "Green", color: "#107c10" }, { value: "Purple", label: "Purple", color: "#8764b8" }]} />;
     case "Switch": return <label className="playground-inline"><Switch checked={checked} onChange={event => setChecked(event.currentTarget.checked)} /> Enable notifications</label>;
     case "Table": return <Table caption="Request owners"><thead><tr><th scope="col">Request</th><th scope="col">Owner</th></tr></thead><tbody><tr><td>Access review</td><td>Avery Chen</td></tr><tr><td>Site update</td><td>Jordan Lee</td></tr></tbody></Table>;

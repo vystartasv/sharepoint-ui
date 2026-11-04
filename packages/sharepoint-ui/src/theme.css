@@ -78,7 +78,7 @@
 .spui-spinner>span{display:block;width:100%;height:100%;border:2px solid var(--spui-border);border-top-color:var(--spui-accent);border-radius:50%;animation:spui-spin .8s linear infinite}
 @keyframes spui-spin{to{transform:rotate(1turn)}}
 @media(prefers-reduced-motion:reduce){.spui-spinner>span{animation:none;border-top-color:var(--spui-border);border-inline-end-color:var(--spui-accent)}}
-.spui-skeleton{display:inline-block;max-width:100%;border-radius:var(--spui-radius);background:var(--spui-background);vertical-align:middle;animation:spui-pulse 1.4s ease-in-out infinite alternate}
+.spui-skeleton{display:inline-block;max-width:100%;border-radius:var(--spui-radius);background:var(--spui-border);vertical-align:middle;animation:spui-pulse 1.4s ease-in-out infinite alternate}
 @keyframes spui-pulse{to{opacity:.5}}
 @media(prefers-reduced-motion:reduce){.spui-skeleton{animation:none}}
 .spui-alert{padding:var(--spui-space-3);border:1px solid var(--spui-border);border-radius:var(--spui-radius);background:var(--spui-surface)}

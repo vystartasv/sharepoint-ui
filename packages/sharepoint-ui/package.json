@@ -1,6 +1,6 @@
 {
   "name": "@spfx-fast/sharepoint-ui",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "license": "MIT",
   "description": "Small themeable React components for SharePoint Framework",
   "homepage": "https://vystartasv.github.io/sharepoint-ui/",
