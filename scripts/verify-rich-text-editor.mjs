@@ -86,7 +86,7 @@ try {
   });
   assert.ok(overflowLayout.left >= 0 && overflowLayout.top >= 0 && overflowLayout.right <= overflowLayout.width && overflowLayout.bottom <= overflowLayout.height && overflowLayout.zIndex >= 1000, "the mobile More panel stays inside the viewport above sticky page chrome");
   await native.locator('.toolbar-color-swatch[data-color-format="background"]').first().click();
-  assert.match(await native.evaluate(node => node.value), /background(?:-color)?/i, "highlight color applies to selected text through the overflow toolbar");
+  assert.deepEqual(await native.evaluate(node => [...node.querySelectorAll('[role="textbox"] [style*="background-color"]')].map(span => span.textContent)), ["Highlight"], "highlight color applies only to the native selected text through the overflow toolbar");
   await page.setViewportSize({ width: 1000, height: 800 });
   await native.evaluate((node, value) => { node.value = value; }, nativeTableValue);
   const openMore = async editor => {
@@ -272,7 +272,17 @@ try {
   assert.equal(await reactEditor.getByRole("textbox", { name: "محرر أصلي" }).count(), 1, "RTL editor has a programmatic name");
   assert.equal(await reactEditor.evaluate(node => getComputedStyle(node).direction), "rtl", "RTL host direction reaches the editor controls");
   await reactEditor.evaluate(node => { node.value = "<p>Keyboard focus</p>"; });
-  await reactEditor.locator('[role="textbox"]').click();
+  const keyboardSurface = reactEditor.locator('[role="textbox"]');
+  await keyboardSurface.evaluate(node => {
+    const text = node.querySelector("p")?.firstChild;
+    if (!text) throw new Error("Expected text to select in the React editor");
+    const range = node.ownerDocument.createRange();
+    range.setStart(text, 0);
+    range.setEnd(text, 8);
+    const selection = node.ownerDocument.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+  });
   await page.keyboard.press("Shift+Tab");
   assert.equal(await page.evaluate(() => document.querySelector('[data-testid="react"]').shadowRoot.activeElement?.getAttribute("aria-label")), "More formatting", "Shift+Tab enters the toolbar at its visible roving tab stop");
   await page.keyboard.press("ArrowLeft");
@@ -284,6 +294,24 @@ try {
   await page.keyboard.press("Tab");
   assert.equal(await page.evaluate(() => document.activeElement?.getAttribute("role")), "textbox", "Tab moves from the toolbar to the editor");
   assert.equal(await italic.getAttribute("tabindex"), "-1", "toolbar keeps one tab stop after roving focus");
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("Enter");
+  assert.equal(await reactEditor.locator(".toolbar-overflow").getAttribute("data-open"), "true");
+  await page.keyboard.press("ArrowLeft");
+  assert.equal(await reactEditor.locator('select[data-command="formatBlock"]').getAttribute("tabindex"), "0", "RTL toolbar navigation can focus the text style select");
+  await page.keyboard.press("ArrowLeft");
+  assert.equal(await reactEditor.locator('select[data-command="fontFamily"]').getAttribute("tabindex"), "0", "RTL toolbar navigation can focus the font selector");
+  await page.keyboard.press("ArrowLeft");
+  assert.equal(await reactEditor.locator('select[data-command="fontSize"]').getAttribute("tabindex"), "0", "RTL toolbar navigation can focus the size selector");
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("End");
+  const customColor = reactEditor.locator('input[data-toolbar-control]').nth(1);
+  assert.equal(await customColor.getAttribute("tabindex"), "0", "End reaches the custom color field in the open toolbar");
+  await customColor.fill("#aabbcc");
+  await customColor.press("Tab");
+  assert.deepEqual(await reactEditor.evaluate(node => [...node.querySelectorAll('[role="textbox"] [style*="background-color"]')].map(span => ({ text: span.textContent, color: span.style.backgroundColor }))), [{ text: "Keyboard", color: "rgb(170, 187, 204)" }], "keyboard custom highlight color changes only the selected text");
   assert.equal(await nativeLabel, "Native editor");
   assert.equal(await reactLabel, "محرر أصلي");
   assert.deepEqual(errors, [], JSON.stringify(errors));

@@ -880,8 +880,8 @@ export function defineRichTextEditor(): void {
       });
       toolbar.addEventListener("keydown", event => {
         const key = (event as KeyboardEvent).key;
-        if ((event.target instanceof HTMLSelectElement || event.target instanceof HTMLInputElement) && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(key)) return;
-        const controls = [...toolbar.querySelectorAll<HTMLElement>("button[data-command]:not(:disabled):not([hidden]),button.toolbar-overflow__trigger:not(:disabled)")].filter(control => control.getClientRects().length > 0);
+        if ((event.target instanceof HTMLInputElement && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(key)) || (event.target instanceof HTMLSelectElement && ["ArrowUp", "ArrowDown", "Home", "End"].includes(key))) return;
+        const controls = [...toolbar.querySelectorAll<HTMLElement>(toolbarFocusable)].filter(control => !control.matches(":disabled,[hidden]") && control.getClientRects().length > 0);
         const current = controls.indexOf(event.target as HTMLElement);
         const rtl = getComputedStyle(this).direction === "rtl";
         const step = key === "ArrowRight" ? (rtl ? -1 : 1) : key === "ArrowLeft" ? (rtl ? 1 : -1) : 0;
