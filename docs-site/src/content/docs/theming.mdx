@@ -7,6 +7,26 @@ description: Inherit and customize SharePoint theme tokens.
 
 Import the stylesheet once and wrap the app in `SharePointThemeProvider`. It reads SharePoint's theme variables, so theme changes flow through without copying a palette.
 
+## Control sizing
+
+Buttons, single-line inputs, selects, and component action buttons share a 40px minimum height and the same horizontal padding. Text areas use the same padding but stay taller for multi-line text. Checkbox, radio, and switch controls keep their native shapes.
+
+The defaults come from two CSS variables on `.spui-theme`:
+
+| Variable | Default | Applies to |
+| --- | --- | --- |
+| `--spui-control-height` | `2.5rem` (40px) | Buttons, single-line inputs, selects |
+| `--spui-control-padding-inline` | `.75rem` | Buttons and text-entry controls |
+
+Override the variables where the provider is mounted:
+
+```css
+.spui-theme {
+  --spui-control-height: 2.75rem;
+  --spui-control-padding-inline: 1rem;
+}
+```
+
 ```tsx
 import { Button, SharePointThemeProvider } from "@spfx-fast/sharepoint-ui/react";
 import "@spfx-fast/sharepoint-ui/styles.css";

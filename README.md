@@ -8,3 +8,5 @@ Install: `npm install @spfx-fast/sharepoint-ui`
 - [Components and samples](https://vystartasv.github.io/sharepoint-ui/components/)
 - [Agent guide](https://vystartasv.github.io/sharepoint-ui/agents/)
 - [Build and deployment](https://vystartasv.github.io/sharepoint-ui/deployment/)
+
+Buttons, single-line inputs, and selects share a 40px minimum height. See the theme guide to customize `--spui-control-height` and `--spui-control-padding-inline`.

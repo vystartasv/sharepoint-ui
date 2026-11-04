@@ -17,3 +17,5 @@ Choose controls by task:
 - People and lookups: `PersonPicker` or `LookupPicker` with options loaded by the host.
 
 Read `/components/` or `@spfx-fast/sharepoint-ui/components.json` for the current inventory. Each component page includes a live example and source link. The package does not access SharePoint. Use the host service for reads, writes, permissions, and uploads.
+
+Buttons, single-line inputs, and selects share a 40px minimum height. Text areas stay taller; use the theme guide's CSS variables to customize sizing.

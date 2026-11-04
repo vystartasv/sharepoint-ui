@@ -23,3 +23,5 @@ function RequestForm() {
 ```
 
 The package provides presentation and interaction only. The host owns SharePoint requests, permissions, validation, and persistence. See the [component guide](https://vystartasv.github.io/sharepoint-ui/components/), [theme guide](https://vystartasv.github.io/sharepoint-ui/theming/), and [agent guide](https://vystartasv.github.io/sharepoint-ui/agents/).
+
+Buttons, single-line inputs, and selects share a 40px minimum height. Customize `--spui-control-height` and `--spui-control-padding-inline` on `.spui-theme`; text areas remain taller for multi-line content.
