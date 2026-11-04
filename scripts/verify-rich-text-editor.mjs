@@ -346,7 +346,9 @@ try {
     await editor.locator('[role="textbox"]').click();
     const pasted = await editor.evaluate((node, html) => {
       const editable = node.querySelector('[role="textbox"]');
-      node.quill.setText("");
+      editable.blur();
+      node.value = "";
+      editable.focus();
       node.quill.setSelection(0, 0);
       const transfer = new DataTransfer();
       transfer.setData("text/html", html);
