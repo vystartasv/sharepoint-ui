@@ -78,6 +78,30 @@ function safeHref(value: string): boolean {
 function safeImageSrc(value: string): boolean {
   try { return ["http:", "https:"].includes(new URL(value.trim(), document.baseURI).protocol); } catch { return false; }
 }
+function ensureRichTextDocumentStyles(doc: Document): void {
+  if (doc.querySelector("style[data-spui-rich-text-editor-styles]")) return;
+  const style = doc.createElement("style");
+  style.dataset.spuiRichTextEditorStyles = "";
+  style.textContent = `spui-rich-text-editor[data-spui-rich-text-editor]>.editor-mount{display:block;min-width:0;max-width:100%}spui-rich-text-editor[data-spui-rich-text-editor]>.editor-mount>.ql-container{display:block;min-width:0;max-width:100%;box-sizing:border-box;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit}spui-rich-text-editor[data-spui-rich-text-editor]>.editor-mount>.ql-container:focus-within{border-color:var(--spui-focus-ring,var(--spui-ui-accent,#005a9e))}spui-rich-text-editor[data-spui-rich-text-editor] .ql-editor[role=textbox],spui-rich-text-editor[data-spui-rich-text-editor] .ql-editor[role=textbox] *{-webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default;touch-action:auto}spui-rich-text-editor[data-spui-rich-text-editor] .ql-editor[role=textbox]{box-sizing:border-box;min-width:0;min-height:150px;padding:10px 12px;border:0;border-radius:inherit;background:transparent;color:inherit;font:inherit;line-height:1.5;overflow:auto;overflow-wrap:anywhere;caret-color:var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline:none}spui-rich-text-editor[data-spui-rich-text-editor] .ql-editor.ql-blank:before{inset-inline:12px;color:var(--spui-ui-muted,#666);font-style:normal;pointer-events:none}spui-rich-text-editor[data-spui-rich-text-editor] .ql-editor p{margin:0 0 .5em}spui-rich-text-editor[data-spui-rich-text-editor] .ql-editor table{border-collapse:collapse;max-width:100%;margin-block:8px}spui-rich-text-editor[data-spui-rich-text-editor] .ql-editor td,spui-rich-text-editor[data-spui-rich-text-editor] .ql-editor th{min-width:56px;padding:6px 9px;border:1px solid var(--spui-ui-stroke,#c8c8c8);text-align:start}spui-rich-text-editor[data-spui-rich-text-editor] .ql-editor th{background:var(--spui-ui-surface-hover,#f5f5f5);font-weight:600}spui-rich-text-editor[data-spui-rich-text-editor] .ql-editor a{color:var(--spui-semantic-link,#0f6cbd)}@container (max-width:64rem){spui-rich-text-editor[data-spui-rich-text-editor] .ql-editor[role=textbox]{min-height:12rem}spui-rich-text-editor[data-spui-rich-text-editor] .ql-editor table{display:block;overflow-x:auto}}@media(forced-colors:active){spui-rich-text-editor[data-spui-rich-text-editor]>.editor-mount>.ql-container{border-color:FieldText}spui-rich-text-editor[data-spui-rich-text-editor]>.editor-mount>.ql-container:focus-within{border-color:Highlight}}`;
+  (doc.head ?? doc.documentElement).append(style);
+}
+function resolveHostColor(host: HTMLElement, variable: string, fallback: string): string {
+  const probe = host.ownerDocument.createElement("span");
+  probe.style.cssText = `position:absolute;visibility:hidden;color:var(${variable},${fallback})`;
+  host.append(probe);
+  const color = getComputedStyle(probe).color;
+  probe.remove();
+  return color;
+}
+function mixRgb(foreground: string, background: string, amount: number): string {
+  const channels = (value: string): number[] | undefined => {
+    const rgb = value.match(/[\d.]+/g)?.map(Number);
+    return rgb?.length && rgb.length >= 3 ? rgb.slice(0, 3) : undefined;
+  };
+  const front = channels(foreground), back = channels(background);
+  if (!front || !back) return foreground;
+  return `rgb(${front.map((channel, index) => Math.round(channel * amount + back[index] * (1 - amount))).join(" ")})`;
+}
 function safeLanguageTag(value: string): boolean {
   const tag = value.trim();
   if (!tag || tag.length > 128) return false;
@@ -163,7 +187,7 @@ export function defineRichTextEditor(): void {
   SizeStyle.whitelist = ["10px", "12px", "16px", "18px", "24px", "32px", "48px"];
   class SpuiRichTextEditor extends HTMLElement implements SharePointRichTextEditorElement {
     static formAssociated = true;
-    static observedAttributes = ["label", "editor-label", "placeholder", "content-mode", "allow-hyperlink", "disabled", "read-only", "required", "required-message", "value", "name", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "bold-label", "italic-label", "underline-label", "strike-label", "subscript-label", "superscript-label", "align-left-label", "align-center-label", "align-right-label", "align-justify-label", "clear-formatting-label", "format-block-label", "font-family-label", "font-size-label", "paragraph-label", "heading-1-label", "heading-2-label", "heading-3-label", "blockquote-label", "preformatted-label", "bullet-list-label", "number-list-label", "link-label", "text-color-label", "highlight-color-label", "custom-color-label", "theme-accent-label", "color-swatch-label", "undo-label", "redo-label", "insert-table-label", "insert-image-label", "image-input-label", "insert-row-above-label", "insert-row-below-label", "insert-column-before-label", "insert-column-after-label", "delete-row-label", "delete-column-label", "delete-table-label", "toolbar-label", "more-options-label", "more-formatting-label", "link-prompt", "link-dialog-label", "link-text-label", "link-title-label", "link-apply-label", "link-remove-label", "link-cancel-label", "link-new-tab-label", "link-invalid-message", "link-picker-label", "link-picker-loading-label", "link-picker-error-message"];
+    static observedAttributes = ["label", "editor-label", "placeholder", "content-mode", "allow-hyperlink", "disabled", "read-only", "required", "required-message", "value", "name", "dir", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "bold-label", "italic-label", "underline-label", "strike-label", "subscript-label", "superscript-label", "align-left-label", "align-center-label", "align-right-label", "align-justify-label", "clear-formatting-label", "format-block-label", "font-family-label", "font-size-label", "paragraph-label", "heading-1-label", "heading-2-label", "heading-3-label", "blockquote-label", "preformatted-label", "bullet-list-label", "number-list-label", "link-label", "text-color-label", "highlight-color-label", "custom-color-label", "clear-color-label", "theme-accent-label", "color-swatch-label", "undo-label", "redo-label", "insert-table-label", "insert-image-label", "image-input-label", "insert-row-above-label", "insert-row-below-label", "insert-column-before-label", "insert-column-after-label", "delete-row-label", "delete-column-label", "delete-table-label", "toolbar-label", "more-options-label", "more-formatting-label", "link-prompt", "link-dialog-label", "link-text-label", "link-title-label", "link-apply-label", "link-remove-label", "link-cancel-label", "link-new-tab-label", "link-invalid-message", "link-picker-label", "link-picker-loading-label", "link-picker-error-message"];
     private editor!: HTMLDivElement;
     private editorMount!: HTMLDivElement;
     private quill?: Quill;
@@ -232,9 +256,11 @@ export function defineRichTextEditor(): void {
       } else if (name === "editor-label" && this.editor) this.syncEditorLabel();
       else if (["aria-label", "aria-labelledby", "aria-description", "aria-describedby"].includes(name) && this.editor) syncHostAccessibleName(this, this.editor);
       else if (name === "aria-invalid" && this.editor) { const value = this.getAttribute(name); if (value === null) this.editor.removeAttribute(name); else this.editor.setAttribute(name, value); }
+      else if (name === "dir" && this.editor) this.syncEditorDirection();
       else this.refreshStrings();
     }
     private syncEditorLabel(): void { this.editor.setAttribute("aria-label", this.getAttribute("aria-label") ?? this.getAttribute("label") ?? this.getAttribute("editor-label") ?? "Rich text"); }
+    private syncEditorDirection(): void { this.editor.dir = this.getAttribute("dir") ?? (getComputedStyle(this).direction === "rtl" ? "rtl" : "ltr"); }
     get value(): string { const html = this.quill?.getSemanticHTML() ?? this.editor?.innerHTML; return html !== undefined ? (this.contentMode === "plain" ? plainText(html) : cleanHtml(html, this.contentMode, this.allowHyperlinks)) : this.pendingValue ?? this.getAttribute("value") ?? ""; }
     set value(value: string) {
       this.pendingValue = value;
@@ -267,8 +293,7 @@ export function defineRichTextEditor(): void {
       this.quill?.enable(!readOnly);
       this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only")));
       this.editor.setAttribute("aria-disabled", String(disabled));
-      this.shadowRoot?.querySelectorAll<HTMLButtonElement | HTMLSelectElement | HTMLInputElement>("[role=toolbar] button,[role=toolbar] select,[role=toolbar] input[type=color]").forEach(control => { control.disabled = readOnly; });
-      this.shadowRoot?.querySelectorAll<HTMLElement>("[role=toolbar] .toolbar-color").forEach(picker => picker.classList.toggle("is-disabled", readOnly));
+      this.shadowRoot?.querySelectorAll<HTMLButtonElement | HTMLSelectElement | HTMLInputElement>("[role=toolbar] button,[role=toolbar] select,[role=toolbar] input:not([type=file])").forEach(control => { control.disabled = readOnly; });
       const overflow = this.shadowRoot?.querySelector<HTMLDetailsElement>(".toolbar-overflow");
       const overflowTrigger = overflow?.querySelector<HTMLElement>(".toolbar-overflow__trigger");
       if (overflowTrigger) { overflowTrigger.tabIndex = readOnly ? -1 : 0; overflowTrigger.setAttribute("aria-disabled", String(readOnly)); }
@@ -324,6 +349,7 @@ export function defineRichTextEditor(): void {
     private commitEditorValue(eventName: "spui-input" | "spui-change" = "spui-input"): void {
       const value = this.sanitizeEditor();
       this.onSelectionChange();
+      this.syncTableActions();
       this.syncForm(value);
       const event = eventName === "spui-change"
         ? new CustomEvent("spui-change", { detail: { value }, bubbles: true, composed: true })
@@ -351,12 +377,12 @@ export function defineRichTextEditor(): void {
     }
     private selection(): Selection | null { return this.editor.ownerDocument.getSelection(); }
     private onSelectionChange = (): void => {
-      const selected = this.quill?.getSelection();
-      if (!selected) return;
-      this.savedQuillSelection = { index: selected.index, length: selected.length };
       const selection = this.selection();
       const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
       if (!range || !this.editor.contains(range.commonAncestorContainer)) return;
+      const selected = this.quill?.getSelection();
+      if (!selected) return;
+      this.savedQuillSelection = { index: selected.index, length: selected.length };
       this.savedRange = range.cloneRange();
       const node = range.startContainer;
       const element = node instanceof Element ? node : node.parentElement;
@@ -385,8 +411,12 @@ export function defineRichTextEditor(): void {
     }
     private onEditorClick = (event: MouseEvent): void => {
       const cell = event.composedPath().find((node): node is HTMLTableCellElement => node instanceof HTMLTableCellElement && this.editor.contains(node));
-      if (cell) { this.savedCell = cell; this.rememberCell(cell); }
+      if (cell) {
+        this.savedCell = cell;
+        this.rememberCell(cell);
+      }
       this.onSelectionChange();
+      this.syncTableActions();
     };
     private syncTableActions(): void {
       const cell = this.selectedCell();
@@ -407,10 +437,11 @@ export function defineRichTextEditor(): void {
       this.quill.focus();
       if (saved) this.quill.setSelection(saved.index, saved.length, "silent");
     }
-    private applyInlineStyle(property: "color" | "background-color" | "font-family" | "font-size", value: string): void {
+    private applyInlineStyle(property: "color" | "background-color" | "font-family" | "font-size", value: string | false): void {
       const range = this.savedQuillSelection;
       if (!range || !range.length || !this.quill) return;
       const format = ({ color: "color", "background-color": "background", "font-family": "font", "font-size": "size" } as const)[property];
+      this.restoreSelection();
       this.quill.formatText(range.index, range.length, format, value, "user");
     }
     private editTable(command: string): void {
@@ -594,29 +625,31 @@ export function defineRichTextEditor(): void {
     }
     private render(): void {
       if (this.quill) return;
+      this.setAttribute("data-spui-rich-text-editor", "");
+      ensureRichTextDocumentStyles(this.ownerDocument);
       const shadow = this.shadowRoot ?? this.attachShadow({ mode: "open" });
       const label = document.createElement("label"); label.textContent = this.getAttribute("label") ?? ""; label.hidden = !this.hasAttribute("label"); label.part.add("label");
       const toolbar = document.createElement("div"); toolbar.setAttribute("role", "toolbar"); toolbar.setAttribute("aria-orientation", "horizontal"); toolbar.part.add("toolbar");
       const preserveSelection = (): void => {
-        const quillSelection = this.quill?.getSelection();
-        if (quillSelection) this.savedQuillSelection = { index: quillSelection.index, length: quillSelection.length };
         const selection = this.selection();
         const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
-        if (range && !range.collapsed && this.editor.contains(range.commonAncestorContainer)) this.savedRange = range.cloneRange();
+        if (!range || !this.editor.contains(range.commonAncestorContainer)) return;
+        const quillSelection = this.quill?.getSelection();
+        if (quillSelection) this.savedQuillSelection = { index: quillSelection.index, length: quillSelection.length };
+        if (!range.collapsed) this.savedRange = range.cloneRange();
       };
       toolbar.addEventListener("pointerdown", preserveSelection, true);
-      toolbar.addEventListener("focusin", preserveSelection, true);
       const format = document.createElement("select"); format.className = "toolbar-format"; format.dataset.command = "formatBlock"; format.dataset.labelAttribute = "format-block-label"; format.setAttribute("aria-label", this.getAttribute("format-block-label") ?? "Text style");
       for (const [value, attribute, fallback] of [["P", "paragraph-label", "Paragraph"], ["H1", "heading-1-label", "Heading 1"], ["H2", "heading-2-label", "Heading 2"], ["H3", "heading-3-label", "Heading 3"], ["BLOCKQUOTE", "blockquote-label", "Quote"], ["PRE", "preformatted-label", "Preformatted"]]) {
         const option = document.createElement("option"); option.value = value; option.dataset.labelAttribute = attribute; option.textContent = this.getAttribute(attribute) ?? fallback; format.append(option);
       }
-      format.addEventListener("change", () => this.command("formatBlock", format.value));
+      format.addEventListener("change", () => { this.command("formatBlock", format.value); toolbar.querySelector<HTMLDetailsElement>(".toolbar-overflow")?.removeAttribute("open"); });
       toolbar.append(format);
       const fontGroup = document.createElement("div"); fontGroup.className = "toolbar-group toolbar-group--fonts";
       const addFontSelect = (command: string, labelAttribute: string, fallback: string, options: Array<[string, string]>): void => {
         const select = document.createElement("select"); select.className = "toolbar-format toolbar-font-select"; select.dataset.command = command; select.dataset.labelAttribute = labelAttribute; select.setAttribute("aria-label", this.getAttribute(labelAttribute) ?? fallback);
         for (const [value, text] of options) { const option = document.createElement("option"); option.value = value; option.textContent = text; if (!value) { option.disabled = true; option.selected = true; } select.append(option); }
-        select.addEventListener("change", () => this.applyInlineStyle(command === "fontFamily" ? "font-family" : "font-size", select.value));
+        select.addEventListener("change", () => { this.applyInlineStyle(command === "fontFamily" ? "font-family" : "font-size", select.value); toolbar.querySelector<HTMLDetailsElement>(".toolbar-overflow")?.removeAttribute("open"); });
         fontGroup.append(select);
       };
       addFontSelect("fontFamily", "font-family-label", "Font family", [["", "Font family"], ["Arial", "Arial"], ["Calibri", "Calibri"], ["Georgia", "Georgia"], ["Segoe UI", "Segoe UI"], ["Tahoma", "Tahoma"], ["Times New Roman", "Times New Roman"], ["Verdana", "Verdana"]]);
@@ -641,21 +674,28 @@ export function defineRichTextEditor(): void {
         group.append(button);
       }
       const colorGroup = document.createElement("div"); colorGroup.className = "toolbar-group toolbar-group--color";
-      for (const [attribute, fallback, command, color] of [
-        ["text-color-label", "Text color", "foreColor", "#323130"],
-        ["highlight-color-label", "Highlight color", "hiliteColor", "#fff2cc"]
-      ] as Array<[string, string, string, string]>) {
-        const picker = document.createElement("label"); picker.className = "toolbar-color"; picker.dataset.labelAttribute = attribute; picker.dataset.command = command; picker.part.add(command === "foreColor" ? "text-color" : "highlight-color");
-        const glyph = createToolbarIcon(command === "foreColor" ? "textColor" : "highlightColor"); glyph.classList.add("toolbar-color__glyph");
-        const swatch = document.createElement("span"); swatch.className = "toolbar-color__current"; swatch.style.setProperty("--spui-picked-color", color); swatch.setAttribute("aria-hidden", "true");
-        const input = document.createElement("input"); input.type = "color"; input.className = "toolbar-color__input"; input.value = color; input.dataset.command = command; input.dataset.labelAttribute = attribute; input.setAttribute("aria-label", this.getAttribute(attribute) ?? fallback); input.title = this.getAttribute(attribute) ?? fallback;
-        input.addEventListener("input", () => swatch.style.setProperty("--spui-picked-color", input.value));
-        input.addEventListener("change", () => {
-          swatch.style.setProperty("--spui-picked-color", input.value);
-          this.applyInlineStyle(command === "foreColor" ? "color" : "background-color", input.value);
-          toolbar.querySelector<HTMLDetailsElement>(".toolbar-overflow")?.removeAttribute("open");
-        });
-        picker.append(glyph, swatch, input); colorGroup.append(picker);
+      const accent = resolveHostColor(this, "--spui-ui-accent", "#0078d4");
+      const surface = resolveHostColor(this, "--spui-ui-surface", "#ffffff");
+      const colorSets: Array<{ attribute: string; name: string; format: "color" | "background"; colors: Array<{ value: string; label?: string }> }> = [
+        { attribute: "text-color-label", name: "Text color", format: "color", colors: [...["#242424", "#595959", "#c50f1f", "#ca5010", "#107c10", "#0078d4"].map(value => ({ value })), { value: accent, label: this.getAttribute("theme-accent-label") ?? "SharePoint theme accent" }, { value: "#5c2d91" }, { value: "#ffffff" }] },
+        { attribute: "highlight-color-label", name: "Highlight color", format: "background", colors: [...["#fff2cc", "#fce4d6", "#f4cccc", "#fce5cd", "#d9ead3", "#d9eaf7", "#d9d2e9"].map(value => ({ value })), { value: mixRgb(accent, surface, 0.2), label: this.getAttribute("theme-accent-label") ?? "SharePoint theme accent" }] }
+      ];
+      for (const set of colorSets) {
+        const fieldset = document.createElement("fieldset"); fieldset.className = "toolbar-color-set"; fieldset.dataset.labelAttribute = set.attribute; fieldset.part.add(set.format === "color" ? "text-color" : "highlight-color");
+        const legend = document.createElement("legend"); legend.textContent = this.getAttribute(set.attribute) ?? set.name; fieldset.append(legend);
+        const swatches = document.createElement("div"); swatches.className = "toolbar-color-set__swatches";
+        for (const { value: color, label: colorLabel } of set.colors) {
+          const button = document.createElement("button"); button.type = "button"; button.className = "toolbar-color-swatch"; button.dataset.command = "applyColor"; button.dataset.colorFormat = set.format; button.dataset.colorValue = color; button.dataset.colorLabelAttribute = set.attribute; button.dataset.colorValueLabelAttribute = colorLabel ? "theme-accent-label" : ""; button.dataset.colorValueLabel = colorLabel ?? color; button.style.setProperty("--spui-swatch-color", color);
+          const label = `${this.getAttribute(set.attribute) ?? set.name} ${colorLabel ?? color}`; button.dataset.fallback = label; button.setAttribute("aria-label", label); button.title = label;
+          button.addEventListener("mousedown", event => event.preventDefault()); button.addEventListener("click", () => { this.applyInlineStyle(set.format === "color" ? "color" : "background-color", color); toolbar.querySelector<HTMLDetailsElement>(".toolbar-overflow")?.removeAttribute("open"); });
+          swatches.append(button);
+        }
+        const clear = document.createElement("button"); clear.type = "button"; clear.className = "toolbar-color-clear"; clear.dataset.command = "clearColor"; clear.dataset.clearLabelAttribute = "clear-color-label"; clear.dataset.colorLabelAttribute = set.attribute; clear.dataset.fallback = `${this.getAttribute("clear-color-label") ?? "Remove color"} (${(this.getAttribute(set.attribute) ?? set.name).toLowerCase()})`; clear.setAttribute("aria-label", clear.dataset.fallback); clear.title = clear.dataset.fallback; clear.append(createToolbarIcon("removeFormat"));
+        clear.addEventListener("mousedown", event => event.preventDefault()); clear.addEventListener("click", () => { this.applyInlineStyle(set.format === "color" ? "color" : "background-color", false); toolbar.querySelector<HTMLDetailsElement>(".toolbar-overflow")?.removeAttribute("open"); });
+        const custom = document.createElement("label"); custom.className = "toolbar-color-custom"; custom.dataset.labelAttribute = "custom-color-label"; custom.textContent = `${this.getAttribute("custom-color-label") ?? "Custom hex"} `;
+        const input = document.createElement("input"); input.type = "text"; input.inputMode = "text"; input.maxLength = 7; input.pattern = "#[0-9a-fA-F]{6}"; input.placeholder = "#RRGGBB"; input.dataset.toolbarControl = ""; input.setAttribute("aria-label", this.getAttribute("custom-color-label") ?? "Custom hex color");
+        input.addEventListener("change", () => { const value = input.value.trim(); if (/^#[0-9a-f]{6}$/i.test(value)) { input.removeAttribute("aria-invalid"); this.applyInlineStyle(set.format === "color" ? "color" : "background-color", value); toolbar.querySelector<HTMLDetailsElement>(".toolbar-overflow")?.removeAttribute("open"); } else { input.setAttribute("aria-invalid", "true"); } });
+        custom.append(input); fieldset.append(swatches, clear, custom); colorGroup.append(fieldset);
       }
       toolbar.append(colorGroup);
       const overflow = document.createElement("details"); overflow.className = "toolbar-overflow"; overflow.part.add("toolbar-overflow");
@@ -722,13 +762,13 @@ export function defineRichTextEditor(): void {
       linkForm.append(linkActions);
       linkForm.addEventListener("submit", event => { event.preventDefault(); this.applyLink(); });
       linkForm.addEventListener("keydown", event => { if ((event as KeyboardEvent).key === "Escape") { event.preventDefault(); event.stopPropagation(); this.closeLinkEditor(false); } });
-      const toolbarFocusable = "button[data-command],select[data-command],input[type=color][data-command],summary.toolbar-overflow__trigger";
+      const toolbarFocusable = "button[data-command],select[data-command],input[data-toolbar-control],summary.toolbar-overflow__trigger";
       toolbar.querySelectorAll<HTMLElement>(toolbarFocusable).forEach((control,index) => { control.tabIndex = index === 0 ? 0 : -1; });
       toolbar.addEventListener("focusin", event => { const active = event.target; toolbar.querySelectorAll<HTMLElement>(toolbarFocusable).forEach(control => { control.tabIndex = control === active ? 0 : -1; }); });
       toolbar.addEventListener("keydown", event => {
         const key = (event as KeyboardEvent).key;
         if ((event.target instanceof HTMLSelectElement || event.target instanceof HTMLInputElement) && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(key)) return;
-        const controls = [...toolbar.querySelectorAll<HTMLElement>("button[data-command]:not(:disabled):not([hidden]),select[data-command]:not(:disabled):not([hidden]),input[type=color][data-command]:not(:disabled):not([hidden]),summary.toolbar-overflow__trigger")].filter(control => control.getClientRects().length > 0);
+        const controls = [...toolbar.querySelectorAll<HTMLElement>("button[data-command]:not(:disabled):not([hidden]),select[data-command]:not(:disabled):not([hidden]),input[data-toolbar-control]:not(:disabled),summary.toolbar-overflow__trigger")].filter(control => control.getClientRects().length > 0);
         const current = controls.indexOf(event.target as HTMLElement);
         const rtl = getComputedStyle(this).direction === "rtl";
         const step = key === "ArrowRight" ? (rtl ? -1 : 1) : key === "ArrowLeft" ? (rtl ? 1 : -1) : 0;
@@ -739,18 +779,21 @@ export function defineRichTextEditor(): void {
       const style = document.createElement("style"); style.textContent = `${base}:host{display:grid;min-width:0;max-width:100%;container-type:inline-size;gap:6px}label{font-weight:600;color:var(--spui-ui-muted,var(--spui-semantic-body-text,inherit))}[role=toolbar]{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:6px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface,#fff)}[role=toolbar][hidden],button[hidden]{display:none}.toolbar-group{display:flex;flex:0 1 auto;flex-wrap:wrap;align-items:center;gap:2px;min-width:0;padding-inline-start:6px;border-inline-start:1px solid var(--spui-ui-stroke,#c8c8c8)}.toolbar-group[hidden]{display:none}button{box-sizing:border-box;display:inline-grid;place-items:center;flex:none;width:36px;min-width:36px;min-height:36px;padding:0;border:0;border-radius:var(--spui-control-radius,4px);background:transparent;color:var(--spui-ui-text,inherit);font:inherit;cursor:pointer}.toolbar-format{box-sizing:border-box;max-width:172px;min-width:116px;min-height:36px;padding:0 8px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit}.toolbar-format:hover{background:var(--spui-ui-surface-hover,#eee)}button svg{display:block;width:18px;height:18px}button:hover:not(:disabled){background:var(--spui-ui-surface-hover,#eee)}button[aria-pressed=true]{background:color-mix(in srgb,var(--spui-ui-accent,#0078d4) 14%,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,var(--spui-semantic-body-text,#323130))}button:disabled{opacity:.42;cursor:not-allowed}button:focus-visible,select:focus-visible,[role=textbox]:focus-visible,input:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}[role=textbox]{min-width:0;min-height:150px;box-sizing:border-box;padding:10px 12px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit;line-height:1.5;overflow:auto;caret-color:var(--spui-focus-ring,var(--spui-ui-accent,#005a9e))}[role=textbox]:empty:before{content:attr(data-placeholder);color:var(--spui-ui-muted,#666);pointer-events:none}table{border-collapse:collapse;max-width:100%;margin-block:8px}caption{text-align:start;font-weight:600}td,th{min-width:56px;padding:6px 9px;border:1px solid var(--spui-ui-stroke,#c8c8c8);text-align:start}th{background:var(--spui-ui-surface-hover,#f5f5f5);font-weight:600}a{color:var(--spui-semantic-link,#0f6cbd)}@media(pointer:coarse){[role=toolbar] button{width:44px;min-width:44px;min-height:44px}[role=toolbar] select{min-height:44px}}@container (max-width: 64rem){[role=toolbar]{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px}.toolbar-format{flex:1 0 100%;width:100%;max-width:none;min-width:0;min-height:40px}.toolbar-group{display:flex;flex:0 1 auto;flex-wrap:wrap;align-items:center;gap:4px;min-width:0;padding:0;border:0}.toolbar-group--fonts{display:grid;flex:1 0 100%;grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar-font-select{width:100%;max-width:none;min-width:0;min-height:44px}.toolbar-group button{width:44px;min-width:44px;min-height:44px}.toolbar-group--table{flex:1 0 100%}[role=textbox]{min-height:12rem;overflow-wrap:anywhere}table{display:block;overflow-x:auto}}@media(forced-colors:active){select{border:1px solid ButtonText;background:Field;color:FieldText}button{border:1px solid ButtonText}button[aria-pressed=true]{color:Highlight;border-color:Highlight}td,th{border-color:CanvasText}}`;
       style.textContent += `.link-editor{display:flex;flex-wrap:wrap;align-items:end;gap:8px;padding:8px;border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface-hover,var(--spui-ui-surface,#fff))}.link-editor[hidden]{display:none}.link-field{display:grid;flex:1 1 150px;gap:4px;min-width:0;color:var(--spui-ui-text,inherit);font-size:13px}.link-field input{box-sizing:border-box;width:100%;min-width:0;min-height:32px;padding:5px 8px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#8a8886));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit)}.link-actions{display:flex;flex-wrap:wrap;gap:4px}.link-actions button{border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,4px);background:var(--spui-ui-surface,#fff)}.link-actions [data-link-action=apply]{border-color:transparent;background:var(--spui-semantic-primary-button-background,var(--spui-ui-accent,#0078d4));color:var(--spui-ui-accent-text,#fff)}.link-error{flex:1 0 100%;color:var(--spui-ui-danger,var(--spui-semantic-error-text,#c50f1f));font-size:13px}`;
       style.textContent += `[role=textbox],[role=textbox] *{-webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default;touch-action:auto}`;
-      style.textContent += `.toolbar-group--fonts{gap:4px}.toolbar-font-select{width:100%;min-width:0}.toolbar-group--color{gap:4px;padding:0}.toolbar-color{position:relative;display:grid;place-items:center;box-sizing:border-box;width:36px;min-width:36px;height:36px;border-radius:var(--spui-control-radius,4px);color:var(--spui-ui-text,inherit);cursor:pointer}.toolbar-color:hover{background:var(--spui-ui-surface-hover,#eee)}.toolbar-color__glyph{width:18px;height:18px;pointer-events:none}.toolbar-color__current{position:absolute;inset-inline:9px;inset-block-end:5px;height:3px;border-radius:2px;background:var(--spui-picked-color);pointer-events:none}.toolbar-color__input{position:absolute;inset:0;box-sizing:border-box;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}.toolbar-color:focus-within{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px;border-radius:var(--spui-control-radius,4px)}.toolbar-color input:disabled{opacity:.42;cursor:not-allowed}@container (max-width:64rem){.toolbar-font-select{min-height:40px}.toolbar-group--color{flex-wrap:nowrap;padding:0}.toolbar-color{width:40px;min-width:40px;height:40px}}`;
+      style.textContent += `.toolbar-group--fonts{gap:4px}.toolbar-font-select{width:100%;min-width:0}@container (max-width:64rem){.toolbar-font-select{min-height:40px}}`;
       style.textContent += `.link-new-tab{display:inline-flex;flex:1 0 100%;align-items:center;gap:8px;color:var(--spui-ui-text,inherit);font-size:13px}.link-new-tab input{width:16px;height:16px;min-height:16px;margin:0;accent-color:var(--spui-ui-accent,#0078d4)}`;
-      style.textContent += `.toolbar-overflow:not([open])>.toolbar-overflow__panel,.toolbar-overflow__panel[hidden]{display:none!important}.toolbar-overflow[open]>.toolbar-overflow__panel:not([hidden]){display:grid;gap:8px}.toolbar-overflow__panel{width:min(320px,calc(100vw - 24px))}.toolbar-overflow__panel .toolbar-group--color{flex-wrap:nowrap}.toolbar-overflow__panel .toolbar-color{width:44px;min-width:44px;height:44px}.toolbar-color__input{touch-action:manipulation}.link-picker-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}`;
-      style.textContent += `.toolbar-color.is-disabled{opacity:.42;cursor:not-allowed}.toolbar-color__input:disabled{opacity:0;cursor:not-allowed}.toolbar-color__input:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}`;
+      style.textContent += `.toolbar-overflow:not([open])>.toolbar-overflow__panel,.toolbar-overflow__panel[hidden]{display:none!important}.toolbar-overflow[open]>.toolbar-overflow__panel:not([hidden]){display:grid;gap:8px}.toolbar-overflow__panel{width:min(320px,calc(100vw - 24px))}.link-picker-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}`;
+      style.textContent += `.toolbar-overflow__panel .toolbar-group--color{display:grid;grid-template-columns:minmax(0,1fr);flex:1 0 100%;gap:8px;padding:0;border:0}.toolbar-color-set{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;min-width:0;margin:0;padding:8px 0;border:0;border-block-start:1px solid var(--spui-ui-stroke,#ddd)}.toolbar-color-set legend{grid-column:1/-1;color:var(--spui-ui-text,inherit);font-size:13px;font-weight:600}.toolbar-color-set__swatches{display:grid;grid-template-columns:repeat(6,36px);gap:4px;justify-content:start}.toolbar-color-swatch{width:32px;min-width:32px;min-height:32px;border:1px solid var(--spui-ui-stroke,#8a8886);border-radius:50%;background:var(--spui-swatch-color);cursor:pointer}.toolbar-color-swatch:hover{outline:2px solid var(--spui-ui-accent,#0078d4);outline-offset:1px}.toolbar-color-swatch:focus-visible,.toolbar-color-clear:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}.toolbar-color-clear{grid-column:2;grid-row:2;width:34px;min-width:34px;min-height:34px;border:1px solid var(--spui-ui-stroke,#8a8886)}.toolbar-color-custom{grid-column:1/-1;grid-row:3;display:flex;align-items:center;gap:5px;color:var(--spui-ui-muted,var(--spui-semantic-body-text,inherit));font-size:12px;white-space:nowrap}.toolbar-color-custom input{box-sizing:border-box;width:76px;min-width:76px;min-height:34px;padding:4px 6px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#8a8886));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit}.toolbar-color-custom input[aria-invalid=true]{border-color:var(--spui-ui-danger,var(--spui-semantic-error-text,#c50f1f))}@media(pointer:coarse){.toolbar-color-set__swatches{grid-template-columns:repeat(5,44px)}.toolbar-color-swatch,.toolbar-color-clear{width:44px;min-width:44px;min-height:44px}.toolbar-color-custom input{width:100%;min-height:44px}}`;
       style.textContent += `[role=toolbar]{position:relative;flex-wrap:nowrap;min-width:0;overflow:visible}.toolbar-group{flex:0 0 auto;flex-wrap:nowrap}.toolbar-overflow{position:relative;flex:none}.toolbar-overflow__trigger{box-sizing:border-box;display:grid;place-items:center;width:36px;min-width:36px;min-height:36px;border:1px solid transparent;border-radius:var(--spui-control-radius,5px);color:var(--spui-ui-text,inherit);cursor:pointer;list-style:none}.toolbar-overflow__trigger::-webkit-details-marker{display:none}.toolbar-overflow__trigger svg{width:18px;height:18px}.toolbar-overflow__trigger:hover{background:var(--spui-ui-surface-hover,#eee)}.toolbar-overflow__trigger:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}.toolbar-overflow[open]>.toolbar-overflow__trigger{background:color-mix(in srgb,var(--spui-ui-accent,#0078d4) 12%,var(--spui-ui-surface,#fff))}.toolbar-overflow__panel{position:absolute;z-index:20;inset-block-start:calc(100% + 6px);inset-inline-end:0;display:none;box-sizing:border-box;width:min(360px,calc(100vw - 24px));max-height:min(70dvh,480px);overflow:auto;padding:10px;border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,8px);background:var(--spui-ui-surface,#fff);color:var(--spui-ui-text,inherit);box-shadow:0 8px 24px #0003}.toolbar-overflow[open]>.toolbar-overflow__panel{display:grid;gap:8px}.toolbar-overflow__panel>.toolbar-format{width:100%;max-width:none;min-width:0;min-height:40px}.toolbar-overflow__panel>.toolbar-group{display:flex;flex-wrap:wrap;min-width:0;padding:6px 0;border:0;border-block-start:1px solid var(--spui-ui-stroke,#ddd)}.toolbar-overflow__panel .toolbar-group--fonts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.toolbar-overflow__panel .toolbar-font-select{width:100%;min-width:0;max-width:none;min-height:40px}.toolbar-overflow__panel .toolbar-group--more-commands{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));justify-items:center}.toolbar-overflow__panel .toolbar-group--table{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));justify-items:center}.toolbar-overflow__panel .toolbar-group--color{display:flex;flex-wrap:wrap;padding:6px 0}.toolbar-overflow__panel .toolbar-color>summary{min-height:40px}.toolbar-overflow__panel .toolbar-color__name{white-space:normal}@media(pointer:coarse){.toolbar-overflow__trigger{width:44px;min-width:44px;min-height:44px}}@media(forced-colors:active){.toolbar-overflow__trigger,.toolbar-overflow__panel{border-color:ButtonText;background:Canvas;color:CanvasText;box-shadow:none}}`;
       style.textContent += `.editor-mount{min-width:0;max-width:100%;border:0;background:transparent;color:var(--spui-ui-text,inherit)}.ql-container{min-width:0;max-width:100%;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit}.ql-container:focus-within{border-color:var(--spui-focus-ring,var(--spui-ui-accent,#005a9e))}.ql-editor[role=textbox]{box-sizing:border-box;min-height:150px;padding:10px 12px;border:0;border-radius:inherit;background:transparent;color:inherit;font:inherit;line-height:1.5;overflow:auto;caret-color:var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline:none}.ql-editor.ql-blank::before{inset-inline:12px;color:var(--spui-ui-muted,#666);font-style:normal;pointer-events:none}.ql-editor p{margin:0 0 .5em}.ql-editor table{display:table;overflow:auto}.ql-editor td,.ql-editor th{min-width:56px;padding:6px 9px;border:1px solid var(--spui-ui-stroke,#c8c8c8)}.ql-editor a{color:var(--spui-semantic-link,#0f6cbd)}@container (max-width:64rem){.ql-editor[role=textbox]{min-height:12rem;overflow-wrap:anywhere}.ql-editor table{display:block;overflow-x:auto}}`;
       style.textContent += `@media(forced-colors:active){.ql-container{border-color:FieldText}.ql-container:focus-within{border-color:Highlight}}`;
+      style.textContent += `.toolbar-overflow__panel>.toolbar-group--color{display:grid;grid-template-columns:minmax(0,1fr);flex:1 0 100%;gap:8px;padding:0;border:0}.toolbar-overflow__panel>.toolbar-group[hidden],[role=toolbar] .toolbar-group[hidden]{display:none!important}`;
       this.editorMount = document.createElement("div"); this.editorMount.className = "editor-mount"; this.editorMount.part.add("editor");
-      shadow.replaceChildren(style,label,toolbar,linkForm,this.editorMount);
+      const editorSlot = document.createElement("slot");
+      shadow.replaceChildren(style,label,toolbar,editorSlot,linkForm);
+      this.append(this.editorMount);
       this.quill = new Quill(this.editorMount, { modules: { table: true, history: { userOnly: true } }, formats: ["bold", "italic", "underline", "strike", "script", "header", "blockquote", "code-block", "list", "link", "image", "color", "background", "font", "size", "align", "direction", "table"], placeholder: this.getAttribute("placeholder") ?? "Write something…", readOnly: this.hasAttribute("disabled") || this.hasAttribute("read-only") });
       this.editor = this.quill.root;
-      this.editor.setAttribute("role", "textbox"); this.editor.setAttribute("aria-multiline", "true"); this.syncEditorLabel(); const invalid = this.getAttribute("aria-invalid"); if (invalid !== null) this.editor.setAttribute("aria-invalid", invalid); this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only"))); this.editor.setAttribute("aria-disabled", String(this.hasAttribute("disabled"))); this.editor.setAttribute("aria-required", String(this.hasAttribute("required"))); this.editor.dataset.placeholder = this.getAttribute("placeholder") ?? "Write something…";
+      this.editor.setAttribute("role", "textbox"); this.editor.setAttribute("aria-multiline", "true"); this.editor.tabIndex = 0; this.syncEditorLabel(); this.syncEditorDirection(); const invalid = this.getAttribute("aria-invalid"); if (invalid !== null) this.editor.setAttribute("aria-invalid", invalid); this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only"))); this.editor.setAttribute("aria-disabled", String(this.hasAttribute("disabled"))); this.editor.setAttribute("aria-required", String(this.hasAttribute("required"))); this.editor.dataset.placeholder = this.getAttribute("placeholder") ?? "Write something…";
       this.editor.addEventListener("keydown", event => { const key = (event as KeyboardEvent).key.toLowerCase(); const shortcut = (event as KeyboardEvent).metaKey || (event as KeyboardEvent).ctrlKey; if (this.contentMode === "plain" && shortcut && ["b", "i", "u", "k"].includes(key)) event.preventDefault(); });
       this.quill.on("text-change", (_delta, _old, source) => { if (source === "user" && !this.suppressEditorCommit) this.commitEditorValue(); });
       this.editor.addEventListener("mouseup", this.onSelectionChange); this.editor.addEventListener("keyup", this.onSelectionChange); this.editor.addEventListener("click", this.onEditorClick);
@@ -787,9 +830,9 @@ export function defineRichTextEditor(): void {
       const moreTrigger = toolbar.querySelector<HTMLElement>(".toolbar-overflow__trigger");
       if (moreTrigger) { const moreLabel = this.getAttribute("more-options-label") ?? "More formatting"; moreTrigger.setAttribute("aria-label", moreLabel); moreTrigger.title = moreLabel; }
       toolbar.querySelector<HTMLElement>(".toolbar-overflow__panel")?.setAttribute("aria-label", this.getAttribute("more-formatting-label") ?? "More formatting");
-      const attrs = ["bold-label","italic-label","underline-label","strike-label","bullet-list-label","number-list-label","clear-formatting-label","undo-label","redo-label","insert-table-label","insert-image-label","insert-row-above-label","insert-row-below-label","insert-column-before-label","insert-column-after-label","delete-row-label","delete-column-label","delete-table-label","link-label"];
-      toolbar.querySelectorAll<HTMLButtonElement>("button[data-command]").forEach((button,index) => {
-        const attribute = button.dataset.labelAttribute ?? attrs[index];
+      const commandLabelAttributes: Record<string, string> = { bold: "bold-label", italic: "italic-label", underline: "underline-label", strikeThrough: "strike-label", subscript: "subscript-label", superscript: "superscript-label", justifyLeft: "align-left-label", justifyCenter: "align-center-label", justifyRight: "align-right-label", justifyFull: "align-justify-label", insertUnorderedList: "bullet-list-label", insertOrderedList: "number-list-label", removeFormat: "clear-formatting-label", undo: "undo-label", redo: "redo-label", insertTable: "insert-table-label", insertImage: "insert-image-label", insertRowAbove: "insert-row-above-label", insertRowBelow: "insert-row-below-label", insertColumnBefore: "insert-column-before-label", insertColumnAfter: "insert-column-after-label", deleteRow: "delete-row-label", deleteColumn: "delete-column-label", deleteTable: "delete-table-label", createLink: "link-label" };
+      toolbar.querySelectorAll<HTMLButtonElement>("button[data-command]:not(.toolbar-color-swatch):not(.toolbar-color-clear)").forEach(button => {
+        const attribute = button.dataset.labelAttribute ?? commandLabelAttributes[button.dataset.command ?? ""];
         const text = this.getAttribute(attribute) ?? button.dataset.fallback ?? "";
         button.setAttribute("aria-label", text);
         button.title = text;
@@ -801,10 +844,26 @@ export function defineRichTextEditor(): void {
         format.querySelectorAll<HTMLOptionElement>("option").forEach(option => { const [attribute, fallback] = labels[option.value]; option.textContent = this.getAttribute(attribute) ?? fallback; });
       }
       toolbar.querySelectorAll<HTMLSelectElement>(".toolbar-font-select").forEach(select => select.setAttribute("aria-label", this.getAttribute(select.dataset.labelAttribute ?? "") ?? (select.dataset.command === "fontFamily" ? "Font family" : "Font size")));
-      toolbar.querySelectorAll<HTMLElement>(".toolbar-color[data-label-attribute]").forEach(picker => {
-        const text = this.getAttribute(picker.dataset.labelAttribute ?? "") ?? (picker.dataset.command === "foreColor" ? "Text color" : "Highlight color");
-        const input = picker.querySelector<HTMLInputElement>('input[type="color"]');
-        if (input) { input.setAttribute("aria-label", text); input.title = text; }
+      toolbar.querySelectorAll<HTMLFieldSetElement>(".toolbar-color-set[data-label-attribute]").forEach(fieldset => {
+        const attribute = fieldset.dataset.labelAttribute ?? "";
+        const fallback = attribute === "text-color-label" ? "Text color" : "Highlight color";
+        const legend = fieldset.querySelector("legend");
+        if (legend) legend.textContent = this.getAttribute(attribute) ?? fallback;
+      });
+      toolbar.querySelectorAll<HTMLButtonElement>(".toolbar-color-swatch").forEach(button => {
+        const group = this.getAttribute(button.dataset.colorLabelAttribute ?? "") ?? (button.dataset.colorFormat === "color" ? "Text color" : "Highlight color");
+        const value = this.getAttribute(button.dataset.colorValueLabelAttribute ?? "") ?? button.dataset.colorValueLabel ?? "";
+        button.dataset.fallback = `${group} ${value}`; button.setAttribute("aria-label", button.dataset.fallback); button.title = button.dataset.fallback;
+      });
+      toolbar.querySelectorAll<HTMLButtonElement>(".toolbar-color-clear").forEach(button => {
+        const action = this.getAttribute(button.dataset.clearLabelAttribute ?? "") ?? "Remove color";
+        const group = this.getAttribute(button.dataset.colorLabelAttribute ?? "") ?? "color";
+        button.dataset.fallback = `${action} (${group.toLowerCase()})`; button.setAttribute("aria-label", button.dataset.fallback); button.title = button.dataset.fallback;
+      });
+      toolbar.querySelectorAll<HTMLLabelElement>(".toolbar-color-custom[data-label-attribute]").forEach(label => {
+        const text = this.getAttribute(label.dataset.labelAttribute ?? "") ?? "Custom hex";
+        if (label.firstChild) label.firstChild.textContent = `${text} `;
+        label.querySelector("input")?.setAttribute("aria-label", text);
       });
       if (this.linkForm) {
         this.linkForm.setAttribute("aria-label", this.getAttribute("link-dialog-label") ?? "Edit link");

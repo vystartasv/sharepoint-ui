@@ -7,7 +7,7 @@ import RichTextEditorPlayground from "../../../components/RichTextEditorPlaygrou
 
 `RichTextEditor` uses Quill Core 2 for document editing, selection, history, and formatting. It does not add Quill's default toolbar or theme; the library supplies a compact SharePoint-aware toolbar, field constraints, link validation, and HTML sanitization. The editor is framework-neutral and does not require React. Your SPFx web part owns SharePoint access: provide a picker callback and save the emitted HTML through your existing list or page data service.
 
-The compact toolbar keeps bold, italic, underline, and link in view. Open **More formatting** for text styles, lists, alignment, history, tables, images, and color controls. Text and highlight colors use the device's native color picker; choose text first, then open a color control to apply it to that selection. `SharePointUIProvider.strings` localizes the controls, including `richTextTextColor` and `richTextHighlightColor`. Restricted SharePoint fields hide unsupported table, image, link, font, and color actions.
+The compact toolbar keeps bold, italic, underline, and link in view. Open **More formatting** for text styles, lists, alignment, history, tables, images, and color controls. Text and highlight colors use inline swatches derived from the active theme, with an exact `#RRGGBB` field for other colors. Choose text first, then pick a swatch or enter a color to apply it to that selection. `SharePointUIProvider.strings` localizes the controls, including `richTextTextColor` and `richTextHighlightColor`. Restricted SharePoint fields hide unsupported table, image, link, font, and color actions.
 
 ## Try the editor
 
@@ -15,7 +15,7 @@ Edit the note directly, or switch to **HTML source** to inspect and edit its val
 
 <RichTextEditorPlayground />
 
-On touch screens, press and hold text to use the browser's native selection handles. Quill tracks the selection while toolbar controls receive focus, so color and highlight apply to the selected text.
+On touch screens, press and hold text to use the browser's native selection handles. The editable surface stays in the component's light DOM so iOS WebKit can expose that native selection; the toolbar remains isolated in Shadow DOM. Formatting controls preserve the selected range while focus moves to the toolbar.
 
 ## Connect your picker
 

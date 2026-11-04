@@ -2327,7 +2327,7 @@
           },
           {
             "name": "RichTextEditorProps color labels",
-            "description": "SharePointUIProvider.strings.richTextTextColor, richTextHighlightColor, richTextCustomColor, richTextThemeAccent, richTextFontFamily, richTextFontSize, and colorSwatch localize color and font controls and their palette labels. These are available for compatible-rich and FullHtml fields; restricted/plain fields hide them. Safe inline font/color styles are sanitized before values are emitted."
+            "description": "SharePointUIProvider.strings.richTextTextColor, richTextHighlightColor, richTextCustomColor, richTextThemeAccent, richTextFontFamily, richTextFontSize, and colorSwatch localize the inline theme-aware color palettes, custom hex fields, and font controls. SharePointUIProvider.strings.remove labels the clear-color action. These are available for compatible-rich and FullHtml fields; restricted/plain fields hide them. Safe inline font/color styles are sanitized before values are emitted."
           },
           {
             "name": "RichTextEditorProps.onValueChange",
@@ -2339,7 +2339,7 @@
           },
           {
             "name": "RichTextEditor mobile selection",
-            "description": "On touch devices, press and hold text to use the browser's native selection handles. The editor does not force blur or refocus during the gesture; toolbar formatting uses the saved range."
+            "description": "On touch devices, press and hold text to use the browser's native selection handles. The editable surface is kept in light DOM because WebKit does not expose shadow-root selections to Quill; the toolbar remains isolated in Shadow DOM and formatting keeps the selected range when focus moves."
           },
           {
             "name": "RichTextEditorProps.onImageUploadError",

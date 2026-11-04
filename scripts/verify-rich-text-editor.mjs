@@ -62,26 +62,32 @@ try {
     editor.formStateRestoreCallback("<p>Restored by the browser</p>");
     return { beforeConnection, afterConnection, afterRestore: editor.value };
   });
-  assert.deepEqual(preconnectedValue, { beforeConnection: "<p>Assigned before connection</p>", afterConnection: "<p>Assigned before connection</p>", afterRestore: "<p>Restored by the browser</p>" }, "pre-connection assignment and browser-restored form state survive custom-element connection");
+  const normalizeHtmlWhitespace = value => value.replace(/&nbsp;/g, " ");
+  assert.deepEqual(Object.fromEntries(Object.entries(preconnectedValue).map(([key, value]) => [key, normalizeHtmlWhitespace(value)])), { beforeConnection: "<p>Assigned before connection</p>", afterConnection: "<p>Assigned before connection</p>", afterRestore: "<p>Restored by the browser</p>" }, "pre-connection assignment and browser-restored form state survive custom-element connection");
   const selectCell = cell => cell.click();
   const editTable = async editor => {
     const cell = editor.locator("[role=textbox] td").first();
+    const initialBodyRows = await editor.locator("tbody tr").count();
     await selectCell(cell);
+    await editor.locator(".toolbar-overflow__trigger").click();
     const rowButton = editor.getByRole("button", { name: /Insert row below|إدراج صف أسفل/ });
     await rowButton.waitFor({ state: "visible" });
     await page.waitForFunction(element => !element.disabled, await rowButton.elementHandle());
     assert.equal(await rowButton.isDisabled(), false);
     await rowButton.click();
-    await assertCount(editor.locator("tbody tr"), 3);
+    await assertCount(editor.locator("tbody tr"), initialBodyRows + 1);
+    await editor.locator(".toolbar-overflow__trigger").click();
     const addColumn = editor.getByRole("button", { name: /Insert column after|إدراج عمود بعد/ });
     await addColumn.click();
     await assertCount(editor.locator("tbody tr:first-child td"), 3);
+    await editor.locator(".toolbar-overflow__trigger").click();
     const removeColumn = editor.getByRole("button", { name: /Delete column|حذف العمود/ });
     await removeColumn.click();
     await assertCount(editor.locator("tbody tr:first-child td"), 2);
+    await editor.locator(".toolbar-overflow__trigger").click();
     const removeRow = editor.getByRole("button", { name: /Delete row|حذف الصف/ });
     await removeRow.click();
-    await assertCount(editor.locator("tbody tr"), 2);
+    await assertCount(editor.locator("tbody tr"), initialBodyRows);
     assert.equal(await editor.locator("script").count(), 0);
     return editor.locator("[role=textbox]").getAttribute("aria-label");
   };
@@ -140,7 +146,7 @@ try {
   const pasteHtml = '<h1 onclick="alert(1)">Heading</h1><div><span style="color:red"><strong>First paragraph</strong></span></div><pre>const value = 1;</pre><hr><del>Removed text</del><a href="javascript:alert(1)">unsafe link</a><table><tbody><tr><td>Cell</td></tr></tbody></table><script>alert(1)</script>';
   for (const editor of [native, reactEditor]) {
     const pasted = await editor.evaluate((node, html) => {
-      const editable = node.shadowRoot.querySelector('[role="textbox"]');
+      const editable = node.querySelector('[role="textbox"]');
       editable.replaceChildren();
       editable.focus();
       const selection = editable.ownerDocument.getSelection();
@@ -164,7 +170,7 @@ try {
     assert.doesNotMatch(pasted, /onclick|style=|javascript:|<script/i);
   }
   await reactEditor.evaluate(node => {
-    const editable = node.shadowRoot.querySelector('[role="textbox"]');
+    const editable = node.querySelector('[role="textbox"]');
     editable.dispatchEvent(new InputEvent("beforeinput", { bubbles: true, composed: true, data: "x", inputType: "insertText" }));
     editable.dispatchEvent(new InputEvent("input", { bubbles: true, composed: true, data: "x", inputType: "insertText" }));
   });
@@ -176,7 +182,7 @@ try {
   for (const editor of [native, reactEditor]) {
     const plainPasted = await editor.evaluate((node, text) => {
       node.value = "<p>Start</p>";
-      const editable = node.shadowRoot.querySelector('[role="textbox"]');
+      const editable = node.querySelector('[role="textbox"]');
       editable.focus();
       const selection = editable.ownerDocument.getSelection();
       const range = editable.ownerDocument.createRange();
@@ -209,7 +215,7 @@ try {
   assert.equal(await native.evaluate(node => node.value), "<p>Initial body</p>");
   assert.equal(await reactEditor.locator("[role=textbox] table").count(), 1);
   await native.evaluate(node => {
-    const editable = node.shadowRoot.querySelector('[role="textbox"]');
+      const editable = node.querySelector('[role="textbox"]');
     editable.focus();
     const transfer = new DataTransfer();
     transfer.items.add(new File(["image"], "pasted.png", { type: "image/png" }));
