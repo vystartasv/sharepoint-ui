@@ -92,7 +92,13 @@ try {
     });
   }
   await page.setViewportSize({ width: 393, height: 852 });
-  await native.locator(".toolbar-overflow__trigger").click();
+  const activate = async locator => {
+    if (browserType === webkit && process.env.RTE_TOUCH === "1") {
+      await locator.evaluate(node => node.scrollIntoView({ block: "center", inline: "center" }));
+      await locator.tap();
+    } else await locator.click();
+  };
+  await activate(native.locator(".toolbar-overflow__trigger"));
   assert.deepEqual(await nativeEditable.evaluate(node => ({ userSelect: getComputedStyle(node).webkitUserSelect, touchAction: getComputedStyle(node).touchAction })), { userSelect: "text", touchAction: "auto" }, "mobile browsers allow native long-press text selection inside the editor");
   const overflowLayout = await native.evaluate(node => {
     const panel = node.shadowRoot.querySelector(".toolbar-overflow__panel");
@@ -102,12 +108,12 @@ try {
   assert.ok(overflowLayout.left >= 0 && overflowLayout.top >= 0 && overflowLayout.right <= overflowLayout.width && overflowLayout.bottom <= overflowLayout.height && overflowLayout.zIndex >= 1000, "the mobile More panel stays inside the viewport above sticky page chrome");
   const openColor = async (editor, format) => {
     const disclosure = editor.locator(".toolbar-color").nth(format === "color" ? 0 : 1);
-    if (await disclosure.getAttribute("open") === null) await disclosure.locator("summary").click();
+    if (await disclosure.getAttribute("open") === null) await activate(disclosure.locator("summary"));
   };
   await openColor(native, "background");
   const paletteLayout = await native.evaluate(node => { const palette = node.shadowRoot.querySelector('.toolbar-color-set[data-label-attribute="highlight-color-label"] .toolbar-color-set__swatches'); return { width: palette.clientWidth, scrollWidth: palette.scrollWidth, grid: getComputedStyle(palette).gridTemplateColumns }; });
   assert.ok(paletteLayout.scrollWidth <= paletteLayout.width + 1, `the phone color palette fits its panel: ${JSON.stringify(paletteLayout)}`);
-  await native.locator('.toolbar-color-swatch[data-color-format="background"]').first().click();
+  await activate(native.locator('.toolbar-color-swatch[data-color-format="background"]').first());
   assert.deepEqual(await native.evaluate(node => [...node.querySelectorAll('[role="textbox"] [style*="background-color"]')].map(span => span.textContent)), ["Highlight"], "highlight color applies only to the native selected text through the overflow toolbar");
   if (process.env.RTE_SCOPE === "selection") {
     console.log(JSON.stringify({ assertions: "passed", browser: browserType.name(), scope: "mobile-selection-and-highlight", nativeSelectionStyles: true, browserTextDragSelection: browserType === webkit, selectedTextHighlight: true }));
@@ -121,7 +127,7 @@ try {
   await page.setViewportSize({ width: 1000, height: browserType === webkit ? 1300 : 800 });
   await native.evaluate((node, value) => { node.value = value; }, nativeTableValue);
   const openMore = async editor => {
-    if (await editor.locator(".toolbar-overflow").getAttribute("data-open") !== "true") await editor.locator(".toolbar-overflow__trigger").click();
+    if (await editor.locator(".toolbar-overflow").getAttribute("data-open") !== "true") await activate(editor.locator(".toolbar-overflow__trigger"));
     await page.waitForFunction(host => {
       const overflow = host.shadowRoot.querySelector(".toolbar-overflow");
       const panel = host.shadowRoot.querySelector(".toolbar-overflow__panel");

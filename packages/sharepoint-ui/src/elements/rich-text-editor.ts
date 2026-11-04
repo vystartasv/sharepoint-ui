@@ -216,6 +216,8 @@ export function defineRichTextEditor(): void {
     private formDisabled = false;
     private pendingValue: string | undefined;
     private customError = "";
+    private touchClickTarget?: HTMLElement;
+    private touchClickTimer?: number;
     private savedRange?: Range;
     private savedQuillSelection?: { index: number; length: number };
     private preserveToolbarSelection = false;
@@ -249,6 +251,8 @@ export function defineRichTextEditor(): void {
       this.events?.abort();
       this.events = new AbortController();
       this.render();
+      this.addEventListener("pointerup", this.activateTouchControl, { capture: true, signal: this.events.signal });
+      this.addEventListener("click", this.suppressTouchClick, { capture: true, signal: this.events.signal });
       document.addEventListener("selectionchange", this.onSelectionChange, { signal: this.events.signal });
       const overflow = this.shadowRoot?.querySelector<HTMLElement>(".toolbar-overflow");
       if (overflow) {
@@ -259,7 +263,27 @@ export function defineRichTextEditor(): void {
       else if (this.hasAttribute("value")) this.value = this.getAttribute("value") ?? "";
       this.syncForm();
     }
-    disconnectedCallback(): void { this.events?.abort(); }
+    disconnectedCallback(): void { this.events?.abort(); this.clearTouchClick(); }
+    private clearTouchClick(): void {
+      if (this.touchClickTimer !== undefined) window.clearTimeout(this.touchClickTimer);
+      this.touchClickTimer = undefined;
+      this.touchClickTarget = undefined;
+    }
+    private activateTouchControl = (event: PointerEvent): void => {
+      if (event.pointerType !== "touch") return;
+      const control = event.composedPath().find((node): node is HTMLElement => node instanceof HTMLElement && (node instanceof HTMLButtonElement || node.tagName === "SUMMARY") && this.shadowRoot?.contains(node) === true);
+      if (!control || control.matches(":disabled,[aria-disabled=true]")) return;
+      this.clearTouchClick();
+      this.touchClickTarget = control;
+      this.touchClickTimer = window.setTimeout(() => this.clearTouchClick(), 750);
+      control.click();
+    };
+    private suppressTouchClick = (event: MouseEvent): void => {
+      if (event.detail <= 0 || !this.touchClickTarget || !event.composedPath().includes(this.touchClickTarget)) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      this.clearTouchClick();
+    };
     attributeChangedCallback(name: string): void {
       if (!this.isConnected) return;
       if (name === "value") this.value = this.getAttribute("value") ?? "";
