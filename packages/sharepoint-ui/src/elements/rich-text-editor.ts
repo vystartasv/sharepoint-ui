@@ -218,6 +218,7 @@ export function defineRichTextEditor(): void {
     private customError = "";
     private savedRange?: Range;
     private savedQuillSelection?: { index: number; length: number };
+    private preserveToolbarSelection = false;
     /** Uploads to a durable asset store and returns the image URL to persist in editor HTML. */
     private imageUploader?: RichTextEditorImageUploader;
     get uploadImage(): RichTextEditorImageUploader | undefined { return this.imageUploader; }
@@ -485,6 +486,8 @@ export function defineRichTextEditor(): void {
       const selection = this.selection();
       const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
       if (!range || !this.editor.contains(range.commonAncestorContainer)) return;
+      if (range.collapsed && this.preserveToolbarSelection) return;
+      if (!range.collapsed) this.preserveToolbarSelection = true;
       this.saveSelection(range);
       const node = range.startContainer;
       const element = node instanceof Element ? node : node.parentElement;
@@ -758,6 +761,8 @@ export function defineRichTextEditor(): void {
         const selection = this.selection();
         const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
         if (!range || !this.editor.contains(range.commonAncestorContainer)) return;
+        if (range.collapsed && this.preserveToolbarSelection) return;
+        if (!range.collapsed) this.preserveToolbarSelection = true;
         this.saveSelection(range);
       };
       toolbar.addEventListener("pointerdown", preserveSelection, true);
@@ -908,7 +913,8 @@ export function defineRichTextEditor(): void {
       this.quill = new Quill(this.editorMount, { modules: { table: true, history: { userOnly: true } }, formats: ["bold", "italic", "underline", "strike", "script", "header", "blockquote", "code-block", "list", "link", "image", "color", "background", "font", "size", "align", "direction", "table", "horizontal-rule", "colspan", "rowspan"], placeholder: this.getAttribute("placeholder") ?? "Write something…", readOnly: this.hasAttribute("disabled") || this.hasAttribute("read-only") });
       this.editor = this.quill.root;
       this.editor.setAttribute("role", "textbox"); this.editor.setAttribute("aria-multiline", "true"); this.editor.tabIndex = 0; this.syncEditorLabel(); this.syncEditorDirection(); const invalid = this.getAttribute("aria-invalid"); if (invalid !== null) this.editor.setAttribute("aria-invalid", invalid); this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only"))); this.editor.setAttribute("aria-disabled", String(this.hasAttribute("disabled"))); this.editor.setAttribute("aria-required", String(this.hasAttribute("required"))); this.editor.dataset.placeholder = this.getAttribute("placeholder") ?? "Write something…";
-      this.editor.addEventListener("keydown", event => { const key = (event as KeyboardEvent).key.toLowerCase(); const shortcut = (event as KeyboardEvent).metaKey || (event as KeyboardEvent).ctrlKey; if (this.contentMode === "plain" && shortcut && ["b", "i", "u", "k"].includes(key)) event.preventDefault(); });
+      this.editor.addEventListener("keydown", event => { this.preserveToolbarSelection = false; const key = (event as KeyboardEvent).key.toLowerCase(); const shortcut = (event as KeyboardEvent).metaKey || (event as KeyboardEvent).ctrlKey; if (this.contentMode === "plain" && shortcut && ["b", "i", "u", "k"].includes(key)) event.preventDefault(); });
+      this.editor.addEventListener("pointerdown", () => { this.preserveToolbarSelection = false; }, true);
       this.quill.on("text-change", (_delta, _old, source) => { if (source === "user" && !this.suppressEditorCommit) this.commitEditorValue(); });
       this.editor.addEventListener("mouseup", this.onSelectionChange); this.editor.addEventListener("keyup", this.onSelectionChange); this.editor.addEventListener("click", this.onEditorClick);
       this.editor.addEventListener("paste", event => {
