@@ -173,7 +173,11 @@ try {
   await native.locator(".toolbar-overflow__trigger").click();
   assert.match(await native.evaluate(node => node.value), /colspan="2"[^>]*rowspan="2"|rowspan="2"[^>]*colspan="2"/i, "merged SharePoint table cells survive editor import and serialization");
   assert.equal(await native.getByRole("button", { name: "Insert row below" }).isDisabled(), true, "row operations are disabled when merged cells cannot be changed safely");
+  assert.equal(await native.getByRole("button", { name: "Delete table" }).isDisabled(), false, "deleting an entire merged table remains available because it cannot corrupt the cell spans");
+  await native.getByRole("button", { name: "Delete table" }).click();
+  await assertCount(native.locator('[role="textbox"] table'), 0);
   await native.evaluate(node => { node.uploadImage = async file => `https://contoso.sharepoint.com/SiteAssets/${encodeURIComponent(file.name)}`; });
+  await native.locator(".toolbar-overflow__trigger").click();
   await native.getByRole("button", { name: "Insert image" }).click();
   await native.locator('input[type="file"]').setInputFiles({ name: "diagram.png", mimeType: "image/png", buffer: Buffer.from("image") });
   await page.waitForFunction(() => document.querySelector("#native").value.includes("<img"));

@@ -533,7 +533,7 @@ export function defineRichTextEditor(): void {
       if (tableGroup) tableGroup.hidden = this.contentMode === "restricted" || this.contentMode === "plain" || !cell || !table;
       this.shadowRoot?.querySelectorAll<HTMLButtonElement>("button[data-table-command]").forEach(button => {
         const command = button.dataset.tableCommand;
-        button.disabled = !cell || !table || hasSpans || (command === "deleteRow" && rowCount <= 1) || (command === "deleteColumn" && columnCount <= 1);
+        button.disabled = !cell || !table || (hasSpans && command !== "deleteTable") || (command === "deleteRow" && rowCount <= 1) || (command === "deleteColumn" && columnCount <= 1);
       });
     }
     private restoreSelection(): void {
