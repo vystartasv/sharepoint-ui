@@ -255,11 +255,23 @@ try {
   const italic = toolbar.getByRole("button", { name: "Italic" });
   assert.equal(await reactEditor.getByRole("textbox", { name: "محرر أصلي" }).count(), 1, "RTL editor has a programmatic name");
   assert.equal(await reactEditor.evaluate(node => getComputedStyle(node).direction), "rtl", "RTL host direction reaches the editor controls");
+  await reactEditor.evaluate(node => { node.value = "<p>Keyboard focus</p>"; });
+  await reactEditor.locator('[role="textbox"]').click();
+  await page.keyboard.press("Shift+Tab");
+  assert.equal(await page.evaluate(() => document.querySelector('[data-testid="react"]').shadowRoot.activeElement?.getAttribute("aria-label")), "More formatting", "Shift+Tab enters the toolbar at its visible roving tab stop");
+  await page.keyboard.press("ArrowLeft");
+  assert.equal(await page.evaluate(() => document.querySelector('[data-testid="react"]').shadowRoot.activeElement?.getAttribute("aria-label")), "Bold", "RTL toolbar arrow keys follow inline direction");
+  await page.keyboard.press("Home");
+  assert.equal(await page.evaluate(() => document.querySelector('[data-testid="react"]').shadowRoot.activeElement?.getAttribute("aria-label")), "Bold", "Home returns to the first toolbar button");
+  await page.keyboard.press("End");
+  assert.equal(await page.evaluate(() => document.querySelector('[data-testid="react"]').shadowRoot.activeElement?.getAttribute("aria-label")), "More formatting", "End moves to the last visible toolbar button");
+  await page.keyboard.press("Tab");
+  assert.equal(await page.evaluate(() => document.activeElement?.getAttribute("role")), "textbox", "Tab moves from the toolbar to the editor");
   assert.equal(await italic.getAttribute("tabindex"), "-1", "toolbar keeps one tab stop after roving focus");
   assert.equal(await nativeLabel, "Native editor");
   assert.equal(await reactLabel, "محرر أصلي");
   assert.deepEqual(errors, [], JSON.stringify(errors));
-  console.log(JSON.stringify({ assertions: "passed", nativeReactEventBridge: true, nativeTableEditing: true, reactTableEditing: true, richPasteStructureAndSanitization: true, plainTextPastePreservesLineBreaks: true, plainTextMarkupRemainsInert: true, nativeAndReactUndoRedo: true, nativeAndReactDefaultValueReset: true, controlledReactValue: true, formParticipationAndValidity: true, disabledFieldsetDisablesAndReenables: true, pastedImageUpload: true, rtlLabels: true, toolbarTabStopRecovery: true, mergedCellGuard: true, sanitizedContent: true, nativeAndReactDurableImageUpload: true, pageErrors: errors }));
+  console.log(JSON.stringify({ assertions: "passed", nativeReactEventBridge: true, nativeTableEditing: true, reactTableEditing: true, richPasteStructureAndSanitization: true, plainTextPastePreservesLineBreaks: true, plainTextMarkupRemainsInert: true, nativeAndReactUndoRedo: true, nativeAndReactDefaultValueReset: true, controlledReactValue: true, formParticipationAndValidity: true, disabledFieldsetDisablesAndReenables: true, pastedImageUpload: true, rtlLabels: true, toolbarTabStopRecovery: true, rtlArrowNavigation: true, toolbarTabNavigation: true, mergedCellGuard: true, sanitizedContent: true, nativeAndReactDurableImageUpload: true, pageErrors: errors }));
 } finally {
   await browser?.close();
   await new Promise(done => server.close(done));
