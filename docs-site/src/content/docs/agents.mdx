@@ -14,6 +14,6 @@ await page.getByRole("button", { name: "Save work item" }).click();
 await expect(page.getByRole("status")).toContainText("Saved");
 ```
 
-Check the [component guide](/sharepoint-ui/components/) before choosing a control. The package's `components.json` is the machine-readable inventory. The package does not read or save SharePoint data; use the host workflow and verify its visible result.
+Check the [component guide](/sharepoint-ui/components/) before choosing a control. Each catalog item opens its own interactive page. The package's `components.json` is the machine-readable inventory. The package does not read or save SharePoint data; use the host workflow and verify its visible result.
 
 For agent retrieval, see the [plain Markdown interaction contract](/sharepoint-ui/agents/AGENTS.md).

@@ -19,3 +19,10 @@
 }
 
 .hero { padding-block: 3rem; }
+
+.component-catalog { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1.5rem; padding: 0; list-style: none; }
+.component-catalog li { border-bottom: 1px solid var(--sl-color-hairline); }
+.component-catalog a { display: grid; gap: .2rem; padding: .7rem 0; text-decoration: none; }
+.component-catalog a span { color: var(--sl-color-gray-2); font-size: .9rem; }
+.component-catalog a:hover strong { text-decoration: underline; text-underline-offset: .15em; }
+@media (max-width: 40rem) { .component-catalog { grid-template-columns: 1fr; } }
