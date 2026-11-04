@@ -1,14 +1,48 @@
 ---
 title: SharePoint UI
 description: Native React controls for SharePoint Framework.
+hero:
+  title: SharePoint UI
+  tagline: Native React controls that inherit the active SharePoint theme. Keep data access and permissions in your SPFx host.
+  actions:
+    - text: Browse components
+      link: /sharepoint-ui/components/
+      icon: right-arrow
+      variant: primary
+    - text: View on npm
+      link: https://www.npmjs.com/package/@spfx-fast/sharepoint-ui
+      variant: minimal
 ---
 
-# SharePoint UI
+## Install
 
-Small React 18.3.1 components styled from the active SharePoint theme. The package uses native HTML and leaves SharePoint data access to the host.
+In an SPFx project that uses React 18.3.1, install the package and import its stylesheet once:
 
-- [Browse components and samples](/sharepoint-ui/components/)
-- [Customize the theme](/sharepoint-ui/theming/)
-- [Agent interaction guide](/sharepoint-ui/agents/)
-- [Build and deployment](/sharepoint-ui/deployment/)
-- [Install the package](https://github.com/vystartasv/sharepoint-ui/tree/main/packages/sharepoint-ui#readme)
+```sh
+npm install @spfx-fast/sharepoint-ui
+```
+
+```tsx
+import { Button, Field, Input, SharePointThemeProvider } from "@spfx-fast/sharepoint-ui/react";
+import "@spfx-fast/sharepoint-ui/styles.css";
+
+function RequestForm() {
+  return <SharePointThemeProvider>
+    <form>
+      <Field id="title" label="Title" required>
+        <Input name="title" required />
+      </Field>
+      <Button type="submit">Save</Button>
+    </form>
+  </SharePointThemeProvider>;
+}
+```
+
+React is supplied by the SPFx host. The library renders controls and reports interaction; your web part handles SharePoint requests, permissions, validation, and persistence.
+
+## Choose a guide
+
+- [Components](/sharepoint-ui/components/) — find a control by task and open its interactive example.
+- [Theme](/sharepoint-ui/theming/) — inherit the tenant palette or customize sizing and spacing.
+- [Agent guide](/sharepoint-ui/agents/) — locate controls by role and verify the visible result.
+- [Package README](https://github.com/vystartasv/sharepoint-ui/tree/main/packages/sharepoint-ui#readme) — install details and package entry points.

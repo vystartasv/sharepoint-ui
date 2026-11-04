@@ -27,6 +27,8 @@
 }
 
 .hero { padding-block: 3rem; }
+.hero .actions { align-items: center; gap: var(--spui-space-2); }
+.hero .actions > .sl-link-button { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; min-height: var(--spui-control-height); margin: 0; padding: var(--spui-space-2) var(--spui-control-padding-inline); line-height: var(--spui-control-line-height); }
 .sl-menu-button { box-sizing: border-box; width: var(--spui-control-height); height: var(--spui-control-height); }
 
 .component-catalog { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 var(--spui-space-6); padding: 0; list-style: none; }
