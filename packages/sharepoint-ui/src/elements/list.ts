@@ -18,12 +18,12 @@ const parseValues = (value: string | null): ListItemValue[] => {
 export function defineListItem(): void {
   if (customElements.get("spui-list-item")) return;
   class SpuiListItem extends HTMLElement {
-    static observedAttributes = ["value", "disabled-selection", "has-action"];
+    static observedAttributes = ["value", "disabled-selection", "has-action", "role"];
     private generatedValue = `spui-list-item-${crypto.randomUUID()}`;
     private itemValue?: ListItemValue;
     connectedCallback(): void { this.render(); this.closest<HTMLElement>("spui-list")?.dispatchEvent(new Event("spui-list-items-change")); }
     disconnectedCallback(): void { this.closest<HTMLElement>("spui-list")?.dispatchEvent(new Event("spui-list-items-change")); }
-    attributeChangedCallback(): void { if (this.isConnected) this.closest<HTMLElement>("spui-list")?.dispatchEvent(new Event("spui-list-items-change")); }
+    attributeChangedCallback(name: string): void { if (this.isConnected) { if (name === "role") this.syncCompositeCell(); this.closest<HTMLElement>("spui-list")?.dispatchEvent(new Event("spui-list-items-change")); } }
     get value(): ListItemValue { const attr = this.getAttribute("value"); return this.itemValue ?? attr ?? (this.id || this.generatedValue); }
     set value(value: ListItemValue) { this.itemValue = value; this.setAttribute("value", String(value)); }
     get disabledSelection(): boolean { return this.hasAttribute("disabled-selection"); }
@@ -34,8 +34,18 @@ export function defineListItem(): void {
       style.textContent = `${base}:host{box-sizing:border-box;position:relative;display:flex;align-items:center;gap:8px;min-width:0;min-height:36px;padding:6px 10px;border-radius:var(--spui-list-item-radius,var(--spui-control-radius,4px));outline:none;color:var(--spui-ui-text,var(--colorNeutralForeground1,#242424));cursor:default}:host(:focus-visible){outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#0078d4));outline-offset:-2px}:host(:hover){background:var(--spui-list-row-hover,var(--spui-ui-surface-hover,#f5f5f5))}:host([aria-selected=true]){background:var(--spui-list-selected-background,color-mix(in srgb,var(--spui-ui-accent,#0078d4) 12%,var(--spui-ui-surface,#fff)))}:host([aria-selected=true]) .checkmark{opacity:1}:host([aria-disabled=true]){opacity:.55}.content{display:flex;align-items:center;gap:inherit;min-width:0;flex:1}.checkmark{display:inline-flex;align-items:center;justify-content:center;flex:none;width:16px;height:16px;opacity:0;color:var(--spui-ui-accent,#0078d4);font-size:14px}.checkmark::before{content:"✓"}@media(forced-colors:active){:host([aria-selected=true]){outline:1px solid Highlight;background:Canvas;color:CanvasText}.checkmark{color:Highlight}}`;
       const checkmark = document.createElement("span"); checkmark.className = "checkmark"; checkmark.part.add("checkmark"); checkmark.setAttribute("aria-hidden", "true"); checkmark.append(document.createElement("slot"));
       const customCheckmark = checkmark.querySelector("slot")!; customCheckmark.name = "checkmark"; customCheckmark.textContent = "✓";
-      const content = document.createElement("span"); content.className = "content"; content.part.add("content"); content.append(document.createElement("slot"));
+      const content = document.createElement("span"); content.className = "content"; content.part.add("content");
+      const contentSlot = document.createElement("slot"); contentSlot.addEventListener("slotchange", () => this.syncCompositeCell()); content.append(contentSlot);
       shadow.replaceChildren(style, checkmark, content);
+      this.syncCompositeCell();
+    }
+    private syncCompositeCell(): void {
+      const content = this.shadowRoot?.querySelector<HTMLElement>(".content");
+      if (!content) return;
+      const inGrid = this.getAttribute("role") === "row" && this.closest("spui-list")?.getAttribute("role") === "grid";
+      const hasExplicitCell = this.querySelector('[role="gridcell"],[role="rowheader"],[role="columnheader"]') !== null;
+      if (inGrid && !hasExplicitCell) content.setAttribute("role", "gridcell");
+      else content.removeAttribute("role");
     }
   }
   customElements.define("spui-list-item", SpuiListItem);

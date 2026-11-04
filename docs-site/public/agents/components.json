@@ -4968,6 +4968,7 @@
       "customElementAttributes": [
         "disabled-selection",
         "has-action",
+        "role",
         "value"
       ]
     },

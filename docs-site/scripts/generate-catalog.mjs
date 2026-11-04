@@ -225,6 +225,7 @@ function exampleFor(component) {
     "message-bar": { tag: "spui-message-bar-group", attrs: 'animate="both" aria-label="Project alerts"', markup: '<spui-message-bar-group animate="both" aria-label="Project alerts"><spui-message-bar intent="warning" politeness="polite"><spui-message-bar-body><spui-message-bar-title>Storage almost full</spui-message-bar-title>The project archive is nearing its storage limit.</spui-message-bar-body><spui-message-bar-actions><spui-button appearance="secondary">Dismiss</spui-button></spui-message-bar-actions></spui-message-bar><spui-message-bar intent="success" politeness="polite"><spui-message-bar-body><spui-message-bar-title>Review published</spui-message-bar-title>The latest access review is ready for your team.</spui-message-bar-body></spui-message-bar></spui-message-bar-group>' },
     popover: { tag: "spui-popover", attrs: '', markup: '<spui-popover><spui-button slot="trigger" appearance="secondary">Review details</spui-button><spui-popover-surface slot="content"><strong>Quarterly review</strong><br />Updated just now</spui-popover-surface></spui-popover>' },
     tabs: { tag: "spui-tabs", attrs: 'value="overview"', markup: '<spui-tabs value="overview"><spui-tab-list><spui-tab value="overview">Overview</spui-tab><spui-tab value="activity">Activity</spui-tab></spui-tab-list><spui-tab-panel value="overview">Workspace overview and key details.</spui-tab-panel></spui-tabs>' },
+    list: { tag: "spui-list", attrs: 'aria-label="Review queue" selection-mode="single" navigation-mode="items" default-selected-items="[&quot;quarterly-review&quot;]"', markup: '<spui-list aria-label="Review queue" selection-mode="single" navigation-mode="items" default-selected-items="[&quot;quarterly-review&quot;]"><spui-list-item value="quarterly-review">Quarterly access review</spui-list-item><spui-list-item value="finance-policy">Finance policy update</spui-list-item><spui-list-item value="workspace-guide">Workspace guide</spui-list-item></spui-list>' },
     "avatar-group-primitives": { tag: "spui-avatar-group-popover", attrs: 'count="2" label="Other reviewers" trigger-label="View {count} more reviewers"', markup: '<spui-avatar-group-popover count="2" label="Other reviewers" trigger-label="View {count} more reviewers"><li>Maria Chen</li><li>Daniel Morgan</li></spui-avatar-group-popover>' },
   };
   if (component.react === "SharePointField") return {
@@ -317,13 +318,29 @@ for (const [module, entries] of familyIndex) {
     const attributeTable = customElementAttributesTableFor(entry);
     const useRichTextPlayground = entry.react === "RichTextEditor";
     const richTextFieldNote = useRichTextPlayground ? `\n\nThe toolbar follows the destination field: compatible-rich and FullHtml modes expose font family, size, text color, and highlight color; plain and restricted fields hide unsupported formatting. Values are sanitized HTML, and SharePoint can normalize content when it saves it. The editor does not reproduce every native SharePoint form control or classic-only command. Microsoft documents enhanced rich text's supported formatting in its [rich-text list-column guide](https://support.microsoft.com/en-us/sharepoint/lists/data-and-lists/edit-a-rich-text-list-column).\n` : "";
+    const listSemanticsNote = entry.react === "List" ? `\n\nWith \`navigationMode="composite"\`, the list exposes grid and row semantics. Each row gets a grid cell around its content automatically; explicit \`gridcell\`, \`rowheader\`, or \`columnheader\` content is kept as supplied. Use this mode for rows with nested actions. The simpler \`items\` mode is a list or listbox with Up/Down navigation.\n` : "";
     const previewImport = useRichTextPlayground
       ? 'import RichTextEditorPlayground from "../../../../components/RichTextEditorPlayground.astro";'
       : 'import ComponentPreviewRuntime from "../../../../components/ComponentPreviewRuntime.astro";';
     const previewRuntime = useRichTextPlayground ? "" : "<ComponentPreviewRuntime />";
     const styling = entry.api?.styling?.length ? entry.api.styling.map(item => `<code>${escapeHtml(item)}</code>`).join(", ") : "Use the provider theme and element CSS parts.";
     const signature = entry.api?.reactSignature ? `\n<details>\n<summary>React API signature</summary>\n\n\`\`\`tsx\n${entry.api.reactSignature}\n\`\`\`\n\n</details>` : "";
-    const reactUsage = entry.react === "SharePointField" ? [
+    const reactUsage = entry.react === "List" ? [
+      "## Compose a selectable work list",
+      "",
+      "```tsx",
+      'import { List, ListItem } from "@spfx-fast/sharepoint-ui/react";',
+      "",
+      '<List aria-label="Review queue" selectionMode="single" navigationMode="items" defaultSelectedItems={["quarterly-review"]}>',
+      '  <ListItem value="quarterly-review">Quarterly access review</ListItem>',
+      '  <ListItem value="finance-policy">Finance policy update</ListItem>',
+      '  <ListItem value="workspace-guide">Workspace guide</ListItem>',
+      "</List>",
+      "```",
+      "",
+      "Use `navigationMode=\"composite\"` when each row contains its own controls. The list supplies the row and grid-cell roles; you do not need to add a cell wrapper unless you need explicit header or cell semantics.",
+      "",
+    ].join("\n") : entry.react === "SharePointField" ? [
       "## Use SharePoint metadata in a form",
       "",
       "```tsx",
@@ -379,7 +396,7 @@ for (const [module, entries] of familyIndex) {
     const agentSlice = `/sharepoint-ui/agents/components/${slugFor(module)}/${slug}.json`;
     const eventSlice = entry.tag?.startsWith("spui-") ? ` Custom-element events are in the [${escapeHtml(module)} event inventory](/sharepoint-ui/agents/events/${slugFor(module)}.json); it is module-scoped.` : "";
     const agentPath = `\n> **Building with an agent?** Follow the [component conventions](/sharepoint-ui/guides/component-patterns/), then use the [quickstart](/sharepoint-ui/agents/QUICKSTART.md) and this component’s [API slice](${agentSlice}).${eventSlice}\n`;
-    const page = `---\ntitle: ${quote(name)}\ndescription: ${quote(entry.summary ?? firstSummary)}\n---\n\n${previewImport}\n\n${previewRuntime}\n\n${entry.summary ?? ""}${richTextFieldNote}\n${agentPath}\n${preview}\n${reactUsage}\n${properties}\n${slotTable}\n${attributeTable}\n<div class="api-entry">\n  <p class="api-meta"><span>${react}</span><span>${reactRoot}</span><span>${customElement}</span></p>\n  <p><strong>Callbacks:</strong> ${callbacks}</p>\n  <p><strong>Styling:</strong> ${styling}</p>\n  ${signature}\n  ${relatedApis}\n</div>\n${customExample}${relatedPreview}\n`;
+    const page = `---\ntitle: ${quote(name)}\ndescription: ${quote(entry.summary ?? firstSummary)}\n---\n\n${previewImport}\n\n${previewRuntime}\n\n${entry.summary ?? ""}${richTextFieldNote}${listSemanticsNote}\n${agentPath}\n${preview}\n${reactUsage}\n${properties}\n${slotTable}\n${attributeTable}\n<div class="api-entry">\n  <p class="api-meta"><span>${react}</span><span>${reactRoot}</span><span>${customElement}</span></p>\n  <p><strong>Callbacks:</strong> ${callbacks}</p>\n  <p><strong>Styling:</strong> ${styling}</p>\n  ${signature}\n  ${relatedApis}\n</div>\n${customExample}${relatedPreview}\n`;
     await writeFile(join(familyDir, `${slug}.mdx`), page);
     items.push(`- [${name}](${pagePath})`);
     catalogLinks.push(`- [${name}](${pagePath}) — ${entry.summary ?? titleFor(module)}`);
