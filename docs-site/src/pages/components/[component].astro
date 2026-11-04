@@ -1,0 +1,18 @@
+---
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { ComponentPlayground } from "../../components/ComponentPlayground";
+import { availableComponents, componentSlug } from "../../lib/component-catalog.js";
+
+export function getStaticPaths() {
+  return availableComponents.map(component => ({ params: { component: componentSlug(component.name) }, props: { component } }));
+}
+
+const { component } = Astro.props;
+---
+
+<StarlightPage frontmatter={{ title: component.name, description: component.summary }}>
+  <p><a href="/sharepoint-ui/components/">← All components</a></p>
+  <p>{component.summary}</p>
+  <h2>Interactive preview</h2>
+  <ComponentPlayground client:load name={component.name} summary={component.summary} />
+</StarlightPage>

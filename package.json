@@ -14,5 +14,8 @@
     "setup:spfx": "npm install --prefix examples/spfx124-webpart",
     "version:spfx:patch": "node scripts/bump-spfx-version.mjs patch",
     "version:spfx:dry-run": "node scripts/bump-spfx-version.mjs patch --dry-run"
+  },
+  "devDependencies": {
+    "astro": "7.2.10"
   }
 }

@@ -1,50 +1,17 @@
 ---
 title: Components
-description: Available controls, interactive samples, and common SharePoint workflows.
+description: Browse and open a live playground for every SharePoint UI component.
 ---
 
-import inventory from "../../../../packages/sharepoint-ui/components.json";
-import measurements from "../../../../packages/sharepoint-ui/measurements.json";
-import InteractionSamples from "../../components/InteractionSamples.astro";
-import ListWorkflowSample from "../../components/ListWorkflowSample.astro";
+import { availableComponents, componentGroups, componentSlug } from "../../lib/component-catalog.js";
 
 # Components
 
-The catalog lists {inventory.components.filter(component => component.available).length} available components. Choose one native control for each task and keep state in the host app.
+Explore {availableComponents.length} components. Open any item to see the real React component, interact with its example, and adjust the shared theme controls.
 
-<ul>{inventory.components.filter(component => component.available).map(component => <li><code>{component.name}</code> — {component.summary}</li>)}</ul>
-
-<InteractionSamples />
-
-<ListWorkflowSample />
-
-## Use a field
-
-```tsx
-import { Button, Field, Input, SharePointThemeProvider } from "@spfx-fast/sharepoint-ui/react";
-import "@spfx-fast/sharepoint-ui/styles.css";
-
-function RequestForm() {
-  return <SharePointThemeProvider>
-    <Field id="request-title" label="Request title" required>
-      <Input name="title" required />
-    </Field>
-    <Button type="submit">Save request</Button>
-  </SharePointThemeProvider>;
-}
-```
-
-## Compose a list workflow
-
-Use `FilterBar` for labelled filters, `ListView` for results, and `ViewSwitcher` only when users can choose a layout. Use `FileDropzone` to collect files and `AttachmentList` to display host-managed upload status. These components do not call SharePoint.
-
-The full list is available in the package's [`components.json`](https://github.com/vystartasv/sharepoint-ui/blob/main/packages/sharepoint-ui/components.json).
-
-<details>
-  <summary>Per-component package measurements</summary>
-  <p>{measurements.componentCount} modules; {measurements.componentJsBytes.toLocaleString()} emitted JavaScript bytes total. Import time includes Node and external React startup; it is not render time.</p>
-  <table>
-    <thead><tr><th>Component</th><th>JS bytes</th><th>Type bytes</th></tr></thead>
-    <tbody>{measurements.components.map(component => <tr><th scope="row"><code>{component.name}</code></th><td>{component.moduleBytes}</td><td>{component.declarationBytes}</td></tr>)}</tbody>
-  </table>
-</details>
+{Object.entries(componentGroups).map(([group, components]) => <section>
+  <h2>{group}</h2>
+  <ul className="component-catalog">
+    {components.map(component => <li><a href={`/sharepoint-ui/components/${componentSlug(component.name)}/`}><strong>{component.name}</strong><span>{component.summary}</span></a></li>)}
+  </ul>
+</section>)}
