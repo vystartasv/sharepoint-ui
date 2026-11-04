@@ -376,14 +376,60 @@ export function defineRichTextEditor(): void {
       this.selectedTablePath = table ? { table: [...this.editor.querySelectorAll("table")].indexOf(table), row: (cell.parentElement as HTMLTableRowElement).rowIndex, cell: cell.cellIndex } : undefined;
     }
     private selection(): Selection | null { return this.editor.ownerDocument.getSelection(); }
+    private quillRangeFromDom(range: Range): { index: number; length: number } | undefined {
+      const quill = this.quill;
+      if (!quill || !this.editor.contains(range.commonAncestorContainer)) return undefined;
+      const indexAt = (container: Node, offset: number): number | undefined => {
+        let textNode: Node | undefined;
+        let textOffset = 0;
+        if (container.nodeType === Node.TEXT_NODE) {
+          textNode = container;
+          textOffset = offset;
+        } else {
+          const children = container.childNodes;
+          const before = offset > 0 ? children[offset - 1] : undefined;
+          const after = offset < children.length ? children[offset] : undefined;
+          const findText = (node: Node | undefined, last: boolean): Node | undefined => {
+            if (!node) return undefined;
+            if (node.nodeType === Node.TEXT_NODE) return node;
+            const walker = this.editor.ownerDocument.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+            let found: Node | null = null;
+            let current: Node | null;
+            while ((current = walker.nextNode())) { found = current; if (!last) break; }
+            return found ?? undefined;
+          };
+          textNode = findText(after, false) ?? findText(before, true);
+          textOffset = textNode && textNode === findText(before, true) && !after
+            ? textNode.textContent?.length ?? 0
+            : 0;
+        }
+        if (!textNode) return undefined;
+        const blot = Quill.find(textNode, true);
+        if (!blot || blot instanceof Quill) return undefined;
+        return quill.getIndex(blot) + Math.min(textOffset, textNode.textContent?.length ?? 0);
+      };
+      const start = indexAt(range.startContainer, range.startOffset);
+      const end = indexAt(range.endContainer, range.endOffset);
+      if (start === undefined || end === undefined) return undefined;
+      const index = Math.max(0, Math.min(start, end));
+      return { index, length: Math.max(0, Math.abs(end - start)) };
+    }
+    private saveSelection(range: Range): void {
+      if (!this.editor.contains(range.commonAncestorContainer)) return;
+      const selected = this.quill?.getSelection();
+      const domRange = this.quillRangeFromDom(range);
+      const hasDomText = !range.collapsed && range.toString().length > 0;
+      const saved = selected && (selected.length > 0 || !hasDomText)
+        ? { index: selected.index, length: selected.length }
+        : domRange ?? (selected ? { index: selected.index, length: selected.length } : undefined);
+      if (saved) this.savedQuillSelection = saved;
+      this.savedRange = range.cloneRange();
+    }
     private onSelectionChange = (): void => {
       const selection = this.selection();
       const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
       if (!range || !this.editor.contains(range.commonAncestorContainer)) return;
-      const selected = this.quill?.getSelection();
-      if (!selected) return;
-      this.savedQuillSelection = { index: selected.index, length: selected.length };
-      this.savedRange = range.cloneRange();
+      this.saveSelection(range);
       const node = range.startContainer;
       const element = node instanceof Element ? node : node.parentElement;
       const cell = element?.closest<HTMLTableCellElement>("td,th");
@@ -634,9 +680,7 @@ export function defineRichTextEditor(): void {
         const selection = this.selection();
         const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
         if (!range || !this.editor.contains(range.commonAncestorContainer)) return;
-        const quillSelection = this.quill?.getSelection();
-        if (quillSelection) this.savedQuillSelection = { index: quillSelection.index, length: quillSelection.length };
-        if (!range.collapsed) this.savedRange = range.cloneRange();
+        this.saveSelection(range);
       };
       toolbar.addEventListener("pointerdown", preserveSelection, true);
       const format = document.createElement("select"); format.className = "toolbar-format"; format.dataset.command = "formatBlock"; format.dataset.labelAttribute = "format-block-label"; format.setAttribute("aria-label", this.getAttribute("format-block-label") ?? "Text style");

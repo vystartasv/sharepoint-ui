@@ -64,6 +64,16 @@ try {
   });
   const normalizeHtmlWhitespace = value => value.replace(/&nbsp;/g, " ");
   assert.deepEqual(Object.fromEntries(Object.entries(preconnectedValue).map(([key, value]) => [key, normalizeHtmlWhitespace(value)])), { beforeConnection: "<p>Assigned before connection</p>", afterConnection: "<p>Assigned before connection</p>", afterRestore: "<p>Restored by the browser</p>" }, "pre-connection assignment and browser-restored form state survive custom-element connection");
+  const nativeTableValue = await native.evaluate(node => node.value);
+  await native.evaluate(node => { node.value = "<p>Highlight this text</p>"; });
+  const nativeEditable = native.locator('[role="textbox"]');
+  await nativeEditable.click();
+  await nativeEditable.press("Home");
+  for (let index = 0; index < 9; index++) await page.keyboard.press("Shift+ArrowRight");
+  await native.locator(".toolbar-overflow__trigger").click();
+  await native.locator('.toolbar-color-swatch[data-color-format="background"]').first().click();
+  assert.match(await native.evaluate(node => node.value), /background(?:-color)?/i, "highlight color applies to selected text through the overflow toolbar");
+  await native.evaluate((node, value) => { node.value = value; }, nativeTableValue);
   const selectCell = cell => cell.click();
   const editTable = async editor => {
     const cell = editor.locator("[role=textbox] td").first();
