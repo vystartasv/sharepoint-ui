@@ -67,12 +67,27 @@ try {
   const nativeTableValue = await native.evaluate(node => node.value);
   await native.evaluate(node => { node.value = "<p>Highlight this text</p>"; });
   const nativeEditable = native.locator('[role="textbox"]');
-  await nativeEditable.click();
-  await nativeEditable.press("Home");
-  for (let index = 0; index < 9; index++) await page.keyboard.press("Shift+ArrowRight");
+  await nativeEditable.evaluate(node => {
+    const text = node.querySelector("p")?.firstChild;
+    if (!text) throw new Error("Expected text to select in the editor");
+    const range = node.ownerDocument.createRange();
+    range.setStart(text, 0);
+    range.setEnd(text, 9);
+    const selection = node.ownerDocument.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+  });
+  await page.setViewportSize({ width: 393, height: 852 });
   await native.locator(".toolbar-overflow__trigger").click();
+  const overflowLayout = await native.evaluate(node => {
+    const panel = node.shadowRoot.querySelector(".toolbar-overflow__panel");
+    const { left, right, top, bottom } = panel.getBoundingClientRect();
+    return { left, right, top, bottom, width: innerWidth, height: innerHeight, zIndex: Number.parseInt(getComputedStyle(panel).zIndex, 10) };
+  });
+  assert.ok(overflowLayout.left >= 0 && overflowLayout.top >= 0 && overflowLayout.right <= overflowLayout.width && overflowLayout.bottom <= overflowLayout.height && overflowLayout.zIndex >= 1000, "the mobile More panel stays inside the viewport above sticky page chrome");
   await native.locator('.toolbar-color-swatch[data-color-format="background"]').first().click();
   assert.match(await native.evaluate(node => node.value), /background(?:-color)?/i, "highlight color applies to selected text through the overflow toolbar");
+  await page.setViewportSize({ width: 1000, height: 800 });
   await native.evaluate((node, value) => { node.value = value; }, nativeTableValue);
   const openMore = async editor => {
     if (await editor.locator(".toolbar-overflow").getAttribute("data-open") !== "true") await editor.locator(".toolbar-overflow__trigger").click();
@@ -153,11 +168,11 @@ try {
   await reactEditor.getByRole("button", { name: "إدراج صورة" }).click();
   await reactEditor.locator('input[type="file"]').setInputFiles({ name: "react-image.png", mimeType: "image/png", buffer: Buffer.from("image") });
   await page.waitForFunction(() => document.querySelector('[data-testid="react"]')?.value.includes("ReactAssets/react-image.png"));
-  await native.evaluate(node => { node.value = '<table><tbody><tr><td colspan="2">Merged cell</td><td>Other</td></tr><tr><td>A</td><td>B</td><td>C</td></tr></tbody></table>'; });
+  await native.evaluate(node => { node.value = '<table><tbody><tr><td colspan="2" rowspan="2">Merged cell</td><td>Other</td></tr><tr><td>Last cell</td></tr></tbody></table>'; });
   await selectCell(native.locator("[role=textbox] td").first());
   await native.locator(".toolbar-overflow__trigger").click();
-  assert.doesNotMatch(await native.evaluate(node => node.querySelector('[role="textbox"] table')?.outerHTML ?? ""), /colspan|rowspan/i, "Quill's current table model drops merged-cell spans on import");
-  assert.equal(await native.getByRole("button", { name: "Insert row below" }).isDisabled(), false);
+  assert.match(await native.evaluate(node => node.value), /colspan="2"[^>]*rowspan="2"|rowspan="2"[^>]*colspan="2"/i, "merged SharePoint table cells survive editor import and serialization");
+  assert.equal(await native.getByRole("button", { name: "Insert row below" }).isDisabled(), true, "row operations are disabled when merged cells cannot be changed safely");
   await native.evaluate(node => { node.uploadImage = async file => `https://contoso.sharepoint.com/SiteAssets/${encodeURIComponent(file.name)}`; });
   await native.getByRole("button", { name: "Insert image" }).click();
   await native.locator('input[type="file"]').setInputFiles({ name: "diagram.png", mimeType: "image/png", buffer: Buffer.from("image") });
