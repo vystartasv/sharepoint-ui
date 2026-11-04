@@ -11079,5 +11079,21 @@
       "reactAdapter": { "rawBytes": 113731, "gzipBytes": 28693, "brotliBytes": 24939, "includedModules": 7, "reactExternalized": true }
     },
     "limits": "Minified tree-shaken JavaScript only; excludes CSS, React runtime, persistent storage behavior, and SharePoint host cost. The React hook is only retained when imported."
+  },
+  "richTextQuillPayloadCheckpoint": {
+    "measuredOn": "2026-11-04",
+    "sourceCommit": "4f7cd60d7862c39b6f0e7e80310d83ada62805bd",
+    "method": "npm run measure:component with esbuild minification and tree-shaking; React externalized",
+    "components": {
+      "Button": {
+        "customElement": { "rawBytes": 18478, "gzipBytes": 5533, "brotliBytes": 4957, "includedModules": 3 },
+        "reactAdapter": { "rawBytes": 61212, "gzipBytes": 16157, "brotliBytes": 14218, "includedModules": 5, "quillIncluded": false }
+      },
+      "RichTextEditor": {
+        "customElement": { "rawBytes": 227676, "gzipBytes": 65383, "brotliBytes": 56276, "includedModules": 202 },
+        "reactAdapter": { "rawBytes": 273888, "gzipBytes": 77394, "brotliBytes": 66289, "includedModules": 206, "reactExternalized": true }
+      }
+    },
+    "limits": "Per-component minified JavaScript slices only; excludes CSS, React runtime, SharePoint host, page startup, and render time. The Button-only slice does not include Quill; the RichTextEditor slice includes Quill Core and required formats/modules."
   }
 }

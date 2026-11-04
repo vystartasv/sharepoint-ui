@@ -17,6 +17,23 @@ On 2026-11-03, the repository benchmark bundled `Button`, `Input`, `Card`, and `
 
 This is a concrete advantage for compact SharePoint and Copilot task surfaces: the four-component custom-element slice is 74% smaller after gzip than the matching Fluent imports.
 
+## What one component costs
+
+A separate per-component measurement on 2026-11-04 shows how payload follows the import. The editor is deliberately much larger than a basic control because it includes Quill Core and its document, history, table, and format modules. A Button-only import does not include those modules.
+
+| Import | Raw JavaScript | Gzip | Brotli | Included modules |
+| --- | ---: | ---: | ---: | ---: |
+| Button custom-element leaf | 18,478 bytes | 5,533 bytes | 4,957 bytes | 3 |
+| Button React adapter | 61,212 bytes | 16,157 bytes | 14,218 bytes | 5 |
+| RichTextEditor custom-element leaf | 227,676 bytes | 65,383 bytes | 56,276 bytes | 202 |
+| RichTextEditor React adapter | 273,888 bytes | 77,394 bytes | 66,289 bytes | 206 |
+
+The small import stays small: the measured React Button slice retains the adapter, its shared helper, and Button code; it does not retain RichTextEditor or Quill. Import the editor only where it is used, and use the [lazy-loading pattern](/sharepoint-ui/guides/rich-text-editor/#load-the-editor-only-when-needed) if editing should not load with the initial view. These are independent component slices, not additive totals.
+
+The measurements use the same minify/tree-shake process as the package analyzer. They exclude CSS, React's host-provided runtime, SharePoint startup and rendering work, and do not predict full-page download or interaction time. RichTextEditor is not compared with Fluent's core component set because Fluent UI React does not include a first-party rich-text editor.
+
+These per-component readings describe repository source at [commit `4f7cd60`](https://github.com/vystartasv/sharepoint-ui/commit/4f7cd60d7862c39b6f0e7e80310d83ada62805bd), not a measurement of the current npm tarball.
+
 ## SharePoint metadata fields
 
 The same benchmark measures the metadata-driven `SharePointField` renderer. Eagerly importing every supported control is 51,725 gzip bytes for the custom element and 67,112 bytes for the React adapter: the no-React import is 22.9% smaller. This includes the field types and control code the renderer can select; it is not the size of one rendered text field.
