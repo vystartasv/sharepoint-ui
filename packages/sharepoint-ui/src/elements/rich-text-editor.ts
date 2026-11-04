@@ -1,4 +1,23 @@
 import { base, syncHostAccessibleName } from "./shared.js";
+import Quill from "quill/core.js";
+import Bold from "quill/formats/bold.js";
+import Italic from "quill/formats/italic.js";
+import Underline from "quill/formats/underline.js";
+import Strike from "quill/formats/strike.js";
+import Script from "quill/formats/script.js";
+import Header from "quill/formats/header.js";
+import Blockquote from "quill/formats/blockquote.js";
+import CodeBlock from "quill/formats/code.js";
+import List, { ListContainer } from "quill/formats/list.js";
+import Link from "quill/formats/link.js";
+import Image from "quill/formats/image.js";
+import { ColorStyle } from "quill/formats/color.js";
+import { BackgroundStyle } from "quill/formats/background.js";
+import { FontStyle } from "quill/formats/font.js";
+import { SizeStyle } from "quill/formats/size.js";
+import { AlignStyle } from "quill/formats/align.js";
+import { DirectionAttribute } from "quill/formats/direction.js";
+import TableModule from "quill/modules/table.js";
 import { getRichTextEditorFieldOptions, type SharePointMultiLineField } from "../sharepoint-fields.js";
 export { getRichTextEditorFieldOptions, type SharePointMultiLineField } from "../sharepoint-fields.js";
 
@@ -51,8 +70,6 @@ const DROP_CONTENT = new Set(["SCRIPT", "STYLE", "IFRAME", "OBJECT", "EMBED", "T
 const HTML_STYLE_PROPERTIES = new Set(["background-color", "color", "direction", "font-family", "font-size", "font-style", "font-weight", "letter-spacing", "line-height", "list-style-type", "margin-block-end", "margin-block-start", "margin-inline-end", "margin-inline-start", "text-align", "text-decoration", "text-indent", "text-transform", "vertical-align", "white-space"]);
 const RICH_STYLE_PROPERTIES = new Set(["background-color", "color", "font-family", "font-size", "font-style", "font-weight", "text-align", "text-decoration"]);
 const FONT_SIZE_PX: Record<string, string> = { "1": "10px", "2": "12px", "3": "16px", "4": "18px", "5": "24px", "6": "32px", "7": "48px" };
-type TextSelectionPoint = { offset: number; path: number[]; nodeOffset: number; text?: string; tag?: string };
-type TextSelectionSnapshot = { anchor: TextSelectionPoint; focus: TextSelectionPoint };
 function safeHref(value: string): boolean {
   if (/[\u0000-\u001f\u007f]/.test(value)) return false;
   try { return ["http:", "https:", "mailto:"].includes(new URL(value.trim(), document.baseURI).protocol); }
@@ -140,18 +157,23 @@ function cleanHtml(html: string, mode: "plain" | "restricted" | "rich" | "html" 
 
 export function defineRichTextEditor(): void {
   if (customElements.get("spui-rich-text-editor")) return;
+  Quill.register("formats/bold", Bold, true); Quill.register("formats/italic", Italic, true); Quill.register("formats/underline", Underline, true); Quill.register("formats/strike", Strike, true); Quill.register("formats/script", Script, true); Quill.register("formats/header", Header, true); Quill.register("formats/blockquote", Blockquote, true); Quill.register("formats/code-block", CodeBlock, true); Quill.register("formats/list", List, true); Quill.register("formats/list-container", ListContainer, true); Quill.register("formats/link", Link, true); Quill.register("formats/image", Image, true); Quill.register("formats/color", ColorStyle, true); Quill.register("formats/background", BackgroundStyle, true); Quill.register("formats/font", FontStyle, true); Quill.register("formats/size", SizeStyle, true); Quill.register("formats/align", AlignStyle, true); Quill.register("formats/direction", DirectionAttribute, true);
+  Quill.register("modules/table", TableModule, true);
+  FontStyle.whitelist = ["Arial", "Calibri", "Georgia", "Segoe UI", "Tahoma", "Times New Roman", "Verdana"];
+  SizeStyle.whitelist = ["10px", "12px", "16px", "18px", "24px", "32px", "48px"];
   class SpuiRichTextEditor extends HTMLElement implements SharePointRichTextEditorElement {
     static formAssociated = true;
     static observedAttributes = ["label", "editor-label", "placeholder", "content-mode", "allow-hyperlink", "disabled", "read-only", "required", "required-message", "value", "name", "aria-label", "aria-labelledby", "aria-description", "aria-describedby", "aria-invalid", "bold-label", "italic-label", "underline-label", "strike-label", "subscript-label", "superscript-label", "align-left-label", "align-center-label", "align-right-label", "align-justify-label", "clear-formatting-label", "format-block-label", "font-family-label", "font-size-label", "paragraph-label", "heading-1-label", "heading-2-label", "heading-3-label", "blockquote-label", "preformatted-label", "bullet-list-label", "number-list-label", "link-label", "text-color-label", "highlight-color-label", "custom-color-label", "theme-accent-label", "color-swatch-label", "undo-label", "redo-label", "insert-table-label", "insert-image-label", "image-input-label", "insert-row-above-label", "insert-row-below-label", "insert-column-before-label", "insert-column-after-label", "delete-row-label", "delete-column-label", "delete-table-label", "toolbar-label", "more-options-label", "more-formatting-label", "link-prompt", "link-dialog-label", "link-text-label", "link-title-label", "link-apply-label", "link-remove-label", "link-cancel-label", "link-new-tab-label", "link-invalid-message", "link-picker-label", "link-picker-loading-label", "link-picker-error-message"];
     private editor!: HTMLDivElement;
+    private editorMount!: HTMLDivElement;
+    private quill?: Quill;
+    private suppressEditorCommit = false;
     private internals: ElementInternals | undefined;
     private formDisabled = false;
     private pendingValue: string | undefined;
     private customError = "";
     private savedRange?: Range;
-    private preserveToolbarSelection = false;
-    private probingSelection = false;
-    private probedSelection?: Range;
+    private savedQuillSelection?: { index: number; length: number };
     /** Uploads to a durable asset store and returns the image URL to persist in editor HTML. */
     private imageUploader?: RichTextEditorImageUploader;
     get uploadImage(): RichTextEditorImageUploader | undefined { return this.imageUploader; }
@@ -207,16 +229,21 @@ export function defineRichTextEditor(): void {
       else this.refreshStrings();
     }
     private syncEditorLabel(): void { this.editor.setAttribute("aria-label", this.getAttribute("aria-label") ?? this.getAttribute("label") ?? this.getAttribute("editor-label") ?? "Rich text"); }
-    get value(): string { return this.editor ? (this.contentMode === "plain" ? plainText(this.editor.innerHTML) : cleanHtml(this.editor.innerHTML, this.contentMode, this.allowHyperlinks)) : this.pendingValue ?? this.getAttribute("value") ?? ""; }
+    get value(): string { const html = this.quill?.getSemanticHTML() ?? this.editor?.innerHTML; return html !== undefined ? (this.contentMode === "plain" ? plainText(html) : cleanHtml(html, this.contentMode, this.allowHyperlinks)) : this.pendingValue ?? this.getAttribute("value") ?? ""; }
     set value(value: string) {
       this.pendingValue = value;
       if (!this.editor) return;
       const normalized = this.contentMode === "plain" ? plainText(value) : cleanHtml(value, this.contentMode, this.allowHyperlinks);
-      if (this.value !== normalized) {
-        if (this.contentMode === "plain") this.editor.textContent = normalized;
-        else this.editor.innerHTML = normalized;
-      }
+      if (this.value !== normalized) this.setEditorHtml(normalized);
       this.syncForm(normalized);
+    }
+    private setEditorHtml(value: string): void {
+      if (!this.quill) { this.editor.innerHTML = value; return; }
+      const selection = this.quill.getSelection() ?? this.savedQuillSelection;
+      const toolbar = this.shadowRoot?.querySelector<HTMLElement>("[role=toolbar]");
+      const restoreFocus = this.quill.hasFocus() || Boolean(toolbar?.contains(this.shadowRoot?.activeElement ?? null));
+      this.quill.clipboard.dangerouslyPasteHTML(value, "silent");
+      if (selection && restoreFocus) { const index = Math.min(selection.index, this.quill.getLength() - 1); this.savedQuillSelection = { index, length: Math.min(selection.length, this.quill.getLength() - 1 - index) }; this.quill.setSelection(index, this.savedQuillSelection.length, "silent"); }
     }
     get form(): HTMLFormElement | null { return this.internals?.form ?? null; }
     get validity(): ValidityState | undefined { return this.internals?.validity; }
@@ -231,7 +258,7 @@ export function defineRichTextEditor(): void {
     private syncDisabled(): void {
       const disabled = this.formDisabled || this.hasAttribute("disabled");
       const readOnly = disabled || this.hasAttribute("read-only");
-      this.editor.contentEditable = readOnly ? "false" : this.contentMode === "plain" ? "plaintext-only" : "true";
+      this.quill?.enable(!readOnly);
       this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only")));
       this.editor.setAttribute("aria-disabled", String(disabled));
       this.shadowRoot?.querySelectorAll<HTMLButtonElement | HTMLSelectElement | HTMLInputElement>("[role=toolbar] button,[role=toolbar] select,[role=toolbar] input[type=color]").forEach(control => { control.disabled = readOnly; });
@@ -298,103 +325,10 @@ export function defineRichTextEditor(): void {
       this.dispatchEvent(event);
     }
     private sanitizeEditor(): string {
-      const html = this.editor.innerHTML;
+      const html = this.quill?.getSemanticHTML() ?? this.editor.innerHTML;
       const value = cleanHtml(html, this.contentMode, this.allowHyperlinks);
-      if (this.contentMode === "plain") { if (this.editor.textContent !== value) this.editor.textContent = value; return value; }
-      if (value === html) return value;
-      const selection = this.captureTextSelection();
-      const cell = this.selectedCell();
-      const tableIndex = cell ? [...this.editor.querySelectorAll("table")].indexOf(cell.closest("table")!) : -1;
-      const rowIndex = cell?.closest("tr")?.rowIndex ?? -1;
-      const cellIndex = cell?.cellIndex ?? -1;
-      this.editor.innerHTML = value;
-      if (selection) this.restoreTextSelection(selection);
-      const restoredCell = tableIndex >= 0 && rowIndex >= 0 && cellIndex >= 0
-        ? this.editor.querySelectorAll("table")[tableIndex]?.rows[rowIndex]?.cells[cellIndex]
-        : undefined;
-      this.savedCell = restoredCell ?? this.selectedCell();
-      if (!selection && restoredCell) {
-        const range = document.createRange();
-        range.selectNodeContents(restoredCell);
-        range.collapse(true);
-        this.savedRange = range;
-      } else if (!selection) this.savedRange = undefined;
-      this.syncTableActions();
+      if (value !== html) this.setEditorHtml(value);
       return value;
-    }
-    private captureTextSelection(): TextSelectionSnapshot | undefined {
-      const selection = this.selection();
-      const anchorNode = selection?.anchorNode;
-      const focusNode = selection?.focusNode;
-      if (anchorNode && focusNode && this.editor.contains(anchorNode) && this.editor.contains(focusNode)) {
-        return { anchor: this.selectionPoint(anchorNode, selection!.anchorOffset), focus: this.selectionPoint(focusNode, selection!.focusOffset) };
-      }
-      const range = this.savedRange;
-      if (!range || !this.editor.contains(range.commonAncestorContainer)) return undefined;
-      return { anchor: this.selectionPoint(range.startContainer, range.startOffset), focus: this.selectionPoint(range.endContainer, range.endOffset) };
-    }
-    private selectionPoint(node: Node, nodeOffset: number): TextSelectionPoint {
-      const path: number[] = [];
-      for (let current: Node = node; current !== this.editor;) {
-        const parent = current.parentNode;
-        if (!parent) break;
-        path.unshift(Array.from(parent.childNodes).findIndex(child => child === current));
-        current = parent;
-      }
-      return {
-        offset: this.textOffset(node, nodeOffset), path, nodeOffset,
-        ...(node.nodeType === Node.TEXT_NODE ? { text: node.textContent ?? "" } : {}),
-        ...(node instanceof Element ? { tag: node.tagName } : {})
-      };
-    }
-    private textOffset(node: Node, offset: number): number {
-      const range = document.createRange();
-      range.selectNodeContents(this.editor);
-      range.setEnd(node, offset);
-      return range.toString().length;
-    }
-    private textPoint(offset: number): { node: Node; offset: number } {
-      const walker = document.createTreeWalker(this.editor, NodeFilter.SHOW_TEXT);
-      let remaining = Math.max(0, offset);
-      let last: Node | undefined;
-      while (walker.nextNode()) {
-        const node = walker.currentNode;
-        const length = node.textContent?.length ?? 0;
-        last = node;
-        if (remaining <= length) return { node, offset: remaining };
-        remaining -= length;
-      }
-      return last ? { node: last, offset: last.textContent?.length ?? 0 } : { node: this.editor, offset: 0 };
-    }
-    private restoreTextSelection(snapshot: TextSelectionSnapshot): void {
-      const anchor = this.restoreSelectionPoint(snapshot.anchor);
-      const focus = this.restoreSelectionPoint(snapshot.focus);
-      const selection = this.selection();
-      if (selection?.setBaseAndExtent) {
-        selection.setBaseAndExtent(anchor.node, anchor.offset, focus.node, focus.offset);
-        this.savedRange = selection.rangeCount ? selection.getRangeAt(0).cloneRange() : undefined;
-        return;
-      }
-      const range = document.createRange();
-      const forward = snapshot.anchor.offset <= snapshot.focus.offset;
-      const start = forward ? anchor : focus;
-      const end = forward ? focus : anchor;
-      range.setStart(start.node, start.offset);
-      range.setEnd(end.node, end.offset);
-      selection?.removeAllRanges();
-      selection?.addRange(range);
-      this.savedRange = range.cloneRange();
-    }
-    private restoreSelectionPoint(point: TextSelectionPoint): { node: Node; offset: number } {
-      let node: Node | undefined = this.editor;
-      for (const index of point.path) node = node?.childNodes[index];
-      if (node && point.text !== undefined && node.nodeType === Node.TEXT_NODE && node.textContent === point.text) {
-        return { node, offset: Math.min(point.nodeOffset, point.text.length) };
-      }
-      if (node && point.text === undefined && node instanceof Element && node.tagName === point.tag && point.nodeOffset <= node.childNodes.length) {
-        return { node, offset: point.nodeOffset };
-      }
-      return this.textPoint(point.offset);
     }
     private selectedCell(): HTMLTableCellElement | undefined {
       const node = this.savedRange?.startContainer;
@@ -409,27 +343,14 @@ export function defineRichTextEditor(): void {
       const table = cell.closest("table");
       this.selectedTablePath = table ? { table: [...this.editor.querySelectorAll("table")].indexOf(table), row: (cell.parentElement as HTMLTableRowElement).rowIndex, cell: cell.cellIndex } : undefined;
     }
-    private selection(): Selection | null {
-      const root = this.editor.getRootNode();
-      return root instanceof ShadowRoot ? (root as ShadowRoot & { getSelection?: () => Selection | null }).getSelection?.() ?? this.editor.ownerDocument.getSelection() : this.editor.ownerDocument.getSelection();
-    }
+    private selection(): Selection | null { return this.editor.ownerDocument.getSelection(); }
     private onSelectionChange = (): void => {
+      const selected = this.quill?.getSelection();
+      if (!selected) return;
+      this.savedQuillSelection = { index: selected.index, length: selected.length };
       const selection = this.selection();
-      let range = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
-      if (!range || !this.editor.contains(range.commonAncestorContainer)) {
-        const InputEventConstructor = this.editor.ownerDocument.defaultView?.InputEvent;
-        const touchFirst = this.editor.ownerDocument.defaultView?.matchMedia("(pointer: coarse)").matches ?? false;
-        if (!touchFirst && this.editor.matches(":focus") && typeof InputEventConstructor?.prototype.getTargetRanges === "function" && !this.probingSelection) {
-          this.probedSelection = undefined;
-          this.probingSelection = true;
-          try { this.editor.ownerDocument.execCommand("indent"); }
-          finally { this.probingSelection = false; }
-          range = this.probedSelection;
-        }
-      }
+      const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
       if (!range || !this.editor.contains(range.commonAncestorContainer)) return;
-      if (range.collapsed && this.preserveToolbarSelection && this.savedRange && !this.savedRange.collapsed) return;
-      if (!range.collapsed) this.preserveToolbarSelection = false;
       this.savedRange = range.cloneRange();
       const node = range.startContainer;
       const element = node instanceof Element ? node : node.parentElement;
@@ -439,30 +360,22 @@ export function defineRichTextEditor(): void {
       this.syncTableActions();
     };
     private syncToolbarState(): void {
-      const document = this.editor.ownerDocument;
       const toolbar = this.shadowRoot?.querySelector<HTMLElement>('[role="toolbar"]');
       if (!toolbar) return;
-      for (const button of toolbar.querySelectorAll<HTMLButtonElement>('button[data-command="bold"],button[data-command="italic"],button[data-command="underline"],button[data-command="strikeThrough"],button[data-command="subscript"],button[data-command="superscript"],button[data-command^="justify"],button[data-command="insertUnorderedList"],button[data-command="insertOrderedList"]')) {
-        try { button.setAttribute("aria-pressed", String(document.queryCommandState(button.dataset.command!))); }
-        catch { button.setAttribute("aria-pressed", "false"); }
-      }
+      const range = this.quill?.getSelection() ?? this.savedQuillSelection;
+      const formats = range ? this.quill?.getFormat(range) ?? {} : {};
+      const pressedFormats: Record<string, string> = { bold: "bold", italic: "italic", underline: "underline", strikeThrough: "strike", subscript: "script", superscript: "script", justifyLeft: "align", justifyCenter: "align", justifyRight: "align", justifyFull: "align", insertUnorderedList: "list", insertOrderedList: "list" };
+      for (const button of toolbar.querySelectorAll<HTMLButtonElement>("button[data-command]")) { const command = button.dataset.command ?? ""; const formatName = pressedFormats[command]; if (formatName) { const expected = ({ subscript: "sub", superscript: "super", justifyCenter: "center", justifyRight: "right", justifyFull: "justify", insertUnorderedList: "bullet", insertOrderedList: "ordered" } as Record<string, string>)[command]; button.setAttribute("aria-pressed", String(expected ? formats[formatName] === expected : formats[formatName] === true)); } }
       const format = toolbar.querySelector<HTMLSelectElement>('select[data-command="formatBlock"]');
       if (format) {
-        try {
-          const block = document.queryCommandValue("formatBlock").replace(/[<>]/g, "").toUpperCase();
-          format.value = [...format.options].some(option => option.value === block) ? block : "P";
-        } catch { format.value = "P"; }
+        const [line] = this.quill?.getLine(range?.index ?? 0) ?? [];
+        const block = line?.domNode instanceof Element ? line.domNode.tagName : "P";
+        format.value = [...format.options].some(option => option.value === block) ? block : "P";
       }
-      const selection = this.selection();
-      const node = selection?.anchorNode && this.editor.contains(selection.anchorNode) ? selection.anchorNode : this.savedRange?.startContainer;
-      const element = node instanceof Element ? node : node?.parentElement;
-      if (element && this.editor.contains(element)) {
-        const computed = this.editor.ownerDocument.defaultView?.getComputedStyle(element);
-        const family = toolbar.querySelector<HTMLSelectElement>('select[data-command="fontFamily"]');
-        const size = toolbar.querySelector<HTMLSelectElement>('select[data-command="fontSize"]');
-        if (family && computed) family.value = [...family.options].some(option => option.value === computed.fontFamily) ? computed.fontFamily : "";
-        if (size && computed) size.value = Object.entries(FONT_SIZE_PX).find(([, px]) => px === computed.fontSize)?.[0] ?? "";
-      }
+      const family = toolbar.querySelector<HTMLSelectElement>('select[data-command="fontFamily"]');
+      const size = toolbar.querySelector<HTMLSelectElement>('select[data-command="fontSize"]');
+      if (family) family.value = typeof formats.font === "string" ? formats.font : "";
+      if (size) size.value = typeof formats.size === "string" ? formats.size : "";
     }
     private onEditorClick = (event: MouseEvent): void => {
       const cell = event.composedPath().find((node): node is HTMLTableCellElement => node instanceof HTMLTableCellElement && this.editor.contains(node));
@@ -483,125 +396,24 @@ export function defineRichTextEditor(): void {
       });
     }
     private restoreSelection(): void {
-      const selection = this.selection();
-      const liveRange = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
-      if ((!liveRange || !this.editor.contains(liveRange.commonAncestorContainer)) && this.editor.matches(":focus")) return;
-      const keepUnfocusedSelection = Boolean(this.savedRange && !this.savedRange.collapsed && !this.editor.matches(":focus"));
-      if (!keepUnfocusedSelection) this.editor.focus();
-      if (!selection || !this.savedRange || !this.editor.contains(this.savedRange.commonAncestorContainer)) return;
-      selection.removeAllRanges();
-      selection.addRange(this.savedRange);
-    }
-    private wrapUnfocusedSelection(range: Range, createWrapper: () => HTMLElement): boolean {
-      const selectionRoot = range.commonAncestorContainer.nodeType === Node.TEXT_NODE
-        ? range.commonAncestorContainer.parentNode ?? this.editor
-        : range.commonAncestorContainer;
-      const walker = this.editor.ownerDocument.createTreeWalker(selectionRoot, NodeFilter.SHOW_TEXT);
-      const nodes: Text[] = [];
-      while (walker.nextNode()) {
-        const node = walker.currentNode as Text;
-        if (range.intersectsNode(node)) nodes.push(node);
-      }
-      const wrappers: HTMLElement[] = [];
-      for (const node of nodes.reverse()) {
-        const start = node === range.startContainer ? range.startOffset : 0;
-        const end = node === range.endContainer ? range.endOffset : node.length;
-        if (end <= start) continue;
-        const part = this.editor.ownerDocument.createRange();
-        part.setStart(node, start);
-        part.setEnd(node, end);
-        const wrapper = createWrapper();
-        wrapper.append(part.extractContents());
-        part.insertNode(wrapper);
-        wrappers.push(wrapper);
-      }
-      if (!wrappers.length) return false;
-      wrappers.reverse();
-      const selected = this.editor.ownerDocument.createRange();
-      selected.setStartBefore(wrappers[0]);
-      selected.setEndAfter(wrappers[wrappers.length - 1]);
-      const selection = this.selection();
-      selection?.removeAllRanges();
-      selection?.addRange(selected);
-      this.savedRange = selected.cloneRange();
-      return true;
-    }
-    private applyStyleToUnfocusedSelection(range: Range, property: "color" | "background-color" | "font-family" | "font-size", value: string): boolean {
-      return this.wrapUnfocusedSelection(range, () => {
-        const span = this.editor.ownerDocument.createElement("span");
-        span.style.setProperty(property, value);
-        return span;
-      });
+      if (!this.quill) return;
+      const saved = this.savedQuillSelection;
+      this.quill.focus();
+      if (saved) this.quill.setSelection(saved.index, saved.length, "silent");
     }
     private applyInlineStyle(property: "color" | "background-color" | "font-family" | "font-size", value: string): void {
-      const editorFocused = this.editor.matches(":focus");
-      if (editorFocused) this.restoreSelection();
-      const selection = this.selection();
-      const liveRange = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
-      const range = liveRange && this.editor.contains(liveRange.commonAncestorContainer) ? liveRange : this.savedRange;
-      if (!range || range.collapsed || !this.editor.contains(range.commonAncestorContainer)) return;
-      if (!editorFocused) {
-        const cssValue = property === "font-size" ? FONT_SIZE_PX[value] ?? value : value;
-        if (this.applyStyleToUnfocusedSelection(range, property, cssValue)) this.commitEditorValue();
-        return;
-      }
-      const command = property === "color" ? "foreColor" : property === "background-color" ? "hiliteColor" : property === "font-family" ? "fontName" : "fontSize";
-      const document = this.editor.ownerDocument;
-      document.execCommand("styleWithCSS", false, "true");
-      const applied = document.execCommand(command, false, value);
-      if (command === "hiliteColor" && !applied) document.execCommand("backColor", false, value);
-      this.commitEditorValue();
+      const range = this.savedQuillSelection;
+      if (!range || !range.length || !this.quill) return;
+      const format = ({ color: "color", "background-color": "background", "font-family": "font", "font-size": "size" } as const)[property];
+      this.quill.formatText(range.index, range.length, format, value, "user");
     }
     private editTable(command: string): void {
-      const cell = this.selectedCell();
-      const table = cell?.closest<HTMLTableElement>("table");
-      const merged = Boolean(table && [...table.querySelectorAll<HTMLTableCellElement>("td,th")].some(item => item.rowSpan !== 1 || item.colSpan !== 1));
-      if (!cell || !table || merged) return;
-      let focusCell: HTMLTableCellElement | undefined;
-      if (command === "deleteTable") {
-        table.remove();
-        this.savedRange = undefined;
-        this.savedCell = undefined;
-        this.selectedTablePath = undefined;
-      } else if (command === "insertRowAbove" || command === "insertRowBelow") {
-        const source = cell.parentElement as HTMLTableRowElement;
-        const row = source.cloneNode(true) as HTMLTableRowElement;
-        for (const clone of [...row.cells]) { clone.replaceChildren(document.createElement("br")); }
-        source.parentElement?.insertBefore(row, command === "insertRowAbove" ? source : source.nextSibling);
-        focusCell = row.cells[cell.cellIndex];
-      } else if (command === "insertColumnBefore" || command === "insertColumnAfter") {
-        const index = cell.cellIndex + (command === "insertColumnAfter" ? 1 : 0);
-        for (const row of [...table.rows]) {
-          const isHeader = row.parentElement?.tagName === "THEAD";
-          const next = document.createElement(isHeader ? "th" : "td");
-          if (isHeader) next.setAttribute("scope", "col");
-          next.append(document.createElement("br"));
-          row.insertBefore(next, row.cells[index] ?? null);
-          if (row === cell.parentElement) focusCell = next;
-        }
-      } else if (command === "deleteRow") {
-        const row = cell.parentElement as HTMLTableRowElement;
-        const index = row.rowIndex;
-        const cellIndex = cell.cellIndex;
-        row.remove();
-        const next = table.rows[Math.min(index, table.rows.length - 1)];
-        focusCell = next?.cells[Math.min(cellIndex, next.cells.length - 1)];
-      } else if (command === "deleteColumn") {
-        const index = cell.cellIndex;
-        const row = cell.parentElement as HTMLTableRowElement;
-        for (const row of [...table.rows]) row.cells[index]?.remove();
-        focusCell = row.cells[Math.min(index, row.cells.length - 1)];
-      }
-      if (focusCell) {
-        this.savedCell = focusCell;
-        this.rememberCell(focusCell);
-        const range = document.createRange();
-        range.selectNodeContents(focusCell);
-        range.collapse(true);
-        this.savedRange = range;
-        this.restoreSelection();
-      } else this.editor.focus();
-      this.commitEditorValue();
+      this.restoreSelection();
+      const table = this.quill?.getModule("table") as InstanceType<typeof TableModule> | undefined;
+      const actions: Record<string, keyof TableModule> = { insertRowAbove: "insertRowAbove", insertRowBelow: "insertRowBelow", insertColumnBefore: "insertColumnLeft", insertColumnAfter: "insertColumnRight", deleteRow: "deleteRow", deleteColumn: "deleteColumn", deleteTable: "deleteTable" };
+      if (!table || !this.quill?.getSelection() || !actions[command]) return;
+      const action = table[actions[command]] as () => void;
+      action.call(table);
     }
     private command(command: string, value?: string): void {
       if ((this.contentMode === "plain" && !["undo", "redo"].includes(command)) || (this.contentMode === "restricted" && ["insertTable", "insertImage", "insertRowAbove", "insertRowBelow", "insertColumnBefore", "insertColumnAfter", "deleteRow", "deleteColumn", "deleteTable", "foreColor", "hiliteColor", "fontFamily", "fontSize"].includes(command)) || (this.contentMode !== "html" && ["subscript", "superscript", "justifyLeft", "justifyCenter", "justifyRight", "justifyFull"].includes(command)) || (command === "createLink" && !this.allowHyperlinks)) return;
@@ -609,15 +421,17 @@ export function defineRichTextEditor(): void {
       if (command === "insertImage") { this.imageInput?.click(); return; }
       if (["insertRowAbove", "insertRowBelow", "insertColumnBefore", "insertColumnAfter", "deleteRow", "deleteColumn", "deleteTable"].includes(command)) { this.editTable(command); return; }
       if (command === "createLink") { this.openLinkEditor(); return; }
-      const editorFocused = this.editor.matches(":focus");
       this.restoreSelection();
-      if (command === "insertTable") value = '<table><caption><br></caption><thead><tr><th scope="col"><br></th><th scope="col"><br></th></tr></thead><tbody><tr><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td></tr></tbody></table><p><br></p>';
-      const document = this.editor.ownerDocument;
-      const applied = document.execCommand(command === "insertTable" ? "insertHTML" : command, false, command === "formatBlock" ? `<${value?.toLowerCase() ?? "p"}>` : value);
-      const tag = ({ bold: "strong", italic: "em", underline: "u", strikeThrough: "s" } as Record<string, string>)[command];
-      if (!editorFocused && !applied && tag && this.savedRange && !this.savedRange.collapsed && this.wrapUnfocusedSelection(this.savedRange, () => document.createElement(tag))) { this.commitEditorValue(); return; }
-      if (command === "hiliteColor" && !applied) this.editor.ownerDocument.execCommand("backColor", false, value);
-      this.commitEditorValue();
+      const selection = this.quill?.getSelection(true);
+      if (!this.quill || !selection) return;
+      const formats: Record<string, string> = { bold: "bold", italic: "italic", underline: "underline", strikeThrough: "strike", subscript: "script", superscript: "script", justifyLeft: "align", justifyCenter: "align", justifyRight: "align", justifyFull: "align", insertUnorderedList: "list", insertOrderedList: "list" };
+      const values: Record<string, unknown> = { subscript: "sub", superscript: "super", justifyLeft: false, justifyCenter: "center", justifyRight: "right", justifyFull: "justify", insertUnorderedList: "bullet", insertOrderedList: "ordered" };
+      if (command === "undo") this.quill.history.undo();
+      else if (command === "redo") this.quill.history.redo();
+      else if (command === "insertTable") (this.quill.getModule("table") as InstanceType<typeof TableModule>).insertTable(3, 2);
+      else if (command === "removeFormat") this.quill.removeFormat(selection.index, selection.length, "user");
+      else if (command === "formatBlock") { const block = value?.toUpperCase(); if (block === "BLOCKQUOTE") this.quill.format("blockquote", true, "user"); else if (block === "PRE") this.quill.format("code-block", true, "user"); else this.quill.format("header", block === "P" ? false : Number(block?.slice(1)), "user"); }
+      else if (formats[command]) { const name = formats[command]; let next: unknown = values[command] ?? !Boolean(this.quill.getFormat(selection)[name]); if (command === "insertUnorderedList" || command === "insertOrderedList") next = this.quill.getFormat(selection).list === values[command] ? false : values[command]; this.quill.format(name, next, "user"); }
     }
     private linkAtRange(range?: Range): HTMLAnchorElement | undefined {
       const node = range?.startContainer;
@@ -703,44 +517,43 @@ export function defineRichTextEditor(): void {
       const normalizedHref = new URL(href, this.editor.ownerDocument.baseURI).href;
       const displayText = this.linkTextInput!.value.trim() || href;
       const title = this.linkTitleInput!.value.trim();
-      const range = this.savedRange?.cloneRange();
-      const existing = this.linkAtRange(range);
-      let link = existing;
-      if (existing) {
-        existing.setAttribute("href", normalizedHref);
-      } else if (range?.collapsed) {
-        link = this.editor.ownerDocument.createElement("a");
-        link.href = normalizedHref;
-        range.insertNode(link);
-      } else {
-        this.restoreSelection();
-        const created = this.editor.ownerDocument.execCommand("createLink", false, normalizedHref);
-        const selection = this.selection();
-        link = this.linkAtRange(range) ?? this.linkAtRange(selection?.rangeCount ? selection.getRangeAt(0) : undefined);
-        if (!created && !link && range && !range.collapsed) {
-          link = this.editor.ownerDocument.createElement("a");
-          link.href = normalizedHref;
-          link.append(range.extractContents());
-          range.insertNode(link);
+      const range = this.savedQuillSelection;
+      if (!this.quill || !range) return;
+      this.suppressEditorCommit = true;
+      let length = range.length;
+      try {
+        if (range.length && this.quill.getText(range.index, range.length) !== displayText) {
+          this.quill.deleteText(range.index, range.length, "user");
+          this.quill.insertText(range.index, displayText, "user");
+          length = displayText.length;
+        } else if (!range.length) {
+          this.quill.insertText(range.index, displayText, "user");
+          length = displayText.length;
         }
+        this.quill.formatText(range.index, length, "link", normalizedHref, "user");
+        this.quill.setSelection(range.index, length, "silent");
+        const selection = this.selection();
+        const link = this.linkAtRange(selection?.rangeCount ? selection.getRangeAt(0) : undefined);
+        if (link) {
+          if (title) link.setAttribute("title", title); else link.removeAttribute("title");
+          if (this.linkNewTabInput!.checked) { link.target = "_blank"; link.rel = "noopener noreferrer"; }
+          else { link.removeAttribute("target"); link.removeAttribute("rel"); }
+          this.quill.update("silent");
+        }
+      } finally {
+        this.suppressEditorCommit = false;
       }
-      if (link) {
-        if (link.textContent !== displayText) link.textContent = displayText;
-        if (title) link.setAttribute("title", title); else link.removeAttribute("title");
-        if (this.linkNewTabInput!.checked) { link.setAttribute("target", "_blank"); link.setAttribute("rel", "noopener noreferrer"); }
-        else { link.removeAttribute("target"); link.removeAttribute("rel"); }
-        const caret = this.editor.ownerDocument.createRange();
-        caret.selectNodeContents(link);
-        caret.collapse(false);
-        this.savedRange = caret;
-      }
+      this.quill.setSelection(range.index + length, 0, "silent");
+      this.savedQuillSelection = { index: range.index + displayText.length, length: 0 };
       this.closeLinkEditor(true);
       this.commitEditorValue();
     }
     private removeLink(): void {
-      const link = this.linkAtRange(this.savedRange);
-      if (!link) return;
-      link.replaceWith(...link.childNodes);
+      const range = this.savedQuillSelection;
+      if (!this.quill || !range?.length) return;
+      this.suppressEditorCommit = true;
+      try { this.quill.formatText(range.index, range.length, "link", false, "user"); }
+      finally { this.suppressEditorCommit = false; }
       this.closeLinkEditor(true);
       this.commitEditorValue();
     }
@@ -753,23 +566,32 @@ export function defineRichTextEditor(): void {
         if (typeof uploaded !== "string" && typeof uploaded.alt !== "string") throw new Error("Image upload results must include alt text; use an empty string only for decorative images.");
         if (!safeImageSrc(src)) throw new Error("Image upload must return an HTTP or HTTPS URL.");
         this.restoreSelection();
-        const image = document.createElement("img"); image.src = new URL(src, document.baseURI).href; image.alt = (typeof uploaded === "string" ? file.name.replace(/\.[^.]*$/, "") : uploaded.alt).slice(0, 200);
-        const selection = this.selection(); const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
-        if (range && this.editor.contains(range.commonAncestorContainer)) { range.deleteContents(); range.insertNode(image); range.setStartAfter(image); range.collapse(true); selection!.removeAllRanges(); selection!.addRange(range); }
-        else this.editor.append(image);
-        this.savedRange = range?.cloneRange(); this.commitEditorValue();
+        const range = this.savedQuillSelection ?? this.quill?.getSelection();
+        if (!this.quill || !range) return;
+        this.suppressEditorCommit = true;
+        try {
+          this.quill.insertEmbed(range.index, "image", new URL(src, document.baseURI).href, "user");
+          const [image] = this.quill.getLeaf(range.index);
+          if (image?.domNode instanceof HTMLImageElement) image.domNode.alt = (typeof uploaded === "string" ? file.name.replace(/\.[^.]*$/, "") : uploaded.alt).slice(0, 200);
+          this.quill.update("silent");
+          this.quill.setSelection(range.index + 1, 0, "silent");
+        } finally { this.suppressEditorCommit = false; }
+        this.commitEditorValue();
       } catch (error) {
         this.dispatchEvent(new CustomEvent("spui-image-upload-error", { detail: { fileName: file.name, error }, bubbles: true, composed: true }));
       } finally { this.uploadingImage = false; this.syncImageButton(); }
     }
     private render(): void {
+      if (this.quill) return;
       const shadow = this.shadowRoot ?? this.attachShadow({ mode: "open" });
       const label = document.createElement("label"); label.textContent = this.getAttribute("label") ?? ""; label.hidden = !this.hasAttribute("label"); label.part.add("label");
       const toolbar = document.createElement("div"); toolbar.setAttribute("role", "toolbar"); toolbar.setAttribute("aria-orientation", "horizontal"); toolbar.part.add("toolbar");
       const preserveSelection = (): void => {
+        const quillSelection = this.quill?.getSelection();
+        if (quillSelection) this.savedQuillSelection = { index: quillSelection.index, length: quillSelection.length };
         const selection = this.selection();
         const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined;
-        if (range && !range.collapsed && this.editor.contains(range.commonAncestorContainer)) { this.savedRange = range.cloneRange(); this.preserveToolbarSelection = true; }
+        if (range && !range.collapsed && this.editor.contains(range.commonAncestorContainer)) this.savedRange = range.cloneRange();
       };
       toolbar.addEventListener("pointerdown", preserveSelection, true);
       toolbar.addEventListener("focusin", preserveSelection, true);
@@ -787,7 +609,7 @@ export function defineRichTextEditor(): void {
         fontGroup.append(select);
       };
       addFontSelect("fontFamily", "font-family-label", "Font family", [["", "Font family"], ["Arial", "Arial"], ["Calibri", "Calibri"], ["Georgia", "Georgia"], ["Segoe UI", "Segoe UI"], ["Tahoma", "Tahoma"], ["Times New Roman", "Times New Roman"], ["Verdana", "Verdana"]]);
-      addFontSelect("fontSize", "font-size-label", "Font size", [["", "Font size"], ["1", "10 px"], ["2", "12 px"], ["3", "16 px"], ["4", "18 px"], ["5", "24 px"], ["6", "32 px"], ["7", "48 px"]]);
+      addFontSelect("fontSize", "font-size-label", "Font size", [["", "Font size"], ["10px", "10 px"], ["12px", "12 px"], ["16px", "16 px"], ["18px", "18 px"], ["24px", "24 px"], ["32px", "32 px"], ["48px", "48 px"]]);
       toolbar.append(fontGroup);
       const actions: Array<[string,string,string?,string?,string?]> = [["Bold","bold"],["Italic","italic"],["Underline","underline"],["Strikethrough","strikeThrough",undefined,undefined,"strike-label"],["Subscript","subscript",undefined,undefined,"subscript-label"],["Superscript","superscript",undefined,undefined,"superscript-label"],["Align left","justifyLeft",undefined,undefined,"align-left-label"],["Align center","justifyCenter",undefined,undefined,"align-center-label"],["Align right","justifyRight",undefined,undefined,"align-right-label"],["Justify text","justifyFull",undefined,undefined,"align-justify-label"],["Bulleted list","insertUnorderedList",undefined,"• List"],["Numbered list","insertOrderedList",undefined,"1. List"],["Clear formatting","removeFormat",undefined,undefined,"clear-formatting-label"],["Undo","undo"],["Redo","redo"],["Insert table","insertTable"],["Insert image","insertImage",undefined,undefined,"insert-image-label"],["Insert row above","insertRowAbove",undefined,undefined,"insert-row-above-label"],["Insert row below","insertRowBelow",undefined,undefined,"insert-row-below-label"],["Insert column before","insertColumnBefore",undefined,undefined,"insert-column-before-label"],["Insert column after","insertColumnAfter",undefined,undefined,"insert-column-after-label"],["Delete row","deleteRow",undefined,undefined,"delete-row-label"],["Delete column","deleteColumn",undefined,undefined,"delete-column-label"],["Delete table","deleteTable",undefined,undefined,"delete-table-label"],["Link","createLink"]];
       const toolbarGroups = new Map<string, HTMLDivElement>();
@@ -849,7 +671,19 @@ export function defineRichTextEditor(): void {
       overflow.addEventListener("toggle", () => {
         const isOpen = overflow.open;
         overflowPanel.hidden = !isOpen;
+        if (isOpen) {
+          const trigger = overflowTrigger.getBoundingClientRect();
+          const width = Math.min(360, window.innerWidth - 24);
+          const left = Math.max(12, Math.min(window.innerWidth - width - 12, trigger.right - width));
+          const top = Math.min(trigger.bottom + 6, Math.max(12, window.innerHeight - Math.min(480, window.innerHeight * 0.7) - 12));
+          overflowPanel.style.insetInlineEnd = "auto";
+          overflowPanel.style.left = `${left}px`;
+          overflowPanel.style.top = `${top}px`;
+        }
       });
+      window.addEventListener("scroll", () => { if (overflow.open) overflow.open = false; }, { capture: true, signal: this.events?.signal });
+      window.addEventListener("resize", () => { if (overflow.open) overflow.open = false; }, { signal: this.events?.signal });
+      document.addEventListener("pointerdown", event => { if (overflow.open && !event.composedPath().includes(overflow)) overflow.open = false; }, { signal: this.events?.signal });
       toolbar.append(overflow);
       this.imageInput = document.createElement("input"); this.imageInput.type = "file"; this.imageInput.accept = "image/*"; this.imageInput.hidden = true; this.imageInput.setAttribute("aria-label", this.getAttribute("image-input-label") ?? "Choose image"); this.imageInput.addEventListener("change", () => { const file = this.imageInput?.files?.[0]; if (file) void this.insertUploadedImage(file); this.imageInput!.value = ""; }); toolbar.append(this.imageInput);
       const linkForm = document.createElement("form"); this.linkForm = linkForm; linkForm.className = "link-editor"; linkForm.part.add("link-editor"); linkForm.hidden = true; linkForm.setAttribute("aria-label", this.getAttribute("link-dialog-label") ?? "Edit link");
@@ -891,44 +725,6 @@ export function defineRichTextEditor(): void {
         if (index < 0 || !controls[index]) return;
         event.preventDefault(); controls[index].tabIndex = 0; controls.forEach((control, controlIndex) => { if (controlIndex !== index) control.tabIndex = -1; }); controls[index].focus();
       });
-      this.editor = document.createElement("div"); this.editor.setAttribute("role", "textbox"); this.editor.setAttribute("aria-multiline", "true"); this.syncEditorLabel(); const invalid = this.getAttribute("aria-invalid"); if (invalid !== null) this.editor.setAttribute("aria-invalid", invalid); this.editor.contentEditable = this.hasAttribute("disabled") || this.hasAttribute("read-only") ? "false" : this.contentMode === "plain" ? "plaintext-only" : "true"; this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only"))); this.editor.setAttribute("aria-disabled", String(this.hasAttribute("disabled"))); this.editor.setAttribute("aria-required", String(this.hasAttribute("required"))); this.editor.dataset.placeholder = this.getAttribute("placeholder") ?? "Write something…"; this.editor.part.add("editor");
-      this.editor.addEventListener("keydown", event => { const key = (event as KeyboardEvent).key.toLowerCase(); const shortcut = (event as KeyboardEvent).metaKey || (event as KeyboardEvent).ctrlKey; if (!shortcut) return; if (key === "z") { event.preventDefault(); this.command((event as KeyboardEvent).shiftKey ? "redo" : "undo"); } else if (key === "y") { event.preventDefault(); this.command("redo"); } });
-      this.editor.addEventListener("beforeinput", event => {
-        if (!this.probingSelection) return;
-        const targetRange = (event as InputEvent & { getTargetRanges?: () => StaticRange[] }).getTargetRanges?.()[0];
-        if (targetRange && this.editor.contains(targetRange.startContainer) && this.editor.contains(targetRange.endContainer)) {
-          const range = this.editor.ownerDocument.createRange();
-          range.setStart(targetRange.startContainer, targetRange.startOffset);
-          range.setEnd(targetRange.endContainer, targetRange.endOffset);
-          this.probedSelection = range;
-        }
-        event.preventDefault();
-        event.stopImmediatePropagation();
-      }, true);
-      this.editor.addEventListener("input", () => this.commitEditorValue());
-      this.editor.addEventListener("pointerdown", event => {
-        this.preserveToolbarSelection = false;
-      });
-      this.editor.addEventListener("mouseup", this.onSelectionChange);
-      this.editor.addEventListener("keyup", this.onSelectionChange);
-      this.editor.addEventListener("click", this.onEditorClick);
-      this.editor.addEventListener("paste", event => {
-        event.preventDefault();
-        const clipboard = (event as ClipboardEvent).clipboardData;
-        if (this.contentMode === "plain" || this.contentMode === "restricted") {
-          this.editor.ownerDocument.execCommand("insertText", false, clipboard?.getData("text/plain") ?? plainText(clipboard?.getData("text/html") ?? ""));
-          this.commitEditorValue();
-          return;
-        }
-        const imageFile = [...(clipboard?.files ?? [])].find(file => file.type.startsWith("image/"));
-        if (imageFile) { void this.insertUploadedImage(imageFile); return; }
-        const html = cleanHtml(clipboard?.getData("text/html") ?? clipboard?.getData("text/plain") ?? "", this.contentMode, this.allowHyperlinks);
-        const text = clipboard?.getData("text/plain") ?? "";
-        if (html) this.editor.ownerDocument.execCommand("insertHTML", false, html);
-        else this.editor.ownerDocument.execCommand("insertText", false, text);
-        this.commitEditorValue();
-      });
-      this.editor.addEventListener("blur", () => this.commitEditorValue("spui-change"));
       const style = document.createElement("style"); style.textContent = `${base}:host{display:grid;min-width:0;max-width:100%;container-type:inline-size;gap:6px}label{font-weight:600;color:var(--spui-ui-muted,var(--spui-semantic-body-text,inherit))}[role=toolbar]{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:6px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface,#fff)}[role=toolbar][hidden],button[hidden]{display:none}.toolbar-group{display:flex;flex:0 1 auto;flex-wrap:wrap;align-items:center;gap:2px;min-width:0;padding-inline-start:6px;border-inline-start:1px solid var(--spui-ui-stroke,#c8c8c8)}.toolbar-group[hidden]{display:none}button{box-sizing:border-box;display:inline-grid;place-items:center;flex:none;width:36px;min-width:36px;min-height:36px;padding:0;border:0;border-radius:var(--spui-control-radius,4px);background:transparent;color:var(--spui-ui-text,inherit);font:inherit;cursor:pointer}.toolbar-format{box-sizing:border-box;max-width:172px;min-width:116px;min-height:36px;padding:0 8px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit}.toolbar-format:hover{background:var(--spui-ui-surface-hover,#eee)}button svg{display:block;width:18px;height:18px}button:hover:not(:disabled){background:var(--spui-ui-surface-hover,#eee)}button[aria-pressed=true]{background:color-mix(in srgb,var(--spui-ui-accent,#0078d4) 14%,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,var(--spui-semantic-body-text,#323130))}button:disabled{opacity:.42;cursor:not-allowed}button:focus-visible,select:focus-visible,[role=textbox]:focus-visible,input:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}[role=textbox]{min-width:0;min-height:150px;box-sizing:border-box;padding:10px 12px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit;line-height:1.5;overflow:auto;caret-color:var(--spui-focus-ring,var(--spui-ui-accent,#005a9e))}[role=textbox]:empty:before{content:attr(data-placeholder);color:var(--spui-ui-muted,#666);pointer-events:none}table{border-collapse:collapse;max-width:100%;margin-block:8px}caption{text-align:start;font-weight:600}td,th{min-width:56px;padding:6px 9px;border:1px solid var(--spui-ui-stroke,#c8c8c8);text-align:start}th{background:var(--spui-ui-surface-hover,#f5f5f5);font-weight:600}a{color:var(--spui-semantic-link,#0f6cbd)}@media(pointer:coarse){[role=toolbar] button{width:44px;min-width:44px;min-height:44px}[role=toolbar] select{min-height:44px}}@container (max-width: 64rem){[role=toolbar]{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px}.toolbar-format{flex:1 0 100%;width:100%;max-width:none;min-width:0;min-height:40px}.toolbar-group{display:flex;flex:0 1 auto;flex-wrap:wrap;align-items:center;gap:4px;min-width:0;padding:0;border:0}.toolbar-group--fonts{display:grid;flex:1 0 100%;grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar-font-select{width:100%;max-width:none;min-width:0;min-height:44px}.toolbar-group button{width:44px;min-width:44px;min-height:44px}.toolbar-group--table{flex:1 0 100%}[role=textbox]{min-height:12rem;overflow-wrap:anywhere}table{display:block;overflow-x:auto}}@media(forced-colors:active){select{border:1px solid ButtonText;background:Field;color:FieldText}button{border:1px solid ButtonText}button[aria-pressed=true]{color:Highlight;border-color:Highlight}td,th{border-color:CanvasText}}`;
       style.textContent += `.link-editor{display:flex;flex-wrap:wrap;align-items:end;gap:8px;padding:8px;border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,6px);background:var(--spui-ui-surface-hover,var(--spui-ui-surface,#fff))}.link-editor[hidden]{display:none}.link-field{display:grid;flex:1 1 150px;gap:4px;min-width:0;color:var(--spui-ui-text,inherit);font-size:13px}.link-field input{box-sizing:border-box;width:100%;min-width:0;min-height:32px;padding:5px 8px;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#8a8886));border-radius:var(--spui-control-radius,4px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit)}.link-actions{display:flex;flex-wrap:wrap;gap:4px}.link-actions button{border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,4px);background:var(--spui-ui-surface,#fff)}.link-actions [data-link-action=apply]{border-color:transparent;background:var(--spui-semantic-primary-button-background,var(--spui-ui-accent,#0078d4));color:var(--spui-ui-accent-text,#fff)}.link-error{flex:1 0 100%;color:var(--spui-ui-danger,var(--spui-semantic-error-text,#c50f1f));font-size:13px}`;
       style.textContent += `[role=textbox],[role=textbox] *{-webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default;touch-action:auto}`;
@@ -937,7 +733,17 @@ export function defineRichTextEditor(): void {
       style.textContent += `.toolbar-overflow:not([open])>.toolbar-overflow__panel,.toolbar-overflow__panel[hidden]{display:none!important}.toolbar-overflow[open]>.toolbar-overflow__panel:not([hidden]){display:grid;gap:8px}.toolbar-overflow__panel{width:min(320px,calc(100vw - 24px))}.toolbar-overflow__panel .toolbar-group--color{flex-wrap:nowrap}.toolbar-overflow__panel .toolbar-color{width:44px;min-width:44px;height:44px}.toolbar-color__input{touch-action:manipulation}.link-picker-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}`;
       style.textContent += `.toolbar-color.is-disabled{opacity:.42;cursor:not-allowed}.toolbar-color__input:disabled{opacity:0;cursor:not-allowed}.toolbar-color__input:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}`;
       style.textContent += `[role=toolbar]{position:relative;flex-wrap:nowrap;min-width:0;overflow:visible}.toolbar-group{flex:0 0 auto;flex-wrap:nowrap}.toolbar-overflow{position:relative;flex:none}.toolbar-overflow__trigger{box-sizing:border-box;display:grid;place-items:center;width:36px;min-width:36px;min-height:36px;border:1px solid transparent;border-radius:var(--spui-control-radius,5px);color:var(--spui-ui-text,inherit);cursor:pointer;list-style:none}.toolbar-overflow__trigger::-webkit-details-marker{display:none}.toolbar-overflow__trigger svg{width:18px;height:18px}.toolbar-overflow__trigger:hover{background:var(--spui-ui-surface-hover,#eee)}.toolbar-overflow__trigger:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}.toolbar-overflow[open]>.toolbar-overflow__trigger{background:color-mix(in srgb,var(--spui-ui-accent,#0078d4) 12%,var(--spui-ui-surface,#fff))}.toolbar-overflow__panel{position:absolute;z-index:20;inset-block-start:calc(100% + 6px);inset-inline-end:0;display:none;box-sizing:border-box;width:min(360px,calc(100vw - 24px));max-height:min(70dvh,480px);overflow:auto;padding:10px;border:1px solid var(--spui-ui-stroke,#c8c8c8);border-radius:var(--spui-control-radius,8px);background:var(--spui-ui-surface,#fff);color:var(--spui-ui-text,inherit);box-shadow:0 8px 24px #0003}.toolbar-overflow[open]>.toolbar-overflow__panel{display:grid;gap:8px}.toolbar-overflow__panel>.toolbar-format{width:100%;max-width:none;min-width:0;min-height:40px}.toolbar-overflow__panel>.toolbar-group{display:flex;flex-wrap:wrap;min-width:0;padding:6px 0;border:0;border-block-start:1px solid var(--spui-ui-stroke,#ddd)}.toolbar-overflow__panel .toolbar-group--fonts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.toolbar-overflow__panel .toolbar-font-select{width:100%;min-width:0;max-width:none;min-height:40px}.toolbar-overflow__panel .toolbar-group--more-commands{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));justify-items:center}.toolbar-overflow__panel .toolbar-group--table{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));justify-items:center}.toolbar-overflow__panel .toolbar-group--color{display:flex;flex-wrap:wrap;padding:6px 0}.toolbar-overflow__panel .toolbar-color>summary{min-height:40px}.toolbar-overflow__panel .toolbar-color__name{white-space:normal}@media(pointer:coarse){.toolbar-overflow__trigger{width:44px;min-width:44px;min-height:44px}}@media(forced-colors:active){.toolbar-overflow__trigger,.toolbar-overflow__panel{border-color:ButtonText;background:Canvas;color:CanvasText;box-shadow:none}}`;
-      shadow.replaceChildren(style,label,toolbar,linkForm,this.editor);
+      style.textContent += `.editor-mount{min-width:0;max-width:100%;border:0;background:transparent;color:var(--spui-ui-text,inherit)}.ql-container{min-width:0;max-width:100%;border:1px solid var(--spui-control-border,var(--spui-ui-stroke,#c8c8c8));border-radius:var(--spui-control-radius,6px);background:var(--spui-control-background,var(--spui-ui-surface,#fff));color:var(--spui-ui-text,inherit);font:inherit}.ql-editor[role=textbox]{box-sizing:border-box;min-height:150px;padding:10px 12px;border:0;border-radius:inherit;background:transparent;color:inherit;font:inherit;line-height:1.5;overflow:auto;caret-color:var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline:none}.ql-editor[role=textbox]:focus-visible{outline:2px solid var(--spui-focus-ring,var(--spui-ui-accent,#005a9e));outline-offset:2px}.ql-editor.ql-blank::before{inset-inline:12px;color:var(--spui-ui-muted,#666);font-style:normal;pointer-events:none}.ql-editor p{margin:0 0 .5em}.ql-editor table{display:table;overflow:auto}.ql-editor td,.ql-editor th{min-width:56px;padding:6px 9px;border:1px solid var(--spui-ui-stroke,#c8c8c8)}.ql-editor a{color:var(--spui-semantic-link,#0f6cbd)}@container (max-width:64rem){.ql-editor[role=textbox]{min-height:12rem;overflow-wrap:anywhere}.ql-editor table{display:block;overflow-x:auto}}`;
+      this.editorMount = document.createElement("div"); this.editorMount.className = "editor-mount"; this.editorMount.part.add("editor");
+      shadow.replaceChildren(style,label,toolbar,linkForm,this.editorMount);
+      this.quill = new Quill(this.editorMount, { modules: { table: true, history: { userOnly: true } }, formats: ["bold", "italic", "underline", "strike", "script", "header", "blockquote", "code-block", "list", "link", "image", "color", "background", "font", "size", "align", "direction", "table"], placeholder: this.getAttribute("placeholder") ?? "Write something…", readOnly: this.hasAttribute("disabled") || this.hasAttribute("read-only") });
+      this.editor = this.quill.root;
+      this.editor.setAttribute("role", "textbox"); this.editor.setAttribute("aria-multiline", "true"); this.syncEditorLabel(); const invalid = this.getAttribute("aria-invalid"); if (invalid !== null) this.editor.setAttribute("aria-invalid", invalid); this.editor.setAttribute("aria-readonly", String(this.hasAttribute("read-only"))); this.editor.setAttribute("aria-disabled", String(this.hasAttribute("disabled"))); this.editor.setAttribute("aria-required", String(this.hasAttribute("required"))); this.editor.dataset.placeholder = this.getAttribute("placeholder") ?? "Write something…";
+      this.editor.addEventListener("keydown", event => { const key = (event as KeyboardEvent).key.toLowerCase(); const shortcut = (event as KeyboardEvent).metaKey || (event as KeyboardEvent).ctrlKey; if (this.contentMode === "plain" && shortcut && ["b", "i", "u", "k"].includes(key)) event.preventDefault(); });
+      this.quill.on("text-change", (_delta, _old, source) => { if (source === "user" && !this.suppressEditorCommit) this.commitEditorValue(); });
+      this.editor.addEventListener("mouseup", this.onSelectionChange); this.editor.addEventListener("keyup", this.onSelectionChange); this.editor.addEventListener("click", this.onEditorClick);
+      this.editor.addEventListener("paste", event => { event.preventDefault(); const clipboard = (event as ClipboardEvent).clipboardData; const imageFile = [...(clipboard?.files ?? [])].find(file => file.type.startsWith("image/")); if (imageFile) { void this.insertUploadedImage(imageFile); return; } const selection = this.quill?.getSelection(true); if (!selection || !this.quill) return; const html = cleanHtml(clipboard?.getData("text/html") ?? clipboard?.getData("text/plain") ?? "", this.contentMode, this.allowHyperlinks); this.quill.clipboard.dangerouslyPasteHTML(selection.index, html, "user"); });
+      this.editor.addEventListener("blur", () => this.commitEditorValue("spui-change"));
       syncHostAccessibleName(this, this.editor);
       this.syncDisabled();
       this.refreshStrings();

@@ -94,5 +94,8 @@
     "react-dom": {
       "optional": true
     }
+  },
+  "dependencies": {
+    "quill": "2.0.3"
   }
 }
