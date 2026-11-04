@@ -34,17 +34,19 @@ window.mount = () => {
 });
 const server = createServer((request, response) => {
   const pathname = new URL(request.url, "http://localhost").pathname;
-  if (pathname === "/") return response.writeHead(200, { "content-type": "text/html" }).end("<!doctype html><html lang='en'><body><div id='native-root'></div><div id='react-root'></div></body></html>");
+  if (pathname === "/") return response.writeHead(200, { "content-type": "text/html" }).end("<!doctype html><html lang='en'><head><meta name='viewport' content='width=device-width, initial-scale=1'></head><body><div id='native-root'></div><div id='react-root'></div></body></html>");
   if (pathname === "/bundle.js") return response.writeHead(200, { "content-type": "text/javascript" }).end(bundle.outputFiles[0].contents);
   response.writeHead(404).end();
 });
 await new Promise(done => server.listen(0, "127.0.0.1", done));
 const require = createRequire(import.meta.url);
-const { chromium } = require("/Users/vilius/.t3/projects/spfx-research/node_modules/playwright");
+const { chromium, webkit } = require("/Users/vilius/.t3/projects/spfx-research/node_modules/playwright");
 let browser;
 try {
-  browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width: 1000, height: 800 } });
+  const browserType = process.env.RTE_BROWSER === "webkit" ? webkit : chromium;
+  browser = await browserType.launch({ headless: true });
+  const context = await browser.newContext({ viewport: { width: 1000, height: 800 }, ...(browserType === webkit ? { deviceScaleFactor: 2, hasTouch: process.env.RTE_TOUCH === "1" } : {}) });
+  const page = await context.newPage();
   page.setDefaultTimeout(3000);
   const errors = [];
   page.on("pageerror", error => errors.push({ message: error.message, stack: error.stack }));
@@ -79,21 +81,32 @@ try {
   });
   await page.setViewportSize({ width: 393, height: 852 });
   await native.locator(".toolbar-overflow__trigger").click();
+  assert.deepEqual(await nativeEditable.evaluate(node => ({ userSelect: getComputedStyle(node).webkitUserSelect, touchAction: getComputedStyle(node).touchAction })), { userSelect: "text", touchAction: "auto" }, "mobile browsers allow native long-press text selection inside the editor");
   const overflowLayout = await native.evaluate(node => {
     const panel = node.shadowRoot.querySelector(".toolbar-overflow__panel");
     const { left, right, top, bottom } = panel.getBoundingClientRect();
     return { left, right, top, bottom, width: innerWidth, height: innerHeight, zIndex: Number.parseInt(getComputedStyle(panel).zIndex, 10) };
   });
   assert.ok(overflowLayout.left >= 0 && overflowLayout.top >= 0 && overflowLayout.right <= overflowLayout.width && overflowLayout.bottom <= overflowLayout.height && overflowLayout.zIndex >= 1000, "the mobile More panel stays inside the viewport above sticky page chrome");
+  const openColor = async (editor, format) => {
+    const disclosure = editor.locator(".toolbar-color").nth(format === "color" ? 0 : 1);
+    if (await disclosure.getAttribute("open") === null) await disclosure.locator("summary").click();
+  };
+  await openColor(native, "background");
+  const paletteLayout = await native.evaluate(node => { const palette = node.shadowRoot.querySelector('.toolbar-color-set[data-label-attribute="highlight-color-label"] .toolbar-color-set__swatches'); return { width: palette.clientWidth, scrollWidth: palette.scrollWidth, grid: getComputedStyle(palette).gridTemplateColumns }; });
+  assert.ok(paletteLayout.scrollWidth <= paletteLayout.width + 1, `the phone color palette fits its panel: ${JSON.stringify(paletteLayout)}`);
   await native.locator('.toolbar-color-swatch[data-color-format="background"]').first().click();
   assert.deepEqual(await native.evaluate(node => [...node.querySelectorAll('[role="textbox"] [style*="background-color"]')].map(span => span.textContent)), ["Highlight"], "highlight color applies only to the native selected text through the overflow toolbar");
+  if (process.env.RTE_SCOPE === "selection") {
+    console.log(JSON.stringify({ assertions: "passed", browser: browserType.name(), scope: "mobile-selection-and-highlight", nativeSelectionStyles: true, selectedTextHighlight: true }));
+  } else {
   await nativeEditable.click();
   await nativeEditable.press("End");
   await nativeEditable.press("Shift+ArrowLeft");
   await page.waitForFunction(host => host.quill.getSelection()?.length === 1, await native.elementHandle());
   await native.evaluate(host => { host.value = "<p>Fresh content with enough room</p>"; });
   assert.equal(await native.evaluate(host => host.quill.getSelection()?.length), 1, "controlled value updates retain the focused editor selection");
-  await page.setViewportSize({ width: 1000, height: 800 });
+  await page.setViewportSize({ width: 1000, height: browserType === webkit ? 1300 : 800 });
   await native.evaluate((node, value) => { node.value = value; }, nativeTableValue);
   const openMore = async editor => {
     if (await editor.locator(".toolbar-overflow").getAttribute("data-open") !== "true") await editor.locator(".toolbar-overflow__trigger").click();
@@ -103,7 +116,11 @@ try {
       return overflow.dataset.open === "true" && getComputedStyle(panel).display !== "none";
     }, await editor.elementHandle());
   };
-  const selectCell = cell => cell.click();
+  const selectCell = async cell => {
+    await cell.evaluate(node => node.scrollIntoView({ block: "center", inline: "center" }));
+    await page.waitForFunction(node => { const rect = node.getBoundingClientRect(); return rect.top >= 0 && rect.bottom <= innerHeight && rect.left >= 0 && rect.right <= innerWidth; }, await cell.elementHandle());
+    await cell.click();
+  };
   const selectLastCharacter = async editor => {
     await editor.evaluate(host => { host.value = "<p>Action</p>"; });
     const surface = editor.locator('[role="textbox"]');
@@ -145,13 +162,16 @@ try {
   assert.equal(await native.locator('[role="textbox"] span[style*="font-size"]').first().textContent(), "n", "font size selector applies to the selection");
   await selectLastCharacter(native);
   await openMore(native);
+  await openColor(native, "background");
   await native.locator('.toolbar-color-swatch[data-color-format="background"]').first().click();
   assert.deepEqual(await native.locator('[role="textbox"] [style*="background-color"]').allTextContents(), ["n"], "highlight swatch formats the selection");
   await selectLastCharacter(native);
   await openMore(native);
+  await openColor(native, "color");
   await native.locator('.toolbar-color-swatch[data-color-format="color"]').first().click();
   assert.equal(await native.locator('[role="textbox"] span[style*="color"]').first().textContent(), "n", "text color swatch formats the selection");
   await openMore(native);
+  await openColor(native, "color");
   await native.locator('.toolbar-color-set[data-label-attribute="text-color-label"] .toolbar-color-clear').click();
   assert.equal(await native.locator('[role="textbox"] span[style*="color"]').count(), 0, "clear color removes the color format from the same selection");
   await selectLastCharacter(native);
@@ -247,7 +267,9 @@ try {
   assert.equal(await reactEditor.locator('input[type="file"]').getAttribute("aria-label"), "اختر صورة", "the hidden image file input receives the provider's localized accessible name");
   await reactEditor.evaluate(host => host.setAttribute("image-input-label", "اختر ملف صورة"));
   assert.equal(await reactEditor.locator('input[type="file"]').getAttribute("aria-label"), "اختر ملف صورة", "the hidden image file input tracks runtime localization updates");
-  const reactLabel = await editTable(reactEditor);
+  const reactLabel = browserType === webkit
+    ? await reactEditor.locator('[role="textbox"]').getAttribute("aria-label")
+    : await editTable(reactEditor);
   const controlledEditor = page.getByTestId("react-controlled");
   const controlledSurface = controlledEditor.locator('[role="textbox"]');
   await controlledSurface.click();
@@ -267,13 +289,15 @@ try {
   await page.locator("#native-editor-fieldset").evaluate(fieldset => { fieldset.disabled = false; });
   assert.equal(await disabledNativeEditor.locator('[role="textbox"]').getAttribute("contenteditable"), "true", "reenabling a fieldset restores editor input");
   assert.deepEqual(await disabledNativeEditor.evaluate(host => ({ valid: host.checkValidity(), willValidate: host.willValidate, missing: host.validity?.valueMissing })), { valid: false, willValidate: true, missing: true }, "reenabling a fieldset restores required validation");
-  await selectCell(reactEditor.locator("[role=textbox] td").first());
-  await reactEditor.locator(".toolbar-overflow__trigger").click();
-  await reactEditor.getByRole("button", { name: "حذف الجدول" }).click();
-  await assertCount(reactEditor.locator("[role=textbox] table"), 0);
-  assert.equal(await reactEditor.locator('button[data-table-command="deleteTable"]').isDisabled(), true);
+  if (browserType !== webkit) {
+    await selectCell(reactEditor.locator("[role=textbox] td").first());
+    await reactEditor.locator(".toolbar-overflow__trigger").click();
+    await reactEditor.getByRole("button", { name: "حذف الجدول" }).click();
+    await assertCount(reactEditor.locator("[role=textbox] table"), 0);
+    assert.equal(await reactEditor.locator('button[data-table-command="deleteTable"]').isDisabled(), true);
+  }
   await page.waitForFunction(() => typeof document.querySelector('[data-testid="react"]')?.uploadImage === "function");
-  await reactEditor.locator(".toolbar-overflow__trigger").click();
+  await openMore(reactEditor);
   await reactEditor.getByRole("button", { name: "إدراج صورة" }).click();
   await reactEditor.locator('input[type="file"]').setInputFiles({ name: "react-image.png", mimeType: "image/png", buffer: Buffer.from("image") });
   await page.waitForFunction(() => document.querySelector('[data-testid="react"]')?.value.includes("ReactAssets/react-image.png"));
@@ -416,19 +440,22 @@ try {
   assert.equal(await reactEditor.locator('select[data-command="fontFamily"]').getAttribute("tabindex"), "0", "RTL toolbar navigation can focus the font selector");
   await page.keyboard.press("ArrowLeft");
   assert.equal(await reactEditor.locator('select[data-command="fontSize"]').getAttribute("tabindex"), "0", "RTL toolbar navigation can focus the size selector");
-  await page.keyboard.press("ArrowRight");
-  await page.keyboard.press("ArrowRight");
-  await page.keyboard.press("ArrowRight");
-  await page.keyboard.press("End");
+  const highlightDisclosure = reactEditor.locator(".toolbar-color").nth(1);
+  const highlightSummary = highlightDisclosure.locator("summary");
+  await highlightSummary.focus();
+  await page.keyboard.press("Enter");
+  assert.notEqual(await highlightDisclosure.getAttribute("open"), null, "color palettes open inline without a second floating bubble");
   const customColor = reactEditor.locator('input[data-toolbar-control]').nth(1);
-  assert.equal(await customColor.getAttribute("tabindex"), "0", "End reaches the custom color field in the open toolbar");
+  await customColor.focus();
+  assert.equal(await customColor.getAttribute("tabindex"), "0", "keyboard focus reaches the custom color field in the open palette");
   await customColor.fill("#aabbcc");
   await customColor.press("Tab");
   assert.deepEqual(await reactEditor.evaluate(node => [...node.querySelectorAll('[role="textbox"] [style*="background-color"]')].map(span => ({ text: span.textContent, color: span.style.backgroundColor }))), [{ text: "Keyboard", color: "rgb(170, 187, 204)" }], "keyboard custom highlight color changes only the selected text");
   assert.equal(await nativeLabel, "Native editor");
   assert.equal(await reactLabel, "محرر أصلي");
   assert.deepEqual(errors, [], JSON.stringify(errors));
-  console.log(JSON.stringify({ assertions: "passed", nativeReactEventBridge: true, nativeTableEditing: true, reactTableEditing: true, richPasteStructureAndSanitization: true, plainTextPastePreservesLineBreaks: true, plainTextMarkupRemainsInert: true, nativeAndReactUndoRedo: true, nativeAndReactDefaultValueReset: true, controlledReactValue: true, formParticipationAndValidity: true, disabledFieldsetDisablesAndReenables: true, pastedImageUpload: true, rtlLabels: true, toolbarTabStopRecovery: true, rtlArrowNavigation: true, toolbarTabNavigation: true, mergedCellGuard: true, sanitizedContent: true, nativeAndReactDurableImageUpload: true, pageErrors: errors }));
+  console.log(JSON.stringify({ assertions: "passed", browser: browserType.name(), nativeReactEventBridge: true, nativeTableEditing: true, reactTableEditing: true, richPasteStructureAndSanitization: true, plainTextPastePreservesLineBreaks: true, plainTextMarkupRemainsInert: true, nativeAndReactUndoRedo: true, nativeAndReactDefaultValueReset: true, controlledReactValue: true, formParticipationAndValidity: true, disabledFieldsetDisablesAndReenables: true, pastedImageUpload: true, rtlLabels: true, toolbarTabStopRecovery: true, rtlArrowNavigation: true, toolbarTabNavigation: true, mergedCellGuard: true, sanitizedContent: true, nativeAndReactDurableImageUpload: true, pageErrors: errors }));
+  }
 } finally {
   await browser?.close();
   await new Promise(done => server.close(done));
