@@ -106,15 +106,10 @@ try {
     return { left, right, top, bottom, width: innerWidth, height: innerHeight, zIndex: Number.parseInt(getComputedStyle(panel).zIndex, 10) };
   });
   assert.ok(overflowLayout.left >= 0 && overflowLayout.top >= 0 && overflowLayout.right <= overflowLayout.width && overflowLayout.bottom <= overflowLayout.height && overflowLayout.zIndex >= 1000, "the mobile More panel stays inside the viewport above sticky page chrome");
-  const openColor = async (editor, format) => {
-    const disclosure = editor.locator(".toolbar-color").nth(format === "color" ? 0 : 1);
-    if (await disclosure.getAttribute("open") === null) await activate(disclosure.locator("summary"));
-  };
-  await openColor(native, "background");
-  const paletteLayout = await native.evaluate(node => { const palette = node.shadowRoot.querySelector('.toolbar-color-set[data-label-attribute="highlight-color-label"] .toolbar-color-set__swatches'); return { width: palette.clientWidth, scrollWidth: palette.scrollWidth, grid: getComputedStyle(palette).gridTemplateColumns }; });
-  assert.ok(paletteLayout.scrollWidth <= paletteLayout.width + 1, `the phone color palette fits its panel: ${JSON.stringify(paletteLayout)}`);
-  await activate(native.locator('.toolbar-color-swatch[data-color-format="background"]').first());
+  const setColor = async (editor, format, value) => editor.locator(`.toolbar-color-picker[aria-label="${format === "color" ? "Text color" : "Highlight color"}"]`).evaluate((input, color) => { input.value = color; input.dispatchEvent(new Event("change", { bubbles: true })); }, value);
+  await setColor(native, "background", "#fff2cc");
   assert.deepEqual(await native.evaluate(node => [...node.querySelectorAll('[role="textbox"] [style*="background-color"]')].map(span => span.textContent)), ["Highlight"], "highlight color applies only to the native selected text through the overflow toolbar");
+  assert.equal(await native.locator(".toolbar-overflow").getAttribute("data-open"), "false", "choosing a highlight closes More without leaving an overlapping palette");
   if (process.env.RTE_SCOPE === "selection") {
     console.log(JSON.stringify({ assertions: "passed", browser: browserType.name(), scope: "mobile-selection-and-highlight", nativeSelectionStyles: true, browserTextDragSelection: browserType === webkit, selectedTextHighlight: true }));
   } else {
@@ -184,18 +179,15 @@ try {
   assert.equal(await native.locator('[role="textbox"] span[style*="font-size"]').first().textContent(), "n", "font size selector applies to the selection");
   await selectLastCharacter(native);
   await openMore(native);
-  await openColor(native, "background");
-  await native.locator('.toolbar-color-swatch[data-color-format="background"]').first().click();
-  assert.deepEqual(await native.locator('[role="textbox"] [style*="background-color"]').allTextContents(), ["n"], "highlight swatch formats the selection");
+  await setColor(native, "background", "#fff2cc");
+  assert.deepEqual(await native.locator('[role="textbox"] [style*="background-color"]').allTextContents(), ["n"], "highlight picker formats the selection");
   await selectLastCharacter(native);
   await openMore(native);
-  await openColor(native, "color");
-  await native.locator('.toolbar-color-swatch[data-color-format="color"]').first().click();
-  assert.equal(await native.locator('[role="textbox"] span[style*="color"]').first().textContent(), "n", "text color swatch formats the selection");
+  await setColor(native, "color", "#c50f1f");
+  assert.equal(await native.locator('[role="textbox"] span[style*="color"]').first().textContent(), "n", "text color picker formats the selection");
   await openMore(native);
-  await openColor(native, "color");
-  await native.locator('.toolbar-color-set[data-label-attribute="text-color-label"] .toolbar-color-clear').click();
-  assert.equal(await native.locator('[role="textbox"] span[style*="color"]').count(), 0, "clear color removes the color format from the same selection");
+  await native.locator('.toolbar-color[data-label-attribute="text-color-label"] .toolbar-color-clear').click();
+  assert.equal(await native.evaluate(node => [...node.querySelectorAll('[role="textbox"] span')].some(span => Boolean(span.style.color))), false, "clear color removes text color while preserving any highlight on the same selection");
   await selectLastCharacter(native);
   await openMore(native);
   await native.locator('button[data-command="bold"]').click();
@@ -459,16 +451,10 @@ try {
   assert.equal(await reactEditor.locator('select[data-command="fontFamily"]').getAttribute("tabindex"), "0", "RTL toolbar navigation can focus the font selector");
   await page.keyboard.press("ArrowLeft");
   assert.equal(await reactEditor.locator('select[data-command="fontSize"]').getAttribute("tabindex"), "0", "RTL toolbar navigation can focus the size selector");
-  const highlightDisclosure = reactEditor.locator(".toolbar-color").nth(1);
-  const highlightSummary = highlightDisclosure.locator("summary");
-  await highlightSummary.focus();
-  await page.keyboard.press("Enter");
-  assert.notEqual(await highlightDisclosure.getAttribute("open"), null, "color palettes open inline without a second floating bubble");
-  const customColor = reactEditor.locator('input[data-toolbar-control]').nth(1);
+  const customColor = reactEditor.locator('.toolbar-color-picker[aria-label="Highlight color"]');
   await customColor.focus();
-  assert.equal(await customColor.getAttribute("tabindex"), "0", "keyboard focus reaches the custom color field in the open palette");
-  await customColor.fill("#aabbcc");
-  await customColor.press("Tab");
+  assert.equal(await customColor.getAttribute("tabindex"), "0", "keyboard focus reaches the highlight color picker");
+  await customColor.evaluate(node => { node.value = "#aabbcc"; node.dispatchEvent(new Event("change", { bubbles: true })); });
   assert.deepEqual(await reactEditor.evaluate(node => [...node.querySelectorAll('[role="textbox"] [style*="background-color"]')].map(span => ({ text: span.textContent, color: span.style.backgroundColor }))), [{ text: "Keyboard", color: "rgb(170, 187, 204)" }], "keyboard custom highlight color changes only the selected text");
   assert.equal(await nativeLabel, "Native editor");
   assert.equal(await reactLabel, "محرر أصلي");
