@@ -188,9 +188,10 @@ try {
     assert.match(pasted, /<h1>Heading<\/h1>/);
     assert.match(pasted, /<p><strong style="color: red">First&nbsp;paragraph<\/strong><\/p>/);
     assert.match(pasted, /<pre>const value = 1;\n<\/pre>/);
-    assert.match(pasted, /<p>Removed&nbsp;textunsafe&nbsp;link<\/p>/);
+    assert.match(pasted, /<hr>/, "horizontal rules round-trip as block embeds");
+    assert.match(pasted, /<p><s>Removed&nbsp;text<\/s>unsafe&nbsp;link<\/p>/, "del markup round-trips as Quill strike formatting");
     assert.match(pasted, /<table>/);
-    assert.doesNotMatch(pasted, /onclick|javascript:|<script|<hr|<del/i);
+    assert.doesNotMatch(pasted, /onclick|javascript:|<script|<del/i);
   }
   await reactEditor.evaluate(node => {
     const editable = node.querySelector('[role="textbox"]');
