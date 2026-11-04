@@ -319,6 +319,7 @@ try {
     assert.equal(await reactEditor.locator('button[data-table-command="deleteTable"]').isDisabled(), true);
   }
   await page.waitForFunction(() => typeof document.querySelector('[data-testid="react"]')?.uploadImage === "function");
+  await reactEditor.evaluate(host => { const text = "React upload target"; host.quill.setText(text); host.quill.setSelection(text.length, 0); });
   await openMore(reactEditor);
   await reactEditor.getByRole("button", { name: "إدراج صورة" }).click();
   await reactEditor.locator('input[type="file"]').setInputFiles({ name: "react-image.png", mimeType: "image/png", buffer: Buffer.from("image") });
@@ -345,14 +346,8 @@ try {
     await editor.locator('[role="textbox"]').click();
     const pasted = await editor.evaluate((node, html) => {
       const editable = node.querySelector('[role="textbox"]');
-      editable.replaceChildren();
-      editable.focus();
-      const selection = editable.ownerDocument.getSelection();
-      const range = editable.ownerDocument.createRange();
-      range.selectNodeContents(editable);
-      range.collapse(true);
-      selection.removeAllRanges();
-      selection.addRange(range);
+      node.quill.setText("");
+      node.quill.setSelection(0, 0);
       const transfer = new DataTransfer();
       transfer.setData("text/html", html);
       transfer.setData("text/plain", "fallback text");

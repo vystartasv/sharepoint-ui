@@ -606,7 +606,12 @@ export function defineRichTextEditor(): void {
     private command(command: string, value?: string): void {
       if ((this.contentMode === "plain" && !["undo", "redo"].includes(command)) || (this.contentMode === "restricted" && ["insertTable", "insertImage", "insertRowAbove", "insertRowBelow", "insertColumnBefore", "insertColumnAfter", "deleteRow", "deleteColumn", "deleteTable", "foreColor", "hiliteColor", "fontFamily", "fontSize"].includes(command)) || (this.contentMode !== "html" && ["subscript", "superscript", "justifyLeft", "justifyCenter", "justifyRight", "justifyFull"].includes(command)) || (command === "createLink" && !this.allowHyperlinks)) return;
       if (command === "formatBlock" && !["P", "H1", "H2", "H3", "BLOCKQUOTE", "PRE"].includes(value?.toUpperCase() ?? "")) return;
-      if (command === "insertImage") { this.imageInput?.click(); return; }
+      if (command === "insertImage") {
+        const selection = this.currentQuillRange() ?? { index: Math.max(0, (this.quill?.getLength() ?? 1) - 1), length: 0 };
+        this.savedQuillSelection = { index: selection.index, length: selection.length };
+        this.imageInput?.click();
+        return;
+      }
       if (["insertRowAbove", "insertRowBelow", "insertColumnBefore", "insertColumnAfter", "deleteRow", "deleteColumn", "deleteTable"].includes(command)) { this.editTable(command); return; }
       if (command === "createLink") { this.openLinkEditor(); return; }
       this.restoreSelection();
