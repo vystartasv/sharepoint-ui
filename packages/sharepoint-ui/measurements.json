@@ -1,0 +1,335 @@
+{
+  "measuredWith": {
+    "node": "v22.22.1",
+    "react": "18.3.1",
+    "method": "isolated Node ESM import of each emitted component module, including React peer startup"
+  },
+  "componentCount": 54,
+  "componentJsBytes": 30346,
+  "components": [
+    {
+      "name": "Button",
+      "moduleBytes": 215,
+      "declarationBytes": 227,
+      "coldImportMs": 8.532
+    },
+    {
+      "name": "ButtonGroup",
+      "moduleBytes": 263,
+      "declarationBytes": 323,
+      "coldImportMs": 5.364
+    },
+    {
+      "name": "CommandBar",
+      "moduleBytes": 246,
+      "declarationBytes": 332,
+      "coldImportMs": 5.241
+    },
+    {
+      "name": "Menu",
+      "moduleBytes": 360,
+      "declarationBytes": 320,
+      "coldImportMs": 5.258
+    },
+    {
+      "name": "CopyButton",
+      "moduleBytes": 977,
+      "declarationBytes": 383,
+      "coldImportMs": 5.407
+    },
+    {
+      "name": "Link",
+      "moduleBytes": 333,
+      "declarationBytes": 228,
+      "coldImportMs": 5.086
+    },
+    {
+      "name": "Field",
+      "moduleBytes": 832,
+      "declarationBytes": 458,
+      "coldImportMs": 5.217
+    },
+    {
+      "name": "Input",
+      "moduleBytes": 189,
+      "declarationBytes": 215,
+      "coldImportMs": 5.165
+    },
+    {
+      "name": "TextArea",
+      "moduleBytes": 198,
+      "declarationBytes": 233,
+      "coldImportMs": 5.213
+    },
+    {
+      "name": "Checkbox",
+      "moduleBytes": 213,
+      "declarationBytes": 238,
+      "coldImportMs": 5.757
+    },
+    {
+      "name": "Switch",
+      "moduleBytes": 232,
+      "declarationBytes": 238,
+      "coldImportMs": 5.13
+    },
+    {
+      "name": "RadioGroup",
+      "moduleBytes": 268,
+      "declarationBytes": 344,
+      "coldImportMs": 5.309
+    },
+    {
+      "name": "Radio",
+      "moduleBytes": 204,
+      "declarationBytes": 229,
+      "coldImportMs": 5.507
+    },
+    {
+      "name": "Select",
+      "moduleBytes": 192,
+      "declarationBytes": 221,
+      "coldImportMs": 5.171
+    },
+    {
+      "name": "ComboBox",
+      "moduleBytes": 539,
+      "declarationBytes": 379,
+      "coldImportMs": 6.072
+    },
+    {
+      "name": "DateRangePicker",
+      "moduleBytes": 794,
+      "declarationBytes": 685,
+      "coldImportMs": 5.355
+    },
+    {
+      "name": "PersonPicker",
+      "moduleBytes": 568,
+      "declarationBytes": 492,
+      "coldImportMs": 5.091
+    },
+    {
+      "name": "LookupPicker",
+      "moduleBytes": 498,
+      "declarationBytes": 469,
+      "coldImportMs": 5.288
+    },
+    {
+      "name": "SharePointField",
+      "moduleBytes": 3600,
+      "declarationBytes": 838,
+      "coldImportMs": 7.113
+    },
+    {
+      "name": "Card",
+      "moduleBytes": 189,
+      "declarationBytes": 197,
+      "coldImportMs": 5.104
+    },
+    {
+      "name": "ViewCard",
+      "moduleBytes": 415,
+      "declarationBytes": 392,
+      "coldImportMs": 5.624
+    },
+    {
+      "name": "EmptyState",
+      "moduleBytes": 411,
+      "declarationBytes": 362,
+      "coldImportMs": 5.095
+    },
+    {
+      "name": "Badge",
+      "moduleBytes": 188,
+      "declarationBytes": 204,
+      "coldImportMs": 5.271
+    },
+    {
+      "name": "Tag",
+      "moduleBytes": 467,
+      "declarationBytes": 350,
+      "coldImportMs": 5.293
+    },
+    {
+      "name": "TagGroup",
+      "moduleBytes": 257,
+      "declarationBytes": 329,
+      "coldImportMs": 5.138
+    },
+    {
+      "name": "Avatar",
+      "moduleBytes": 401,
+      "declarationBytes": 293,
+      "coldImportMs": 5.406
+    },
+    {
+      "name": "AvatarGroup",
+      "moduleBytes": 661,
+      "declarationBytes": 462,
+      "coldImportMs": 5.636
+    },
+    {
+      "name": "Persona",
+      "moduleBytes": 444,
+      "declarationBytes": 338,
+      "coldImportMs": 5.939
+    },
+    {
+      "name": "Image",
+      "moduleBytes": 187,
+      "declarationBytes": 247,
+      "coldImportMs": 5.461
+    },
+    {
+      "name": "Text",
+      "moduleBytes": 192,
+      "declarationBytes": 259,
+      "coldImportMs": 5.057
+    },
+    {
+      "name": "Label",
+      "moduleBytes": 189,
+      "declarationBytes": 215,
+      "coldImportMs": 5.448
+    },
+    {
+      "name": "Divider",
+      "moduleBytes": 190,
+      "declarationBytes": 208,
+      "coldImportMs": 5.113
+    },
+    {
+      "name": "Accordion",
+      "moduleBytes": 403,
+      "declarationBytes": 414,
+      "coldImportMs": 5.337
+    },
+    {
+      "name": "Tabs",
+      "moduleBytes": 1950,
+      "declarationBytes": 521,
+      "coldImportMs": 5.184
+    },
+    {
+      "name": "Breadcrumb",
+      "moduleBytes": 633,
+      "declarationBytes": 417,
+      "coldImportMs": 5.537
+    },
+    {
+      "name": "Pagination",
+      "moduleBytes": 821,
+      "declarationBytes": 557,
+      "coldImportMs": 5.261
+    },
+    {
+      "name": "List",
+      "moduleBytes": 251,
+      "declarationBytes": 309,
+      "coldImportMs": 5.403
+    },
+    {
+      "name": "Table",
+      "moduleBytes": 259,
+      "declarationBytes": 321,
+      "coldImportMs": 5.184
+    },
+    {
+      "name": "DataGrid",
+      "moduleBytes": 2635,
+      "declarationBytes": 1114,
+      "coldImportMs": 5.364
+    },
+    {
+      "name": "VirtualList",
+      "moduleBytes": 1516,
+      "declarationBytes": 596,
+      "coldImportMs": 5.093
+    },
+    {
+      "name": "Tree",
+      "moduleBytes": 678,
+      "declarationBytes": 470,
+      "coldImportMs": 5.239
+    },
+    {
+      "name": "Rating",
+      "moduleBytes": 391,
+      "declarationBytes": 360,
+      "coldImportMs": 5.237
+    },
+    {
+      "name": "ProgressBar",
+      "moduleBytes": 349,
+      "declarationBytes": 307,
+      "coldImportMs": 5.179
+    },
+    {
+      "name": "Spinner",
+      "moduleBytes": 284,
+      "declarationBytes": 275,
+      "coldImportMs": 5.662
+    },
+    {
+      "name": "Skeleton",
+      "moduleBytes": 327,
+      "declarationBytes": 353,
+      "coldImportMs": 5.066
+    },
+    {
+      "name": "Alert",
+      "moduleBytes": 210,
+      "declarationBytes": 209,
+      "coldImportMs": 5.268
+    },
+    {
+      "name": "Dialog",
+      "moduleBytes": 901,
+      "declarationBytes": 467,
+      "coldImportMs": 5.476
+    },
+    {
+      "name": "Drawer",
+      "moduleBytes": 272,
+      "declarationBytes": 264,
+      "coldImportMs": 5.575
+    },
+    {
+      "name": "Popover",
+      "moduleBytes": 337,
+      "declarationBytes": 329,
+      "coldImportMs": 5.321
+    },
+    {
+      "name": "Toast",
+      "moduleBytes": 707,
+      "declarationBytes": 424,
+      "coldImportMs": 5.204
+    },
+    {
+      "name": "Carousel",
+      "moduleBytes": 515,
+      "declarationBytes": 424,
+      "coldImportMs": 5.188
+    },
+    {
+      "name": "Nav",
+      "moduleBytes": 407,
+      "declarationBytes": 419,
+      "coldImportMs": 5.527
+    },
+    {
+      "name": "TagPicker",
+      "moduleBytes": 499,
+      "declarationBytes": 473,
+      "coldImportMs": 5.089
+    },
+    {
+      "name": "SwatchPicker",
+      "moduleBytes": 1089,
+      "declarationBytes": 663,
+      "coldImportMs": 5.294
+    }
+  ]
+}

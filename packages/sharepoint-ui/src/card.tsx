@@ -1,7 +1,7 @@
 import { createElement, type HTMLAttributes, type ReactElement } from "react";
 
-export type CardProps = HTMLAttributes<HTMLDivElement>;
+export type CardProps = HTMLAttributes<HTMLElement>;
 
 export function Card({ className = "", ...props }: CardProps): ReactElement {
-  return createElement("div", { ...props, className: `spui-card ${className}`.trim() });
+  return createElement("article", { ...props, className: `spui-card ${className}`.trim() });
 }

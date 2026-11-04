@@ -55,7 +55,7 @@ export function SharePointThemeProvider({
 }) {
   const value = createSharePointTheme(theme);
   const style = Object.fromEntries(
-    Object.entries(value).map(([key, token]) => [`--spui-${key}`, token]),
+    Object.entries(theme ?? {}).map(([key, token]) => [`--spui-${key}`, token]),
   ) as CSSProperties;
   return createElement(ThemeContext.Provider, { value },
     createElement("div", { className: "spui-theme", style }, children),

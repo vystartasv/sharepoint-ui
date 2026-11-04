@@ -1,0 +1,95 @@
+<section class="interaction-samples" aria-labelledby="sample-actions-title">
+  <h2 id="sample-actions-title">Explore native interactions</h2>
+  <p>Each example stays in the browser's normal keyboard and accessibility model. Try the disclosure, panel switcher, and modal.</p>
+
+  <div class="interaction-row">
+    <div>
+      <h3>Action disclosure</h3>
+      <details class="spui-menu">
+        <summary>Record actions</summary>
+        <div class="spui-menu-items" role="group" aria-label="Record actions">
+          <button type="button" data-action="copy">Copy record link</button>
+          <button type="button" data-action="archive">Archive record</button>
+        </div>
+      </details>
+      <p class="interaction-status" role="status" aria-live="polite" data-status="menu"></p>
+    </div>
+    <div>
+      <h3>Switch a panel</h3>
+      <div class="spui-tabs" data-sample-tabs>
+        <div role="tablist" aria-label="Workspace details">
+          <button id="sample-tab-summary" type="button" role="tab" aria-selected="true" aria-controls="sample-panel-summary" tabindex="0">Summary</button>
+          <button id="sample-tab-owners" type="button" role="tab" aria-selected="false" aria-controls="sample-panel-owners" tabindex="-1">Owners</button>
+        </div>
+        <div id="sample-panel-summary" role="tabpanel" tabindex="0" aria-labelledby="sample-tab-summary">Four open work items need review.</div>
+        <div id="sample-panel-owners" role="tabpanel" tabindex="0" aria-labelledby="sample-tab-owners" hidden>Vilius and the site owners group.</div>
+      </div>
+    </div>
+    <div>
+      <h3>Confirm a decision</h3>
+      <button class="spui-button" id="sample-open-dialog" type="button">Review changes</button>
+      <dialog class="spui-dialog" id="sample-dialog" aria-labelledby="sample-dialog-title">
+        <header>
+          <h2 id="sample-dialog-title">Apply these changes?</h2>
+          <button type="button" data-close-dialog>Close</button>
+        </header>
+        <p>The dialog uses the browser's modal focus and Escape behavior.</p>
+        <button class="spui-button" type="button" data-close-dialog>Apply changes</button>
+      </dialog>
+      <p class="interaction-status" role="status" aria-live="polite" data-status="dialog"></p>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll(".spui-menu [data-action]").forEach(button => {
+    button.addEventListener("click", () => {
+      const status = button.closest("div")?.parentElement?.querySelector("[data-status='menu']");
+      if (status) status.textContent = `${button.textContent.trim()} selected.`;
+      button.closest("details")?.removeAttribute("open");
+    });
+  });
+
+  document.querySelectorAll("[data-sample-tabs]").forEach(tabset => {
+    const tabs = [...tabset.querySelectorAll("[role='tab']")];
+    const activate = tab => {
+      tabs.forEach(item => {
+        const active = item === tab;
+        item.setAttribute("aria-selected", String(active));
+        item.tabIndex = active ? 0 : -1;
+        tabset.querySelector(`#${item.getAttribute("aria-controls")}`).hidden = !active;
+      });
+    };
+    tabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => activate(tab));
+      tab.addEventListener("keydown", event => {
+        const rtl = getComputedStyle(tabset).direction === "rtl";
+        const next = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1
+          : event.key === "ArrowRight" ? (index + (rtl ? -1 : 1) + tabs.length) % tabs.length
+          : event.key === "ArrowLeft" ? (index + (rtl ? 1 : -1) + tabs.length) % tabs.length : -1;
+        if (next < 0) return;
+        event.preventDefault();
+        tabs[next].focus();
+        activate(tabs[next]);
+      });
+    });
+  });
+
+  const dialog = document.querySelector("#sample-dialog");
+  document.querySelector("#sample-open-dialog")?.addEventListener("click", () => dialog.showModal());
+  dialog?.querySelectorAll("[data-close-dialog]").forEach(button => button.addEventListener("click", () => dialog.close()));
+  dialog?.addEventListener("close", () => {
+    const status = document.querySelector("[data-status='dialog']");
+    if (status) status.textContent = "Dialog closed.";
+  });
+</script>
+
+<style>
+  .interaction-samples { margin-block: 3rem; }
+  .interaction-samples > p { max-width: 68ch; color: var(--sl-color-gray-2); }
+  .interaction-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; padding-block: 1rem; border-block: 1px solid var(--sl-color-hairline); }
+  .interaction-row h3 { margin: 0 0 .75rem; font-size: 1rem; }
+  .interaction-row button:not(.spui-button) { min-height: 2rem; border: 1px solid var(--spui-border); border-radius: var(--spui-radius); background: var(--spui-surface); color: var(--spui-text); font: inherit; padding: .3rem .55rem; cursor: pointer; }
+  .interaction-row .interaction-status { min-height: 1.4em; }
+  @media (max-width: 48rem) { .interaction-row { grid-template-columns: 1fr; } }
+</style>

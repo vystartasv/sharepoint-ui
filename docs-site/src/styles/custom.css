@@ -1,3 +1,5 @@
+@import "../../../packages/sharepoint-ui/src/theme.css";
+
 :root {
   --sl-color-accent-low: #e5f1fb;
   --sl-color-accent: #0f6cbd;
@@ -6,6 +8,14 @@
   --sl-content-width: 52rem;
   --sl-font: "Segoe UI", system-ui, sans-serif;
   accent-color: #0f6cbd;
+  --spui-accent: #0f6cbd;
+  --spui-accentText: #fff;
+  --spui-background: #f6f8fa;
+  --spui-border: #c8d0d9;
+  --spui-radius: 4px;
+  --spui-surface: #fff;
+  --spui-text: #182230;
+  --spui-muted: #526070;
 }
 
 .hero { padding-block: 3rem; }

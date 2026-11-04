@@ -1,0 +1,27 @@
+---
+title: Theme and customize
+description: How the semantic tokens inherit SharePoint's current theme.
+---
+
+# Theme and customize
+
+Import the stylesheet once. `SharePointThemeProvider` maps a small semantic set to SharePoint's page variables: accent, accent text, surface, background, text, muted text, border, and radius. Because the CSS reads the host variables directly, a SharePoint theme change updates mounted components without a React rerender.
+
+```tsx
+import { Button, SharePointThemeProvider } from "@spfx-fast/sharepoint-ui/react";
+import "@spfx-fast/sharepoint-ui/styles.css";
+
+<SharePointThemeProvider>
+  <Button>Save changes</Button>
+</SharePointThemeProvider>
+```
+
+Pass a partial `theme` to override only the values the component needs:
+
+```tsx
+<SharePointThemeProvider theme={{ accent: "#3459a8", radius: "6px" }}>
+  <Button>Use workspace color</Button>
+</SharePointThemeProvider>
+```
+
+`createSharePointTheme()` returns the current resolved values for code that needs a snapshot. Component styling stays in CSS variables so consumers can also customize `.spui-theme`, `.spui-button`, and other documented classes in their own stylesheet.

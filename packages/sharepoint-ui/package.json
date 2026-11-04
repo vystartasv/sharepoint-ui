@@ -39,6 +39,7 @@
       "types": "./dist/theme.d.ts",
       "import": "./dist/theme.js"
     },
+    "./components.json": "./components.json",
     "./styles.css": "./src/theme.css"
   },
   "files": [
@@ -46,7 +47,9 @@
     "LICENSE",
     "README.md",
     "QUICKSTART.md",
-    "src/theme.css"
+    "src/theme.css",
+    "components.json",
+    "measurements.json"
   ],
   "scripts": {
     "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.json",

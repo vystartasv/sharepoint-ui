@@ -1,4 +1,7 @@
 # SharePoint UI docs
 
 - [Getting started](https://vystartasv.github.io/sharepoint-ui/)
+- [Component inventory](https://vystartasv.github.io/sharepoint-ui/components/)
+- [Agent interaction guide](https://vystartasv.github.io/sharepoint-ui/agents/)
+- [Agent interaction contract](https://vystartasv.github.io/sharepoint-ui/agents/AGENTS.md)
 - [Package README](https://github.com/vystartasv/sharepoint-ui/blob/main/packages/sharepoint-ui/README.md)

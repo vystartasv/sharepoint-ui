@@ -1,0 +1,54 @@
+---
+title: Agent interaction guide
+description: Accessible locators and direct interaction patterns for browser agents.
+---
+
+# Agent interaction guide
+
+Use the page's accessibility tree as the interface contract. Native roles, visible labels, and normal browser events make components discoverable and operable without package-specific scripts.
+
+## Find a control
+
+Prefer role and accessible name. Use a stable `data-agent-id` only when the page contains duplicate names.
+
+```ts
+const title = page.getByRole("textbox", { name: "Work item title" });
+await title.fill("Update the team site");
+await page.getByRole("combobox", { name: "Status" }).selectOption("In progress");
+await page.getByRole("checkbox", { name: "Notify the owner" }).check();
+await page.getByRole("button", { name: "Save work item" }).click();
+await expect(page.getByRole("status")).toContainText("Saved");
+```
+
+## Select by task
+
+- Click or submit an action: `button` with a verb in its name.
+- Enter text: `textbox` with a visible associated `label`.
+- Choose one option: `combobox` or a labelled radio group.
+- Toggle an independent option: `checkbox`; toggle an immediate preference: `switch`.
+- Navigate: `link` with a destination in its name.
+- Confirm a result: inspect the named `status` or `alert` region.
+
+## State and errors
+
+Read `checked`, `selected`, `expanded`, `disabled`, and `value` from the accessibility tree or native DOM. After an action, wait for the visible status or changed value. If validation fails, read the associated message and correct the field; do not infer success from a click alone.
+
+## Stable selectors
+
+All React components forward standard `data-*` props. For duplicate labels, add a stable `data-agent-id` such as `save-work-item`; otherwise prefer role and label locators. Do not target generated classes, child positions, or visual coordinates when an accessible name exists.
+
+See the plain Markdown copy at `/agents/AGENTS.md` for retrieval by coding agents.
+
+## Resolve a component
+
+Check the [component inventory](../components/) before choosing an element. The published package also exposes `@spfx-fast/sharepoint-ui/components.json` with one short summary per supported component. Choose by user task, then use that component's native role and label; avoid searching for old compound parts or appearance variants.
+
+Examples:
+
+- A labelled, validated value: `Field` with `Input` or `TextArea`.
+- One fixed choice: `Select`; one-of-many: `RadioGroup` with `Radio`; multiple values: `TagPicker`.
+- An immediate preference: `Switch`; a separately submitted choice: `Checkbox`.
+- A record list: `DataGrid`; static columns: `Table`; a large fixed-height feed: `VirtualList`.
+- A SharePoint person or lookup: `PersonPicker` or `LookupPicker`, with options loaded by the host.
+
+The library does not fetch, save, or upload SharePoint data. Agents should use the host page's supported workflow for those operations, then verify the saved value in the page.

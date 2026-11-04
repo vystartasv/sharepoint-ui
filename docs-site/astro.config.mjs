@@ -10,6 +10,6 @@ export default defineConfig({
     disable404Route: true,
     social: [{ icon: "github", label: "GitHub", href: "https://github.com/vystartasv/sharepoint-ui" }],
     customCss: ["./src/styles/custom.css"],
-    sidebar: [{ label: "Guide", items: ["index"] }],
+    sidebar: [{ label: "Guides", items: ["index", "components", "theming", "agents"] }],
   })],
 });
