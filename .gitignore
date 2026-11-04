@@ -13,8 +13,4 @@ node_modules/
 **/solution/
 test-results/
 products/
-investigation/README.md
-docs-site/catalog/components.json
-docs-site/src/content/docs/catalog.mdx
-docs-site/src/content/docs/components/
 coverage/

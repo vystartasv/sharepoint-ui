@@ -140,7 +140,7 @@ function Demo({ name, notify }: { name: string; notify: (message: string) => voi
   }
 }
 
-export function ComponentPlayground({ name, summary }: { name: string; summary: string }) {
+export function ComponentPlayground({ name }: { name: string }) {
   const [accent, setAccent] = useState("#0f6cbd");
   const [radius, setRadius] = useState(4);
   const [disabled, setDisabled] = useState(false);
@@ -150,11 +150,17 @@ export function ComponentPlayground({ name, summary }: { name: string; summary: 
 
   return <SharePointThemeProvider theme={{ accent, radius: `${radius}px` }}>
     <section className="component-playground" aria-label={`${name} playground`}>
-      <div className="playground-toolbar" aria-label="Playground settings">
-        <label>Accent <input type="color" value={accent} onChange={event => setAccent(event.currentTarget.value)} /></label>
-        <label>Radius <input type="range" min="0" max="12" value={radius} onChange={event => setRadius(Number(event.currentTarget.value))} /><output>{radius}px</output></label>
-        <label className="playground-inline"><input type="checkbox" checked={disabled} onChange={event => setDisabled(event.currentTarget.checked)} /> Disable controls</label>
-        <button type="button" onClick={() => { setResetKey(key => key + 1); setMessage("Preview reset."); }}>Reset example</button>
+      <div className="playground-toolbar" role="group" aria-label="Preview settings">
+        <label className="playground-accent"><span className="playground-toolbar-label">Accent</span><input aria-label="Accent color" type="color" value={accent} onChange={event => setAccent(event.currentTarget.value)} /></label>
+        <label className="playground-radius"><span className="playground-toolbar-label">Radius</span><input aria-label="Corner radius" type="range" min="0" max="12" value={radius} onChange={event => setRadius(Number(event.currentTarget.value))} /><output>{radius}px</output></label>
+        <label className="playground-disabled"><input type="checkbox" checked={disabled} onChange={event => setDisabled(event.currentTarget.checked)} /><span>Disable</span></label>
+        <button className="playground-reset" type="button" aria-label="Reset preview" title="Reset preview" onClick={() => {
+          setAccent("#0f6cbd");
+          setRadius(4);
+          setDisabled(false);
+          setResetKey(key => key + 1);
+          setMessage("Preview reset.");
+        }}><span aria-hidden="true">↺</span><span className="playground-reset-label">Reset</span></button>
       </div>
 
       <div className={`playground-canvas${disabled ? " is-disabled" : ""}`}>
@@ -166,7 +172,6 @@ export function ComponentPlayground({ name, summary }: { name: string; summary: 
       <p className="playground-status" role="status" aria-live="polite">{message}</p>
 
       <div className="playground-meta">
-        <p>{summary}</p>
         <p><code>{`import { ${name} } from "@spfx-fast/sharepoint-ui/react";`}</code></p>
         <a href={`https://github.com/vystartasv/sharepoint-ui/blob/main/packages/sharepoint-ui/src/${sourceFiles[name] ?? slug}.tsx`}>View source</a>
       </div>

@@ -14,5 +14,5 @@ const { component } = Astro.props;
   <p><a href="/sharepoint-ui/components/">← All components</a></p>
   <p>{component.summary}</p>
   <h2>Interactive preview</h2>
-  <ComponentPlayground client:load name={component.name} summary={component.summary} />
+  <ComponentPlayground client:load name={component.name} />
 </StarlightPage>
