@@ -1,0 +1,46 @@
+---
+title: Build and deploy
+description: Repository build, npm release, and docs deployment steps.
+---
+
+# Build and deploy
+
+## Build
+
+Use Node.js 24 and npm from the repository root:
+
+```sh
+npm ci
+npm run build:library
+npm run build:spfx
+npm run build:docs
+npm pack --dry-run --workspace @spfx-fast/sharepoint-ui
+```
+
+The SPFx job builds an example web part for CI. It does not deploy to a tenant.
+
+## Release to npm
+
+Pushing a `v*` tag runs `.github/workflows/npm-publish.yml`. The tag must match the package version. The workflow builds and publishes through npm trusted publishing with GitHub Actions OIDC and the `production` environment.
+
+1. Bump the package and root lockfile with `npm version patch --workspace @spfx-fast/sharepoint-ui --no-git-tag-version` (use `minor` or `major` when appropriate). Update the starter template's package version to match.
+2. Run the library build and inspect the package with `npm pack --dry-run --workspace @spfx-fast/sharepoint-ui`.
+3. Merge the version change to `main`.
+4. Tag and push that merged commit:
+
+   ```sh
+   git tag -a vX.Y.Z origin/main -m "SharePoint UI X.Y.Z"
+   git push origin vX.Y.Z
+   ```
+
+5. Confirm the `Publish SharePoint UI to npm` workflow and check the published version on npm.
+
+React 18.3.1 stays external as a peer dependency supplied by SPFx.
+
+## Docs site
+
+`.github/workflows/docs-pages.yml` builds and deploys the site on relevant changes to `main`. It also supports manual runs. Set GitHub Pages' source to **GitHub Actions**. The site is [vystartasv.github.io/sharepoint-ui](https://vystartasv.github.io/sharepoint-ui/).
+
+## SPFx deployment
+
+The repository does not deploy web parts. Build the generated solution in its SPFx project, then upload its `.sppkg` file through your organization's app catalog process.

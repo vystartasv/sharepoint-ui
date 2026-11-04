@@ -46,7 +46,6 @@
     "dist",
     "LICENSE",
     "README.md",
-    "QUICKSTART.md",
     "src/theme.css",
     "components.json",
     "measurements.json"
