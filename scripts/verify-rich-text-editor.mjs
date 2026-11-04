@@ -127,12 +127,16 @@ try {
   await page.setViewportSize({ width: 1000, height: browserType === webkit ? 1300 : 800 });
   await native.evaluate((node, value) => { node.value = value; }, nativeTableValue);
   const openMore = async editor => {
-    if (await editor.locator(".toolbar-overflow").getAttribute("data-open") !== "true") await activate(editor.locator(".toolbar-overflow__trigger"));
+    const trigger = editor.locator(".toolbar-overflow__trigger");
+    if (await editor.locator(".toolbar-overflow").getAttribute("data-open") !== "true") await activate(trigger);
     await page.waitForFunction(host => {
       const overflow = host.shadowRoot.querySelector(".toolbar-overflow");
       const panel = host.shadowRoot.querySelector(".toolbar-overflow__panel");
       return overflow.dataset.open === "true" && getComputedStyle(panel).display !== "none";
-    }, await editor.elementHandle());
+    }, await editor.elementHandle()).catch(async error => {
+      const state = await editor.evaluate(host => { const trigger = host.shadowRoot.querySelector(".toolbar-overflow__trigger"); return { open: host.shadowRoot.querySelector(".toolbar-overflow")?.dataset.open, expanded: trigger?.getAttribute("aria-expanded"), panel: getComputedStyle(host.shadowRoot.querySelector(".toolbar-overflow__panel")).display, triggerDisabled: trigger?.disabled, disabled: host.hasAttribute("disabled"), readOnly: host.hasAttribute("read-only"), formDisabled: host.formDisabled }; });
+      throw new Error(`More did not open: ${JSON.stringify(state)}; ${error.message}`);
+    });
   };
   const selectCell = async cell => {
     await cell.evaluate(node => node.scrollIntoView({ block: "center", inline: "center" }));
