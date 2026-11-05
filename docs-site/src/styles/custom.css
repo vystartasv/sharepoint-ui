@@ -7,7 +7,6 @@
   --sl-color-text-accent: #0f6cbd;
   --sl-content-width: 52rem;
   --sl-font: "Segoe UI", system-ui, sans-serif;
-  --sl-menu-button-size: var(--spui-control-height);
   accent-color: #0f6cbd;
   --spui-accent: #0f6cbd;
   --spui-accentText: #fff;
@@ -30,6 +29,10 @@
 .hero { padding-block: 3rem; }
 .hero .actions { align-items: center; gap: var(--spui-space-2); }
 .hero .actions > .sl-link-button { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; min-height: var(--spui-control-height); margin: 0; padding: var(--spui-space-2) var(--spui-control-padding-inline); line-height: var(--spui-control-line-height); }
+@media (max-width: 50rem) {
+  :root { --sl-menu-button-size: var(--sl-nav-height); }
+  .sl-menu-button > svg { width: 1.5rem; height: 1.5rem; }
+}
 .component-catalog { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 var(--spui-space-6); padding: 0; list-style: none; }
 .component-catalog li { border-bottom: 1px solid var(--sl-color-hairline); }
 .component-catalog a { display: grid; gap: var(--spui-space-1); min-height: var(--spui-control-height); padding-block: var(--spui-space-2); text-decoration: none; }
