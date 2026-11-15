@@ -1,6 +1,6 @@
 # SharePoint UI
 
-Native React controls and theme tokens for SharePoint Framework. React `18.3.1` comes from the SPFx host; the library handles UI while your web part handles SharePoint data.
+Accessible, theme-aware React controls for SharePoint Framework (SPFx). React `18.3.1` comes from the SPFx host; this library handles presentation while your web part handles SharePoint data. Browse the [component examples](https://vystartasv.github.io/sharepoint-ui/) or install the package below.
 
 ```sh
 npm install @spfx-fast/sharepoint-ui

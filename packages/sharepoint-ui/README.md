@@ -42,7 +42,7 @@ function RequestForm() {
 
 The package provides presentation and interaction. Your web part owns SharePoint requests, permissions, business validation, uploads, and persistence.
 
-For agent-assisted SPFx development, [`@spfx-fast/ide`](https://www.npmjs.com/package/@spfx-fast/ide) is an optional development-time router. Its published 0.1.0 release routes to E2E; candidate 0.1.1 adds Workbench preview and diagnostics after Workbench 0.1.1 is published. The IDE can direct an agent to this package's component inventory and interaction guide; it does not add a dependency on the IDE or move data access into the UI library.
+For agent-assisted SPFx development, [`@spfx-fast/ide`](https://www.npmjs.com/package/@spfx-fast/ide) is an optional development-time router. Its published 0.1.0 release routes to Knowledge and Playwright; IDE 0.1.1 failed publication at npm. Candidate 0.1.2 adds Workbench preview and diagnostics after Workbench 0.1.2 is published and the IDE Trusted Publisher is corrected. The IDE can direct an agent to this package's component inventory and interaction guide; it does not add a dependency on the IDE or move data access into the UI library.
 
 ## Theme and components
 
